@@ -62,12 +62,12 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
         </div>
       </div>
 
-      {/* Image — edge-to-edge 4:5 portrait */}
-      <div className="relative aspect-[4/5] overflow-hidden bg-muted">
+      {/* Image — true edge-to-edge 4:5 portrait */}
+      <div className="relative aspect-[4/5] overflow-hidden bg-muted -mx-px">
         <img
           src={post.image}
           alt={post.caption}
-          className="w-full h-full object-cover"
+          className="w-[calc(100%+2px)] h-full object-cover"
           loading="lazy"
         />
       </div>
