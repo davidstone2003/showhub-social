@@ -61,6 +61,10 @@ export default {
         sand: {
           DEFAULT: "hsl(var(--sand))",
         },
+        "post-btn": {
+          DEFAULT: "hsl(var(--post-btn))",
+          hover: "hsl(var(--post-btn-hover))",
+        },
         pill: {
           DEFAULT: "hsl(var(--pill-bg))",
           text: "hsl(var(--pill-text))",

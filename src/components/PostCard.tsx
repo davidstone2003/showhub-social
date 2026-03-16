@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, Share2, Bookmark, Trophy } from "lucide-react";
+import { Heart, MessageCircle, Share2, Bookmark, Trophy, Phone } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -11,6 +11,28 @@ interface PostCardProps {
   onTagClick?: (tag: { label: string; type: string }) => void;
 }
 
+// Extract contact numbers from caption
+function extractContacts(caption: string): { name: string; phone: string }[] {
+  const contacts: { name: string; phone: string }[] = [];
+  const phoneRegex = /(\w+)\s+([\d.]{10,})/g;
+  let match;
+  while ((match = phoneRegex.exec(caption)) !== null) {
+    contacts.push({ name: match[1], phone: match[2].replace(/\./g, "") });
+  }
+  return contacts;
+}
+
+// Extract title (first line) and subtitle from caption
+function parseCaption(caption: string) {
+  const lines = caption.split("\n").filter((l) => l.trim() !== "");
+  const title = lines[0] || "";
+  // Check if second line looks like a genetics line (contains "x" or "×")
+  const subtitle = lines[1] && /[x×]/i.test(lines[1]) ? lines[1] : undefined;
+  const startIdx = subtitle ? 2 : 1;
+  const body = lines.slice(startIdx).join("\n");
+  return { title, subtitle, body };
+}
+
 export function PostCard({ post, index, onTagClick }: PostCardProps) {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(post.saved);
@@ -21,17 +43,23 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
     setLikeCount((c) => (liked ? c - 1 : c + 1));
   };
 
-  // Split caption into lines for proper rendering
-  const captionLines = post.caption.split("\n");
+  const { title, subtitle, body } = parseCaption(post.caption);
+  const contacts = extractContacts(post.caption);
+
+  // Remove phone lines from body for cleaner display
+  const cleanBody = body
+    .split("\n")
+    .filter((line) => !/📞/.test(line))
+    .join("\n");
 
   return (
     <motion.article
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: index * 0.03 }}
-      className="bg-card lg:rounded-xl lg:border lg:border-border lg:shadow-sm overflow-hidden border-b border-border lg:mb-4"
+      className="bg-card rounded-xl border border-border shadow-sm overflow-hidden mx-3 mb-4 lg:mx-0"
     >
-      {/* Breeder header — Facebook style */}
+      {/* Breeder header */}
       <div className="flex items-center gap-3 px-4 py-3">
         <span className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg shrink-0 shadow-sm">
           {post.breeder.logo}
@@ -49,20 +77,30 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
         </div>
       </div>
 
-      {/* Caption text — above image like Facebook */}
-      <div className="px-4 pb-2.5">
-        {captionLines.map((line, i) => (
-          <p key={i} className={`text-[14px] leading-relaxed ${line.trim() === "" ? "h-2" : "text-foreground"}`}>
-            {line}
-          </p>
-        ))}
+      {/* Title + subtitle hierarchy */}
+      <div className="px-4 pb-2">
+        <h3 className="text-[18px] font-bold text-foreground leading-tight">{title}</h3>
+        {subtitle && (
+          <p className="text-[14px] font-medium text-muted-foreground mt-0.5">{subtitle}</p>
+        )}
       </div>
+
+      {/* Body text */}
+      {cleanBody.trim() && (
+        <div className="px-4 pb-3">
+          {cleanBody.split("\n").map((line, i) => (
+            <p key={i} className={`text-[13px] leading-relaxed ${line.trim() === "" ? "h-1.5" : "text-muted-foreground"}`}>
+              {line}
+            </p>
+          ))}
+        </div>
+      )}
 
       {/* Full-width image */}
       <div className="relative w-full overflow-hidden bg-muted">
         <img
           src={post.image}
-          alt={post.caption.split("\n")[0]}
+          alt={title}
           className="w-full h-auto object-cover"
           loading="lazy"
         />
@@ -82,7 +120,7 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
               <Link key={tag.label} to={`/sire/${post.sire_id}`}>
                 <Badge
                   variant="outline"
-                  className="text-[12px] cursor-pointer bg-pill text-pill-text border-pill-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+                  className="text-[12px] cursor-pointer bg-pill text-pill-text border-0 hover:bg-primary hover:text-primary-foreground transition-colors"
                 >
                   {tag.label}
                 </Badge>
@@ -93,7 +131,7 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
             <Badge
               key={tag.label}
               variant="outline"
-              className="text-[12px] cursor-pointer bg-pill text-pill-text border-pill-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+              className="text-[12px] cursor-pointer bg-pill text-pill-text border-0 hover:bg-primary hover:text-primary-foreground transition-colors"
               onClick={() => onTagClick?.(tag)}
             >
               {tag.label}
@@ -102,8 +140,24 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
         })}
       </div>
 
-      {/* Engagement bar — Facebook/IG style */}
-      <div className="px-4 pb-1 pt-0.5">
+      {/* Contact buttons */}
+      {contacts.length > 0 && (
+        <div className="flex flex-wrap gap-2 px-4 pb-3">
+          {contacts.map((c) => (
+            <a
+              key={c.phone}
+              href={`tel:${c.phone}`}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pill text-pill-text text-[12px] font-medium hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              <Phone className="w-3 h-3" />
+              Call {c.name}
+            </a>
+          ))}
+        </div>
+      )}
+
+      {/* Engagement count */}
+      <div className="px-4 pb-1">
         <p className="text-[13px] text-muted-foreground">
           {likeCount.toLocaleString()} likes · {post.comments} comments
         </p>
@@ -111,22 +165,23 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
 
       <div className="border-t border-border mx-4" />
 
+      {/* Quick action bar */}
       <div className="flex items-center justify-around px-2 py-1.5">
-        <button onClick={handleLike} className="flex items-center gap-1.5 py-1.5 px-3 rounded-md hover:bg-muted transition-colors group flex-1 justify-center">
-          <Heart className={`w-5 h-5 transition-colors ${liked ? "fill-destructive text-destructive" : "text-muted-foreground group-hover:text-destructive"}`} />
-          <span className={`text-[13px] font-medium ${liked ? "text-destructive" : "text-muted-foreground"}`}>Like</span>
+        <button onClick={handleLike} className="flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-muted transition-colors group flex-1 justify-center">
+          <Heart className={`w-[18px] h-[18px] transition-colors ${liked ? "fill-destructive text-destructive" : "text-muted-foreground group-hover:text-destructive"}`} />
+          <span className={`text-[13px] font-medium ${liked ? "text-destructive" : "text-muted-foreground"}`}>Save</span>
         </button>
-        <button className="flex items-center gap-1.5 py-1.5 px-3 rounded-md hover:bg-muted transition-colors group flex-1 justify-center">
-          <MessageCircle className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-          <span className="text-[13px] font-medium text-muted-foreground">Comment</span>
-        </button>
-        <button className="flex items-center gap-1.5 py-1.5 px-3 rounded-md hover:bg-muted transition-colors group flex-1 justify-center">
-          <Share2 className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+        <button className="flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-muted transition-colors group flex-1 justify-center">
+          <Share2 className="w-[18px] h-[18px] text-muted-foreground group-hover:text-primary transition-colors" />
           <span className="text-[13px] font-medium text-muted-foreground">Share</span>
         </button>
-        <button onClick={() => setSaved(!saved)} className="flex items-center gap-1.5 py-1.5 px-3 rounded-md hover:bg-muted transition-colors group flex-1 justify-center">
-          <Bookmark className={`w-5 h-5 transition-colors ${saved ? "fill-primary text-primary" : "text-muted-foreground group-hover:text-primary"}`} />
-          <span className={`text-[13px] font-medium ${saved ? "text-primary" : "text-muted-foreground"}`}>Save</span>
+        <button className="flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-muted transition-colors group flex-1 justify-center">
+          <MessageCircle className="w-[18px] h-[18px] text-muted-foreground group-hover:text-primary transition-colors" />
+          <span className="text-[13px] font-medium text-muted-foreground">Contact</span>
+        </button>
+        <button onClick={() => setSaved(!saved)} className="flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-muted transition-colors group flex-1 justify-center">
+          <Bookmark className={`w-[18px] h-[18px] transition-colors ${saved ? "fill-primary text-primary" : "text-muted-foreground group-hover:text-primary"}`} />
+          <span className={`text-[13px] font-medium ${saved ? "text-primary" : "text-muted-foreground"}`}>Follow</span>
         </button>
       </div>
     </motion.article>
