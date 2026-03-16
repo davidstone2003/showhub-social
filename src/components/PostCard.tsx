@@ -52,7 +52,7 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
           <div className="flex items-center gap-1.5">
             <p className="font-semibold text-sm text-foreground truncate">{post.breeder.name}</p>
             {post.breeder.is_pro && (
-              <span className="bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shrink-0">Pro</span>
+              <span className="bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shrink-0 ml-0.5">Pro</span>
             )}
             {typeIcons[post.post_type] && (
               <span className="text-primary shrink-0">{typeIcons[post.post_type]}</span>
