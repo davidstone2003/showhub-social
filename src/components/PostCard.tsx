@@ -41,7 +41,7 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.04 }}
-      className="bg-card border-b border-border lg:rounded-lg lg:border lg:mb-4"
+      className="bg-card border-b border-border lg:rounded-lg lg:border lg:mb-4 overflow-hidden"
     >
       {/* Breeder header */}
       <div className="flex items-center gap-2.5 px-3 py-2.5">
