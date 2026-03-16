@@ -43,14 +43,14 @@ export const sires: Sire[] = [
 ];
 
 const lambImages = [
-  "https://images.unsplash.com/photo-1484557985045-edf25e08da73?w=800&q=80",
-  "https://images.unsplash.com/photo-1509460913710-56c3da450eea?w=800&q=80",
-  "https://images.unsplash.com/photo-1527153857715-3908f2bae5e8?w=800&q=80",
-  "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&q=80",
-  "https://images.unsplash.com/photo-1560493676-04071c5f467b?w=800&q=80",
-  "https://images.unsplash.com/photo-1588006173527-b84e4936b130?w=800&q=80",
-  "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=800&q=80",
-  "https://images.unsplash.com/photo-1580377968131-75a35ac6577b?w=800&q=80",
+  "https://images.unsplash.com/photo-1484557985045-edf25e08da73?w=800&h=600&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=800&h=600&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1527153857715-3908f2bae5e8?w=800&h=600&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=600&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1560493676-04071c5f467b?w=800&h=600&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1605726439061-30d0dab29cba?w=800&h=600&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=800&h=600&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1580377968131-75a35ac6577b?w=800&h=600&fit=crop&q=80",
 ];
 
 export const posts: Post[] = [
