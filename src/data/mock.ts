@@ -1,3 +1,9 @@
+import compassSire from "@/assets/posts/compass-sire.jpeg";
+import brandSaleDay from "@/assets/posts/brand-sale-day.jpeg";
+import beattyThankyou from "@/assets/posts/beatty-thankyou.jpeg";
+import whitcombFlush from "@/assets/posts/whitcomb-flush.jpeg";
+import beattySale from "@/assets/posts/beatty-sale.jpeg";
+
 export interface Breeder {
   id: string;
   name: string;
@@ -13,7 +19,7 @@ export interface Sire {
   photo: string;
 }
 
-export type PostType = "lamb" | "champion" | "sire" | "sale" | "hauler";
+export type PostType = "lamb" | "champion" | "sire" | "sale" | "hauler" | "flush" | "event";
 
 export interface Post {
   id: string;
@@ -47,41 +53,28 @@ export interface Animal {
 }
 
 export const breeders: Breeder[] = [
-  { id: "b1", name: "Iron Oak Livestock", location: "Texas", logo: "🐑", is_pro: true },
-  { id: "b2", name: "Stone Show Stock", location: "Ohio", logo: "🪨", is_pro: true },
-  { id: "b3", name: "Rule Sheep Co", location: "Texas", logo: "♟️", is_pro: true },
-  { id: "b4", name: "Beatty Club Lambs", location: "Kentucky", logo: "🏆", is_pro: true },
-  { id: "b5", name: "Prairie Fire Genetics", location: "Kansas", logo: "🔥", is_pro: false },
-  { id: "b6", name: "Blue Ribbon Ranch", location: "Ohio", logo: "🎗️", is_pro: true },
-  { id: "b7", name: "Midwest Hauling Co.", location: "Missouri", logo: "🚛", is_pro: true },
+  { id: "b1", name: "Silvers Livestock", location: "Texas", logo: "🐑", is_pro: true },
+  { id: "b2", name: "The Brand Sale", location: "Webster City, Iowa", logo: "🏷️", is_pro: true },
+  { id: "b3", name: "Beatty's Club Lambs", location: "Indiana, PA", logo: "🏆", is_pro: true },
+  { id: "b4", name: "Whitcomb Club Lambs", location: "Illinois", logo: "🐏", is_pro: true },
+  { id: "b5", name: "Allen Newcomb Show Lambs", location: "Oklahoma", logo: "🎯", is_pro: false },
 ];
 
 export const sires: Sire[] = [
-  { id: "s1", name: "Iron Throne", breeder_id: "b1", photo: "" },
-  { id: "s2", name: "Wingman", breeder_id: "b2", photo: "" },
-  { id: "s3", name: "Chess Not Checkers", breeder_id: "b3", photo: "" },
-  { id: "s4", name: "Tres Amigos", breeder_id: "b4", photo: "" },
-];
-
-const images = [
-  "https://images.unsplash.com/photo-1484557985045-edf25e08da73?w=800&h=1000&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=800&h=1000&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1527153857715-3908f2bae5e8?w=800&h=1000&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=1000&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1560493676-04071c5f467b?w=800&h=1000&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1605726439061-30d0dab29cba?w=800&h=1000&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=800&h=1000&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1580377968131-75a35ac6577b?w=800&h=1000&fit=crop&q=80",
+  { id: "s1", name: "Compass", breeder_id: "b1", photo: "" },
+  { id: "s2", name: "2.0", breeder_id: "b1", photo: "" },
+  { id: "s3", name: "Beast", breeder_id: "b5", photo: "" },
+  { id: "s4", name: "Trifecta", breeder_id: "b4", photo: "" },
 ];
 
 export const animals: Animal[] = [
   {
-    id: "a1", name: "Iron Throne 24-01", breed: "Hampshire",
-    sire: "Iron Throne", dam: "Iron Oak 21-08", dob: "Jan 15, 2024",
-    weight: "135 lbs", breeder: breeders[0], photos: [images[0], images[1], images[2]],
-    price: "$3,500", status: "For Sale",
-    description: "This Iron Throne son is putting it all together heading into Fort Worth. Built like a tank with the look to match. Heavy-boned, square-built, and moves like a dream.",
-    tags: [{ label: "Iron Throne", type: "sire" }, { label: "Hampshire", type: "breed" }, { label: "For Sale", type: "sale" }],
+    id: "a1", name: "Compass", breed: "Club Lamb",
+    sire: "2.0", dam: "Gas Monkey", dob: "Jan 2024",
+    weight: "140 lbs", breeder: breeders[0], photos: [compassSire],
+    price: "Contact", status: "Reference",
+    description: "2.0 x Beast x Gas Monkey. Headed in the right direction. Owned with Silvers Livestock.",
+    tags: [{ label: "Compass", type: "sire" }, { label: "Club Lamb", type: "breed" }],
   },
 ];
 
@@ -98,27 +91,33 @@ export const filterCategories = [
 
 export const posts: Post[] = [
   {
-    id: "p1", image: images[0], breeder: breeders[0], post_type: "champion",
-    caption: "Hampshire Wether • Sire: Iron Throne 🏆 Champion. This Iron Throne son is putting it all together heading into Fort Worth. Built like a tank with the look to match.",
-    tags: [{ label: "Hampshire 🐑", type: "breed" }, { label: "For Sale 💰", type: "sale" }, { label: "Private Treaty 📄", type: "sale" }],
-    sire_id: "s1", animal_id: "a1", created_at: "2h ago", likes: 142, comments: 18, saved: false,
+    id: "p1", image: compassSire, breeder: breeders[0], post_type: "sire",
+    caption: "COMPASS 🧭\n2.0 x Beast x Gas Monkey\n\nHeaded in the right direction. Owned with Silvers Livestock. Raised by Allen Newcomb Show Lambs & Treadmills.\n\n📞 Sam 830.234.7021 | Ty 580.225.2679 | Cooper 580.821.2361",
+    tags: [{ label: "Compass", type: "sire" }, { label: "Club Lamb 🐑", type: "breed" }, { label: "For Sale 💰", type: "sale" }],
+    sire_id: "s1", created_at: "2h ago", likes: 247, comments: 34, saved: false,
   },
   {
-    id: "p2", image: images[1], breeder: breeders[1], post_type: "sale",
-    caption: "Wingman wethers ready for show season. These guys have the bone, muscle shape and balance to compete at the highest level. Private treaty available.",
-    tags: [{ label: "Wingman", type: "sire" }, { label: "For Sale 💰", type: "sale" }, { label: "Private Treaty 📄", type: "sale" }],
-    sire_id: "s2", created_at: "4h ago", likes: 98, comments: 12, saved: false,
+    id: "p2", image: brandSaleDay, breeder: breeders[1], post_type: "event",
+    caption: "🔥 THE BRAND — SALE DAY 🔥\nMarch 6 & 7, 2026 • Webster City, Iowa\n\nCustomer Appreciation Sale\nSelling 120+ Decembers from 80+ Consignors\n\n8am: Viewing & Donuts sponsored by DuraFerm\n10am: Sale Starts • Food Truck: Texas Toast & Tots\n\n📞 Charlie: 515.351.2070 | Tanner: 928.285.8975\n📍 2268 Neely Ave, Webster City, Iowa",
+    tags: [{ label: "Sale Previews 📅", type: "sale" }, { label: "December Lambs", type: "breed" }, { label: "For Sale 💰", type: "sale" }],
+    created_at: "5h ago", likes: 389, comments: 56, saved: false,
   },
   {
-    id: "p3", image: images[2], breeder: breeders[2], post_type: "sale",
-    caption: "Chess Not Checkers flush available. Limited availability on this cross — some of the best lambs we've ever raised. Contact for details.",
-    tags: [{ label: "Chess Not Checkers", type: "sire" }, { label: "Flush 🧬", type: "sale" }, { label: "Hampshire 🐑", type: "breed" }],
-    sire_id: "s3", created_at: "6h ago", likes: 76, comments: 8, saved: false,
+    id: "p3", image: beattyThankyou, breeder: breeders[2], post_type: "event",
+    caption: "Thank you for your support! 💙\n\nWhat an incredible turnout this year. We are so grateful for each and every one of you who came out, bid, and believed in our program. This community is everything.\n\nSee you next time! 🐑",
+    tags: [{ label: "Recent Winners 🏆", type: "sale" }, { label: "Club Lamb 🐑", type: "breed" }],
+    created_at: "8h ago", likes: 512, comments: 89, saved: false,
   },
   {
-    id: "p4", image: images[3], breeder: breeders[3], post_type: "sire",
-    caption: "Tres Amigos semen now available. This sire has produced multiple champions across the country. Limited units — contact for pricing and availability.",
-    tags: [{ label: "Tres Amigos", type: "sire" }, { label: "Semen Available 🧪", type: "sale" }, { label: "Kentucky", type: "location" }],
-    sire_id: "s4", created_at: "8h ago", likes: 213, comments: 31, saved: false,
+    id: "p4", image: whitcombFlush, breeder: breeders[3], post_type: "flush",
+    caption: "🧬 ONLINE FLUSH SALE — March 16\n\nLot 1: Trifecta x Perry x Sundown\nLot 2: Trifecta x Perry x Sundown\nLot 3: Trifecta x Perry x Sundown\n\nSelling via NXT GEN Online Sales\n\n📞 Jared Whitcomb: 217.737.3122",
+    tags: [{ label: "Flush 🧬", type: "sale" }, { label: "Trifecta", type: "sire" }, { label: "For Sale 💰", type: "sale" }],
+    sire_id: "s4", created_at: "12h ago", likes: 178, comments: 22, saved: false,
+  },
+  {
+    id: "p5", image: beattySale, breeder: breeders[2], post_type: "sale",
+    caption: "Tomorrow! March 15th 🐑\n\nAll January born wethers + ewes selling:\n• Private Bid Link\n• Pen Sale at the Farm\n📍 Indiana, PA\n\nDon't miss out on some of our best January lambs yet!",
+    tags: [{ label: "For Sale 💰", type: "sale" }, { label: "Private Treaty 📄", type: "sale" }, { label: "Club Lamb 🐑", type: "breed" }],
+    created_at: "1d ago", likes: 334, comments: 47, saved: false,
   },
 ];

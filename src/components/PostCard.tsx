@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, Eye, Bookmark, Trophy } from "lucide-react";
+import { Heart, MessageCircle, Share2, Bookmark, Trophy } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -21,37 +21,24 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
     setLikeCount((c) => (liked ? c - 1 : c + 1));
   };
 
+  // Split caption into lines for proper rendering
+  const captionLines = post.caption.split("\n");
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: index * 0.03 }}
-      className="bg-card lg:rounded-xl lg:border lg:border-border lg:mb-4 lg:shadow-sm overflow-hidden"
+      className="bg-card lg:rounded-xl lg:border lg:border-border lg:shadow-sm overflow-hidden border-b border-border lg:mb-4"
     >
-      {/* Full-bleed 4:5 image */}
-      <div className="relative aspect-[4/5] overflow-hidden bg-muted">
-        <img
-          src={post.image}
-          alt={post.caption}
-          className="absolute inset-0 w-full h-full object-cover"
-          loading="lazy"
-        />
-        {post.post_type === "champion" && (
-          <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2.5 py-1 rounded-full bg-gold text-white text-[11px] font-bold shadow-md">
-            <Trophy className="w-3 h-3" />
-            Champion
-          </div>
-        )}
-      </div>
-
-      {/* Breeder info */}
-      <div className="flex items-center gap-2.5 px-4 pt-3 pb-1">
-        <span className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm shrink-0">
+      {/* Breeder header — Facebook style */}
+      <div className="flex items-center gap-3 px-4 py-3">
+        <span className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg shrink-0 shadow-sm">
           {post.breeder.logo}
         </span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <p className="font-semibold text-[16px] text-foreground truncate">{post.breeder.name}</p>
+            <p className="font-semibold text-[15px] text-foreground truncate">{post.breeder.name}</p>
             {post.breeder.is_pro && (
               <span className="bg-gold text-white text-[8px] font-black w-[18px] h-[18px] rounded-full flex items-center justify-center shrink-0 shadow-sm">
                 P
@@ -62,13 +49,33 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
         </div>
       </div>
 
-      {/* Caption */}
-      <div className="px-4 pt-1.5 pb-2">
-        <p className="text-[14px] leading-relaxed text-muted-foreground">{post.caption}</p>
+      {/* Caption text — above image like Facebook */}
+      <div className="px-4 pb-2.5">
+        {captionLines.map((line, i) => (
+          <p key={i} className={`text-[14px] leading-relaxed ${line.trim() === "" ? "h-2" : "text-foreground"}`}>
+            {line}
+          </p>
+        ))}
       </div>
 
-      {/* Tag pills — light blue system */}
-      <div className="flex flex-wrap gap-1.5 px-4 pb-3">
+      {/* Full-width image */}
+      <div className="relative w-full overflow-hidden bg-muted">
+        <img
+          src={post.image}
+          alt={post.caption.split("\n")[0]}
+          className="w-full h-auto object-cover"
+          loading="lazy"
+        />
+        {post.post_type === "champion" && (
+          <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2.5 py-1 rounded-full bg-gold text-white text-[11px] font-bold shadow-lg">
+            <Trophy className="w-3 h-3" />
+            Champion
+          </div>
+        )}
+      </div>
+
+      {/* Tag pills */}
+      <div className="flex flex-wrap gap-1.5 px-4 pt-3 pb-2">
         {post.tags.map((tag) => {
           if (tag.type === "sire" && post.sire_id) {
             return (
@@ -95,27 +102,31 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
         })}
       </div>
 
-      {/* Actions */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-t border-border">
-        <div className="flex items-center gap-4">
-          <button onClick={handleLike} className="flex items-center gap-1 group">
-            <Heart className={`w-5 h-5 transition-colors ${liked ? "fill-destructive text-destructive" : "text-muted-foreground group-hover:text-destructive"}`} />
-            <span className="text-xs text-muted-foreground font-medium">{likeCount.toLocaleString()}</span>
-          </button>
-          <button className="flex items-center gap-1 group">
-            <MessageCircle className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-            {post.comments > 0 && <span className="text-xs text-muted-foreground">{post.comments}</span>}
-          </button>
-          {post.sire_id && (
-            <Link to={`/sire/${post.sire_id}`} className="flex items-center gap-1 group">
-              <Eye className="w-5 h-5 text-primary group-hover:text-primary/70 transition-colors" />
-              <span className="text-xs text-primary font-semibold">View Sire</span>
-            </Link>
-          )}
-        </div>
-        <button onClick={() => setSaved(!saved)} className="flex items-center gap-1 group">
+      {/* Engagement bar — Facebook/IG style */}
+      <div className="px-4 pb-1 pt-0.5">
+        <p className="text-[13px] text-muted-foreground">
+          {likeCount.toLocaleString()} likes · {post.comments} comments
+        </p>
+      </div>
+
+      <div className="border-t border-border mx-4" />
+
+      <div className="flex items-center justify-around px-2 py-1.5">
+        <button onClick={handleLike} className="flex items-center gap-1.5 py-1.5 px-3 rounded-md hover:bg-muted transition-colors group flex-1 justify-center">
+          <Heart className={`w-5 h-5 transition-colors ${liked ? "fill-destructive text-destructive" : "text-muted-foreground group-hover:text-destructive"}`} />
+          <span className={`text-[13px] font-medium ${liked ? "text-destructive" : "text-muted-foreground"}`}>Like</span>
+        </button>
+        <button className="flex items-center gap-1.5 py-1.5 px-3 rounded-md hover:bg-muted transition-colors group flex-1 justify-center">
+          <MessageCircle className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+          <span className="text-[13px] font-medium text-muted-foreground">Comment</span>
+        </button>
+        <button className="flex items-center gap-1.5 py-1.5 px-3 rounded-md hover:bg-muted transition-colors group flex-1 justify-center">
+          <Share2 className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+          <span className="text-[13px] font-medium text-muted-foreground">Share</span>
+        </button>
+        <button onClick={() => setSaved(!saved)} className="flex items-center gap-1.5 py-1.5 px-3 rounded-md hover:bg-muted transition-colors group flex-1 justify-center">
           <Bookmark className={`w-5 h-5 transition-colors ${saved ? "fill-primary text-primary" : "text-muted-foreground group-hover:text-primary"}`} />
-          <span className="text-xs text-muted-foreground group-hover:text-primary font-medium">Save</span>
+          <span className={`text-[13px] font-medium ${saved ? "text-primary" : "text-muted-foreground"}`}>Save</span>
         </button>
       </div>
     </motion.article>
