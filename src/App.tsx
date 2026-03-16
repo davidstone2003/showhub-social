@@ -3,8 +3,11 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import Index from "./pages/Index";
+import BreedersPage from "./pages/BreedersPage";
+import SiresPage from "./pages/SiresPage";
+import { WinnersPage, MarketPage, HaulersPage, SubmitPage } from "./pages/PlaceholderPage";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -16,7 +19,12 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/breeders" element={<BreedersPage />} />
+          <Route path="/sires" element={<SiresPage />} />
+          <Route path="/winners" element={<WinnersPage />} />
+          <Route path="/market" element={<MarketPage />} />
+          <Route path="/haulers" element={<HaulersPage />} />
+          <Route path="/submit" element={<SubmitPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
