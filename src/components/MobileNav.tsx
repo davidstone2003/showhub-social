@@ -2,12 +2,12 @@ import { Home, Trophy, Users, Dna, ShoppingBag, Truck } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const navItems = [
-  { icon: Home, label: "Feed", emoji: "📱", to: "/" },
-  { icon: Trophy, label: "Winners", emoji: "🏆", to: "/winners" },
-  { icon: Users, label: "Breeders", emoji: "👨‍🌾", to: "/breeders" },
-  { icon: Dna, label: "Sires", emoji: "🐑", to: "/sires" },
-  { icon: ShoppingBag, label: "Market", emoji: "💰", to: "/market" },
-  { icon: Truck, label: "Haulers", emoji: "🚛", to: "/haulers" },
+  { icon: Home, label: "Feed", to: "/" },
+  { icon: Trophy, label: "Winners", to: "/winners" },
+  { icon: Users, label: "Breeders", to: "/breeders" },
+  { icon: Dna, label: "Sires", to: "/sires" },
+  { icon: ShoppingBag, label: "Market", to: "/market" },
+  { icon: Truck, label: "Haulers", to: "/haulers" },
 ];
 
 export function MobileNav() {
@@ -20,7 +20,7 @@ export function MobileNav() {
             to={item.to}
             className={({ isActive }) =>
               `flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-colors ${
-                isActive ? "text-foreground" : "text-muted-foreground"
+                isActive ? "text-primary" : "text-muted-foreground"
               }`
             }
           >

@@ -12,10 +12,10 @@ const navItems = [
 
 export function DesktopSidebar() {
   return (
-    <aside className="hidden lg:flex flex-col w-[200px] min-h-screen bg-navy text-sidebar-foreground border-r border-sidebar-border sticky top-0">
+    <aside className="hidden lg:flex flex-col w-[200px] min-h-screen bg-primary text-sidebar-foreground border-r border-sidebar-border sticky top-0">
       <div className="p-5 border-b border-sidebar-border">
         <h1 className="text-xl font-bold text-primary-foreground tracking-tight">
-          Show<span className="text-sand">Hub</span>
+          Show<span className="opacity-70">Hub</span>
         </h1>
       </div>
 
@@ -41,7 +41,7 @@ export function DesktopSidebar() {
       <div className="p-3 border-t border-sidebar-border">
         <NavLink
           to="/submit"
-          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-sand text-navy text-sm font-semibold hover:bg-sand/80 transition-colors"
+          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-primary-foreground/10 text-primary-foreground text-sm font-semibold hover:bg-primary-foreground/20 transition-colors"
         >
           <Plus className="w-4 h-4" />
           New Post
