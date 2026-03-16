@@ -1,22 +1,25 @@
 import { useState, useMemo } from "react";
-import { posts } from "@/data/mock";
+import { posts, filterCategories } from "@/data/mock";
 import { PostCard } from "./PostCard";
 import { FilterRow } from "./FilterRow";
 
 export function Feed() {
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [activeFilter, setActiveFilter] = useState(filterCategories[0]);
 
   const filteredPosts = useMemo(() => {
-    if (activeFilter === "All") return posts;
+    if (activeFilter === filterCategories[0]) return posts;
     return posts.filter((p) =>
       p.tags.some((t) =>
-        t.label.toLowerCase().includes(activeFilter.toLowerCase())
+        t.label.toLowerCase().includes(activeFilter.replace(/\s*[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").trim().toLowerCase())
       )
     );
   }, [activeFilter]);
 
   const handleTagClick = (tag: { label: string; type: string }) => {
-    setActiveFilter(tag.label);
+    const match = filterCategories.find((c) =>
+      tag.label.toLowerCase().includes(c.replace(/\s*[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").trim().toLowerCase())
+    );
+    if (match) setActiveFilter(match);
   };
 
   return (
@@ -37,8 +40,8 @@ export function Feed() {
           <div className="text-center py-20">
             <p className="text-muted-foreground text-sm">No posts match "{activeFilter}"</p>
             <button
-              onClick={() => setActiveFilter("All")}
-              className="mt-2 text-sm text-primary font-medium hover:underline"
+              onClick={() => setActiveFilter(filterCategories[0])}
+              className="mt-2 text-sm text-foreground font-medium hover:underline"
             >
               Clear filter
             </button>
