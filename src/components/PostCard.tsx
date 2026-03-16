@@ -26,7 +26,7 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: index * 0.03 }}
-      className="bg-card lg:rounded-xl lg:border lg:border-border lg:mb-4 overflow-hidden"
+      className="bg-card lg:rounded-xl lg:border lg:border-border lg:mb-4 lg:shadow-sm overflow-hidden"
     >
       {/* Full-bleed 4:5 image */}
       <div className="relative aspect-[4/5] overflow-hidden bg-muted">
@@ -37,7 +37,7 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
           loading="lazy"
         />
         {post.post_type === "champion" && (
-          <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 rounded-full bg-gold text-white text-[11px] font-bold">
+          <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2.5 py-1 rounded-full bg-gold text-white text-[11px] font-bold shadow-md">
             <Trophy className="w-3 h-3" />
             Champion
           </div>
@@ -53,7 +53,7 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
           <div className="flex items-center gap-1.5">
             <p className="font-semibold text-[16px] text-foreground truncate">{post.breeder.name}</p>
             {post.breeder.is_pro && (
-              <span className="bg-gold text-white text-[8px] font-black w-[18px] h-[18px] rounded-full flex items-center justify-center shrink-0">
+              <span className="bg-gold text-white text-[8px] font-black w-[18px] h-[18px] rounded-full flex items-center justify-center shrink-0 shadow-sm">
                 P
               </span>
             )}
@@ -67,7 +67,7 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
         <p className="text-[14px] leading-relaxed text-muted-foreground">{post.caption}</p>
       </div>
 
-      {/* Tag pills */}
+      {/* Tag pills — light blue system */}
       <div className="flex flex-wrap gap-1.5 px-4 pb-3">
         {post.tags.map((tag) => {
           if (tag.type === "sire" && post.sire_id) {
@@ -75,7 +75,7 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
               <Link key={tag.label} to={`/sire/${post.sire_id}`}>
                 <Badge
                   variant="outline"
-                  className="text-[12px] cursor-pointer bg-sand border-transparent text-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
+                  className="text-[12px] cursor-pointer bg-pill text-pill-text border-pill-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
                 >
                   {tag.label}
                 </Badge>
@@ -86,7 +86,7 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
             <Badge
               key={tag.label}
               variant="outline"
-              className="text-[12px] cursor-pointer bg-sand border-transparent text-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
+              className="text-[12px] cursor-pointer bg-pill text-pill-text border-pill-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
               onClick={() => onTagClick?.(tag)}
             >
               {tag.label}
@@ -103,19 +103,19 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
             <span className="text-xs text-muted-foreground font-medium">{likeCount.toLocaleString()}</span>
           </button>
           <button className="flex items-center gap-1 group">
-            <MessageCircle className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+            <MessageCircle className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
             {post.comments > 0 && <span className="text-xs text-muted-foreground">{post.comments}</span>}
           </button>
           {post.sire_id && (
             <Link to={`/sire/${post.sire_id}`} className="flex items-center gap-1 group">
-              <Eye className="w-5 h-5 text-foreground group-hover:text-muted-foreground transition-colors" />
-              <span className="text-xs text-foreground font-semibold">View Sire</span>
+              <Eye className="w-5 h-5 text-primary group-hover:text-primary/70 transition-colors" />
+              <span className="text-xs text-primary font-semibold">View Sire</span>
             </Link>
           )}
         </div>
         <button onClick={() => setSaved(!saved)} className="flex items-center gap-1 group">
-          <Bookmark className={`w-5 h-5 transition-colors ${saved ? "fill-foreground text-foreground" : "text-muted-foreground group-hover:text-foreground"}`} />
-          <span className="text-xs text-muted-foreground group-hover:text-foreground font-medium">Save</span>
+          <Bookmark className={`w-5 h-5 transition-colors ${saved ? "fill-primary text-primary" : "text-muted-foreground group-hover:text-primary"}`} />
+          <span className="text-xs text-muted-foreground group-hover:text-primary font-medium">Save</span>
         </button>
       </div>
     </motion.article>

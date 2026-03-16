@@ -24,7 +24,7 @@ export default {
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
-          hover: "hsl(var(--primary-hover))",
+          dark: "hsl(var(--primary-dark))",
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
@@ -55,14 +55,16 @@ export default {
           DEFAULT: "hsl(var(--navy))",
           light: "hsl(var(--navy-light))",
         },
-        sand: {
-          DEFAULT: "hsl(var(--sand))",
-        },
         gold: {
           DEFAULT: "hsl(var(--gold))",
         },
-        cream: {
-          DEFAULT: "hsl(var(--cream))",
+        sand: {
+          DEFAULT: "hsl(var(--sand))",
+        },
+        pill: {
+          DEFAULT: "hsl(var(--pill-bg))",
+          text: "hsl(var(--pill-text))",
+          border: "hsl(var(--pill-border))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
