@@ -20,7 +20,7 @@ export function MobileHeader() {
 
         <Link
           to="/submit"
-          className="flex items-center gap-1.5 h-10 px-5 rounded-xl bg-primary-dark text-primary-foreground text-sm font-bold hover:bg-navy-light shadow-sm transition-all shrink-0"
+          className="flex items-center gap-1.5 h-10 px-5 rounded-[12px] bg-post-btn text-white text-sm font-bold hover:bg-post-btn-hover shadow-md transition-all shrink-0"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
           Post
