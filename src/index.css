@@ -15,8 +15,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 210 29% 16%;
 
-    --primary: 160 84% 39%;
-    --primary-hover: 161 95% 30%;
+    --primary: 200 100% 36%;
+    --primary-hover: 200 100% 28%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 20% 95%;
@@ -25,7 +25,7 @@
     --muted: 210 14% 93%;
     --muted-foreground: 210 10% 46%;
 
-    --accent: 160 59% 42%;
+    --accent: 200 100% 36%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -33,26 +33,26 @@
 
     --border: 210 14% 89%;
     --input: 210 14% 89%;
-    --ring: 160 59% 42%;
+    --ring: 200 100% 36%;
 
     --radius: 0.75rem;
 
     --charcoal: 210 29% 16%;
     --charcoal-light: 210 18% 25%;
-    --emerald: 160 59% 42%;
-    --emerald-light: 160 50% 50%;
-    --emerald-dark: 160 65% 35%;
+    --emerald: 200 100% 36%;
+    --emerald-light: 200 80% 50%;
+    --emerald-dark: 200 100% 28%;
     --surface: 210 20% 98%;
     --surface-raised: 0 0% 100%;
 
     --sidebar-background: 210 29% 16%;
     --sidebar-foreground: 210 14% 83%;
-    --sidebar-primary: 160 59% 42%;
+    --sidebar-primary: 200 100% 36%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 210 18% 22%;
     --sidebar-accent-foreground: 210 14% 93%;
     --sidebar-border: 210 18% 22%;
-    --sidebar-ring: 160 59% 42%;
+    --sidebar-ring: 200 100% 36%;
 
     --font-display: 'Playfair Display', serif;
     --font-body: 'DM Sans', sans-serif;
