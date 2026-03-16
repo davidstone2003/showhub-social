@@ -23,6 +23,7 @@ const App = () => (
           <Route path="/breeders" element={<BreedersPage />} />
           <Route path="/sires" element={<SiresPage />} />
           <Route path="/animal/:id" element={<AnimalPage />} />
+          <Route path="/sire/:id" element={<SirePage />} />
           <Route path="/winners" element={<WinnersPage />} />
           <Route path="/market" element={<MarketPage />} />
           <Route path="/haulers" element={<HaulersPage />} />

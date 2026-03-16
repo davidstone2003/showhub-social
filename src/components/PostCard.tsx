@@ -109,7 +109,7 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
       </div>
 
       {/* Tags */}
-      <div className="flex flex-wrap gap-1.5 px-3 pt-2 pb-3">
+      <div className="flex flex-wrap gap-1.5 px-3 pt-2 pb-1.5">
         {post.tags.map((tag) => (
           <Badge
             key={tag.label}
@@ -120,6 +120,26 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
             {tag.label}
           </Badge>
         ))}
+      </div>
+
+      {/* Quick-link actions */}
+      <div className="flex flex-wrap gap-2 px-3 pb-3">
+        {post.sire_id && (
+          <Link
+            to={`/sire/${post.sire_id}`}
+            className="text-[11px] font-semibold text-primary hover:underline"
+          >
+            View Sire →
+          </Link>
+        )}
+        {post.animal_id && (
+          <Link
+            to={`/animal/${post.animal_id}`}
+            className="text-[11px] font-semibold text-primary hover:underline"
+          >
+            View Animal →
+          </Link>
+        )}
       </div>
     </motion.article>
   );
