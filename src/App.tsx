@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import BreedersPage from "./pages/BreedersPage";
 import SiresPage from "./pages/SiresPage";
 import AnimalPage from "./pages/AnimalPage";
+import SirePage from "./pages/SirePage";
 import { WinnersPage, MarketPage, HaulersPage, SubmitPage } from "./pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/breeders" element={<BreedersPage />} />
           <Route path="/sires" element={<SiresPage />} />
           <Route path="/animal/:id" element={<AnimalPage />} />
+          <Route path="/sire/:id" element={<SirePage />} />
           <Route path="/winners" element={<WinnersPage />} />
           <Route path="/market" element={<MarketPage />} />
           <Route path="/haulers" element={<HaulersPage />} />

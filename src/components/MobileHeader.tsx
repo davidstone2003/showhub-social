@@ -24,11 +24,12 @@ export function MobileHeader() {
         </div>
 
         {/* Post button */}
-        <Link to="/submit">
-          <button className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors shrink-0">
-            <Plus className="w-4 h-4" />
-            Post
-          </button>
+        <Link
+          to="/submit"
+          className="flex items-center gap-1.5 h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-bold hover:brightness-110 hover:shadow-md transition-all shrink-0"
+        >
+          <Plus className="w-4 h-4" />
+          Post
         </Link>
       </div>
     </header>

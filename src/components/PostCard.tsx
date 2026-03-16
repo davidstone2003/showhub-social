@@ -41,7 +41,7 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.04 }}
-      className="bg-card border-b border-border lg:rounded-lg lg:border lg:mb-4"
+      className="bg-card border-b border-border lg:rounded-lg lg:border lg:mb-4 overflow-hidden"
     >
       {/* Breeder header */}
       <div className="flex items-center gap-2.5 px-3 py-2.5">
@@ -52,7 +52,7 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
           <div className="flex items-center gap-1.5">
             <p className="font-semibold text-sm text-foreground truncate">{post.breeder.name}</p>
             {post.breeder.is_pro && (
-              <span className="bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shrink-0">Pro</span>
+              <span className="bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shrink-0 ml-0.5">Pro</span>
             )}
             {typeIcons[post.post_type] && (
               <span className="text-primary shrink-0">{typeIcons[post.post_type]}</span>
@@ -62,12 +62,12 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
         </div>
       </div>
 
-      {/* Image — edge-to-edge 4:5 portrait */}
-      <div className="relative aspect-[4/5] overflow-hidden bg-muted">
+      {/* Image — true edge-to-edge 4:5 portrait */}
+      <div className="relative aspect-[4/5] overflow-hidden bg-muted -mx-px">
         <img
           src={post.image}
           alt={post.caption}
-          className="w-full h-full object-cover"
+          className="w-[calc(100%+2px)] h-full object-cover"
           loading="lazy"
         />
       </div>
@@ -109,7 +109,7 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
       </div>
 
       {/* Tags */}
-      <div className="flex flex-wrap gap-1.5 px-3 pt-2 pb-3">
+      <div className="flex flex-wrap gap-1.5 px-3 pt-2 pb-1.5">
         {post.tags.map((tag) => (
           <Badge
             key={tag.label}
@@ -120,6 +120,26 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
             {tag.label}
           </Badge>
         ))}
+      </div>
+
+      {/* Quick-link actions */}
+      <div className="flex flex-wrap gap-2 px-3 pb-3">
+        {post.sire_id && (
+          <Link
+            to={`/sire/${post.sire_id}`}
+            className="text-[11px] font-semibold text-primary hover:underline"
+          >
+            View Sire →
+          </Link>
+        )}
+        {post.animal_id && (
+          <Link
+            to={`/animal/${post.animal_id}`}
+            className="text-[11px] font-semibold text-primary hover:underline"
+          >
+            View Animal →
+          </Link>
+        )}
       </div>
     </motion.article>
   );

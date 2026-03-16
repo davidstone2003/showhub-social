@@ -13,10 +13,10 @@ export function FilterRow({ active, onSelect }: FilterRowProps) {
           <button
             key={cat}
             onClick={() => onSelect(cat)}
-            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${
               active === cat
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-foreground hover:bg-muted"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-transparent text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
             }`}
           >
             {cat}
