@@ -1,9 +1,9 @@
-import { Heart, Bookmark, MessageCircle, Eye } from "lucide-react";
+import { Heart, MessageCircle, Eye, Bookmark, Trophy, Truck } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import type { Post } from "@/data/mock";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 interface PostCardProps {
   post: Post;
@@ -12,13 +12,18 @@ interface PostCardProps {
 }
 
 const tagColors: Record<string, string> = {
-  sire: "bg-emerald/10 text-emerald-dark border-emerald/20",
+  sire: "bg-primary/10 text-primary border-primary/20",
   show: "bg-primary/10 text-primary border-primary/20",
-  breed: "bg-charcoal/10 text-charcoal border-charcoal/15",
+  breed: "bg-secondary text-foreground border-border",
   sale: "bg-destructive/10 text-destructive border-destructive/20",
-  type: "bg-muted text-muted-foreground border-border",
-  breeder: "bg-secondary text-secondary-foreground border-border",
-  location: "bg-muted text-muted-foreground border-border",
+  type: "bg-secondary text-muted-foreground border-border",
+  breeder: "bg-secondary text-foreground border-border",
+  location: "bg-secondary text-muted-foreground border-border",
+};
+
+const typeIcons: Record<string, React.ReactNode> = {
+  champion: <Trophy className="w-3 h-3" />,
+  hauler: <Truck className="w-3 h-3" />,
 };
 
 export function PostCard({ post, index, onTagClick }: PostCardProps) {
@@ -32,80 +37,90 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
+    <motion.article
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: index * 0.05 }}
-      className="bg-card rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-md transition-shadow"
+      transition={{ duration: 0.3, delay: index * 0.04 }}
+      className="bg-card border-b border-border lg:rounded-lg lg:border lg:mb-4"
     >
-      {/* Image — 70% of card */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+      {/* Breeder header */}
+      <div className="flex items-center gap-2.5 px-3 py-2.5">
+        <span className="w-8 h-8 rounded-full bg-charcoal text-primary-foreground flex items-center justify-center text-sm shrink-0">
+          {post.breeder.logo}
+        </span>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5">
+            <p className="font-semibold text-sm text-foreground truncate">{post.breeder.name}</p>
+            {post.breeder.is_pro && (
+              <span className="bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shrink-0">Pro</span>
+            )}
+            {typeIcons[post.post_type] && (
+              <span className="text-primary shrink-0">{typeIcons[post.post_type]}</span>
+            )}
+          </div>
+          <p className="text-[11px] text-muted-foreground">{post.breeder.location} · {post.created_at}</p>
+        </div>
+      </div>
+
+      {/* Image — edge-to-edge 4:5 portrait */}
+      <div className="relative aspect-[4/5] overflow-hidden bg-muted">
         <img
           src={post.image}
           alt={post.caption}
           className="w-full h-full object-cover"
           loading="lazy"
         />
-        {post.breeder.is_pro && (
-          <span className="absolute top-3 right-3 bg-primary text-primary-foreground text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
-            Pro
-          </span>
+      </div>
+
+      {/* Actions row */}
+      <div className="flex items-center justify-between px-3 pt-2.5">
+        <div className="flex items-center gap-3">
+          <button onClick={handleLike} className="flex items-center gap-1 group">
+            <Heart className={`w-5 h-5 transition-colors ${liked ? "fill-destructive text-destructive" : "text-foreground group-hover:text-destructive"}`} />
+          </button>
+          <button className="flex items-center gap-1 group">
+            <MessageCircle className="w-5 h-5 text-foreground group-hover:text-primary transition-colors" />
+          </button>
+          {post.animal_id && (
+            <Link to={`/animal/${post.animal_id}`} className="flex items-center gap-1 group">
+              <Eye className="w-5 h-5 text-primary group-hover:text-primary/80 transition-colors" />
+            </Link>
+          )}
+        </div>
+        <button onClick={() => setSaved(!saved)}>
+          <Bookmark className={`w-5 h-5 transition-colors ${saved ? "fill-foreground text-foreground" : "text-foreground hover:text-primary"}`} />
+        </button>
+      </div>
+
+      {/* Likes & comments count */}
+      <div className="px-3 pt-1">
+        <span className="text-xs font-semibold text-foreground">{likeCount.toLocaleString()} likes</span>
+        {post.comments > 0 && (
+          <span className="text-xs text-muted-foreground ml-2">{post.comments} comments</span>
         )}
       </div>
 
-      {/* Content */}
-      <div className="p-4 space-y-3">
-        {/* Breeder row */}
-        <div className="flex items-center gap-2">
-          <span className="w-8 h-8 rounded-full bg-charcoal text-primary-foreground flex items-center justify-center text-sm">
-            {post.breeder.logo}
-          </span>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm text-foreground truncate">{post.breeder.name}</p>
-            <p className="text-xs text-muted-foreground">{post.breeder.location} · {post.created_at}</p>
-          </div>
-        </div>
-
-        {/* Caption */}
-        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{post.caption}</p>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-1.5">
-          {post.tags.map((tag) => (
-            <Badge
-              key={tag.label}
-              variant="outline"
-              className={`text-[11px] cursor-pointer hover:opacity-80 transition-opacity ${tagColors[tag.type] || tagColors.type}`}
-              onClick={() => onTagClick?.(tag)}
-            >
-              {tag.label}
-            </Badge>
-          ))}
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center justify-between pt-1 border-t border-border">
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" className="h-8 px-2 gap-1" onClick={handleLike}>
-              <Heart className={`w-4 h-4 ${liked ? "fill-destructive text-destructive" : "text-muted-foreground"}`} />
-              <span className="text-xs text-muted-foreground">{likeCount}</span>
-            </Button>
-            <Button variant="ghost" size="sm" className="h-8 px-2">
-              <MessageCircle className="w-4 h-4 text-muted-foreground" />
-            </Button>
-          </div>
-          <div className="flex items-center gap-1">
-            {post.sire_id && (
-              <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-emerald hover:text-emerald-dark">
-                <Eye className="w-3.5 h-3.5 mr-1" /> Sire
-              </Button>
-            )}
-            <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => setSaved(!saved)}>
-              <Bookmark className={`w-4 h-4 ${saved ? "fill-primary text-primary" : "text-muted-foreground"}`} />
-            </Button>
-          </div>
-        </div>
+      {/* Caption */}
+      <div className="px-3 pt-1">
+        <p className="text-sm text-foreground leading-relaxed">
+          <span className="font-semibold">{post.breeder.name}</span>{" "}
+          <span className="text-muted-foreground">{post.caption}</span>
+        </p>
       </div>
-    </motion.div>
+
+      {/* Tags */}
+      <div className="flex flex-wrap gap-1.5 px-3 pt-2 pb-3">
+        {post.tags.map((tag) => (
+          <Badge
+            key={tag.label}
+            variant="outline"
+            className={`text-[11px] cursor-pointer hover:opacity-80 transition-opacity ${tagColors[tag.type] || tagColors.type}`}
+            onClick={() => onTagClick?.(tag)}
+          >
+            {tag.label}
+          </Badge>
+        ))}
+      </div>
+    </motion.article>
   );
 }
