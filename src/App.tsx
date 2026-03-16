@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import BreedersPage from "./pages/BreedersPage";
 import SiresPage from "./pages/SiresPage";
 import AnimalPage from "./pages/AnimalPage";
+import SirePage from "./pages/SirePage";
 import { WinnersPage, MarketPage, HaulersPage, SubmitPage } from "./pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
