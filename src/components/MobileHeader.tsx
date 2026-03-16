@@ -1,13 +1,10 @@
 import { Plus, Search } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
 
 export function MobileHeader() {
-  const [searchOpen, setSearchOpen] = useState(false);
-
   return (
-    <header className="lg:hidden sticky top-0 z-40 bg-card border-b border-border px-3 py-2.5">
+    <header className="lg:hidden sticky top-0 z-40 bg-card border-b border-border px-3 py-2">
       <div className="flex items-center gap-2">
         {/* Logo */}
         <h1 className="font-display text-lg text-foreground tracking-tight shrink-0">
@@ -23,12 +20,12 @@ export function MobileHeader() {
           />
         </div>
 
-        {/* Post button */}
+        {/* Post button — LARGE emerald */}
         <Link
           to="/submit"
-          className="flex items-center gap-1.5 h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-bold hover:brightness-110 hover:shadow-md transition-all shrink-0"
+          className="flex items-center gap-1.5 h-10 px-5 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-primary-hover shadow-sm hover:shadow-md transition-all shrink-0"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 stroke-[2.5]" />
           Post
         </Link>
       </div>
