@@ -19,4 +19,4 @@ const PlaceholderPage = ({ title, description }: PlaceholderPageProps) => (
 export const WinnersPage = () => <PlaceholderPage title="Winners" description="Browse champion lambs from shows across the country." />;
 export const MarketPage = () => <PlaceholderPage title="Market" description="Find show lambs, breeding stock, and equipment for sale." />;
 export const HaulersPage = () => <PlaceholderPage title="Haulers" description="Connect with livestock haulers in your area." />;
-export const SubmitPage = () => <PlaceholderPage title="New Post" description="Share your latest lambs with the ShowHub community. Coming soon." />;
+export const SubmitPage = () => <PlaceholderPage title="New Post" description="Share your latest lambs with the ShowThread community. Coming soon." />;
