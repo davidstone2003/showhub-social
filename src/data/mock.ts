@@ -79,13 +79,13 @@ export const animals: Animal[] = [
 ];
 
 export const filterCategories = [
-  "🔥 Hot Today",
-  "🏆 Recent Winners",
-  "💰 Just Listed",
+  "🔥 HOT",
+  "🏆 WINNERS",
+  "💰 SALE",
+  "⏱ CLOSING",
   "📍 Ohio",
-  "🐑 Club Lambs",
+  "🐑 Lambs",
   "🧬 Flush",
-  "📅 Sales",
 ];
 
 export const posts: Post[] = [
