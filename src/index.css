@@ -6,57 +6,60 @@
 
 @layer base {
   :root {
-    --background: 210 17% 98%;
-    --foreground: 220 26% 14%;
+    --background: 60 33% 97%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 26% 14%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 26% 14%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 224 64% 33%;
-    --primary-dark: 224 64% 40%;
+    --primary: 224 73% 33%;
+    --primary-dark: 224 73% 28%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 226 100% 97%;
-    --secondary-foreground: 224 64% 33%;
+    --secondary: 60 33% 97%;
+    --secondary-foreground: 224 73% 33%;
 
     --muted: 220 14% 96%;
     --muted-foreground: 220 9% 46%;
 
-    --accent: 226 100% 97%;
-    --accent-foreground: 224 64% 33%;
+    --accent: 60 33% 94%;
+    --accent-foreground: 224 73% 33%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 224 64% 33%;
+    --ring: 224 73% 33%;
 
-    --radius: 0.75rem;
+    --radius: 16px;
 
     --gold: 43 72% 52%;
-    --sand: 36 46% 78%;
-    --navy: 224 64% 33%;
+    --sand: 60 33% 97%;
+    --sand-dark: 60 20% 88%;
+    --navy: 224 73% 33%;
     --navy-light: 224 40% 45%;
 
-    --post-btn: 217 91% 53%;
-    --post-btn-hover: 217 91% 47%;
+    --post-btn: 224 73% 33%;
+    --post-btn-hover: 224 73% 28%;
 
-    --pill-bg: 226 100% 97%;
-    --pill-text: 224 64% 33%;
-    --pill-border: 224 76% 80%;
+    --pill-bg: 60 33% 97%;
+    --pill-text: 224 73% 33%;
+    --pill-border: 224 73% 70%;
 
-    --sidebar-background: 224 64% 33%;
-    --sidebar-foreground: 226 80% 90%;
-    --sidebar-primary: 226 100% 97%;
-    --sidebar-primary-foreground: 224 64% 33%;
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.1);
+
+    --sidebar-background: 224 73% 33%;
+    --sidebar-foreground: 60 33% 95%;
+    --sidebar-primary: 60 33% 97%;
+    --sidebar-primary-foreground: 224 73% 33%;
     --sidebar-accent: 224 50% 26%;
-    --sidebar-accent-foreground: 226 80% 95%;
+    --sidebar-accent-foreground: 60 33% 95%;
     --sidebar-border: 224 50% 26%;
-    --sidebar-ring: 226 100% 97%;
+    --sidebar-ring: 60 33% 97%;
   }
 }
 
@@ -68,6 +71,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
+    font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }

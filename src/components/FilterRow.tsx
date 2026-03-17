@@ -13,12 +13,12 @@ export function FilterRow({ active, onSelect }: FilterRowProps) {
           <button
             key={cat}
             onClick={() => onSelect(cat)}
-            className={`shrink-0 px-3 text-[12px] font-bold transition-all ${
+            className={`shrink-0 font-bold transition-all ${
               active === cat
-                ? "bg-foreground text-background"
-                : "bg-transparent text-foreground border border-white hover:border-foreground/60"
+                ? "bg-primary text-primary-foreground"
+                : "bg-transparent text-foreground border border-border hover:border-foreground/40"
             }`}
-            style={{ borderRadius: '4px', lineHeight: '16px', height: '36px' }}
+            style={{ borderRadius: '4px', fontSize: '12px', lineHeight: '16px', height: '36px', padding: '0 12px' }}
           >
             {cat}
           </button>

@@ -83,9 +83,6 @@ export const filterCategories = [
   "🏆 WINNERS",
   "💰 SALE",
   "⏱ CLOSING",
-  "📍 Ohio",
-  "🐑 Lambs",
-  "🧬 Flush",
 ];
 
 export const posts: Post[] = [
