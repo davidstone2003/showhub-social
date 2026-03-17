@@ -79,14 +79,13 @@ export const animals: Animal[] = [
 ];
 
 export const filterCategories = [
-  "All 🗹",
-  "For Sale 💰",
-  "Private Treaty 📄",
-  "Sale Previews 📅",
-  "Recent Winners 🏆",
-  "Flush 🧬",
-  "Embryos 🧪",
-  "Equipment 🔧",
+  "🔥 Hot Today",
+  "🏆 Recent Winners",
+  "💰 Just Listed",
+  "📍 Ohio",
+  "🐑 Club Lambs",
+  "🧬 Flush",
+  "📅 Sales",
 ];
 
 export const posts: Post[] = [
