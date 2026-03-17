@@ -83,12 +83,6 @@ export const animals: Animal[] = [
   },
 ];
 
-export const filterCategories = [
-  "🔥 HOT",
-  "🏆 WINNERS",
-  "💰 SALE",
-  "⏱ CLOSING",
-];
 
 export const posts: Post[] = [
   {
