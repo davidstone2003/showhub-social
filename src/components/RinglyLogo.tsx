@@ -1,10 +1,10 @@
-interface RinglyLogoProps {
+interface ShowHubLogoProps {
   size?: "sm" | "md" | "lg";
   showTagline?: boolean;
   onDark?: boolean;
 }
 
-export function RinglyLogo({ size = "md", showTagline = true, onDark = true }: RinglyLogoProps) {
+export function ShowHubLogo({ size = "md", showTagline = true, onDark = true }: ShowHubLogoProps) {
   const sizeClasses = {
     sm: "text-[24px]",
     md: "text-[26px]",
@@ -24,7 +24,7 @@ export function RinglyLogo({ size = "md", showTagline = true, onDark = true }: R
         style={{ fontFamily: "'Inter', sans-serif" }}
       >
         <span className={onDark ? "text-primary-foreground" : "text-primary"}>
-          Ringly
+          ShowHub
         </span>
       </h1>
       {showTagline && (

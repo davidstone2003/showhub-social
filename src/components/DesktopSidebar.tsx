@@ -15,7 +15,7 @@ export function DesktopSidebar() {
   return (
     <aside className="hidden lg:flex flex-col w-[200px] min-h-screen bg-primary text-sidebar-foreground border-r border-sidebar-border sticky top-0">
       <div className="p-5 border-b border-sidebar-border">
-        <RinglyLogo size="md" showTagline={true} onDark={true} />
+        <ShowHubLogo size="md" showTagline={true} onDark={true} />
       </div>
 
       <nav className="flex-1 py-4 px-3 space-y-1">
