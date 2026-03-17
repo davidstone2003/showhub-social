@@ -6,9 +6,14 @@ export function MobileHeader() {
   return (
     <header className="lg:hidden sticky top-0 z-40 bg-primary px-3 py-2">
       <div className="flex items-center gap-2">
-        <h1 className="text-lg font-bold text-primary-foreground tracking-tight shrink-0">
-          Show<span className="opacity-80">Hub</span>
-        </h1>
+        <div className="shrink-0">
+          <h1 className="text-lg font-bold text-primary-foreground tracking-tight leading-tight">
+            Show<span className="text-sand">Thread</span>
+          </h1>
+          <p className="text-[10px] text-sand/70 leading-tight -mt-0.5">
+            Where showmen connect, champions shine.
+          </p>
+        </div>
 
         <div className="flex-1 relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary-foreground/50" />
