@@ -3,6 +3,10 @@ import brandSaleDay from "@/assets/posts/brand-sale-day.jpeg";
 import beattyThankyou from "@/assets/posts/beatty-thankyou.jpeg";
 import whitcombFlush from "@/assets/posts/whitcomb-flush.jpeg";
 import beattySale from "@/assets/posts/beatty-sale.jpeg";
+import stoneIndianaFair from "@/assets/posts/stone-indiana-fair.jpeg";
+import stoneHoustonRodeo from "@/assets/posts/stone-houston-rodeo.jpeg";
+import stoneHotGrandchamp from "@/assets/posts/stone-hot-grandchamp.jpeg";
+import stoneBringHeat from "@/assets/posts/stone-bring-heat.jpeg";
 
 export interface Breeder {
   id: string;
