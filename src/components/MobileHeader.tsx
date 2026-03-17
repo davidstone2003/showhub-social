@@ -1,12 +1,12 @@
 import { Plus, Search } from "lucide-react";
 import { Link } from "react-router-dom";
-import { RinglyLogo } from "@/components/RinglyLogo";
+import { ShowHubLogo } from "@/components/RinglyLogo";
 
 export function MobileHeader() {
   return (
     <header className="lg:hidden sticky top-0 z-40 bg-card border-b border-border" style={{ padding: '8px 12px' }}>
       <div className="flex items-center justify-between">
-        <RinglyLogo size="sm" showTagline={false} onDark={false} />
+        <ShowHubLogo size="sm" showTagline={false} onDark={false} />
 
         <button className="p-2 rounded-lg hover:bg-muted transition-colors">
           <Search className="w-6 h-6 text-muted-foreground" />
