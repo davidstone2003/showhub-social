@@ -8,32 +8,22 @@ export function Feed() {
 
   const filteredPosts = useMemo(() => {
     if (activeFilter === filterCategories[0]) return posts;
+    // Strip emoji for matching
+    const clean = activeFilter.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").trim().toLowerCase();
     return posts.filter((p) =>
       p.tags.some((t) =>
-        t.label.toLowerCase().includes(activeFilter.replace(/\s*[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").trim().toLowerCase())
-      )
+        t.label.toLowerCase().includes(clean)
+      ) || p.caption.toLowerCase().includes(clean)
     );
   }, [activeFilter]);
-
-  const handleTagClick = (tag: { label: string; type: string }) => {
-    const match = filterCategories.find((c) =>
-      tag.label.toLowerCase().includes(c.replace(/\s*[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, "").trim().toLowerCase())
-    );
-    if (match) setActiveFilter(match);
-  };
 
   return (
     <div className="flex-1 max-w-2xl mx-auto w-full">
       <FilterRow active={activeFilter} onSelect={setActiveFilter} />
 
-      <div className="lg:py-4">
+      <div className="py-3 lg:py-4">
         {filteredPosts.map((post, i) => (
-          <PostCard
-            key={post.id}
-            post={post}
-            index={i}
-            onTagClick={handleTagClick}
-          />
+          <PostCard key={post.id} post={post} index={i} />
         ))}
 
         {filteredPosts.length === 0 && (
