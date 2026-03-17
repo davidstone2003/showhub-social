@@ -1,6 +1,6 @@
 import { Plus, Search } from "lucide-react";
 import { Link } from "react-router-dom";
-import { RinglyLogo } from "@/components/RinglyLogo";
+import { ShowHubLogo } from "@/components/RinglyLogo";
 
 export function MobileHeader() {
   return (
