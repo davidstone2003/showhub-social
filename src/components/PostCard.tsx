@@ -45,26 +45,26 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
           loading="lazy"
         />
 
-        {/* Top-left: Breeder + PRO */}
-        <div className="absolute top-0 left-0 right-0 p-3">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[16px] font-bold text-background drop-shadow-md leading-4">
+        {/* Full dark gradient: top transparent → bottom 50% black */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50 pointer-events-none" />
+
+        {/* Bottom-left: Breeder + PRO — 16px from edges */}
+        <div className="absolute bottom-0 left-0 right-0" style={{ padding: '16px' }}>
+          <div className="flex items-center" style={{ gap: '4px' }}>
+            <span className="text-[16px] font-bold text-white drop-shadow-md" style={{ lineHeight: '16px' }}>
               {post.breeder.name}
             </span>
             {post.breeder.is_pro && (
-              <span className="bg-gold text-background text-[8px] font-black w-[18px] h-[18px] rounded-full flex items-center justify-center shrink-0 shadow-sm">
+              <span className="bg-green-500 text-white text-[8px] font-black w-[18px] h-[18px] rounded-full flex items-center justify-center shrink-0 shadow-sm">
                 P
               </span>
             )}
           </div>
         </div>
 
-        {/* Bottom gradient overlay */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
-
         {/* Champion badge */}
         {post.post_type === "champion" && (
-          <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2.5 py-1 rounded-full bg-gold text-background text-[11px] font-bold shadow-lg">
+          <div className="absolute bottom-12 left-4 flex items-center gap-1 px-2.5 py-1 rounded-full bg-gold text-background text-[11px] font-bold shadow-lg">
             <Trophy className="w-3 h-3" />
             Champion
           </div>
@@ -72,47 +72,49 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
       </div>
 
       {/* Below image: genetics + meta */}
-      <div className="px-3 pt-2.5 space-y-0.5">
-        {subtitle && (
-          <p className="text-[14px] font-semibold text-foreground truncate" style={{ lineHeight: '16px' }}>
-            {subtitle}
+      <div style={{ padding: '12px', paddingBottom: '0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          {subtitle && (
+            <p className="text-[14px] font-semibold text-foreground truncate" style={{ lineHeight: '16px' }}>
+              {subtitle}
+            </p>
+          )}
+          <p className="text-[12px] text-muted-foreground" style={{ lineHeight: '16px' }}>
+            {post.breeder.location} · {post.created_at}
           </p>
-        )}
-        <p className="text-[12px] text-muted-foreground" style={{ lineHeight: '16px' }}>
-          {post.breeder.location} · {post.created_at}
-        </p>
-        {body && (
-          <p className="text-[14px] text-muted-foreground truncate pt-0.5" style={{ lineHeight: '16px' }}>
-            {body}
-          </p>
-        )}
+          {body && (
+            <p className="text-[14px] text-muted-foreground truncate" style={{ lineHeight: '16px', marginTop: '2px' }}>
+              {body}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Engagement */}
-      <div className="flex items-center justify-between px-3 pt-1.5 pb-1.5">
-        <p className="text-[12px] text-muted-foreground">
+      <div className="flex items-center justify-between" style={{ padding: '6px 12px' }}>
+        <p className="text-[12px] text-muted-foreground" style={{ lineHeight: '16px' }}>
           {likeCount.toLocaleString()} likes · {post.comments} comments
         </p>
       </div>
 
-      <div className="border-t border-border mx-3" />
+      <div className="border-t border-border" style={{ margin: '0 12px' }} />
 
-      <div className="flex items-center justify-around px-1 py-1">
+      <div className="flex items-center justify-around" style={{ padding: '4px' }}>
         <button onClick={handleLike} className="flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-muted transition-colors group flex-1 justify-center">
           <Heart className={`w-[17px] h-[17px] transition-colors ${liked ? "fill-destructive text-destructive" : "text-muted-foreground group-hover:text-destructive"}`} />
-          <span className={`text-[12px] font-medium ${liked ? "text-destructive" : "text-muted-foreground"}`}>Save</span>
+          <span className={`text-[12px] font-medium ${liked ? "text-destructive" : "text-muted-foreground"}`} style={{ lineHeight: '16px' }}>Save</span>
         </button>
         <button className="flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-muted transition-colors group flex-1 justify-center">
           <Share2 className="w-[17px] h-[17px] text-muted-foreground group-hover:text-primary transition-colors" />
-          <span className="text-[12px] font-medium text-muted-foreground">Share</span>
+          <span className="text-[12px] font-medium text-muted-foreground" style={{ lineHeight: '16px' }}>Share</span>
         </button>
         <button className="flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-muted transition-colors group flex-1 justify-center">
           <MessageCircle className="w-[17px] h-[17px] text-muted-foreground group-hover:text-primary transition-colors" />
-          <span className="text-[12px] font-medium text-muted-foreground">Contact</span>
+          <span className="text-[12px] font-medium text-muted-foreground" style={{ lineHeight: '16px' }}>Contact</span>
         </button>
         <button onClick={() => setSaved(!saved)} className="flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-muted transition-colors group flex-1 justify-center">
           <Bookmark className={`w-[17px] h-[17px] transition-colors ${saved ? "fill-primary text-primary" : "text-muted-foreground group-hover:text-primary"}`} />
-          <span className={`text-[12px] font-medium ${saved ? "text-primary" : "text-muted-foreground"}`}>Follow</span>
+          <span className={`text-[12px] font-medium ${saved ? "text-primary" : "text-muted-foreground"}`} style={{ lineHeight: '16px' }}>Follow</span>
         </button>
       </div>
     </motion.article>
