@@ -1,7 +1,6 @@
 import { Heart, Share2, MessageCircle, Bookmark, Trophy } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import type { Post } from "@/data/mock";
 
 interface PostCardProps {
@@ -10,12 +9,12 @@ interface PostCardProps {
   onTagClick?: (tag: { label: string; type: string }) => void;
 }
 
-// Extract title (first line) and genetics line from caption
 function parseCaption(caption: string) {
   const lines = caption.split("\n").filter((l) => l.trim() !== "");
   const title = lines[0] || "";
   const subtitle = lines[1] && /[x×]/i.test(lines[1]) ? lines[1] : undefined;
-  return { title, subtitle };
+  const body = lines.slice(subtitle ? 2 : 1).find((l) => l.trim().length > 0);
+  return { title, subtitle, body };
 }
 
 export function PostCard({ post, index, onTagClick }: PostCardProps) {
@@ -28,16 +27,16 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
     setLikeCount((c) => (liked ? c - 1 : c + 1));
   };
 
-  const { title, subtitle } = parseCaption(post.caption);
+  const { title, subtitle, body } = parseCaption(post.caption);
 
   return (
     <motion.article
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: index * 0.03 }}
-      className="bg-card rounded-xl border border-border shadow-sm overflow-hidden mx-3 mb-3 lg:mx-0"
+      className="bg-card rounded-xl border border-border shadow-sm overflow-hidden mx-3 lg:mx-0"
     >
-      {/* Image-first: full-bleed photo with overlay */}
+      {/* Image with overlays */}
       <div className="relative w-full overflow-hidden bg-muted">
         <img
           src={post.image}
@@ -46,32 +45,22 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
           loading="lazy"
         />
 
-        {/* Top-right overlay info */}
-        <div className="absolute top-0 right-0 left-0 bg-gradient-to-b from-foreground/60 via-foreground/30 to-transparent p-3">
-          <div className="flex items-start justify-between">
-            <div />
-            <div className="flex flex-col items-end gap-1">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[13px] font-bold text-background drop-shadow-sm">
-                  {post.breeder.name}
-                </span>
-                {post.breeder.is_pro && (
-                  <span className="bg-gold text-background text-[8px] font-black w-[18px] h-[18px] rounded-full flex items-center justify-center shrink-0 shadow-sm">
-                    P
-                  </span>
-                )}
-              </div>
-              {subtitle && (
-                <span className="text-[12px] font-medium text-background/90 drop-shadow-sm">
-                  {subtitle}
-                </span>
-              )}
-              <span className="text-[11px] text-background/80 drop-shadow-sm">
-                {post.breeder.location} · {post.created_at}
+        {/* Top-left: Breeder + PRO */}
+        <div className="absolute top-0 left-0 right-0 p-3">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[16px] font-bold text-background drop-shadow-md leading-4">
+              {post.breeder.name}
+            </span>
+            {post.breeder.is_pro && (
+              <span className="bg-gold text-background text-[8px] font-black w-[18px] h-[18px] rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                P
               </span>
-            </div>
+            )}
           </div>
         </div>
+
+        {/* Bottom gradient overlay */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
 
         {/* Champion badge */}
         {post.post_type === "champion" && (
@@ -82,15 +71,25 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
         )}
       </div>
 
-      {/* 1-line caption below image */}
-      <div className="px-3 pt-2.5 pb-2">
-        <p className="text-[14px] font-semibold text-foreground truncate leading-snug">
-          {title}
+      {/* Below image: genetics + meta */}
+      <div className="px-3 pt-2.5 space-y-0.5">
+        {subtitle && (
+          <p className="text-[14px] font-semibold text-foreground truncate" style={{ lineHeight: '16px' }}>
+            {subtitle}
+          </p>
+        )}
+        <p className="text-[12px] text-muted-foreground" style={{ lineHeight: '16px' }}>
+          {post.breeder.location} · {post.created_at}
         </p>
+        {body && (
+          <p className="text-[14px] text-muted-foreground truncate pt-0.5" style={{ lineHeight: '16px' }}>
+            {body}
+          </p>
+        )}
       </div>
 
-      {/* Engagement + actions */}
-      <div className="flex items-center justify-between px-3 pb-2">
+      {/* Engagement */}
+      <div className="flex items-center justify-between px-3 pt-1.5 pb-1.5">
         <p className="text-[12px] text-muted-foreground">
           {likeCount.toLocaleString()} likes · {post.comments} comments
         </p>

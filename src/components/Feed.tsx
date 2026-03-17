@@ -21,7 +21,7 @@ export function Feed() {
     <div className="flex-1 max-w-2xl mx-auto w-full">
       <FilterRow active={activeFilter} onSelect={setActiveFilter} />
 
-      <div className="py-3 lg:py-4">
+      <div className="py-3 lg:py-4 space-y-6">
         {filteredPosts.map((post, i) => (
           <PostCard key={post.id} post={post} index={i} />
         ))}
