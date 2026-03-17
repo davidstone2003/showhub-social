@@ -60,6 +60,7 @@ export default {
         },
         sand: {
           DEFAULT: "hsl(var(--sand))",
+          dark: "hsl(var(--sand-dark))",
         },
         "post-btn": {
           DEFAULT: "hsl(var(--post-btn))",

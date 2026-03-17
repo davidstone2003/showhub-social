@@ -1,12 +1,12 @@
-import { Heart, Share2, MessageCircle, Bookmark, Trophy } from "lucide-react";
+import { Heart, Share2, MessageCircle, Trophy } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import type { Post } from "@/data/mock";
 
 interface PostCardProps {
   post: Post;
   index: number;
-  onTagClick?: (tag: { label: string; type: string }) => void;
 }
 
 function parseCaption(caption: string) {
@@ -17,7 +17,7 @@ function parseCaption(caption: string) {
   return { title, subtitle, body };
 }
 
-export function PostCard({ post, index, onTagClick }: PostCardProps) {
+export function PostCard({ post, index }: PostCardProps) {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(post.saved);
   const [likeCount, setLikeCount] = useState(post.likes);
@@ -27,94 +27,106 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
     setLikeCount((c) => (liked ? c - 1 : c + 1));
   };
 
-  const { title, subtitle, body } = parseCaption(post.caption);
+  const { subtitle, body } = parseCaption(post.caption);
+
+  const isHot = post.tags.some((t) => t.label.toLowerCase().includes("sale") || t.label.toLowerCase().includes("hot"));
 
   return (
     <motion.article
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: index * 0.03 }}
-      className="bg-card rounded-xl border border-border shadow-sm overflow-hidden mx-3 lg:mx-0"
+      className="bg-card overflow-hidden mx-3 lg:mx-0"
+      style={{ borderRadius: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}
     >
       {/* Image with overlays */}
-      <div className="relative w-full overflow-hidden bg-muted">
+      <Link to={post.animal_id ? `/animal/${post.animal_id}` : "#"} className="block relative w-full overflow-hidden bg-muted" style={{ borderRadius: '12px 12px 0 0' }}>
         <img
           src={post.image}
-          alt={title}
+          alt={post.breeder.name}
           className="w-full aspect-[4/5] object-cover"
           loading="lazy"
         />
 
-        {/* Full dark gradient: top transparent → bottom 50% black */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50 pointer-events-none" />
+        {/* Bottom 40% gradient */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.5) 100%)' }} />
 
-        {/* Bottom-left: Breeder + PRO — 16px from edges */}
+        {/* Bottom-left: Breeder + PRO + wins */}
         <div className="absolute bottom-0 left-0 right-0" style={{ padding: '16px' }}>
           <div className="flex items-center" style={{ gap: '4px' }}>
-            <span className="text-[16px] font-bold text-white drop-shadow-md" style={{ lineHeight: '16px' }}>
-              {post.breeder.name}
-            </span>
+            <Link to={`/breeders/${post.breeder.id}`} className="hover:underline" onClick={(e) => e.stopPropagation()}>
+              <span className="font-bold text-white drop-shadow-md" style={{ fontSize: '16px', lineHeight: '16px' }}>
+                {post.breeder.name}
+              </span>
+            </Link>
             {post.breeder.is_pro && (
-              <span className="bg-green-500 text-white text-[8px] font-black w-[18px] h-[18px] rounded-full flex items-center justify-center shrink-0 shadow-sm">
+              <span className="bg-green-500 text-white font-black flex items-center justify-center shrink-0 shadow-sm" style={{ fontSize: '8px', width: '18px', height: '18px', borderRadius: '50%', marginLeft: '4px' }}>
                 P
               </span>
             )}
           </div>
+          {post.post_type === "champion" && (
+            <div className="flex items-center text-white mt-1" style={{ gap: '4px', fontSize: '12px', lineHeight: '16px' }}>
+              <Trophy className="w-3 h-3" />
+              <span>12 wins this season</span>
+            </div>
+          )}
         </div>
+      </Link>
 
-        {/* Champion badge */}
-        {post.post_type === "champion" && (
-          <div className="absolute bottom-12 left-4 flex items-center gap-1 px-2.5 py-1 rounded-full bg-gold text-background text-[11px] font-bold shadow-lg">
-            <Trophy className="w-3 h-3" />
-            Champion
-          </div>
-        )}
-      </div>
-
-      {/* Below image: genetics + meta */}
-      <div style={{ padding: '12px', paddingBottom: '0' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+      {/* Content section */}
+      <div style={{ padding: '10px 12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {subtitle && (
-            <p className="text-[14px] font-semibold text-foreground truncate" style={{ lineHeight: '16px' }}>
+            <p className="font-bold text-primary truncate" style={{ fontSize: '14px', lineHeight: '16px' }}>
               {subtitle}
             </p>
           )}
-          <p className="text-[12px] text-muted-foreground" style={{ lineHeight: '16px' }}>
+          <p className="text-muted-foreground" style={{ fontSize: '12px', lineHeight: '16px' }}>
             {post.breeder.location} · {post.created_at}
+            {isHot && <span className="ml-1">🔥 Hot</span>}
           </p>
           {body && (
-            <p className="text-[14px] text-muted-foreground truncate" style={{ lineHeight: '16px', marginTop: '2px' }}>
+            <p className="text-muted-foreground truncate" style={{ fontSize: '14px', lineHeight: '16px' }}>
               {body}
             </p>
           )}
         </div>
-      </div>
 
-      {/* Engagement */}
-      <div className="flex items-center justify-between" style={{ padding: '6px 12px' }}>
-        <p className="text-[12px] text-muted-foreground" style={{ lineHeight: '16px' }}>
+        {/* Engagement stats */}
+        <p className="text-muted-foreground" style={{ fontSize: '12px', lineHeight: '16px', marginTop: '4px' }}>
           {likeCount.toLocaleString()} likes · {post.comments} comments
         </p>
       </div>
 
+      {/* Divider */}
       <div className="border-t border-border" style={{ margin: '0 12px' }} />
 
-      <div className="flex items-center justify-around" style={{ padding: '4px' }}>
-        <button onClick={handleLike} className="flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-muted transition-colors group flex-1 justify-center">
-          <Heart className={`w-[17px] h-[17px] transition-colors ${liked ? "fill-destructive text-destructive" : "text-muted-foreground group-hover:text-destructive"}`} />
-          <span className={`text-[12px] font-medium ${liked ? "text-destructive" : "text-muted-foreground"}`} style={{ lineHeight: '16px' }}>Save</span>
+      {/* Action bar */}
+      <div className="flex items-center" style={{ height: '44px', padding: '0 8px', gap: '6px' }}>
+        {/* CONTACT - filled navy */}
+        <button className="flex items-center justify-center gap-1.5 bg-primary text-primary-foreground font-bold hover:bg-primary-dark transition-colors flex-1" style={{ borderRadius: '10px', fontSize: '12px', lineHeight: '16px', height: '32px' }}>
+          <MessageCircle className="w-4 h-4" />
+          CONTACT
         </button>
-        <button className="flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-muted transition-colors group flex-1 justify-center">
-          <Share2 className="w-[17px] h-[17px] text-muted-foreground group-hover:text-primary transition-colors" />
-          <span className="text-[12px] font-medium text-muted-foreground" style={{ lineHeight: '16px' }}>Share</span>
+
+        {/* Save icon */}
+        <button onClick={handleLike} className="flex items-center justify-center rounded-lg hover:bg-muted transition-colors" style={{ width: '36px', height: '32px' }}>
+          <Heart className={`w-5 h-5 transition-colors ${liked ? "fill-destructive text-destructive" : "text-muted-foreground hover:text-destructive"}`} />
         </button>
-        <button className="flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-muted transition-colors group flex-1 justify-center">
-          <MessageCircle className="w-[17px] h-[17px] text-muted-foreground group-hover:text-primary transition-colors" />
-          <span className="text-[12px] font-medium text-muted-foreground" style={{ lineHeight: '16px' }}>Contact</span>
+
+        {/* Share icon */}
+        <button className="flex items-center justify-center rounded-lg hover:bg-muted transition-colors" style={{ width: '36px', height: '32px' }}>
+          <Share2 className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
         </button>
-        <button onClick={() => setSaved(!saved)} className="flex items-center gap-1.5 py-2 px-3 rounded-lg hover:bg-muted transition-colors group flex-1 justify-center">
-          <Bookmark className={`w-[17px] h-[17px] transition-colors ${saved ? "fill-primary text-primary" : "text-muted-foreground group-hover:text-primary"}`} />
-          <span className={`text-[12px] font-medium ${saved ? "text-primary" : "text-muted-foreground"}`} style={{ lineHeight: '16px' }}>Follow</span>
+
+        {/* FOLLOW - outline */}
+        <button
+          onClick={() => setSaved(!saved)}
+          className={`flex items-center justify-center font-bold border transition-colors flex-1 ${saved ? "bg-primary text-primary-foreground border-primary" : "bg-transparent text-primary border-primary hover:bg-primary/5"}`}
+          style={{ borderRadius: '10px', fontSize: '12px', lineHeight: '16px', height: '32px' }}
+        >
+          {saved ? "FOLLOWING" : "FOLLOW"}
         </button>
       </div>
     </motion.article>
