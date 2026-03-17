@@ -1,6 +1,6 @@
 import { Home, Trophy, Users, Dna, ShoppingBag, Truck, Plus } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import { ShowThreadLogo } from "@/components/ShowThreadLogo";
+import { RinglyLogo } from "@/components/RinglyLogo";
 
 const navItems = [
   { icon: Home, label: "Feed", to: "/" },
