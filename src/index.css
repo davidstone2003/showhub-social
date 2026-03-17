@@ -52,11 +52,11 @@
 
     --shadow-card: 0 1px 3px rgba(0,0,0,0.1);
 
-    --sidebar-background: 217 91% 20%;
+    --sidebar-background: 224 64% 33%;
     --sidebar-foreground: 60 33% 95%;
     --sidebar-primary: 60 33% 97%;
-    --sidebar-primary-foreground: 217 91% 20%;
-    --sidebar-accent: 217 80% 16%;
+    --sidebar-primary-foreground: 224 64% 33%;
+    --sidebar-accent: 224 64% 26%;
     --sidebar-accent-foreground: 60 33% 95%;
     --sidebar-border: 217 80% 16%;
     --sidebar-ring: 60 33% 97%;
