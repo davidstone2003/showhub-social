@@ -62,6 +62,7 @@ export const breeders: Breeder[] = [
   { id: "b3", name: "Beatty's Club Lambs", location: "Indiana, PA", logo: "🏆", is_pro: true },
   { id: "b4", name: "Whitcomb Club Lambs", location: "Illinois", logo: "🐏", is_pro: true },
   { id: "b5", name: "Allen Newcomb Show Lambs", location: "Oklahoma", logo: "🎯", is_pro: false },
+  { id: "b6", name: "Stone Show Stock", location: "Georgia", logo: "🪨", is_pro: true },
 ];
 
 export const sires: Sire[] = [
