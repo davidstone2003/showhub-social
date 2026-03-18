@@ -193,7 +193,7 @@ export default function SubmitWinnerPage() {
 
       if (error) throw error;
 
-      toast.success("Winner posted! 🏆", {
+      toast.success("Added to Backdrop! 🏆", {
         description: `${title} at ${showName}`,
       });
       navigate("/");
@@ -213,7 +213,7 @@ export default function SubmitWinnerPage() {
         <div className="sticky top-0 z-20 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
           <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
             <Trophy className="w-5 h-5 text-gold" />
-            Post a Winner
+            Add to Backdrop
           </h1>
         </div>
 
@@ -443,7 +443,7 @@ export default function SubmitWinnerPage() {
             className="w-full h-12 rounded-xl text-base font-bold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
           >
             <Trophy className="w-5 h-5 mr-2" />
-            {submitting ? "Posting…" : "Post Winner"}
+            {submitting ? "Adding…" : "Add to Backdrop"}
           </Button>
         </div>
       </div>

@@ -61,7 +61,7 @@ export default function WinnersPage() {
     <Layout showDiscovery={false}>
       <div className="min-h-screen bg-background pb-24">
         <div className="sticky top-0 z-20 bg-card border-b border-border px-4 py-3">
-          <h1 className="text-lg font-bold text-foreground">Winners</h1>
+          <h1 className="text-lg font-bold text-foreground">Backdrop</h1>
         </div>
 
         <div className="max-w-2xl mx-auto w-full py-3 flex flex-col gap-6">
@@ -80,7 +80,7 @@ export default function WinnersPage() {
                 className="inline-flex items-center gap-2 mt-4 h-10 px-4 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                Post the first winner
+                Add to Backdrop
               </Link>
             </div>
           )}

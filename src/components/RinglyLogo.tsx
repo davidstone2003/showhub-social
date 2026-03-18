@@ -1,10 +1,10 @@
-interface ShowHubLogoProps {
+interface BackdropLogoProps {
   size?: "sm" | "md" | "lg";
   showTagline?: boolean;
   onDark?: boolean;
 }
 
-export function ShowHubLogo({ size = "md", showTagline = true, onDark = true }: ShowHubLogoProps) {
+export function BackdropLogo({ size = "md", showTagline = true, onDark = true }: BackdropLogoProps) {
   const sizeClasses = {
     sm: "text-[24px]",
     md: "text-[26px]",
@@ -24,7 +24,7 @@ export function ShowHubLogo({ size = "md", showTagline = true, onDark = true }: 
         style={{ fontFamily: "'Inter', sans-serif" }}
       >
         <span className={onDark ? "text-primary-foreground" : "text-primary"}>
-          ShowHub
+          Backdrop
         </span>
       </h1>
       {showTagline && (
@@ -32,9 +32,12 @@ export function ShowHubLogo({ size = "md", showTagline = true, onDark = true }: 
           className={`${taglineSizes[size]} leading-tight mt-0.5 text-sand`}
           style={{ letterSpacing: "0.04em" }}
         >
-          Where showmen and breeders connect, champions shine.
+          Where champions are captured
         </p>
       )}
     </div>
   );
 }
+
+// Keep backward compat
+export { BackdropLogo as ShowHubLogo };
