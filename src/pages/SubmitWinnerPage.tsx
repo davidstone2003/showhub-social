@@ -182,6 +182,7 @@ export default function SubmitWinnerPage() {
         bred_by: bredBy.trim() || null,
         sired_by: siredBy.trim() || null,
         dam: dam.trim() || null,
+        placed_by: placedBy.trim() || null,
         caption: caption.trim() || null,
         tags,
         image_urls: imageUrls,
