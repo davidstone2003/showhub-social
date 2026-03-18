@@ -213,7 +213,7 @@ export default function SubmitWinnerPage() {
         <div className="sticky top-0 z-20 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
           <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
             <Trophy className="w-5 h-5 text-gold" />
-            Post a Winner
+            Add to Backdrop
           </h1>
         </div>
 
