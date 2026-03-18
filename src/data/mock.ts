@@ -38,6 +38,14 @@ export interface Post {
   likes: number;
   comments: number;
   saved: boolean;
+  // Structured fields for Backdrop wins
+  win_title?: string;
+  show_name?: string;
+  shown_by?: string;
+  bred_by?: string;
+  sired_by?: string;
+  dam?: string;
+  placed_by?: string;
 }
 
 export interface Animal {

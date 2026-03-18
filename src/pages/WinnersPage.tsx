@@ -20,32 +20,29 @@ export default function WinnersPage() {
 
       if (data) {
         setWinners(
-          data.map((winner) => ({
-            id: winner.id,
-            image: winner.image_urls?.[0] || "/placeholder.svg",
+          data.map((w) => ({
+            id: w.id,
+            image: w.image_urls?.[0] || "/placeholder.svg",
             breeder: {
-              id: `winner-${winner.id}`,
-              name: winner.shown_by,
-              location: winner.show_name,
+              id: `winner-${w.id}`,
+              name: w.shown_by,
+              location: w.show_name,
               logo: "🏆",
               is_pro: false,
             },
-            caption: [
-              winner.title,
-              `Shown By: ${winner.shown_by}`,
-              winner.bred_by ? `Bred By: ${winner.bred_by}` : "",
-              winner.sired_by ? `Sired By: ${winner.sired_by}` : "",
-              winner.dam ? `Dam: ${winner.dam}` : "",
-              "",
-              winner.caption || "",
-            ]
-              .filter(Boolean)
-              .join("\n"),
-            tags: (winner.tags || []).map((tag: string) => ({ label: tag, type: "winner" })),
-            post_type: "champion",
-            created_at: new Date(winner.created_at).toLocaleDateString(),
-            likes: winner.likes || 0,
-            comments: winner.comments || 0,
+            win_title: w.title,
+            show_name: w.show_name,
+            shown_by: w.shown_by,
+            bred_by: w.bred_by || undefined,
+            sired_by: w.sired_by || undefined,
+            dam: w.dam || undefined,
+            placed_by: w.placed_by || undefined,
+            caption: w.caption || "",
+            tags: (w.tags || []).map((tag: string) => ({ label: tag, type: "winner" })),
+            post_type: "champion" as const,
+            created_at: new Date(w.created_at).toLocaleDateString(),
+            likes: w.likes || 0,
+            comments: w.comments || 0,
             saved: false,
           }))
         );
