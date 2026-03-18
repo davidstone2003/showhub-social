@@ -109,6 +109,7 @@ export default function SubmitWinnerPage() {
         breeder_id: resolvedBreederId,
         placed_by: placedBy.trim() || null,
         date: format(showDate, "yyyy-MM-dd"),
+        win_placing: winPlacing.trim() || null,
         caption: caption.trim() || null,
         tags: [],
         image_urls: imageUrls,
