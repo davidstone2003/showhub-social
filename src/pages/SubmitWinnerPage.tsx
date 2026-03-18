@@ -69,7 +69,7 @@ export default function SubmitWinnerPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const isValid = images.length > 0 && title.trim() && showName.trim() && shownBy.trim();
+  const isValid = title.trim() && showName.trim() && shownBy.trim();
 
   // Auto-generate tags from fields
   useEffect(() => {
