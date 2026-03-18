@@ -369,6 +369,12 @@ export default function SubmitWinnerPage() {
                 onChange={(e) => setDam(e.target.value)}
                 className="rounded-xl bg-card border-border h-12 text-sm"
               />
+              <Input
+                placeholder="Placed By (e.g., John Smith)"
+                value={placedBy}
+                onChange={(e) => setPlacedBy(e.target.value)}
+                className="rounded-xl bg-card border-border h-12 text-sm"
+              />
             </CollapsibleContent>
           </Collapsible>
 
