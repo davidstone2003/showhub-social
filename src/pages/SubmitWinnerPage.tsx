@@ -1,13 +1,16 @@
 import React, { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { AutocompleteInput } from "@/components/AutocompleteInput";
-import { Camera, X, ImagePlus, Heart, MessageCircle, Clipboard, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
+import { PostTypeSelector, getDefaultToggles } from "@/components/PostTypeSelector";
+import type { PostType } from "@/components/PostTypeSelector";
+import { Camera, X, ImagePlus, Heart, MessageCircle, Clipboard, Sparkles, ChevronDown, ChevronUp, LogIn } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { parseFacebookCaption } from "@/lib/parseFacebookCaption";
@@ -40,6 +43,9 @@ const ensureLookupEntry = async (
 
 /* ── page ── */
 export default function SubmitWinnerPage() {
+  const { user, profile } = useAuth();
+  const isPremium = profile?.is_premium ?? false;
+
   const [images, setImages] = useState<ImageFile[]>([]);
   const [showName, setShowName] = useState("");
   const [showId, setShowId] = useState<string | null>(null);
@@ -51,6 +57,11 @@ export default function SubmitWinnerPage() {
   const [damName, setDamName] = useState("");
   const [caption, setCaption] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  /* Post type + toggles */
+  const [postType, setPostType] = useState<PostType>("winner");
+  const [toggles, setToggles] = useState(getDefaultToggles("winner"));
+
   const [successData, setSuccessData] = useState<{
     showName: string; winPlacing: string; shownBy: string;
     placedBy: string; sireName: string; damName: string;
@@ -151,6 +162,12 @@ export default function SubmitWinnerPage() {
         image_urls: imageUrls,
         show_id: resolvedShowId,
         date: format(new Date(), "yyyy-MM-dd"),
+        user_id: user?.id || null,
+        post_type: postType,
+        show_on_feed: toggles.feed,
+        show_on_breeder_page: toggles.breederPage,
+        show_on_winners_archive: toggles.winnersArchive,
+        is_featured: toggles.featured,
       });
 
       if (error) throw error;
@@ -188,6 +205,19 @@ export default function SubmitWinnerPage() {
           <h1 className="text-lg font-bold text-foreground">Backdrop</h1>
           <p className="text-xs text-muted-foreground">Put your win on the backdrop</p>
         </div>
+
+        {/* Auth prompt */}
+        {!user && (
+          <div className="max-w-lg mx-auto px-4 pt-4">
+            <Link
+              to="/auth"
+              className="flex items-center gap-2 px-4 py-3 rounded-xl bg-primary/5 border border-primary/20 text-sm text-primary font-medium hover:bg-primary/10 transition-colors"
+            >
+              <LogIn className="w-4 h-4" />
+              Sign in to save posts to your breeder page
+            </Link>
+          </div>
+        )}
 
         <div className="max-w-lg mx-auto px-4 py-4 space-y-5">
           {/* Facebook Import */}
@@ -230,6 +260,17 @@ export default function SubmitWinnerPage() {
                 )}
               </div>
             )}
+          </div>
+
+          {/* Post Type + Toggles */}
+          <div className="bg-card border border-border rounded-xl p-3.5">
+            <PostTypeSelector
+              postType={postType}
+              onPostTypeChange={setPostType}
+              toggles={toggles}
+              onTogglesChange={setToggles}
+              isPremium={isPremium}
+            />
           </div>
 
           {/* Photo Upload */}

@@ -32,6 +32,36 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          bio: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          is_premium: boolean
+          logo_url: string | null
+          username: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          is_premium?: boolean
+          logo_url?: string | null
+          username: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          is_premium?: boolean
+          logo_url?: string | null
+          username?: string
+        }
+        Relationships: []
+      }
       shows: {
         Row: {
           created_at: string
@@ -79,15 +109,21 @@ export type Database = {
           date: string
           id: string
           image_urls: string[] | null
+          is_featured: boolean
           likes: number
           placed_by: string | null
+          post_type: string
           show_id: string | null
           show_name: string
+          show_on_breeder_page: boolean
+          show_on_feed: boolean
+          show_on_winners_archive: boolean
           shown_by: string
           sire_id: string | null
           sired_by: string | null
           tags: string[] | null
           title: string
+          user_id: string | null
           win_placing: string | null
         }
         Insert: {
@@ -100,15 +136,21 @@ export type Database = {
           date?: string
           id?: string
           image_urls?: string[] | null
+          is_featured?: boolean
           likes?: number
           placed_by?: string | null
+          post_type?: string
           show_id?: string | null
           show_name: string
+          show_on_breeder_page?: boolean
+          show_on_feed?: boolean
+          show_on_winners_archive?: boolean
           shown_by: string
           sire_id?: string | null
           sired_by?: string | null
           tags?: string[] | null
           title: string
+          user_id?: string | null
           win_placing?: string | null
         }
         Update: {
@@ -121,15 +163,21 @@ export type Database = {
           date?: string
           id?: string
           image_urls?: string[] | null
+          is_featured?: boolean
           likes?: number
           placed_by?: string | null
+          post_type?: string
           show_id?: string | null
           show_name?: string
+          show_on_breeder_page?: boolean
+          show_on_feed?: boolean
+          show_on_winners_archive?: boolean
           shown_by?: string
           sire_id?: string | null
           sired_by?: string | null
           tags?: string[] | null
           title?: string
+          user_id?: string | null
           win_placing?: string | null
         }
         Relationships: [

@@ -1,6 +1,7 @@
-import { Home, Trophy, Users, Dna, ShoppingBag, Truck, Plus } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { Home, Trophy, Users, Dna, ShoppingBag, Truck, Plus, LogIn, LogOut, User } from "lucide-react";
+import { NavLink, Link } from "react-router-dom";
 import { BackdropLogo } from "@/components/RinglyLogo";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
   { icon: Home, label: "Feed", to: "/" },
@@ -12,6 +13,8 @@ const navItems = [
 ];
 
 export function DesktopSidebar() {
+  const { user, profile, signOut } = useAuth();
+
   return (
     <aside className="hidden lg:flex flex-col w-[200px] min-h-screen bg-primary text-sidebar-foreground border-r border-sidebar-border sticky top-0">
       <div className="p-5 border-b border-sidebar-border">
@@ -37,7 +40,33 @@ export function DesktopSidebar() {
         ))}
       </nav>
 
-      <div className="p-3 border-t border-sidebar-border">
+      <div className="p-3 space-y-2 border-t border-sidebar-border">
+        {user ? (
+          <>
+            <Link
+              to={profile ? `/breeder/${profile.username}` : "#"}
+              className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
+            >
+              <User className="w-4 h-4" />
+              {profile?.display_name || "Profile"}
+            </Link>
+            <button
+              onClick={signOut}
+              className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground/60 hover:bg-sidebar-accent/50 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Sign Out
+            </button>
+          </>
+        ) : (
+          <NavLink
+            to="/auth"
+            className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
+          >
+            <LogIn className="w-4 h-4" />
+            Sign In
+          </NavLink>
+        )}
         <NavLink
           to="/submit"
           className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-primary-foreground/10 text-primary-foreground text-sm font-semibold hover:bg-primary-foreground/20 transition-colors"
