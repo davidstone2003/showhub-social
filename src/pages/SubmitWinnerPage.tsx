@@ -164,7 +164,7 @@ export default function SubmitWinnerPage() {
         caption: caption.trim(),
         imageUrls,
       });
-      navigate("/");
+      
     } catch (err: any) {
       toast.error("Failed to post", { description: err.message || "Please try again." });
     } finally {
