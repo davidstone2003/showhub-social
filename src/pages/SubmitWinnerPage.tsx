@@ -167,6 +167,48 @@ export default function SubmitWinnerPage() {
         </div>
 
         <div className="max-w-lg mx-auto px-4 py-4 space-y-5">
+          {/* Facebook Import */}
+          <div className="bg-card border border-border rounded-xl overflow-hidden">
+            <button
+              onClick={() => { setImportOpen(!importOpen); setImportSuccess(false); }}
+              className="w-full flex items-center justify-between px-3.5 py-3"
+            >
+              <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Clipboard className="w-4 h-4 text-muted-foreground" />
+                Import from Facebook
+              </span>
+              {importOpen ? (
+                <ChevronUp className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              )}
+            </button>
+            {importOpen && (
+              <div className="px-3.5 pb-3.5 space-y-2">
+                <Textarea
+                  placeholder="Paste your Facebook caption here..."
+                  value={importText}
+                  onChange={(e) => { setImportText(e.target.value); setImportSuccess(false); }}
+                  className="rounded-lg bg-muted/50 border-border text-sm min-h-[100px] resize-none"
+                />
+                <Button
+                  onClick={handleAutoFill}
+                  disabled={!importText.trim()}
+                  variant="outline"
+                  className="w-full h-10 rounded-lg text-sm font-medium gap-2"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Auto Fill
+                </Button>
+                {importSuccess && (
+                  <p className="text-xs text-green-600 font-medium text-center">
+                    ✓ We found these details — edit below before posting
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Photo Upload */}
           <PhotoUpload
             images={images}
