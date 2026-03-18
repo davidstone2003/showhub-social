@@ -16,7 +16,7 @@ const PlaceholderPage = ({ title, description }: PlaceholderPageProps) => (
   </Layout>
 );
 
-export const WinnersPage = () => <PlaceholderPage title="Winners" description="Browse champion lambs from shows across the country." />;
 export const MarketPage = () => <PlaceholderPage title="Market" description="Find show lambs, breeding stock, and equipment for sale." />;
 export const HaulersPage = () => <PlaceholderPage title="Haulers" description="Connect with livestock haulers in your area." />;
+// WinnersPage moved to WinnersPage.tsx
 // SubmitPage moved to SubmitWinnerPage.tsx

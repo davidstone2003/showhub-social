@@ -174,33 +174,33 @@ export default function SubmitWinnerPage() {
     setSubmitting(true);
 
     try {
-      // Upload images to storage
       const imageUrls: string[] = [];
+
       for (const img of images) {
-        const fileExt = img.file.name.split('.').pop();
+        const fileExt = img.file.name.split(".").pop();
         const filePath = `${crypto.randomUUID()}.${fileExt}`;
         const { error: uploadError } = await supabase.storage
-          .from('winner-images')
+          .from("winner-images")
           .upload(filePath, img.file, {
             contentType: img.file.type,
-            cacheControl: '3600',
+            cacheControl: "3600",
           });
+
         if (uploadError) {
-          console.error('Upload error:', uploadError);
-        } else {
-          const { data: urlData } = supabase.storage
-            .from('winner-images')
-            .getPublicUrl(filePath);
-          imageUrls.push(urlData.publicUrl);
+          throw new Error("Photo upload failed. Please try again.");
         }
+
+        const { data: urlData } = supabase.storage
+          .from("winner-images")
+          .getPublicUrl(filePath);
+        imageUrls.push(urlData.publicUrl);
       }
 
-      // Insert winner into database
-      const { error } = await supabase.from('winners').insert({
+      const { error } = await supabase.from("winners").insert({
         title: title.trim(),
         show_name: showName.trim(),
         shown_by: shownBy.trim(),
-        date: date.toISOString().split('T')[0],
+        date: date.toISOString().split("T")[0],
         bred_by: bredBy.trim() || null,
         sired_by: siredBy.trim() || null,
         dam: dam.trim() || null,
@@ -216,7 +216,9 @@ export default function SubmitWinnerPage() {
       });
       navigate("/");
     } catch (err: any) {
-      toast.error("Failed to post", { description: err.message });
+      toast.error("Failed to post", {
+        description: err.message || "Please try again.",
+      });
     } finally {
       setSubmitting(false);
     }
