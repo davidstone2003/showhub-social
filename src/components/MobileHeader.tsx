@@ -2,6 +2,7 @@ import { Plus, Search, LogIn, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export function MobileHeader() {
   const { user, profile } = useAuth();
@@ -17,12 +18,15 @@ export function MobileHeader() {
           </button>
 
           {user ? (
-            <Link
-              to={profile ? `/breeder/${profile.username}` : "#"}
-              className="p-2 rounded-lg hover:bg-muted transition-colors"
-            >
-              <User className="w-5 h-5 text-foreground" />
-            </Link>
+            <>
+              <NotificationBell />
+              <Link
+                to={profile ? `/breeder/${profile.username}` : "#"}
+                className="p-2 rounded-lg hover:bg-muted transition-colors"
+              >
+                <User className="w-5 h-5 text-foreground" />
+              </Link>
+            </>
           ) : (
             <Link
               to="/auth"

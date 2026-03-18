@@ -1,7 +1,8 @@
-import { Home, Trophy, Users, Dna, ShoppingBag, Truck, Plus, LogIn, LogOut, User } from "lucide-react";
+import { Home, Trophy, Users, Dna, ShoppingBag, Truck, Plus, LogIn, LogOut, User, Shield } from "lucide-react";
 import { NavLink, Link } from "react-router-dom";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const navItems = [
   { icon: Home, label: "Feed", to: "/" },
@@ -14,6 +15,7 @@ const navItems = [
 
 export function DesktopSidebar() {
   const { user, profile, signOut } = useAuth();
+  const { isAdmin } = useUserRole();
 
   return (
     <aside className="hidden lg:flex flex-col w-[200px] min-h-screen bg-primary text-sidebar-foreground border-r border-sidebar-border sticky top-0">
@@ -43,6 +45,19 @@ export function DesktopSidebar() {
       <div className="p-3 space-y-2 border-t border-sidebar-border">
         {user ? (
           <>
+            {isAdmin && (
+              <NavLink
+                to="/admin"
+                className={({ isActive }) =>
+                  `flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  }`
+                }
+              >
+                <Shield className="w-4 h-4" />
+                Admin
+              </NavLink>
+            )}
             <Link
               to={profile ? `/breeder/${profile.username}` : "#"}
               className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"

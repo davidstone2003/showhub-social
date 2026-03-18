@@ -14,6 +14,7 @@ import { MarketPage, HaulersPage } from "./pages/PlaceholderPage";
 import SubmitWinnerPage from "./pages/SubmitWinnerPage";
 import AuthPage from "./pages/AuthPage";
 import BreederProfilePage from "./pages/BreederProfilePage";
+import AdminPage from "./pages/AdminPage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/haulers" element={<HaulersPage />} />
             <Route path="/submit" element={<SubmitWinnerPage />} />
             <Route path="/breeder/:username" element={<BreederProfilePage />} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
