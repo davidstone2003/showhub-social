@@ -8,7 +8,8 @@ import BreedersPage from "./pages/BreedersPage";
 import SiresPage from "./pages/SiresPage";
 import AnimalPage from "./pages/AnimalPage";
 import SirePage from "./pages/SirePage";
-import { WinnersPage, MarketPage, HaulersPage, SubmitPage } from "./pages/PlaceholderPage";
+import { WinnersPage, MarketPage, HaulersPage } from "./pages/PlaceholderPage";
+import SubmitWinnerPage from "./pages/SubmitWinnerPage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -27,7 +28,7 @@ const App = () => (
           <Route path="/winners" element={<WinnersPage />} />
           <Route path="/market" element={<MarketPage />} />
           <Route path="/haulers" element={<HaulersPage />} />
-          <Route path="/submit" element={<SubmitPage />} />
+          <Route path="/submit" element={<SubmitWinnerPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
