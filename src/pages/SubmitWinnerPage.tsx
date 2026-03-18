@@ -69,6 +69,7 @@ export default function SubmitWinnerPage() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [shownBySuggestions, setShownBySuggestions] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
