@@ -409,28 +409,66 @@ export default function SubmitWinnerPage() {
 
           {/* ====== POST PREVIEW ====== */}
           {isValid && (
-            <div className="bg-card border border-border rounded-xl p-4 space-y-1">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                Preview
+            <div className="bg-card border border-border rounded-xl overflow-hidden">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-4 pt-3 pb-2">
+                Preview — This is how your post will look
               </p>
               {images[0] && (
                 <img
                   src={images[0].preview}
                   alt="Preview"
-                  className="w-full rounded-lg aspect-[4/3] object-cover mb-3"
+                  className="w-full aspect-[4/3] object-cover"
                 />
               )}
-              <p className="text-sm font-bold text-foreground">{showName}</p>
-              <p className="text-sm font-semibold text-foreground">{title}</p>
-              <p className="text-sm text-muted-foreground">Shown By: {shownBy}</p>
-              {bredBy && <p className="text-sm text-muted-foreground">Bred By: {bredBy}</p>}
-              {siredBy && <p className="text-sm text-muted-foreground">Sired By: {siredBy}</p>}
-              {dam && <p className="text-sm text-muted-foreground">Dam: {dam}</p>}
-              {placedBy && <p className="text-sm text-muted-foreground">Placed By: {placedBy}</p>}
-              {caption && <p className="text-sm text-foreground mt-2">{caption}</p>}
-              {tags.length > 0 && (
-                <p className="text-sm text-primary mt-1">{tags.join(" ")}</p>
-              )}
+              <div style={{ padding: "12px 14px 10px", display: "flex", flexDirection: "column", gap: "3px" }}>
+                <div className="flex items-center" style={{ gap: "6px" }}>
+                  <Trophy className="w-4 h-4 text-gold shrink-0" />
+                  <p className="font-bold text-foreground" style={{ fontSize: "15px", lineHeight: "20px" }}>
+                    {title}
+                  </p>
+                </div>
+                <p className="font-semibold text-primary" style={{ fontSize: "13px", lineHeight: "18px", paddingLeft: "22px" }}>
+                  {showName}
+                </p>
+                <div style={{ paddingLeft: "22px", display: "flex", flexDirection: "column", gap: "1px", marginTop: "4px" }}>
+                  <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px" }}>
+                    <span className="text-foreground font-medium">Shown By:</span> {shownBy}
+                  </p>
+                  {bredBy && (
+                    <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px" }}>
+                      <span className="text-foreground font-medium">Bred By:</span> {bredBy}
+                    </p>
+                  )}
+                  {siredBy && (
+                    <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px" }}>
+                      <span className="text-foreground font-medium">Sire:</span> {siredBy}
+                    </p>
+                  )}
+                  {dam && (
+                    <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px" }}>
+                      <span className="text-foreground font-medium">Dam:</span> {dam}
+                    </p>
+                  )}
+                  {placedBy && (
+                    <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px" }}>
+                      <span className="text-foreground font-medium">Placed By:</span> {placedBy}
+                    </p>
+                  )}
+                </div>
+                {caption && (
+                  <p className="text-muted-foreground mt-1" style={{ fontSize: "13px", lineHeight: "18px", paddingLeft: "22px" }}>
+                    {caption}
+                  </p>
+                )}
+                {tags.length > 0 && (
+                  <p className="text-primary mt-1" style={{ fontSize: "12px", paddingLeft: "22px" }}>{tags.join(" ")}</p>
+                )}
+              </div>
+              <div className="border-t border-border mx-3.5" />
+              <div className="flex items-center justify-between px-3" style={{ height: "38px" }}>
+                <span className="text-xs text-muted-foreground">❤️ Save · 💬 0 · 🔁 Share</span>
+                <span className="text-xs font-bold text-primary">CONTACT</span>
+              </div>
             </div>
           )}
         </div>

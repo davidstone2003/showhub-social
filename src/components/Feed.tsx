@@ -31,16 +31,15 @@ export function Feed() {
             logo: "🏆",
             is_pro: false,
           },
-          caption: [
-            `${w.title} 🏆`,
-            w.show_name,
-            w.shown_by ? `Shown By: ${w.shown_by}` : "",
-            w.bred_by ? `Bred By: ${w.bred_by}` : "",
-            w.sired_by ? `Sired By: ${w.sired_by}` : "",
-            w.dam ? `Dam: ${w.dam}` : "",
-            "",
-            w.caption || "",
-          ].filter(Boolean).join("\n"),
+          // Structured fields
+          win_title: w.title,
+          show_name: w.show_name,
+          shown_by: w.shown_by,
+          bred_by: w.bred_by || undefined,
+          sired_by: w.sired_by || undefined,
+          dam: w.dam || undefined,
+          placed_by: w.placed_by || undefined,
+          caption: w.caption || "",
           tags: (w.tags || []).map((t: string) => ({ label: t, type: "breed" })),
           post_type: "champion" as const,
           created_at: new Date(w.created_at).toLocaleDateString(),
@@ -60,7 +59,6 @@ export function Feed() {
   const filteredPosts = useMemo(() => {
     let result = [...allPosts];
 
-    // Category filter
     if (activeCategory !== "All") {
       const catLower = activeCategory.toLowerCase();
       result = result.filter((p) =>
@@ -69,7 +67,6 @@ export function Feed() {
       );
     }
 
-    // Sort
     if (activeSort === "Trending") {
       result.sort((a, b) => (b.likes + b.comments) - (a.likes + a.comments));
     }
@@ -107,7 +104,7 @@ export function Feed() {
               style={{ marginTop: '12px', padding: '0 16px', height: '40px', borderRadius: '10px', fontSize: '14px' }}
             >
               <Plus className="w-4 h-4" />
-              Post
+              Add to Backdrop
             </Link>
           </div>
         )}
