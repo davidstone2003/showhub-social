@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,6 +69,7 @@ export default function SubmitWinnerPage() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [shownBySuggestions, setShownBySuggestions] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -167,24 +169,52 @@ export default function SubmitWinnerPage() {
 
   const navigate = useNavigate();
 
-  const handleSubmit = () => {
-    if (!isValid) return;
-    toast.success("Winner posted! 🏆", {
-      description: `${title} at ${showName}`,
-    });
-    // Reset form
-    setImages([]);
-    setTitle("");
-    setShowName("");
-    setShownBy("");
-    setDate(new Date());
-    setBredBy("");
-    setSiredBy("");
-    setDam("");
-    setCaption("");
-    setTags([]);
-    setShowPreview(false);
-    navigate("/");
+  const handleSubmit = async () => {
+    if (!isValid || submitting) return;
+    setSubmitting(true);
+
+    try {
+      // Upload images to storage
+      const imageUrls: string[] = [];
+      for (const img of images) {
+        const fileExt = img.file.name.split('.').pop();
+        const filePath = `${crypto.randomUUID()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('winner-images')
+          .upload(filePath, img.file);
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage
+            .from('winner-images')
+            .getPublicUrl(filePath);
+          imageUrls.push(urlData.publicUrl);
+        }
+      }
+
+      // Insert winner into database
+      const { error } = await supabase.from('winners').insert({
+        title: title.trim(),
+        show_name: showName.trim(),
+        shown_by: shownBy.trim(),
+        date: date.toISOString().split('T')[0],
+        bred_by: bredBy.trim() || null,
+        sired_by: siredBy.trim() || null,
+        dam: dam.trim() || null,
+        caption: caption.trim() || null,
+        tags,
+        image_urls: imageUrls,
+      });
+
+      if (error) throw error;
+
+      toast.success("Winner posted! 🏆", {
+        description: `${title} at ${showName}`,
+      });
+      navigate("/");
+    } catch (err: any) {
+      toast.error("Failed to post", { description: err.message });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -491,11 +521,11 @@ export default function SubmitWinnerPage() {
         <div className="fixed bottom-16 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent z-30 max-w-lg mx-auto">
           <Button
             onClick={handleSubmit}
-            disabled={!isValid}
+            disabled={!isValid || submitting}
             className="w-full h-12 rounded-xl text-base font-bold bg-primary text-primary-foreground hover:bg-primary-dark disabled:opacity-40"
           >
             <Trophy className="w-5 h-5 mr-2" />
-            Post Winner
+            {submitting ? "Posting…" : "Post Winner"}
           </Button>
         </div>
       </div>

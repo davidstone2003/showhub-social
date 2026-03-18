@@ -1,23 +1,64 @@
 import { useState, useMemo, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
-import { posts } from "@/data/mock";
+import { posts, Post } from "@/data/mock";
 import { PostCard } from "./PostCard";
 import { PostCardSkeleton } from "./PostCardSkeleton";
 import { FilterRow, SortOption, CategoryOption } from "./FilterRow";
+import { supabase } from "@/integrations/supabase/client";
 
 export function Feed() {
   const [activeSort, setActiveSort] = useState<SortOption>("Recent");
   const [activeCategory, setActiveCategory] = useState<CategoryOption>("All");
   const [loading, setLoading] = useState(true);
+  const [dbPosts, setDbPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 600);
-    return () => clearTimeout(t);
+    async function fetchWinners() {
+      const { data } = await supabase
+        .from('winners')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (data) {
+        const mapped: Post[] = data.map((w) => ({
+          id: w.id,
+          image: w.image_urls?.[0] || "/placeholder.svg",
+          breeder: {
+            id: "db-" + w.id,
+            name: w.shown_by,
+            location: "",
+            logo: "🏆",
+            is_pro: false,
+          },
+          caption: [
+            `${w.title} 🏆`,
+            w.show_name,
+            w.shown_by ? `Shown By: ${w.shown_by}` : "",
+            w.bred_by ? `Bred By: ${w.bred_by}` : "",
+            w.sired_by ? `Sired By: ${w.sired_by}` : "",
+            w.dam ? `Dam: ${w.dam}` : "",
+            "",
+            w.caption || "",
+          ].filter(Boolean).join("\n"),
+          tags: (w.tags || []).map((t: string) => ({ label: t, type: "breed" })),
+          post_type: "champion" as const,
+          created_at: new Date(w.created_at).toLocaleDateString(),
+          likes: w.likes || 0,
+          comments: w.comments || 0,
+          saved: false,
+        }));
+        setDbPosts(mapped);
+      }
+      setLoading(false);
+    }
+    fetchWinners();
   }, []);
 
+  const allPosts = useMemo(() => [...dbPosts, ...posts], [dbPosts]);
+
   const filteredPosts = useMemo(() => {
-    let result = [...posts];
+    let result = [...allPosts];
 
     // Category filter
     if (activeCategory !== "All") {
@@ -34,7 +75,7 @@ export function Feed() {
     }
 
     return result;
-  }, [activeSort, activeCategory]);
+  }, [activeSort, activeCategory, allPosts]);
 
   return (
     <div className="flex-1 max-w-2xl mx-auto w-full">
