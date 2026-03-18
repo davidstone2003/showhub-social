@@ -85,8 +85,8 @@ export function PostCard({ post, index }: PostCardProps) {
           if (post.sired_by) details.push(`Sired by ${post.sired_by}`);
           if (post.dam) details.push(`Dam: ${post.dam}`);
           return details.length > 0 ? (
-            <p className="text-muted-foreground" style={{ fontSize: "13px", marginTop: "4px" }}>
-              {details.join(" · ")}
+            <p className="text-muted-foreground" style={{ fontSize: "13px", marginTop: "3px" }}>
+              {details.join(" \u2022 ")}
             </p>
           ) : null;
         })()}
