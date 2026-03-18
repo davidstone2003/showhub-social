@@ -181,8 +181,13 @@ export default function SubmitWinnerPage() {
         const filePath = `${crypto.randomUUID()}.${fileExt}`;
         const { error: uploadError } = await supabase.storage
           .from('winner-images')
-          .upload(filePath, img.file);
-        if (!uploadError) {
+          .upload(filePath, img.file, {
+            contentType: img.file.type,
+            cacheControl: '3600',
+          });
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+        } else {
           const { data: urlData } = supabase.storage
             .from('winner-images')
             .getPublicUrl(filePath);
