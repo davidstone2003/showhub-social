@@ -277,7 +277,12 @@ export default function SubmitWinnerPage() {
                 <img src={images[0].preview} alt="Preview" className="w-full aspect-[4/3] object-cover" />
               )}
               <div style={{ padding: "12px 14px 6px" }}>
-                <p className="font-bold text-foreground" style={{ fontSize: "15px", lineHeight: "20px" }}>
+                {winPlacing.trim() && (
+                  <p className="font-bold text-foreground" style={{ fontSize: "16px", lineHeight: "22px" }}>
+                    {winPlacing}
+                  </p>
+                )}
+                <p className={winPlacing.trim() ? "text-muted-foreground font-medium" : "font-bold text-foreground"} style={{ fontSize: "15px", lineHeight: "20px", marginTop: winPlacing.trim() ? "2px" : "0" }}>
                   {showName}
                 </p>
                 <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
