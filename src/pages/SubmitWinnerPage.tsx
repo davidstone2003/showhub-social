@@ -51,10 +51,41 @@ export default function SubmitWinnerPage() {
   const [caption, setCaption] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  /* Facebook import state */
+  const [importOpen, setImportOpen] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [importSuccess, setImportSuccess] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   const isValid = showName.trim() && shownBy.trim();
+
+  /* ── Facebook import ── */
+  const handleAutoFill = () => {
+    if (!importText.trim()) return;
+    const parsed = parseFacebookCaption(importText);
+    let filled = 0;
+    if (parsed.showName) { setShowName(parsed.showName); setShowId(null); filled++; }
+    if (parsed.winPlacing) { setWinPlacing(parsed.winPlacing); filled++; }
+    if (parsed.shownBy) { setShownBy(parsed.shownBy); filled++; }
+    if (parsed.placedBy) { setPlacedBy(parsed.placedBy); filled++; }
+    if (parsed.siredBy) { setSireName(parsed.siredBy); setSireId(null); filled++; }
+    if (parsed.dam) { setDamName(parsed.dam); filled++; }
+    if (parsed.caption) { setCaption(parsed.caption); filled++; }
+
+    if (filled > 0) {
+      setImportSuccess(true);
+      toast.success(`Auto-filled ${filled} field${filled > 1 ? "s" : ""}`, {
+        description: "Review and edit below before posting.",
+      });
+    } else {
+      setCaption(importText);
+      toast("Couldn't detect structured fields", {
+        description: "Text added as caption. Fill fields manually.",
+      });
+    }
+  };
 
   /* ── image handling ── */
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
