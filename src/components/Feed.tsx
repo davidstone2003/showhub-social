@@ -4,12 +4,9 @@ import { Link } from "react-router-dom";
 import { posts, Post } from "@/data/mock";
 import { PostCard } from "./PostCard";
 import { PostCardSkeleton } from "./PostCardSkeleton";
-import { FilterRow, SortOption, CategoryOption } from "./FilterRow";
 import { supabase } from "@/integrations/supabase/client";
 
 export function Feed() {
-  const [activeSort, setActiveSort] = useState<SortOption>("Recent");
-  const [activeCategory, setActiveCategory] = useState<CategoryOption>("All");
   const [loading, setLoading] = useState(true);
   const [dbPosts, setDbPosts] = useState<Post[]>([]);
 
@@ -27,11 +24,10 @@ export function Feed() {
           breeder: {
             id: "db-" + w.id,
             name: w.shown_by,
-            location: "",
-            logo: "🏆",
+            location: w.show_name,
+            logo: "",
             is_pro: false,
           },
-          // Structured fields
           win_title: w.title,
           show_name: w.show_name,
           shown_by: w.shown_by,
@@ -56,41 +52,16 @@ export function Feed() {
 
   const allPosts = useMemo(() => [...dbPosts, ...posts], [dbPosts]);
 
-  const filteredPosts = useMemo(() => {
-    let result = [...allPosts];
-
-    if (activeCategory !== "All") {
-      const catLower = activeCategory.toLowerCase();
-      result = result.filter((p) =>
-        p.tags.some((t) => t.label.toLowerCase().includes(catLower)) ||
-        p.caption.toLowerCase().includes(catLower)
-      );
-    }
-
-    if (activeSort === "Trending") {
-      result.sort((a, b) => (b.likes + b.comments) - (a.likes + a.comments));
-    }
-
-    return result;
-  }, [activeSort, activeCategory, allPosts]);
-
   return (
     <div className="flex-1 max-w-2xl mx-auto w-full">
-      <FilterRow
-        activeSort={activeSort}
-        activeCategory={activeCategory}
-        onSortChange={setActiveSort}
-        onCategoryChange={setActiveCategory}
-      />
-
       <div style={{ padding: '12px 0 16px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
         {loading ? (
           <>
             <PostCardSkeleton />
             <PostCardSkeleton />
           </>
-        ) : filteredPosts.length > 0 ? (
-          filteredPosts.map((post, i) => (
+        ) : allPosts.length > 0 ? (
+          allPosts.map((post, i) => (
             <PostCard key={post.id} post={post} index={i} />
           ))
         ) : (
