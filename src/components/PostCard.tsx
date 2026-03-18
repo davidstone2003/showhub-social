@@ -57,9 +57,16 @@ export function PostCard({ post, index }: PostCardProps) {
 
       {/* Content */}
       <div style={{ padding: "12px 14px 6px" }}>
+        {/* Win Placing */}
+        {post.win_placing && (
+          <p className="font-bold text-foreground" style={{ fontSize: "16px", lineHeight: "22px" }}>
+            {post.win_placing}
+          </p>
+        )}
+
         {/* Show Name */}
         {showName && (
-          <p className="font-bold text-foreground" style={{ fontSize: "15px", lineHeight: "20px" }}>
+          <p className={post.win_placing ? "text-muted-foreground font-medium" : "font-bold text-foreground"} style={{ fontSize: "15px", lineHeight: "20px", marginTop: post.win_placing ? "2px" : "0" }}>
             {showName}
           </p>
         )}

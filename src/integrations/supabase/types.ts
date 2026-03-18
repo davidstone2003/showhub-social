@@ -88,6 +88,7 @@ export type Database = {
           sired_by: string | null
           tags: string[] | null
           title: string
+          win_placing: string | null
         }
         Insert: {
           bred_by?: string | null
@@ -108,6 +109,7 @@ export type Database = {
           sired_by?: string | null
           tags?: string[] | null
           title: string
+          win_placing?: string | null
         }
         Update: {
           bred_by?: string | null
@@ -128,6 +130,7 @@ export type Database = {
           sired_by?: string | null
           tags?: string[] | null
           title?: string
+          win_placing?: string | null
         }
         Relationships: [
           {

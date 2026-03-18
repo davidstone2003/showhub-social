@@ -35,6 +35,7 @@ export function Feed() {
           sired_by: w.sired_by || undefined,
           dam: w.dam || undefined,
           placed_by: w.placed_by || undefined,
+          win_placing: (w as any).win_placing || undefined,
           caption: w.caption || "",
           tags: (w.tags || []).map((t: string) => ({ label: t, type: "breed" })),
           post_type: "champion" as const,

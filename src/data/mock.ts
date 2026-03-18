@@ -46,6 +46,7 @@ export interface Post {
   sired_by?: string;
   dam?: string;
   placed_by?: string;
+  win_placing?: string;
 }
 
 export interface Animal {

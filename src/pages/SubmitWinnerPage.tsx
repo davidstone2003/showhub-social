@@ -22,6 +22,7 @@ export default function SubmitWinnerPage() {
   const [images, setImages] = useState<ImageFile[]>([]);
   const [showName, setShowName] = useState("");
   const [showId, setShowId] = useState<string | null>(null);
+  const [winPlacing, setWinPlacing] = useState("");
   const [shownBy, setShownBy] = useState("");
   const [bredBy, setBredBy] = useState("");
   const [placedBy, setPlacedBy] = useState("");
@@ -100,14 +101,15 @@ export default function SubmitWinnerPage() {
         ? await ensureLookupEntry("breeders_lookup", bredBy, null)
         : null;
 
-      const { error } = await supabase.from("winners").insert({
-        title: showName.trim(),
+      const { error } = await (supabase.from("winners") as any).insert({
+        title: winPlacing.trim() ? `${winPlacing.trim()} — ${showName.trim()}` : showName.trim(),
         show_name: showName.trim(),
         shown_by: shownBy.trim(),
         bred_by: bredBy.trim() || null,
         breeder_id: resolvedBreederId,
         placed_by: placedBy.trim() || null,
         date: format(showDate, "yyyy-MM-dd"),
+        win_placing: winPlacing.trim() || null,
         caption: caption.trim() || null,
         tags: [],
         image_urls: imageUrls,
@@ -209,6 +211,12 @@ export default function SubmitWinnerPage() {
               }}
             />
             <Input
+              placeholder="Placing (e.g., Grand Champion)"
+              value={winPlacing}
+              onChange={(e) => setWinPlacing(e.target.value)}
+              className="rounded-xl bg-card border-border h-12 text-sm"
+            />
+            <Input
               placeholder="Shown by (e.g., Caleb Stone) *"
               value={shownBy}
               onChange={(e) => setShownBy(e.target.value)}
@@ -269,7 +277,12 @@ export default function SubmitWinnerPage() {
                 <img src={images[0].preview} alt="Preview" className="w-full aspect-[4/3] object-cover" />
               )}
               <div style={{ padding: "12px 14px 6px" }}>
-                <p className="font-bold text-foreground" style={{ fontSize: "15px", lineHeight: "20px" }}>
+                {winPlacing.trim() && (
+                  <p className="font-bold text-foreground" style={{ fontSize: "16px", lineHeight: "22px" }}>
+                    {winPlacing}
+                  </p>
+                )}
+                <p className={winPlacing.trim() ? "text-muted-foreground font-medium" : "font-bold text-foreground"} style={{ fontSize: "15px", lineHeight: "20px", marginTop: winPlacing.trim() ? "2px" : "0" }}>
                   {showName}
                 </p>
                 <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
