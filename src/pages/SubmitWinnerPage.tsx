@@ -275,6 +275,11 @@ export default function SubmitWinnerPage() {
                 <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
                   Shown by: <span className="text-foreground font-medium">{shownBy}</span>
                 </p>
+                {bredBy.trim() && (
+                  <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
+                    Bred by: <span className="text-foreground font-medium">{bredBy}</span>
+                  </p>
+                )}
                 {placedBy.trim() && (
                   <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
                     Placed by: <span className="text-foreground font-medium">{placedBy}</span>
