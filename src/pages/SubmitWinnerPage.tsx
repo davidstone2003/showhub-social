@@ -169,24 +169,52 @@ export default function SubmitWinnerPage() {
 
   const navigate = useNavigate();
 
-  const handleSubmit = () => {
-    if (!isValid) return;
-    toast.success("Winner posted! 🏆", {
-      description: `${title} at ${showName}`,
-    });
-    // Reset form
-    setImages([]);
-    setTitle("");
-    setShowName("");
-    setShownBy("");
-    setDate(new Date());
-    setBredBy("");
-    setSiredBy("");
-    setDam("");
-    setCaption("");
-    setTags([]);
-    setShowPreview(false);
-    navigate("/");
+  const handleSubmit = async () => {
+    if (!isValid || submitting) return;
+    setSubmitting(true);
+
+    try {
+      // Upload images to storage
+      const imageUrls: string[] = [];
+      for (const img of images) {
+        const fileExt = img.file.name.split('.').pop();
+        const filePath = `${crypto.randomUUID()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('winner-images')
+          .upload(filePath, img.file);
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage
+            .from('winner-images')
+            .getPublicUrl(filePath);
+          imageUrls.push(urlData.publicUrl);
+        }
+      }
+
+      // Insert winner into database
+      const { error } = await supabase.from('winners').insert({
+        title: title.trim(),
+        show_name: showName.trim(),
+        shown_by: shownBy.trim(),
+        date: date.toISOString().split('T')[0],
+        bred_by: bredBy.trim() || null,
+        sired_by: siredBy.trim() || null,
+        dam: dam.trim() || null,
+        caption: caption.trim() || null,
+        tags,
+        image_urls: imageUrls,
+      });
+
+      if (error) throw error;
+
+      toast.success("Winner posted! 🏆", {
+        description: `${title} at ${showName}`,
+      });
+      navigate("/");
+    } catch (err: any) {
+      toast.error("Failed to post", { description: err.message });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
