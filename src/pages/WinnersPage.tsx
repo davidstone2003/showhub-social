@@ -80,7 +80,7 @@ export default function WinnersPage() {
                 className="inline-flex items-center gap-2 mt-4 h-10 px-4 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                Post the first winner
+                Add to Backdrop
               </Link>
             </div>
           )}

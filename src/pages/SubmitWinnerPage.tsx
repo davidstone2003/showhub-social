@@ -193,7 +193,7 @@ export default function SubmitWinnerPage() {
 
       if (error) throw error;
 
-      toast.success("Winner posted! 🏆", {
+      toast.success("Added to Backdrop! 🏆", {
         description: `${title} at ${showName}`,
       });
       navigate("/");

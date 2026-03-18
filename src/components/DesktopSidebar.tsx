@@ -1,10 +1,10 @@
 import { Home, Trophy, Users, Dna, ShoppingBag, Truck, Plus } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import { ShowHubLogo } from "@/components/RinglyLogo";
+import { BackdropLogo } from "@/components/RinglyLogo";
 
 const navItems = [
   { icon: Home, label: "Feed", to: "/" },
-  { icon: Trophy, label: "Winners", to: "/winners" },
+  { icon: Trophy, label: "Backdrop", to: "/winners" },
   { icon: Users, label: "Breeders", to: "/breeders" },
   { icon: Dna, label: "Sires", to: "/sires" },
   { icon: ShoppingBag, label: "Market", to: "/market" },
@@ -15,7 +15,7 @@ export function DesktopSidebar() {
   return (
     <aside className="hidden lg:flex flex-col w-[200px] min-h-screen bg-primary text-sidebar-foreground border-r border-sidebar-border sticky top-0">
       <div className="p-5 border-b border-sidebar-border">
-        <ShowHubLogo size="md" showTagline={true} onDark={true} />
+        <BackdropLogo size="md" showTagline={true} onDark={true} />
       </div>
 
       <nav className="flex-1 py-4 px-3 space-y-1">
@@ -43,7 +43,7 @@ export function DesktopSidebar() {
           className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-primary-foreground/10 text-primary-foreground text-sm font-semibold hover:bg-primary-foreground/20 transition-colors"
         >
           <Plus className="w-4 h-4" />
-          New Post
+          Add to Backdrop
         </NavLink>
       </div>
     </aside>
