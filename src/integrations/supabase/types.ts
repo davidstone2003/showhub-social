@@ -14,7 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      winners: {
+        Row: {
+          bred_by: string | null
+          caption: string | null
+          comments: number
+          created_at: string
+          dam: string | null
+          date: string
+          id: string
+          image_urls: string[] | null
+          likes: number
+          show_name: string
+          shown_by: string
+          sired_by: string | null
+          tags: string[] | null
+          title: string
+        }
+        Insert: {
+          bred_by?: string | null
+          caption?: string | null
+          comments?: number
+          created_at?: string
+          dam?: string | null
+          date?: string
+          id?: string
+          image_urls?: string[] | null
+          likes?: number
+          show_name: string
+          shown_by: string
+          sired_by?: string | null
+          tags?: string[] | null
+          title: string
+        }
+        Update: {
+          bred_by?: string | null
+          caption?: string | null
+          comments?: number
+          created_at?: string
+          dam?: string | null
+          date?: string
+          id?: string
+          image_urls?: string[] | null
+          likes?: number
+          show_name?: string
+          shown_by?: string
+          sired_by?: string | null
+          tags?: string[] | null
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
