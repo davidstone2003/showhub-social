@@ -37,7 +37,7 @@ export default function WinnersPage() {
             sired_by: w.sired_by || undefined,
             dam: w.dam || undefined,
             placed_by: w.placed_by || undefined,
-            win_placing: (w as any).win_placing || undefined,
+            win_placing: w.win_placing || undefined,
             caption: w.caption || "",
             tags: (w.tags || []).map((tag: string) => ({ label: tag, type: "winner" })),
             post_type: "champion" as const,
