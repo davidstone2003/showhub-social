@@ -15,6 +15,7 @@ const navItems = [
 
 export function DesktopSidebar() {
   const { user, profile, signOut } = useAuth();
+  const { isAdmin } = useUserRole();
 
   return (
     <aside className="hidden lg:flex flex-col w-[200px] min-h-screen bg-primary text-sidebar-foreground border-r border-sidebar-border sticky top-0">
