@@ -43,6 +43,7 @@ export default function SubmitWinnerPage() {
   const [siredBy, setSiredBy] = useState("");
   const [sireId, setSireId] = useState<string | null>(null);
   const [dam, setDam] = useState("");
+  const [placedBy, setPlacedBy] = useState("");
   const [caption, setCaption] = useState("");
   const [tags, setTags] = useState<string[]>([]);
 
