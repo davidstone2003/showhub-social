@@ -154,7 +154,16 @@ export default function SubmitWinnerPage() {
       });
 
       if (error) throw error;
-      toast.success("Added to Backdrop!", { description: `${showName} — ${shownBy}` });
+      setSuccessData({
+        showName: showName.trim(),
+        winPlacing: winPlacing.trim(),
+        shownBy: shownBy.trim(),
+        placedBy: placedBy.trim(),
+        sireName: sireName.trim(),
+        damName: damName.trim(),
+        caption: caption.trim(),
+        imageUrls,
+      });
       navigate("/");
     } catch (err: any) {
       toast.error("Failed to post", { description: err.message || "Please try again." });
