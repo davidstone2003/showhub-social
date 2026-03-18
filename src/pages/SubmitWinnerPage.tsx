@@ -1,14 +1,17 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { format } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { AutocompleteInput } from "@/components/AutocompleteInput";
-import { Camera, X, ImagePlus, Heart, UserPlus } from "lucide-react";
+import { Camera, X, ImagePlus, Heart, UserPlus, CalendarIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 type ImageFile = {
   file: File;
