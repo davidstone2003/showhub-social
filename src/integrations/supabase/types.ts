@@ -14,9 +14,64 @@ export type Database = {
   }
   public: {
     Tables: {
+      breeders_lookup: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      shows: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      sires_lookup: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       winners: {
         Row: {
           bred_by: string | null
+          breeder_id: string | null
           caption: string | null
           comments: number
           created_at: string
@@ -25,14 +80,17 @@ export type Database = {
           id: string
           image_urls: string[] | null
           likes: number
+          show_id: string | null
           show_name: string
           shown_by: string
+          sire_id: string | null
           sired_by: string | null
           tags: string[] | null
           title: string
         }
         Insert: {
           bred_by?: string | null
+          breeder_id?: string | null
           caption?: string | null
           comments?: number
           created_at?: string
@@ -41,14 +99,17 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           likes?: number
+          show_id?: string | null
           show_name: string
           shown_by: string
+          sire_id?: string | null
           sired_by?: string | null
           tags?: string[] | null
           title: string
         }
         Update: {
           bred_by?: string | null
+          breeder_id?: string | null
           caption?: string | null
           comments?: number
           created_at?: string
@@ -57,13 +118,37 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           likes?: number
+          show_id?: string | null
           show_name?: string
           shown_by?: string
+          sire_id?: string | null
           sired_by?: string | null
           tags?: string[] | null
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "winners_breeder_id_fkey"
+            columns: ["breeder_id"]
+            isOneToOne: false
+            referencedRelation: "breeders_lookup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "winners_show_id_fkey"
+            columns: ["show_id"]
+            isOneToOne: false
+            referencedRelation: "shows"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "winners_sire_id_fkey"
+            columns: ["sire_id"]
+            isOneToOne: false
+            referencedRelation: "sires_lookup"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
