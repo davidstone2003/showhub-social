@@ -43,6 +43,7 @@ export default function SubmitWinnerPage() {
   const [siredBy, setSiredBy] = useState("");
   const [sireId, setSireId] = useState<string | null>(null);
   const [dam, setDam] = useState("");
+  const [placedBy, setPlacedBy] = useState("");
   const [caption, setCaption] = useState("");
   const [tags, setTags] = useState<string[]>([]);
 
@@ -181,6 +182,7 @@ export default function SubmitWinnerPage() {
         bred_by: bredBy.trim() || null,
         sired_by: siredBy.trim() || null,
         dam: dam.trim() || null,
+        placed_by: placedBy.trim() || null,
         caption: caption.trim() || null,
         tags,
         image_urls: imageUrls,
@@ -368,6 +370,12 @@ export default function SubmitWinnerPage() {
                 onChange={(e) => setDam(e.target.value)}
                 className="rounded-xl bg-card border-border h-12 text-sm"
               />
+              <Input
+                placeholder="Placed By (e.g., John Smith)"
+                value={placedBy}
+                onChange={(e) => setPlacedBy(e.target.value)}
+                className="rounded-xl bg-card border-border h-12 text-sm"
+              />
             </CollapsibleContent>
           </Collapsible>
 
@@ -418,6 +426,7 @@ export default function SubmitWinnerPage() {
               {bredBy && <p className="text-sm text-muted-foreground">Bred By: {bredBy}</p>}
               {siredBy && <p className="text-sm text-muted-foreground">Sired By: {siredBy}</p>}
               {dam && <p className="text-sm text-muted-foreground">Dam: {dam}</p>}
+              {placedBy && <p className="text-sm text-muted-foreground">Placed By: {placedBy}</p>}
               {caption && <p className="text-sm text-foreground mt-2">{caption}</p>}
               {tags.length > 0 && (
                 <p className="text-sm text-primary mt-1">{tags.join(" ")}</p>

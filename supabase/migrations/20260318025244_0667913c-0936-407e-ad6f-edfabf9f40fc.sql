@@ -1,0 +1,1 @@
+ALTER TABLE public.winners ADD COLUMN placed_by text DEFAULT null;

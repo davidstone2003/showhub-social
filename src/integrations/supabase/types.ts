@@ -80,6 +80,7 @@ export type Database = {
           id: string
           image_urls: string[] | null
           likes: number
+          placed_by: string | null
           show_id: string | null
           show_name: string
           shown_by: string
@@ -99,6 +100,7 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           likes?: number
+          placed_by?: string | null
           show_id?: string | null
           show_name: string
           shown_by: string
@@ -118,6 +120,7 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           likes?: number
+          placed_by?: string | null
           show_id?: string | null
           show_name?: string
           shown_by?: string
