@@ -81,13 +81,18 @@ export function PostCard({ post, index }: PostCardProps) {
 
       <div style={{ padding: "10px 12px" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          {title && (
+            <p className="font-semibold text-foreground truncate" style={{ fontSize: "14px", lineHeight: "18px" }}>
+              {title}
+            </p>
+          )}
           {subtitle && (
             <p className="font-bold text-primary truncate" style={{ fontSize: "14px", lineHeight: "16px" }}>
               {subtitle}
             </p>
           )}
           <p className="text-muted-foreground" style={{ fontSize: "12px", lineHeight: "16px" }}>
-            {post.breeder.location} · {post.created_at}
+            {post.breeder.location}{post.breeder.location && " · "}{post.created_at}
             {isHot && <span className="ml-1">🔥 Hot</span>}
           </p>
           {body && (
