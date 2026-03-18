@@ -11,6 +11,7 @@ import { Camera, X, ImagePlus, Heart, MessageCircle, Clipboard, Sparkles, Chevro
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { parseFacebookCaption } from "@/lib/parseFacebookCaption";
+import PostSuccessScreen from "@/components/PostSuccessScreen";
 
 type ImageFile = { file: File; preview: string };
 
@@ -50,6 +51,11 @@ export default function SubmitWinnerPage() {
   const [damName, setDamName] = useState("");
   const [caption, setCaption] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [successData, setSuccessData] = useState<{
+    showName: string; winPlacing: string; shownBy: string;
+    placedBy: string; sireName: string; damName: string;
+    caption: string; imageUrls: string[];
+  } | null>(null);
 
   /* Facebook import state */
   const [importOpen, setImportOpen] = useState(false);
@@ -148,14 +154,31 @@ export default function SubmitWinnerPage() {
       });
 
       if (error) throw error;
-      toast.success("Added to Backdrop!", { description: `${showName} — ${shownBy}` });
-      navigate("/");
+      setSuccessData({
+        showName: showName.trim(),
+        winPlacing: winPlacing.trim(),
+        shownBy: shownBy.trim(),
+        placedBy: placedBy.trim(),
+        sireName: sireName.trim(),
+        damName: damName.trim(),
+        caption: caption.trim(),
+        imageUrls,
+      });
+      
     } catch (err: any) {
       toast.error("Failed to post", { description: err.message || "Please try again." });
     } finally {
       setSubmitting(false);
     }
   };
+
+  if (successData) {
+    return (
+      <Layout showDiscovery={false}>
+        <PostSuccessScreen data={successData} />
+      </Layout>
+    );
+  }
 
   return (
     <Layout showDiscovery={false}>
