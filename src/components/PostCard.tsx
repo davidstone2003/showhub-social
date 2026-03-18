@@ -70,9 +70,9 @@ export function PostCard({ post, index }: PostCardProps) {
           </p>
         )}
 
-        {/* Line 2: Placement */}
+      {/* Line 2: Placement */}
         {winPlacing && (
-          <p className="font-semibold text-foreground" style={{ fontSize: "14px", marginTop: "4px" }}>
+          <p className="text-foreground" style={{ fontSize: "14px", fontWeight: 600, marginTop: "3px" }}>
             {winPlacing}
           </p>
         )}
