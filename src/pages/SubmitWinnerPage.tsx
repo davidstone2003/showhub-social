@@ -215,11 +215,40 @@ export default function SubmitWinnerPage() {
               className="rounded-xl bg-card border-border h-12 text-sm"
             />
             <Input
+              placeholder="Bred by (optional)"
+              value={bredBy}
+              onChange={(e) => setBredBy(e.target.value)}
+              className="rounded-xl bg-card border-border h-12 text-sm"
+            />
+            <Input
               placeholder="Placed by (optional)"
               value={placedBy}
               onChange={(e) => setPlacedBy(e.target.value)}
               className="rounded-xl bg-card border-border h-12 text-sm"
             />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal rounded-xl bg-card border-border h-12 text-sm",
+                    !showDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {format(showDate, "PPP")}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={showDate}
+                  onSelect={(d) => d && setShowDate(d)}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           {/* Caption */}
