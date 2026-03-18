@@ -6,6 +6,7 @@ import { Layout } from "@/components/Layout";
 import { PostCard } from "@/components/PostCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { User, Trophy, Dna, ShoppingBag, Star } from "lucide-react";
+import type { Post } from "@/data/mock";
 
 type WinnerRow = {
   id: string;
@@ -24,7 +25,30 @@ type WinnerRow = {
   post_type: string;
   is_featured: boolean;
   tags: string[] | null;
+  created_at: string;
 };
+
+/** Map a DB winner row to the Post interface used by PostCard */
+function toPost(row: WinnerRow): Post {
+  return {
+    id: row.id,
+    image: row.image_urls?.[0] || "/placeholder.svg",
+    breeder: { id: "", name: "", location: "", logo: "", is_pro: false },
+    caption: row.caption || "",
+    tags: (row.tags || []).map((t) => ({ label: t, type: "tag" })),
+    post_type: "champion",
+    created_at: row.created_at || row.date,
+    likes: row.likes,
+    comments: row.comments,
+    saved: false,
+    show_name: row.show_name,
+    shown_by: row.shown_by,
+    placed_by: row.placed_by || undefined,
+    sired_by: row.sired_by || undefined,
+    dam: row.dam || undefined,
+    win_placing: row.win_placing || undefined,
+  };
+}
 
 export default function BreederProfilePage() {
   const { username } = useParams<{ username: string }>();
@@ -110,7 +134,7 @@ export default function BreederProfilePage() {
                     {profile.display_name || username}
                   </h1>
                   {profile.is_premium && (
-                    <span className="shrink-0 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-[hsl(var(--gold))]/15 text-[hsl(var(--gold))]">
+                    <span className="shrink-0 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-accent text-accent-foreground">
                       Pro
                     </span>
                   )}
@@ -122,7 +146,6 @@ export default function BreederProfilePage() {
               </div>
             </div>
 
-            {/* Stats */}
             <div className="flex gap-6 mt-4 text-sm">
               <span className="text-muted-foreground">
                 <span className="font-bold text-foreground">{winners.length}</span> wins
@@ -138,47 +161,42 @@ export default function BreederProfilePage() {
         </div>
 
         <div className="max-w-2xl mx-auto px-4 py-4 space-y-6">
-          {/* Featured Winners */}
           {featured.length > 0 && (
             <Section icon={Star} title="Featured Winners">
-              {featured.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {featured.map((post, i) => (
+                <PostCard key={post.id} post={toPost(post)} index={i} />
               ))}
             </Section>
           )}
 
-          {/* Recent Winners */}
           {winners.length > 0 && (
             <Section icon={Trophy} title="Winners">
-              {winners.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {winners.map((post, i) => (
+                <PostCard key={post.id} post={toPost(post)} index={i} />
               ))}
             </Section>
           )}
 
-          {/* Sires */}
           {sires.length > 0 && (
             <Section icon={Dna} title="Current Sires">
-              {sires.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {sires.map((post, i) => (
+                <PostCard key={post.id} post={toPost(post)} index={i} />
               ))}
             </Section>
           )}
 
-          {/* Donors */}
           {donors.length > 0 && (
             <Section icon={Dna} title="Donors / Genetics">
-              {donors.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {donors.map((post, i) => (
+                <PostCard key={post.id} post={toPost(post)} index={i} />
               ))}
             </Section>
           )}
 
-          {/* Sales */}
           {sales.length > 0 && (
             <Section icon={ShoppingBag} title="Available / For Sale">
-              {sales.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {sales.map((post, i) => (
+                <PostCard key={post.id} post={toPost(post)} index={i} />
               ))}
             </Section>
           )}
