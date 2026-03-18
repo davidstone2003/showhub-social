@@ -210,6 +210,12 @@ export default function SubmitWinnerPage() {
               }}
             />
             <Input
+              placeholder="Placing (e.g., Grand Champion)"
+              value={winPlacing}
+              onChange={(e) => setWinPlacing(e.target.value)}
+              className="rounded-xl bg-card border-border h-12 text-sm"
+            />
+            <Input
               placeholder="Shown by (e.g., Caleb Stone) *"
               value={shownBy}
               onChange={(e) => setShownBy(e.target.value)}
