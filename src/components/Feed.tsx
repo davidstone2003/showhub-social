@@ -15,6 +15,8 @@ export function Feed() {
       const { data } = await supabase
         .from('winners')
         .select('*')
+        .eq('status', 'active')
+        .eq('show_on_feed', true)
         .order('created_at', { ascending: false });
 
       if (data) {

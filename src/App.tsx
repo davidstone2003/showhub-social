@@ -37,6 +37,7 @@ const App = () => (
             <Route path="/haulers" element={<HaulersPage />} />
             <Route path="/submit" element={<SubmitWinnerPage />} />
             <Route path="/breeder/:username" element={<BreederProfilePage />} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
