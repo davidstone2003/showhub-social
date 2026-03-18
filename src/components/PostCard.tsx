@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, UserPlus } from "lucide-react";
+import { Heart, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -23,31 +23,34 @@ export function PostCard({ post, index }: PostCardProps) {
   const isUploadedWinnerImage = post.image.includes("/storage/v1/object/public/winner-images/");
   const imageSrc = imageFailed ? "/placeholder.svg" : post.image;
 
-  // Use structured fields if available, otherwise parse caption
   const showName = post.show_name || post.breeder?.location || "";
   const shownBy = post.shown_by || post.breeder?.name || "";
-  const winCount = post.win_title ? 1 : 0;
+  const winPlacing = post.win_placing;
+
+  // Show year suffix for archive posts (not current year)
+  const currentYear = new Date().getFullYear();
+  const postYear = post.created_at ? new Date(post.created_at).getFullYear() : currentYear;
+  const showYear = !isNaN(postYear) && postYear < currentYear;
 
   return (
     <motion.article
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: index * 0.03 }}
-      className="bg-card overflow-hidden mx-3 lg:mx-0"
-      style={{ borderRadius: "16px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}
+      className="bg-card overflow-hidden"
+      style={{ borderRadius: "12px", boxShadow: "var(--shadow-card)" }}
     >
-      {/* Image */}
+      {/* Image — 16:9 */}
       <Link
         to={post.animal_id ? `/animal/${post.animal_id}` : "#"}
-        className="block relative w-full overflow-hidden bg-muted"
-        style={{ borderRadius: "12px 12px 0 0" }}
+        className="block w-full overflow-hidden bg-muted"
       >
         <img
           src={imageSrc}
           alt={showName}
           className={cn(
-            "w-full",
-            isUploadedWinnerImage ? "aspect-[4/3] object-contain bg-muted" : "aspect-[4/5] object-cover"
+            "w-full aspect-video",
+            isUploadedWinnerImage ? "object-contain bg-muted" : "object-cover"
           )}
           loading="lazy"
           decoding="async"
@@ -55,81 +58,86 @@ export function PostCard({ post, index }: PostCardProps) {
         />
       </Link>
 
-      {/* Content */}
-      <div style={{ padding: "12px 14px 6px" }}>
-        {/* Win Placing */}
-        {post.win_placing && (
-          <p className="font-bold text-foreground" style={{ fontSize: "16px", lineHeight: "22px" }}>
-            {post.win_placing}
+      {/* Content — tight left-aligned */}
+      <div className="px-3.5 pt-2 pb-1.5">
+        {/* Win Placing — H4 bold */}
+        {winPlacing && (
+          <p className="font-bold text-foreground text-xl leading-tight">
+            {winPlacing}
           </p>
         )}
 
-        {/* Show Name */}
+        {/* Show Name — H5 medium */}
         {showName && (
-          <p className={post.win_placing ? "text-muted-foreground font-medium" : "font-bold text-foreground"} style={{ fontSize: "15px", lineHeight: "20px", marginTop: post.win_placing ? "2px" : "0" }}>
+          <p
+            className={cn(
+              "leading-snug",
+              winPlacing
+                ? "text-base font-medium text-muted-foreground mt-0.5"
+                : "text-xl font-bold text-foreground"
+            )}
+          >
             {showName}
+            {showYear && (
+              <span className="text-muted-foreground font-normal"> · {postYear}</span>
+            )}
           </p>
         )}
 
-        {/* Shown By */}
+        {/* Shown By — 14px */}
         {shownBy && (
-          <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
+          <p className="text-sm text-muted-foreground mt-0.5">
             Shown by: <span className="text-foreground font-medium">{shownBy}</span>
           </p>
         )}
 
-        {/* Bred By (optional) */}
-        {post.bred_by && (
-          <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
-            Bred by: <span className="text-foreground font-medium">{post.bred_by}</span>
-          </p>
-        )}
-
-        {/* Placed By (optional) */}
+        {/* Placed By — 14px */}
         {post.placed_by && (
-          <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
+          <p className="text-sm text-muted-foreground mt-px">
             Placed by: <span className="text-foreground font-medium">{post.placed_by}</span>
           </p>
         )}
 
-        {/* Caption (optional) */}
+        {/* Sire — 12px caption */}
+        {post.sired_by && (
+          <p className="text-xs text-muted-foreground mt-px">
+            Sire: <span className="font-medium">{post.sired_by}</span>
+          </p>
+        )}
+
+        {/* Dam — 12px caption */}
+        {post.dam && (
+          <p className="text-xs text-muted-foreground mt-px">
+            Dam: <span className="font-medium">{post.dam}</span>
+          </p>
+        )}
+
+        {/* Caption */}
         {post.caption && !post.caption.includes("Shown By:") && post.caption.trim() && (
-          <p className="text-muted-foreground mt-1.5" style={{ fontSize: "13px", lineHeight: "18px" }}>
+          <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">
             {post.caption}
           </p>
         )}
 
-        {/* Stats line */}
-        <p className="text-muted-foreground" style={{ fontSize: "12px", lineHeight: "16px", marginTop: "8px" }}>
-          {winCount > 0 && <span>{winCount} {winCount === 1 ? "win" : "wins"} · </span>}
-          {likeCount.toLocaleString()} {likeCount === 1 ? "like" : "likes"} · {post.comments} {post.comments === 1 ? "comment" : "comments"}
-        </p>
-      </div>
-
-      {/* Action Bar */}
-      <div className="border-t border-border" style={{ margin: "0 14px" }} />
-      <div className="flex items-center" style={{ height: "44px", padding: "0 8px", gap: "4px" }}>
-        {/* Contact */}
-        <button className="flex items-center justify-center gap-1.5 bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-colors" style={{ borderRadius: "10px", fontSize: "12px", lineHeight: "16px", height: "32px", padding: "0 14px" }}>
-          Contact
-        </button>
-
-        <div className="flex-1" />
-
-        {/* Like */}
-        <button
-          onClick={handleLike}
-          className="flex items-center justify-center rounded-lg hover:bg-muted transition-colors"
-          style={{ height: "32px", width: "32px" }}
-        >
-          <Heart className={`w-5 h-5 transition-colors ${liked ? "fill-destructive text-destructive" : "text-muted-foreground"}`} />
-        </button>
-
-        {/* Follow */}
-        <button className="flex items-center justify-center gap-1.5 rounded-lg hover:bg-muted transition-colors font-semibold text-muted-foreground" style={{ height: "32px", padding: "0 10px", fontSize: "12px" }}>
-          <UserPlus className="w-4 h-4" />
-          Follow
-        </button>
+        {/* Engagement row — right-aligned */}
+        <div className="flex items-center justify-end gap-3 mt-2 pb-1">
+          <button
+            onClick={handleLike}
+            className="flex items-center gap-1 text-muted-foreground hover:text-destructive transition-colors"
+          >
+            <Heart
+              className={cn(
+                "w-4 h-4",
+                liked && "fill-destructive text-destructive"
+              )}
+            />
+            <span className="text-xs font-medium">{likeCount}</span>
+          </button>
+          <span className="flex items-center gap-1 text-muted-foreground">
+            <MessageCircle className="w-4 h-4" />
+            <span className="text-xs font-medium">{post.comments}</span>
+          </span>
+        </div>
       </div>
     </motion.article>
   );
