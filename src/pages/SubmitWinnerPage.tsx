@@ -22,6 +22,7 @@ export default function SubmitWinnerPage() {
   const [images, setImages] = useState<ImageFile[]>([]);
   const [showName, setShowName] = useState("");
   const [showId, setShowId] = useState<string | null>(null);
+  const [winPlacing, setWinPlacing] = useState("");
   const [shownBy, setShownBy] = useState("");
   const [bredBy, setBredBy] = useState("");
   const [placedBy, setPlacedBy] = useState("");
