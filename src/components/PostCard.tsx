@@ -99,7 +99,7 @@ export function PostCard({ post, index }: PostCardProps) {
         )}
 
         {/* Engagement row */}
-        <div className="flex items-center justify-end gap-3 pb-1" style={{ marginTop: "6px" }}>
+        <div className="flex items-center justify-end gap-3 pb-1" style={{ marginTop: "3px" }}>
           <button
             onClick={handleLike}
             className="flex items-center gap-1 hover:text-destructive transition-colors"
