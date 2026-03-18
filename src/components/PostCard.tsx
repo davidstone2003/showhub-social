@@ -59,7 +59,7 @@ export function PostCard({ post, index }: PostCardProps) {
       </Link>
 
       {/* Content */}
-      <div className="px-3.5 pt-2 pb-1.5" style={{ lineHeight: 1.4 }}>
+      <div className="px-3.5 pt-2 pb-1.5" style={{ lineHeight: 1.35 }}>
         {/* Line 1: Show Name */}
         {showName && (
           <p className="font-medium text-foreground" style={{ fontSize: "14px" }}>
