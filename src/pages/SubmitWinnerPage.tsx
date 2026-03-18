@@ -172,6 +172,14 @@ export default function SubmitWinnerPage() {
     }
   };
 
+  if (successData) {
+    return (
+      <Layout showDiscovery={false}>
+        <PostSuccessScreen data={successData} />
+      </Layout>
+    );
+  }
+
   return (
     <Layout showDiscovery={false}>
       <div className="min-h-screen bg-background pb-24">
