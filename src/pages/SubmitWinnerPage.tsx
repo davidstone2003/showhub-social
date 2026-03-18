@@ -11,6 +11,7 @@ import { Camera, X, ImagePlus, Heart, MessageCircle, Clipboard, Sparkles, Chevro
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { parseFacebookCaption } from "@/lib/parseFacebookCaption";
+import PostSuccessScreen from "@/components/PostSuccessScreen";
 
 type ImageFile = { file: File; preview: string };
 
