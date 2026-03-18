@@ -29,7 +29,7 @@ export function PostCard({ post, index }: PostCardProps) {
     setLikeCount((c) => (liked ? c - 1 : c + 1));
   };
 
-  const { subtitle, body } = parseCaption(post.caption);
+  const { title, subtitle, body } = parseCaption(post.caption);
   const isHot = post.tags.some((t) => t.label.toLowerCase().includes("sale") || t.label.toLowerCase().includes("hot"));
   const isUploadedWinnerImage = post.image.includes("/storage/v1/object/public/winner-images/");
   const imageSrc = imageFailed ? "/placeholder.svg" : post.image;
