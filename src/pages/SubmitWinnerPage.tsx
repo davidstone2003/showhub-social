@@ -426,6 +426,7 @@ export default function SubmitWinnerPage() {
               {bredBy && <p className="text-sm text-muted-foreground">Bred By: {bredBy}</p>}
               {siredBy && <p className="text-sm text-muted-foreground">Sired By: {siredBy}</p>}
               {dam && <p className="text-sm text-muted-foreground">Dam: {dam}</p>}
+              {placedBy && <p className="text-sm text-muted-foreground">Placed By: {placedBy}</p>}
               {caption && <p className="text-sm text-foreground mt-2">{caption}</p>}
               {tags.length > 0 && (
                 <p className="text-sm text-primary mt-1">{tags.join(" ")}</p>
