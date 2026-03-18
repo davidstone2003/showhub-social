@@ -20,6 +20,7 @@ export default function SubmitWinnerPage() {
   const [showName, setShowName] = useState("");
   const [showId, setShowId] = useState<string | null>(null);
   const [shownBy, setShownBy] = useState("");
+  const [placedBy, setPlacedBy] = useState("");
   const [caption, setCaption] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
