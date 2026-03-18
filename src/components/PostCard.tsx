@@ -71,6 +71,13 @@ export function PostCard({ post, index }: PostCardProps) {
           </p>
         )}
 
+        {/* Bred By (optional) */}
+        {post.bred_by && (
+          <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
+            Bred by: <span className="text-foreground font-medium">{post.bred_by}</span>
+          </p>
+        )}
+
         {/* Placed By (optional) */}
         {post.placed_by && (
           <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
