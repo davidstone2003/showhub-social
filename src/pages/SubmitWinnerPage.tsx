@@ -7,9 +7,10 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { AutocompleteInput } from "@/components/AutocompleteInput";
-import { Camera, X, ImagePlus, Heart, MessageCircle } from "lucide-react";
+import { Camera, X, ImagePlus, Heart, MessageCircle, Clipboard, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { parseFacebookCaption } from "@/lib/parseFacebookCaption";
 
 type ImageFile = { file: File; preview: string };
 
