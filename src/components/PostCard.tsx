@@ -71,6 +71,13 @@ export function PostCard({ post, index }: PostCardProps) {
           </p>
         )}
 
+        {/* Placed By (optional) */}
+        {post.placed_by && (
+          <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
+            Placed by: <span className="text-foreground font-medium">{post.placed_by}</span>
+          </p>
+        )}
+
         {/* Caption (optional) */}
         {post.caption && !post.caption.includes("Shown By:") && post.caption.trim() && (
           <p className="text-muted-foreground mt-1.5" style={{ fontSize: "13px", lineHeight: "18px" }}>
