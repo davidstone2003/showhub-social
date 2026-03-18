@@ -165,9 +165,26 @@ export default function SubmitWinnerPage() {
     s.toLowerCase().includes(shownBy.toLowerCase())
   );
 
+  const navigate = useNavigate();
+
   const handleSubmit = () => {
     if (!isValid) return;
-    setShowPreview(true);
+    toast.success("Winner posted! 🏆", {
+      description: `${title} at ${showName}`,
+    });
+    // Reset form
+    setImages([]);
+    setTitle("");
+    setShowName("");
+    setShownBy("");
+    setDate(new Date());
+    setBredBy("");
+    setSiredBy("");
+    setDam("");
+    setCaption("");
+    setTags([]);
+    setShowPreview(false);
+    navigate("/");
   };
 
   return (
