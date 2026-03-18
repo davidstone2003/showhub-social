@@ -2,6 +2,7 @@ import { Plus, Search, LogIn, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export function MobileHeader() {
   const { user, profile } = useAuth();
