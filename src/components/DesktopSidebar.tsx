@@ -1,7 +1,8 @@
-import { Home, Trophy, Users, Dna, ShoppingBag, Truck, Plus, LogIn, LogOut, User } from "lucide-react";
+import { Home, Trophy, Users, Dna, ShoppingBag, Truck, Plus, LogIn, LogOut, User, Shield } from "lucide-react";
 import { NavLink, Link } from "react-router-dom";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const navItems = [
   { icon: Home, label: "Feed", to: "/" },
