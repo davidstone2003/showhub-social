@@ -1,4 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -163,9 +165,26 @@ export default function SubmitWinnerPage() {
     s.toLowerCase().includes(shownBy.toLowerCase())
   );
 
+  const navigate = useNavigate();
+
   const handleSubmit = () => {
     if (!isValid) return;
-    setShowPreview(true);
+    toast.success("Winner posted! 🏆", {
+      description: `${title} at ${showName}`,
+    });
+    // Reset form
+    setImages([]);
+    setTitle("");
+    setShowName("");
+    setShownBy("");
+    setDate(new Date());
+    setBredBy("");
+    setSiredBy("");
+    setDam("");
+    setCaption("");
+    setTags([]);
+    setShowPreview(false);
+    navigate("/");
   };
 
   return (
