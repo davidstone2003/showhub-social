@@ -1,14 +1,17 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { format } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { AutocompleteInput } from "@/components/AutocompleteInput";
-import { Camera, X, ImagePlus, Heart, UserPlus } from "lucide-react";
+import { Camera, X, ImagePlus, Heart, UserPlus, CalendarIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 type ImageFile = {
   file: File;
@@ -20,7 +23,9 @@ export default function SubmitWinnerPage() {
   const [showName, setShowName] = useState("");
   const [showId, setShowId] = useState<string | null>(null);
   const [shownBy, setShownBy] = useState("");
+  const [bredBy, setBredBy] = useState("");
   const [placedBy, setPlacedBy] = useState("");
+  const [showDate, setShowDate] = useState<Date>(new Date());
   const [caption, setCaption] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -91,13 +96,18 @@ export default function SubmitWinnerPage() {
       }
 
       const resolvedShowId = await ensureLookupEntry("shows", showName, showId);
+      const resolvedBreederId = bredBy.trim()
+        ? await ensureLookupEntry("breeders_lookup", bredBy, null)
+        : null;
 
       const { error } = await supabase.from("winners").insert({
         title: showName.trim(),
         show_name: showName.trim(),
         shown_by: shownBy.trim(),
+        bred_by: bredBy.trim() || null,
+        breeder_id: resolvedBreederId,
         placed_by: placedBy.trim() || null,
-        date: new Date().toISOString().split("T")[0],
+        date: format(showDate, "yyyy-MM-dd"),
         caption: caption.trim() || null,
         tags: [],
         image_urls: imageUrls,
@@ -205,11 +215,40 @@ export default function SubmitWinnerPage() {
               className="rounded-xl bg-card border-border h-12 text-sm"
             />
             <Input
+              placeholder="Bred by (optional)"
+              value={bredBy}
+              onChange={(e) => setBredBy(e.target.value)}
+              className="rounded-xl bg-card border-border h-12 text-sm"
+            />
+            <Input
               placeholder="Placed by (optional)"
               value={placedBy}
               onChange={(e) => setPlacedBy(e.target.value)}
               className="rounded-xl bg-card border-border h-12 text-sm"
             />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal rounded-xl bg-card border-border h-12 text-sm",
+                    !showDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {format(showDate, "PPP")}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={showDate}
+                  onSelect={(d) => d && setShowDate(d)}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           {/* Caption */}
@@ -236,6 +275,11 @@ export default function SubmitWinnerPage() {
                 <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
                   Shown by: <span className="text-foreground font-medium">{shownBy}</span>
                 </p>
+                {bredBy.trim() && (
+                  <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
+                    Bred by: <span className="text-foreground font-medium">{bredBy}</span>
+                  </p>
+                )}
                 {placedBy.trim() && (
                   <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
                     Placed by: <span className="text-foreground font-medium">{placedBy}</span>
