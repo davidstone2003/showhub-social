@@ -96,6 +96,7 @@ export default function SubmitWinnerPage() {
         title: showName.trim(),
         show_name: showName.trim(),
         shown_by: shownBy.trim(),
+        placed_by: placedBy.trim() || null,
         date: new Date().toISOString().split("T")[0],
         caption: caption.trim() || null,
         tags: [],
