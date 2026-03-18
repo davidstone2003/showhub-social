@@ -119,28 +119,52 @@ export type Database = {
           bio: string | null
           created_at: string
           display_name: string | null
+          facebook_url: string | null
+          hero_image_url: string | null
           id: string
+          instagram_url: string | null
           is_premium: boolean
+          location: string | null
           logo_url: string | null
+          phone: string | null
+          subscription_tier: string
+          tagline: string | null
           username: string
+          website_url: string | null
         }
         Insert: {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          facebook_url?: string | null
+          hero_image_url?: string | null
           id: string
+          instagram_url?: string | null
           is_premium?: boolean
+          location?: string | null
           logo_url?: string | null
+          phone?: string | null
+          subscription_tier?: string
+          tagline?: string | null
           username: string
+          website_url?: string | null
         }
         Update: {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          facebook_url?: string | null
+          hero_image_url?: string | null
           id?: string
+          instagram_url?: string | null
           is_premium?: boolean
+          location?: string | null
           logo_url?: string | null
+          phone?: string | null
+          subscription_tier?: string
+          tagline?: string | null
           username?: string
+          website_url?: string | null
         }
         Relationships: []
       }
