@@ -59,8 +59,8 @@ export function PostCard({ post, index }: PostCardProps) {
       </Link>
 
       {/* Content */}
-      <div className="px-3.5 pt-2 pb-1.5" style={{ lineHeight: 1.35 }}>
-        {/* Show Name */}
+      <div className="px-3.5 pt-2 pb-1.5" style={{ lineHeight: 1.4 }}>
+        {/* Line 1: Show Name */}
         {showName && (
           <p className="font-medium text-foreground" style={{ fontSize: "14px" }}>
             {showName}
@@ -70,50 +70,36 @@ export function PostCard({ post, index }: PostCardProps) {
           </p>
         )}
 
-        {/* Win Placing */}
+        {/* Line 2: Placement */}
         {winPlacing && (
-          <p className="font-medium text-foreground" style={{ fontSize: "14px" }}>
+          <p className="font-semibold text-foreground" style={{ fontSize: "14px", marginTop: "4px" }}>
             {winPlacing}
           </p>
         )}
 
-        {/* Shown By */}
-        {shownBy && (
-          <p className="text-muted-foreground" style={{ fontSize: "13px" }}>
-            Shown by {shownBy}
-          </p>
-        )}
+        {/* Line 3: Combined details */}
+        {(() => {
+          const details: string[] = [];
+          if (shownBy) details.push(`Shown by ${shownBy}`);
+          if (post.placed_by) details.push(`Placed by ${post.placed_by}`);
+          if (post.sired_by) details.push(`Sired by ${post.sired_by}`);
+          if (post.dam) details.push(`Dam: ${post.dam}`);
+          return details.length > 0 ? (
+            <p className="text-muted-foreground" style={{ fontSize: "13px", marginTop: "4px" }}>
+              {details.join(" · ")}
+            </p>
+          ) : null;
+        })()}
 
-        {/* Placed By */}
-        {post.placed_by && (
-          <p className="text-muted-foreground" style={{ fontSize: "13px" }}>
-            Placed by {post.placed_by}
-          </p>
-        )}
-
-        {/* Sire */}
-        {post.sired_by && (
-          <p style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))" }}>
-            Sire: {post.sired_by}
-          </p>
-        )}
-
-        {/* Dam */}
-        {post.dam && (
-          <p style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))" }}>
-            Dam: {post.dam}
-          </p>
-        )}
-
-        {/* Caption */}
+        {/* Line 4: Caption */}
         {post.caption && !post.caption.includes("Shown By:") && post.caption.trim() && (
-          <p className="text-foreground mt-1 line-clamp-2" style={{ fontSize: "14px" }}>
+          <p className="text-foreground line-clamp-2" style={{ fontSize: "14px", marginTop: "4px" }}>
             {post.caption}
           </p>
         )}
 
         {/* Engagement row */}
-        <div className="flex items-center justify-end gap-3 mt-2 pb-1">
+        <div className="flex items-center justify-end gap-3 pb-1" style={{ marginTop: "6px" }}>
           <button
             onClick={handleLike}
             className="flex items-center gap-1 hover:text-destructive transition-colors"
