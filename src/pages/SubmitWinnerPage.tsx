@@ -20,6 +20,7 @@ export default function SubmitWinnerPage() {
   const [showName, setShowName] = useState("");
   const [showId, setShowId] = useState<string | null>(null);
   const [shownBy, setShownBy] = useState("");
+  const [placedBy, setPlacedBy] = useState("");
   const [caption, setCaption] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -95,6 +96,7 @@ export default function SubmitWinnerPage() {
         title: showName.trim(),
         show_name: showName.trim(),
         shown_by: shownBy.trim(),
+        placed_by: placedBy.trim() || null,
         date: new Date().toISOString().split("T")[0],
         caption: caption.trim() || null,
         tags: [],
@@ -197,9 +199,15 @@ export default function SubmitWinnerPage() {
               }}
             />
             <Input
-              placeholder="Shown by (e.g., Caleb Stone)"
+              placeholder="Shown by (e.g., Caleb Stone) *"
               value={shownBy}
               onChange={(e) => setShownBy(e.target.value)}
+              className="rounded-xl bg-card border-border h-12 text-sm"
+            />
+            <Input
+              placeholder="Placed by (optional)"
+              value={placedBy}
+              onChange={(e) => setPlacedBy(e.target.value)}
               className="rounded-xl bg-card border-border h-12 text-sm"
             />
           </div>
@@ -228,6 +236,11 @@ export default function SubmitWinnerPage() {
                 <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
                   Shown by: <span className="text-foreground font-medium">{shownBy}</span>
                 </p>
+                {placedBy.trim() && (
+                  <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
+                    Placed by: <span className="text-foreground font-medium">{placedBy}</span>
+                  </p>
+                )}
                 {caption && (
                   <p className="text-muted-foreground mt-1.5" style={{ fontSize: "13px", lineHeight: "18px" }}>
                     {caption}
