@@ -101,8 +101,8 @@ export default function SubmitWinnerPage() {
         ? await ensureLookupEntry("breeders_lookup", bredBy, null)
         : null;
 
-      const { error } = await supabase.from("winners").insert({
-        title: showName.trim(),
+      const { error } = await (supabase.from("winners") as any).insert({
+        title: winPlacing.trim() ? `${winPlacing.trim()} — ${showName.trim()}` : showName.trim(),
         show_name: showName.trim(),
         shown_by: shownBy.trim(),
         bred_by: bredBy.trim() || null,
