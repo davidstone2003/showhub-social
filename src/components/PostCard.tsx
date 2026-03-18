@@ -93,7 +93,7 @@ export function PostCard({ post, index }: PostCardProps) {
 
         {/* Line 4: Caption */}
         {post.caption && !post.caption.includes("Shown By:") && post.caption.trim() && (
-          <p className="text-foreground line-clamp-2" style={{ fontSize: "14px", marginTop: "4px" }}>
+          <p className="text-foreground line-clamp-2" style={{ fontSize: "14px", marginTop: "2px" }}>
             {post.caption}
           </p>
         )}
