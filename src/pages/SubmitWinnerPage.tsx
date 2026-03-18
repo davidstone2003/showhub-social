@@ -96,13 +96,18 @@ export default function SubmitWinnerPage() {
       }
 
       const resolvedShowId = await ensureLookupEntry("shows", showName, showId);
+      const resolvedBreederId = bredBy.trim()
+        ? await ensureLookupEntry("breeders_lookup", bredBy, null)
+        : null;
 
       const { error } = await supabase.from("winners").insert({
         title: showName.trim(),
         show_name: showName.trim(),
         shown_by: shownBy.trim(),
+        bred_by: bredBy.trim() || null,
+        breeder_id: resolvedBreederId,
         placed_by: placedBy.trim() || null,
-        date: new Date().toISOString().split("T")[0],
+        date: format(showDate, "yyyy-MM-dd"),
         caption: caption.trim() || null,
         tags: [],
         image_urls: imageUrls,
