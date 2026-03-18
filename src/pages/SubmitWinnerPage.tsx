@@ -198,9 +198,15 @@ export default function SubmitWinnerPage() {
               }}
             />
             <Input
-              placeholder="Shown by (e.g., Caleb Stone)"
+              placeholder="Shown by (e.g., Caleb Stone) *"
               value={shownBy}
               onChange={(e) => setShownBy(e.target.value)}
+              className="rounded-xl bg-card border-border h-12 text-sm"
+            />
+            <Input
+              placeholder="Placed by (optional)"
+              value={placedBy}
+              onChange={(e) => setPlacedBy(e.target.value)}
               className="rounded-xl bg-card border-border h-12 text-sm"
             />
           </div>
