@@ -7,9 +7,10 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { AutocompleteInput } from "@/components/AutocompleteInput";
-import { Camera, X, ImagePlus, Heart, MessageCircle } from "lucide-react";
+import { Camera, X, ImagePlus, Heart, MessageCircle, Clipboard, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { parseFacebookCaption } from "@/lib/parseFacebookCaption";
 
 type ImageFile = { file: File; preview: string };
 
@@ -50,10 +51,41 @@ export default function SubmitWinnerPage() {
   const [caption, setCaption] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  /* Facebook import state */
+  const [importOpen, setImportOpen] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [importSuccess, setImportSuccess] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   const isValid = showName.trim() && shownBy.trim();
+
+  /* ── Facebook import ── */
+  const handleAutoFill = () => {
+    if (!importText.trim()) return;
+    const parsed = parseFacebookCaption(importText);
+    let filled = 0;
+    if (parsed.showName) { setShowName(parsed.showName); setShowId(null); filled++; }
+    if (parsed.winPlacing) { setWinPlacing(parsed.winPlacing); filled++; }
+    if (parsed.shownBy) { setShownBy(parsed.shownBy); filled++; }
+    if (parsed.placedBy) { setPlacedBy(parsed.placedBy); filled++; }
+    if (parsed.siredBy) { setSireName(parsed.siredBy); setSireId(null); filled++; }
+    if (parsed.dam) { setDamName(parsed.dam); filled++; }
+    if (parsed.caption) { setCaption(parsed.caption); filled++; }
+
+    if (filled > 0) {
+      setImportSuccess(true);
+      toast.success(`Auto-filled ${filled} field${filled > 1 ? "s" : ""}`, {
+        description: "Review and edit below before posting.",
+      });
+    } else {
+      setCaption(importText);
+      toast("Couldn't detect structured fields", {
+        description: "Text added as caption. Fill fields manually.",
+      });
+    }
+  };
 
   /* ── image handling ── */
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,6 +167,48 @@ export default function SubmitWinnerPage() {
         </div>
 
         <div className="max-w-lg mx-auto px-4 py-4 space-y-5">
+          {/* Facebook Import */}
+          <div className="bg-card border border-border rounded-xl overflow-hidden">
+            <button
+              onClick={() => { setImportOpen(!importOpen); setImportSuccess(false); }}
+              className="w-full flex items-center justify-between px-3.5 py-3"
+            >
+              <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Clipboard className="w-4 h-4 text-muted-foreground" />
+                Import from Facebook
+              </span>
+              {importOpen ? (
+                <ChevronUp className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              )}
+            </button>
+            {importOpen && (
+              <div className="px-3.5 pb-3.5 space-y-2">
+                <Textarea
+                  placeholder="Paste your Facebook caption here..."
+                  value={importText}
+                  onChange={(e) => { setImportText(e.target.value); setImportSuccess(false); }}
+                  className="rounded-lg bg-muted/50 border-border text-sm min-h-[100px] resize-none"
+                />
+                <Button
+                  onClick={handleAutoFill}
+                  disabled={!importText.trim()}
+                  variant="outline"
+                  className="w-full h-10 rounded-lg text-sm font-medium gap-2"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Auto Fill
+                </Button>
+                {importSuccess && (
+                  <p className="text-xs text-green-600 font-medium text-center">
+                    ✓ We found these details — edit below before posting
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Photo Upload */}
           <PhotoUpload
             images={images}
