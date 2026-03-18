@@ -51,6 +51,11 @@ export default function SubmitWinnerPage() {
   const [damName, setDamName] = useState("");
   const [caption, setCaption] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [successData, setSuccessData] = useState<{
+    showName: string; winPlacing: string; shownBy: string;
+    placedBy: string; sireName: string; damName: string;
+    caption: string; imageUrls: string[];
+  } | null>(null);
 
   /* Facebook import state */
   const [importOpen, setImportOpen] = useState(false);
