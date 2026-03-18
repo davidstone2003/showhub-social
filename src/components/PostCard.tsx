@@ -59,7 +59,7 @@ export function PostCard({ post, index }: PostCardProps) {
       </Link>
 
       {/* Content */}
-      <div className="px-3.5 pt-2 pb-1.5" style={{ lineHeight: 1.4 }}>
+      <div className="px-3.5 pt-2 pb-1.5" style={{ lineHeight: 1.35 }}>
         {/* Line 1: Show Name */}
         {showName && (
           <p className="font-medium text-foreground" style={{ fontSize: "14px" }}>
@@ -70,9 +70,9 @@ export function PostCard({ post, index }: PostCardProps) {
           </p>
         )}
 
-        {/* Line 2: Placement */}
+      {/* Line 2: Placement */}
         {winPlacing && (
-          <p className="font-semibold text-foreground" style={{ fontSize: "14px", marginTop: "4px" }}>
+          <p className="text-foreground" style={{ fontSize: "14px", fontWeight: 600, marginTop: "3px" }}>
             {winPlacing}
           </p>
         )}
@@ -85,21 +85,21 @@ export function PostCard({ post, index }: PostCardProps) {
           if (post.sired_by) details.push(`Sired by ${post.sired_by}`);
           if (post.dam) details.push(`Dam: ${post.dam}`);
           return details.length > 0 ? (
-            <p className="text-muted-foreground" style={{ fontSize: "13px", marginTop: "4px" }}>
-              {details.join(" · ")}
+            <p className="text-muted-foreground" style={{ fontSize: "13px", marginTop: "3px" }}>
+              {details.join(" \u2022 ")}
             </p>
           ) : null;
         })()}
 
         {/* Line 4: Caption */}
         {post.caption && !post.caption.includes("Shown By:") && post.caption.trim() && (
-          <p className="text-foreground line-clamp-2" style={{ fontSize: "14px", marginTop: "4px" }}>
+          <p className="text-foreground line-clamp-2" style={{ fontSize: "14px", marginTop: "2px" }}>
             {post.caption}
           </p>
         )}
 
         {/* Engagement row */}
-        <div className="flex items-center justify-end gap-3 pb-1" style={{ marginTop: "6px" }}>
+        <div className="flex items-center justify-end gap-3 pb-1" style={{ marginTop: "3px" }}>
           <button
             onClick={handleLike}
             className="flex items-center gap-1 hover:text-destructive transition-colors"
