@@ -443,7 +443,7 @@ export default function SubmitWinnerPage() {
             className="w-full h-12 rounded-xl text-base font-bold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
           >
             <Trophy className="w-5 h-5 mr-2" />
-            {submitting ? "Posting…" : "Post Winner"}
+            {submitting ? "Adding…" : "Add to Backdrop"}
           </Button>
         </div>
       </div>
