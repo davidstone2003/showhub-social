@@ -58,25 +58,11 @@ export function PostCard({ post, index }: PostCardProps) {
         />
       </Link>
 
-      {/* Content — tight left-aligned */}
-      <div className="px-3.5 pt-2 pb-1.5">
-        {/* Win Placing — H4 bold */}
-        {winPlacing && (
-          <p className="font-bold text-foreground text-xl leading-tight">
-            {winPlacing}
-          </p>
-        )}
-
-        {/* Show Name — H5 medium */}
+      {/* Content */}
+      <div className="px-3.5 pt-2 pb-1.5" style={{ lineHeight: 1.35 }}>
+        {/* Show Name */}
         {showName && (
-          <p
-            className={cn(
-              "leading-snug",
-              winPlacing
-                ? "text-base font-medium text-muted-foreground mt-0.5"
-                : "text-xl font-bold text-foreground"
-            )}
-          >
+          <p className="font-medium text-foreground" style={{ fontSize: "14px" }}>
             {showName}
             {showYear && (
               <span className="text-muted-foreground font-normal"> · {postYear}</span>
@@ -84,58 +70,66 @@ export function PostCard({ post, index }: PostCardProps) {
           </p>
         )}
 
-        {/* Shown By — 14px */}
+        {/* Win Placing */}
+        {winPlacing && (
+          <p className="font-medium text-foreground" style={{ fontSize: "14px" }}>
+            {winPlacing}
+          </p>
+        )}
+
+        {/* Shown By */}
         {shownBy && (
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Shown by: <span className="text-foreground font-medium">{shownBy}</span>
+          <p className="text-muted-foreground" style={{ fontSize: "13px" }}>
+            Shown by {shownBy}
           </p>
         )}
 
-        {/* Placed By — 14px */}
+        {/* Placed By */}
         {post.placed_by && (
-          <p className="text-sm text-muted-foreground mt-px">
-            Placed by: <span className="text-foreground font-medium">{post.placed_by}</span>
+          <p className="text-muted-foreground" style={{ fontSize: "13px" }}>
+            Placed by {post.placed_by}
           </p>
         )}
 
-        {/* Sire — 12px caption */}
+        {/* Sire */}
         {post.sired_by && (
-          <p className="text-xs text-muted-foreground mt-px">
-            Sire: <span className="font-medium">{post.sired_by}</span>
+          <p style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))" }}>
+            Sire: {post.sired_by}
           </p>
         )}
 
-        {/* Dam — 12px caption */}
+        {/* Dam */}
         {post.dam && (
-          <p className="text-xs text-muted-foreground mt-px">
-            Dam: <span className="font-medium">{post.dam}</span>
+          <p style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))" }}>
+            Dam: {post.dam}
           </p>
         )}
 
         {/* Caption */}
         {post.caption && !post.caption.includes("Shown By:") && post.caption.trim() && (
-          <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">
+          <p className="text-foreground mt-1 line-clamp-2" style={{ fontSize: "14px" }}>
             {post.caption}
           </p>
         )}
 
-        {/* Engagement row — right-aligned */}
+        {/* Engagement row */}
         <div className="flex items-center justify-end gap-3 mt-2 pb-1">
           <button
             onClick={handleLike}
-            className="flex items-center gap-1 text-muted-foreground hover:text-destructive transition-colors"
+            className="flex items-center gap-1 hover:text-destructive transition-colors"
+            style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))" }}
           >
             <Heart
               className={cn(
-                "w-4 h-4",
+                "w-3.5 h-3.5",
                 liked && "fill-destructive text-destructive"
               )}
             />
-            <span className="text-xs font-medium">{likeCount}</span>
+            <span>{likeCount}</span>
           </button>
-          <span className="flex items-center gap-1 text-muted-foreground">
-            <MessageCircle className="w-4 h-4" />
-            <span className="text-xs font-medium">{post.comments}</span>
+          <span className="flex items-center gap-1" style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))" }}>
+            <MessageCircle className="w-3.5 h-3.5" />
+            <span>{post.comments}</span>
           </span>
         </div>
       </div>
