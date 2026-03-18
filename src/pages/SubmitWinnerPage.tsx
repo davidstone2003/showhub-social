@@ -1,27 +1,14 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { AutocompleteInput } from "@/components/AutocompleteInput";
-import {
-  Camera,
-  X,
-  CalendarIcon,
-  ChevronDown,
-  ChevronUp,
-  Trophy,
-  ImagePlus,
-} from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { Camera, X, ImagePlus, Heart, UserPlus } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 type ImageFile = {
   file: File;
@@ -29,70 +16,17 @@ type ImageFile = {
 };
 
 export default function SubmitWinnerPage() {
-  // Required fields
   const [images, setImages] = useState<ImageFile[]>([]);
-  const [title, setTitle] = useState("");
   const [showName, setShowName] = useState("");
   const [showId, setShowId] = useState<string | null>(null);
   const [shownBy, setShownBy] = useState("");
-  const [date, setDate] = useState<Date>(new Date());
-
-  // Optional fields
-  const [bredBy, setBredBy] = useState("");
-  const [breederId, setBreederId] = useState<string | null>(null);
-  const [siredBy, setSiredBy] = useState("");
-  const [sireId, setSireId] = useState<string | null>(null);
-  const [dam, setDam] = useState("");
-  const [placedBy, setPlacedBy] = useState("");
   const [caption, setCaption] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
-
-  // UI state
-  const [detailsOpen, setDetailsOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
-  const isValid = title.trim() && showName.trim() && shownBy.trim();
-
-  // Auto-generate tags from fields
-  useEffect(() => {
-    const autoTags: string[] = [];
-    if (showName.trim()) autoTags.push(`#${showName.replace(/\s+/g, "")}`);
-    if (shownBy.trim()) autoTags.push(`#${shownBy.replace(/\s+/g, "")}`);
-    if (bredBy.trim()) autoTags.push(`#${bredBy.replace(/\s+/g, "")}`);
-    if (siredBy.trim()) autoTags.push(`#${siredBy.replace(/\s+/g, "")}`);
-    if (title.toLowerCase().includes("market lamb")) autoTags.push("#MarketLamb");
-    if (title.toLowerCase().includes("grand champion")) autoTags.push("#GrandChampion");
-    setTags(autoTags);
-  }, [showName, shownBy, bredBy, siredBy, title]);
-
-  // Auto-extraction from caption paste
-  const handleCaptionChange = useCallback(
-    (value: string) => {
-      setCaption(value);
-      if (value.length > 40 && !caption) {
-        const titleMatch = value.match(
-          /(Grand Champion|Reserve Grand Champion|Champion|Reserve Champion|Class Winner|Breed Champion)[\s]*(Market Lamb|Market Goat|Breeding Ewe|Market Steer|Market Barrow|Market Hog)?/i
-        );
-        if (titleMatch && !title) setTitle(titleMatch[0]);
-        const shownByMatch = value.match(/(?:shown by|exhibited by)[:\s]+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})/i);
-        if (shownByMatch && !shownBy) setShownBy(shownByMatch[1].trim());
-        const bredByMatch = value.match(/(?:bred by)[:\s]+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})/i);
-        if (bredByMatch && !bredBy) {
-          setBredBy(bredByMatch[1].trim());
-          setDetailsOpen(true);
-        }
-        const siredByMatch = value.match(/(?:sired by|sire)[:\s]+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})/i);
-        if (siredByMatch && !siredBy) {
-          setSiredBy(siredByMatch[1].trim());
-          setDetailsOpen(true);
-        }
-      }
-    },
-    [caption, title, shownBy, bredBy, siredBy]
-  );
+  const isValid = showName.trim() && shownBy.trim();
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -111,7 +45,6 @@ export default function SubmitWinnerPage() {
     });
   };
 
-  // Upsert into lookup table if free text (no id matched)
   const ensureLookupEntry = async (
     table: "shows" | "sires_lookup" | "breeders_lookup",
     displayText: string,
@@ -119,23 +52,17 @@ export default function SubmitWinnerPage() {
   ): Promise<string | null> => {
     if (!displayText.trim()) return null;
     if (existingId) return existingId;
-
-    // Try to find existing
     const { data: existing } = await supabase
       .from(table)
       .select("id")
       .ilike("name", displayText.trim())
       .limit(1);
-
     if (existing && existing.length > 0) return existing[0].id;
-
-    // Insert new
     const { data: inserted, error } = await supabase
       .from(table)
       .insert({ name: displayText.trim() })
       .select("id")
       .single();
-
     if (error || !inserted) return null;
     return inserted.id;
   };
@@ -146,7 +73,6 @@ export default function SubmitWinnerPage() {
 
     try {
       const imageUrls: string[] = [];
-
       for (const img of images) {
         const fileExt = img.file.name.split(".").pop();
         const filePath = `${crypto.randomUUID()}.${fileExt}`;
@@ -156,45 +82,30 @@ export default function SubmitWinnerPage() {
             contentType: img.file.type,
             cacheControl: "3600",
           });
-
         if (uploadError) throw new Error("Photo upload failed. Please try again.");
-
         const { data: urlData } = supabase.storage
           .from("winner-images")
           .getPublicUrl(filePath);
         imageUrls.push(urlData.publicUrl);
       }
 
-      // Resolve IDs for lookup fields
       const resolvedShowId = await ensureLookupEntry("shows", showName, showId);
-      const resolvedSireId = siredBy.trim()
-        ? await ensureLookupEntry("sires_lookup", siredBy, sireId)
-        : null;
-      const resolvedBreederId = bredBy.trim()
-        ? await ensureLookupEntry("breeders_lookup", bredBy, breederId)
-        : null;
 
       const { error } = await supabase.from("winners").insert({
-        title: title.trim(),
+        title: showName.trim(),
         show_name: showName.trim(),
         shown_by: shownBy.trim(),
-        date: date.toISOString().split("T")[0],
-        bred_by: bredBy.trim() || null,
-        sired_by: siredBy.trim() || null,
-        dam: dam.trim() || null,
-        placed_by: placedBy.trim() || null,
+        date: new Date().toISOString().split("T")[0],
         caption: caption.trim() || null,
-        tags,
+        tags: [],
         image_urls: imageUrls,
         show_id: resolvedShowId,
-        sire_id: resolvedSireId,
-        breeder_id: resolvedBreederId,
       });
 
       if (error) throw error;
 
-      toast.success("Added to Backdrop! 🏆", {
-        description: `${title} at ${showName}`,
+      toast.success("Added to Backdrop!", {
+        description: `${showName} — ${shownBy}`,
       });
       navigate("/");
     } catch (err: any) {
@@ -210,15 +121,12 @@ export default function SubmitWinnerPage() {
     <Layout showDiscovery={false}>
       <div className="min-h-screen bg-background pb-24">
         {/* Header */}
-        <div className="sticky top-0 z-20 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-gold" />
-            Add to Backdrop
-          </h1>
+        <div className="sticky top-0 z-20 bg-card border-b border-border px-4 py-3">
+          <p className="text-sm text-muted-foreground">Put your win on the backdrop</p>
         </div>
 
         <div className="max-w-lg mx-auto px-4 py-4 space-y-5">
-          {/* ====== PHOTO UPLOAD ====== */}
+          {/* Photo Upload */}
           <div>
             <input
               ref={fileInputRef}
@@ -228,7 +136,6 @@ export default function SubmitWinnerPage() {
               className="hidden"
               onChange={handleImageUpload}
             />
-
             {images.length === 0 ? (
               <button
                 onClick={() => fileInputRef.current?.click()}
@@ -238,8 +145,8 @@ export default function SubmitWinnerPage() {
                   <ImagePlus className="w-7 h-7 text-primary" />
                 </div>
                 <div className="text-center">
-                  <p className="text-sm font-semibold text-foreground">Add Photos</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Up to 3 images • First is cover</p>
+                  <p className="text-sm font-semibold text-foreground">Add Photo</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Up to 3 images</p>
                 </div>
               </button>
             ) : (
@@ -252,9 +159,6 @@ export default function SubmitWinnerPage() {
                   >
                     <X className="w-4 h-4 text-white" />
                   </button>
-                  <Badge className="absolute bottom-2 left-2 bg-black/60 text-white border-0 text-[10px]">
-                    Cover
-                  </Badge>
                 </div>
                 <div className="flex gap-2">
                   {images.slice(1).map((img, i) => (
@@ -281,206 +185,78 @@ export default function SubmitWinnerPage() {
             )}
           </div>
 
-          {/* ====== REQUIRED WIN DETAILS ====== */}
+          {/* Fields */}
           <div className="space-y-3">
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              Win Details
-            </label>
-
-            <Input
-              placeholder="Title / Win (e.g., Grand Champion Market Lamb)"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="rounded-xl bg-card border-border h-12 text-sm"
-            />
-
             <AutocompleteInput
               table="shows"
-              placeholder="Show Name (e.g., Arizona Nationals)"
+              placeholder="Show (e.g., Ohio State Fair)"
               value={showName}
               onChange={(display, id) => {
                 setShowName(display);
                 setShowId(id);
               }}
             />
-
             <Input
-              placeholder="Shown By (e.g., Staci Show Mac)"
+              placeholder="Shown by (e.g., Caleb Stone)"
               value={shownBy}
               onChange={(e) => setShownBy(e.target.value)}
               className="rounded-xl bg-card border-border h-12 text-sm"
             />
-
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal rounded-xl h-12 bg-card border-border text-sm",
-                    !date && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                  {date ? format(date, "MMM d, yyyy") : "Select date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={(d) => d && setDate(d)}
-                  initialFocus
-                  className="p-3 pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
           </div>
 
-          {/* ====== OPTIONAL DETAILS ====== */}
-          <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
-            <CollapsibleTrigger asChild>
-              <button className="flex items-center gap-2 text-sm font-medium text-primary w-full py-2">
-                {detailsOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                People & Pedigree
-                <span className="text-xs text-muted-foreground font-normal">(optional)</span>
-              </button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-3 pt-1">
-              <AutocompleteInput
-                table="breeders_lookup"
-                placeholder="Bred By (e.g., Time Ranch)"
-                value={bredBy}
-                onChange={(display, id) => {
-                  setBredBy(display);
-                  setBreederId(id);
-                }}
-              />
-              <AutocompleteInput
-                table="sires_lookup"
-                placeholder="Sired By (e.g., Double T)"
-                value={siredBy}
-                onChange={(display, id) => {
-                  setSiredBy(display);
-                  setSireId(id);
-                }}
-              />
-              <Input
-                placeholder="Dam (e.g., Zerbach)"
-                value={dam}
-                onChange={(e) => setDam(e.target.value)}
-                className="rounded-xl bg-card border-border h-12 text-sm"
-              />
-              <Input
-                placeholder="Placed By (e.g., John Smith)"
-                value={placedBy}
-                onChange={(e) => setPlacedBy(e.target.value)}
-                className="rounded-xl bg-card border-border h-12 text-sm"
-              />
-            </CollapsibleContent>
-          </Collapsible>
+          {/* Caption */}
+          <Textarea
+            placeholder="Caption (optional)"
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            className="rounded-xl bg-card border-border text-sm min-h-[80px] resize-none"
+          />
 
-          {/* ====== CAPTION ====== */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              Caption
-            </label>
-            <Textarea
-              placeholder="Huge congrats to Staci & family on this Grand Champion Market Lamb at Arizona Nationals! 🐑🏆"
-              value={caption}
-              onChange={(e) => handleCaptionChange(e.target.value)}
-              className="rounded-xl bg-card border-border text-sm min-h-[200px] resize-none"
-            />
-          </div>
-
-          {/* ====== AUTO TAGS ====== */}
-          {tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {tags.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="secondary"
-                  className="rounded-full text-xs px-2.5 py-1 bg-primary/10 text-primary border-0"
-                >
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          )}
-
-          {/* ====== POST PREVIEW ====== */}
+          {/* Preview */}
           {isValid && (
             <div className="bg-card border border-border rounded-xl overflow-hidden">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide px-4 pt-3 pb-2">
-                Preview — This is how your post will look
+                Preview
               </p>
               {images[0] && (
-                <img
-                  src={images[0].preview}
-                  alt="Preview"
-                  className="w-full aspect-[4/3] object-cover"
-                />
+                <img src={images[0].preview} alt="Preview" className="w-full aspect-[4/3] object-cover" />
               )}
-              <div style={{ padding: "12px 14px 10px", display: "flex", flexDirection: "column", gap: "3px" }}>
-                <div className="flex items-center" style={{ gap: "6px" }}>
-                  <Trophy className="w-4 h-4 text-gold shrink-0" />
-                  <p className="font-bold text-foreground" style={{ fontSize: "15px", lineHeight: "20px" }}>
-                    {title}
-                  </p>
-                </div>
-                <p className="font-semibold text-primary" style={{ fontSize: "13px", lineHeight: "18px", paddingLeft: "22px" }}>
+              <div style={{ padding: "12px 14px 6px" }}>
+                <p className="font-bold text-foreground" style={{ fontSize: "15px", lineHeight: "20px" }}>
                   {showName}
                 </p>
-                <div style={{ paddingLeft: "22px", display: "flex", flexDirection: "column", gap: "1px", marginTop: "4px" }}>
-                  <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px" }}>
-                    <span className="text-foreground font-medium">Shown By:</span> {shownBy}
-                  </p>
-                  {bredBy && (
-                    <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px" }}>
-                      <span className="text-foreground font-medium">Bred By:</span> {bredBy}
-                    </p>
-                  )}
-                  {siredBy && (
-                    <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px" }}>
-                      <span className="text-foreground font-medium">Sire:</span> {siredBy}
-                    </p>
-                  )}
-                  {dam && (
-                    <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px" }}>
-                      <span className="text-foreground font-medium">Dam:</span> {dam}
-                    </p>
-                  )}
-                  {placedBy && (
-                    <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px" }}>
-                      <span className="text-foreground font-medium">Placed By:</span> {placedBy}
-                    </p>
-                  )}
-                </div>
+                <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: "18px", marginTop: "2px" }}>
+                  Shown by: <span className="text-foreground font-medium">{shownBy}</span>
+                </p>
                 {caption && (
-                  <p className="text-muted-foreground mt-1" style={{ fontSize: "13px", lineHeight: "18px", paddingLeft: "22px" }}>
+                  <p className="text-muted-foreground mt-1.5" style={{ fontSize: "13px", lineHeight: "18px" }}>
                     {caption}
                   </p>
                 )}
-                {tags.length > 0 && (
-                  <p className="text-primary mt-1" style={{ fontSize: "12px", paddingLeft: "22px" }}>{tags.join(" ")}</p>
-                )}
+                <p className="text-muted-foreground" style={{ fontSize: "12px", lineHeight: "16px", marginTop: "8px" }}>
+                  0 likes · 0 comments
+                </p>
               </div>
               <div className="border-t border-border mx-3.5" />
-              <div className="flex items-center justify-between px-3" style={{ height: "38px" }}>
-                <span className="text-xs text-muted-foreground">❤️ Save · 💬 0 · 🔁 Share</span>
-                <span className="text-xs font-bold text-primary">CONTACT</span>
+              <div className="flex items-center px-3" style={{ height: "38px", gap: "4px" }}>
+                <span className="text-xs font-bold text-primary">Contact</span>
+                <div className="flex-1" />
+                <Heart className="w-4 h-4 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground ml-2 flex items-center gap-1">
+                  <UserPlus className="w-3.5 h-3.5" /> Follow
+                </span>
               </div>
             </div>
           )}
         </div>
 
-        {/* ====== FIXED BOTTOM POST BUTTON ====== */}
+        {/* Submit Button */}
         <div className="fixed bottom-16 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent z-30 max-w-lg mx-auto">
           <Button
             onClick={handleSubmit}
             disabled={!isValid || submitting}
             className="w-full h-12 rounded-xl text-base font-bold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
           >
-            <Trophy className="w-5 h-5 mr-2" />
             {submitting ? "Adding…" : "Add to Backdrop"}
           </Button>
         </div>
