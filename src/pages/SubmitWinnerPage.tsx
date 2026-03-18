@@ -521,11 +521,11 @@ export default function SubmitWinnerPage() {
         <div className="fixed bottom-16 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent z-30 max-w-lg mx-auto">
           <Button
             onClick={handleSubmit}
-            disabled={!isValid}
+            disabled={!isValid || submitting}
             className="w-full h-12 rounded-xl text-base font-bold bg-primary text-primary-foreground hover:bg-primary-dark disabled:opacity-40"
           >
             <Trophy className="w-5 h-5 mr-2" />
-            Post Winner
+            {submitting ? "Posting…" : "Post Winner"}
           </Button>
         </div>
       </div>
