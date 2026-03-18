@@ -1,0 +1,1 @@
+ALTER TABLE public.winners ADD COLUMN win_placing text DEFAULT NULL;
