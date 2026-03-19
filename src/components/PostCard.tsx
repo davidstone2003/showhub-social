@@ -6,6 +6,7 @@ import type { Post } from "@/data/mock";
 import { cn } from "@/lib/utils";
 import { useUserRole } from "@/hooks/useUserRole";
 import { AdminFlagModal } from "@/components/AdminFlagModal";
+import { BreederIdentity } from "@/components/BreederIdentity";
 
 interface PostCardProps {
   post: Post & { status?: string; user_id?: string | null };
@@ -82,6 +83,16 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
             <Flag className="w-3.5 h-3.5 text-muted-foreground" />
           </button>
         )}
+
+        {/* Breeder Header */}
+        <BreederIdentity
+          name={post.breeder?.name || shownBy || "Unknown"}
+          slug={post.breeder?.id ? undefined : undefined}
+          logoUrl={post.breeder?.logo || null}
+          location={post.breeder?.location || null}
+          tier={post.breeder?.is_pro ? "breeder_page" : "free"}
+          variant="feed"
+        />
 
         {/* Image */}
         <Link
