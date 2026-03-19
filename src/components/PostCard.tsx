@@ -84,6 +84,16 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </button>
         )}
 
+        {/* Breeder Header */}
+        <BreederIdentity
+          name={post.breeder?.name || shownBy || "Unknown"}
+          slug={post.breeder?.id ? undefined : undefined}
+          logoUrl={post.breeder?.logo || null}
+          location={post.breeder?.location || null}
+          tier={post.breeder?.is_pro ? "breeder_page" : "free"}
+          variant="feed"
+        />
+
         {/* Image */}
         <Link
           to={post.animal_id ? `/animal/${post.animal_id}` : "#"}
