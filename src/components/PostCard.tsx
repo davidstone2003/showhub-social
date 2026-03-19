@@ -6,6 +6,7 @@ import type { Post } from "@/data/mock";
 import { cn } from "@/lib/utils";
 import { useUserRole } from "@/hooks/useUserRole";
 import { AdminFlagModal } from "@/components/AdminFlagModal";
+import { BreederIdentity } from "@/components/BreederIdentity";
 
 interface PostCardProps {
   post: Post & { status?: string; user_id?: string | null };
