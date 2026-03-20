@@ -193,25 +193,10 @@ function WinnerDetails({
 }) {
   return (
     <div className="space-y-1">
-      {/* Result title — strongest */}
+      {/* Result / placement — strongest */}
       {winPlacing && (
         <p className="text-foreground font-bold" style={{ fontSize: "15px", lineHeight: 1.3 }}>
           {winPlacing}
-        </p>
-      )}
-
-      {/* Animal / win title — skip if redundant with placement */}
-      {winTitle &&
-       winPlacing &&
-       !winTitle.toLowerCase().includes(winPlacing.toLowerCase()) &&
-       !winPlacing.toLowerCase().includes(winTitle.toLowerCase()) && (
-        <p className="text-foreground font-semibold" style={{ fontSize: "14px", lineHeight: 1.3 }}>
-          {winTitle}
-        </p>
-      )}
-      {winTitle && !winPlacing && (
-        <p className="text-foreground font-semibold" style={{ fontSize: "14px", lineHeight: 1.3 }}>
-          {winTitle}
         </p>
       )}
 
