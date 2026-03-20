@@ -215,7 +215,7 @@ function WinnerDetails({
             linkTo={sireId ? `/sire/${sireId}` : undefined}
           />
         )}
-        <DetailLine label="Dam" value={dam || "—"} />
+        {dam && <DetailLine label="Dam" value={dam} />}
       </div>
 
       {/* Caption */}
