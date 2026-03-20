@@ -35,7 +35,7 @@ export function Feed() {
 
         const mapped: Post[] = data.map((w: any) => {
           const profile = w.user_id ? profilesMap[w.user_id] : null;
-          const breederName = profile?.display_name || profile?.username || w.bred_by || w.shown_by;
+          const breederName = w.bred_by || profile?.display_name || profile?.username || w.shown_by;
           const breederSlug = profile?.username;
           const isPro = profile?.subscription_tier === 'breeder_page' || profile?.subscription_tier === 'listing';
 
