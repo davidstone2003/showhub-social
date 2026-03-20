@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { PostCard } from "@/components/PostCard";
+import { SireCard } from "@/components/SireCard";
 import { ArrowLeft, Dna } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Post } from "@/data/mock";
