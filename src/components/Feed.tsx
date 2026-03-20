@@ -14,38 +14,46 @@ export function Feed() {
     async function fetchWinners() {
       const { data } = await supabase
         .from('winners')
-        .select('*')
+        .select('*, profiles:user_id(id, display_name, username, logo_url, location, subscription_tier)')
         .eq('status', 'active')
         .eq('show_on_feed', true)
         .order('created_at', { ascending: false });
 
       if (data) {
-        const mapped: Post[] = data.map((w) => ({
-          id: w.id,
-          image: w.image_urls?.[0] || "/placeholder.svg",
-          breeder: {
-            id: "db-" + w.id,
-            name: w.shown_by,
-            location: w.show_name,
-            logo: "",
-            is_pro: false,
-          },
-          win_title: w.title,
-          show_name: w.show_name,
-          shown_by: w.shown_by,
-          bred_by: w.bred_by || undefined,
-          sired_by: w.sired_by || undefined,
-          dam: w.dam || undefined,
-          placed_by: w.placed_by || undefined,
-          win_placing: w.win_placing || undefined,
-          caption: w.caption || "",
-          tags: (w.tags || []).map((t: string) => ({ label: t, type: "breed" })),
-          post_type: "champion" as const,
-          created_at: w.created_at,
-          likes: w.likes || 0,
-          comments: w.comments || 0,
-          saved: false,
-        }));
+        const mapped: Post[] = data.map((w: any) => {
+          const profile = w.profiles;
+          const breederName = profile?.display_name || profile?.username || w.shown_by;
+          const breederSlug = profile?.username;
+          const isPro = profile?.subscription_tier === 'breeder_page' || profile?.subscription_tier === 'listing';
+
+          return {
+            id: w.id,
+            image: w.image_urls?.[0] || "/placeholder.svg",
+            breeder: {
+              id: profile?.id || "unknown",
+              name: breederName,
+              location: profile?.location || "",
+              logo: profile?.logo_url || "",
+              is_pro: isPro,
+              slug: breederSlug,
+            },
+            win_title: w.title,
+            show_name: w.show_name,
+            shown_by: w.shown_by,
+            bred_by: w.bred_by || undefined,
+            sired_by: w.sired_by || undefined,
+            dam: w.dam || undefined,
+            placed_by: w.placed_by || undefined,
+            win_placing: w.win_placing || undefined,
+            caption: w.caption || "",
+            tags: (w.tags || []).map((t: string) => ({ label: t, type: "breed" })),
+            post_type: "champion" as const,
+            created_at: w.created_at,
+            likes: w.likes || 0,
+            comments: w.comments || 0,
+            saved: false,
+          };
+        });
         setDbPosts(mapped);
       }
       setLoading(false);

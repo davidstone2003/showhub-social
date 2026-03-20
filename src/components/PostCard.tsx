@@ -86,8 +86,8 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
 
         {/* Breeder Header */}
         <BreederIdentity
-          name={post.breeder?.name || shownBy || "Unknown"}
-          slug={post.breeder?.id ? undefined : undefined}
+          name={post.breeder?.name || "Unknown"}
+          slug={(post.breeder as any)?.slug || post.breeder?.id}
           logoUrl={post.breeder?.logo || null}
           location={post.breeder?.location || null}
           tier={post.breeder?.is_pro ? "breeder_page" : "free"}
