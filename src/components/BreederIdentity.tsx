@@ -56,17 +56,12 @@ export function BreederIdentity({
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            {location && (
-              <span className="text-xs text-muted-foreground flex items-center gap-0.5">
-                <MapPin className="w-2.5 h-2.5" />
-                {location}
-              </span>
-            )}
-            <span className="text-xs text-primary/70 group-hover:text-primary transition-colors">
-              View Breeder Page
+          {location && (
+            <span className="text-xs text-muted-foreground flex items-center gap-0.5">
+              <MapPin className="w-2.5 h-2.5" />
+              {location}
             </span>
-          </div>
+          )}
         </div>
       </Link>
     );
@@ -138,7 +133,7 @@ export function BreederIdentity({
             {location}
           </span>
         )}
-        <span className="text-xs text-primary/70">View Breeder Page</span>
+        
       </div>
     </Link>
   );
