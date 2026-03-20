@@ -120,7 +120,6 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           {isWinner ? (
             <WinnerDetails
               winPlacing={post.win_placing}
-              winTitle={post.win_title}
               showNameWithYear={showNameWithYear}
               shownBy={post.shown_by}
               placedBy={post.placed_by}
@@ -170,7 +169,6 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
 /* ── Winner Detail Block ── */
 function WinnerDetails({
   winPlacing,
-  winTitle,
   showNameWithYear,
   shownBy,
   placedBy,
@@ -181,7 +179,6 @@ function WinnerDetails({
   caption,
 }: {
   winPlacing?: string;
-  winTitle?: string;
   showNameWithYear: string | null;
   shownBy?: string;
   placedBy?: string;
@@ -193,25 +190,10 @@ function WinnerDetails({
 }) {
   return (
     <div className="space-y-1">
-      {/* Result title — strongest */}
+      {/* Result / placement — strongest */}
       {winPlacing && (
         <p className="text-foreground font-bold" style={{ fontSize: "15px", lineHeight: 1.3 }}>
           {winPlacing}
-        </p>
-      )}
-
-      {/* Animal / win title — skip if redundant with placement */}
-      {winTitle &&
-       winPlacing &&
-       !winTitle.toLowerCase().includes(winPlacing.toLowerCase()) &&
-       !winPlacing.toLowerCase().includes(winTitle.toLowerCase()) && (
-        <p className="text-foreground font-semibold" style={{ fontSize: "14px", lineHeight: 1.3 }}>
-          {winTitle}
-        </p>
-      )}
-      {winTitle && !winPlacing && (
-        <p className="text-foreground font-semibold" style={{ fontSize: "14px", lineHeight: 1.3 }}>
-          {winTitle}
         </p>
       )}
 
