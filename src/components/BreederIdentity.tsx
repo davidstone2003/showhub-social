@@ -32,11 +32,13 @@ export function BreederIdentity({
   variant,
 }: BreederIdentityProps) {
   const isPaid = tier === "breeder_page";
-  const link = slug ? `/breeder/${slug}` : "#";
+  const link = slug ? `/breeder/${slug}` : null;
 
   if (variant === "feed") {
+    const Wrapper = link ? Link : "div";
+    const wrapperProps = link ? { to: link, className: "flex items-center gap-2.5 px-3.5 pt-3 pb-2 group" } : { className: "flex items-center gap-2.5 px-3.5 pt-3 pb-2" };
     return (
-      <Link to={link} className="flex items-center gap-2.5 px-3.5 pt-3 pb-2 group">
+      <Wrapper {...(wrapperProps as any)}>
         <Avatar className="h-8 w-8 border border-border">
           {logoUrl ? (
             <AvatarImage src={logoUrl} alt={name} className="object-cover" />
@@ -47,7 +49,7 @@ export function BreederIdentity({
         </Avatar>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="text-sm font-semibold text-foreground truncate group-hover:underline">
+            <span className={`text-sm font-semibold text-foreground truncate ${link ? "group-hover:underline" : ""}`}>
               {name}
             </span>
             {isPaid && (
@@ -63,7 +65,7 @@ export function BreederIdentity({
             </span>
           )}
         </div>
-      </Link>
+      </Wrapper>
     );
   }
 
