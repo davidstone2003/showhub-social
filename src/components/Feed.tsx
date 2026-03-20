@@ -56,7 +56,6 @@ export function Feed() {
         });
         setDbPosts(mapped);
       }
-      }
       setLoading(false);
     }
     fetchWinners();
