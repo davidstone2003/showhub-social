@@ -35,10 +35,8 @@ export function BreederIdentity({
   const link = slug ? `/breeder/${slug}` : null;
 
   if (variant === "feed") {
-    const Wrapper = link ? Link : "div";
-    const wrapperProps = link ? { to: link, className: "flex items-center gap-2.5 px-3.5 pt-3 pb-2 group" } : { className: "flex items-center gap-2.5 px-3.5 pt-3 pb-2" };
-    return (
-      <Wrapper {...(wrapperProps as any)}>
+    const content = (
+      <>
         <Avatar className="h-8 w-8 border border-border">
           {logoUrl ? (
             <AvatarImage src={logoUrl} alt={name} className="object-cover" />
@@ -65,7 +63,21 @@ export function BreederIdentity({
             </span>
           )}
         </div>
-      </Wrapper>
+      </>
+    );
+
+    if (link) {
+      return (
+        <Link to={link} className="flex items-center gap-2.5 px-3.5 pt-3 pb-2 group">
+          {content}
+        </Link>
+      );
+    }
+
+    return (
+      <div className="flex items-center gap-2.5 px-3.5 pt-3 pb-2">
+        {content}
+      </div>
     );
   }
 
