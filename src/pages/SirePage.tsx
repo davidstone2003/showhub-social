@@ -1,69 +1,128 @@
 import { useParams, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
-import { sires, breeders, posts } from "@/data/mock";
 import { PostCard } from "@/components/PostCard";
 import { ArrowLeft, Dna } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import type { Post } from "@/data/mock";
+
+interface SireData {
+  id: string;
+  name: string;
+}
 
 export default function SirePage() {
   const { id } = useParams();
-  const sire = sires.find((s) => s.id === id);
+  const [sire, setSire] = useState<SireData | null>(null);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  if (!sire) {
+  useEffect(() => {
+    async function fetchSire() {
+      if (!id) return;
+
+      const { data: sireData } = await supabase
+        .from("sires_lookup")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (sireData) setSire(sireData);
+
+      const { data: winnerData } = await supabase
+        .from("winners")
+        .select("*")
+        .eq("sire_id", id)
+        .eq("status", "active")
+        .order("created_at", { ascending: false });
+
+      if (winnerData) {
+        setPosts(
+          winnerData.map((w: any) => ({
+            id: w.id,
+            image: w.image_urls?.[0] || "/placeholder.svg",
+            breeder: {
+              id: "db-" + w.id,
+              name: w.shown_by,
+              location: "",
+              logo: "",
+              is_pro: false,
+            },
+            win_title: w.title,
+            show_name: w.show_name,
+            shown_by: w.shown_by,
+            bred_by: w.bred_by || undefined,
+            sired_by: w.sired_by || undefined,
+            sire_id: w.sire_id || undefined,
+            dam: w.dam || undefined,
+            placed_by: w.placed_by || undefined,
+            win_placing: w.win_placing || undefined,
+            caption: w.caption || "",
+            tags: [],
+            post_type: "champion" as const,
+            created_at: w.created_at,
+            likes: w.likes || 0,
+            comments: w.comments || 0,
+            saved: false,
+          }))
+        );
+      }
+      setLoading(false);
+    }
+    fetchSire();
+  }, [id]);
+
+  if (!loading && !sire) {
     return (
       <Layout showDiscovery={false}>
         <div className="flex flex-col items-center justify-center py-20">
           <p className="text-muted-foreground">Sire not found.</p>
-          <Link to="/sires" className="mt-2 text-primary text-sm font-medium hover:underline">Back to sires</Link>
+          <Link to="/sires" className="mt-2 text-primary text-sm font-medium hover:underline">
+            Back to sires
+          </Link>
         </div>
       </Layout>
     );
   }
 
-  const breeder = breeders.find((b) => b.id === sire.breeder_id);
-  const offspringPosts = posts.filter((p) => p.sire_id === sire.id);
-
   return (
     <Layout showDiscovery={false}>
-      <div className="max-w-3xl mx-auto">
-        {/* Back */}
-        <div className="px-3 py-3 lg:px-0 lg:pt-6">
-          <Link to="/sires" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+      <div className="max-w-2xl mx-auto w-full">
+        <div className="px-3 py-3">
+          <Link
+            to="/sires"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
             <ArrowLeft className="w-4 h-4" />
             Sires
           </Link>
         </div>
 
-        {/* Hero */}
-        <div className="px-3 lg:px-0 pb-6">
-          <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-xl bg-muted flex items-center justify-center text-4xl">
-              🐏
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <Dna className="w-5 h-5 text-primary" />
-                <h1 className="font-display text-2xl text-foreground">{sire.name}</h1>
+        {sire && (
+          <div className="px-3 pb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center">
+                <Dna className="w-6 h-6 text-primary" />
               </div>
-              {breeder && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  Owned by <Link to="/breeders" className="text-primary hover:underline">{breeder.name}</Link> · {breeder.location}
+              <div>
+                <h1 className="text-lg font-semibold text-foreground">{sire.name}</h1>
+                <p className="text-sm text-muted-foreground">
+                  {posts.length} winner {posts.length === 1 ? "post" : "posts"}
                 </p>
-              )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Offspring posts */}
-        <div className="px-3 lg:px-0 pb-8">
-          <h2 className="font-display text-lg text-foreground mb-3">
-            Offspring & Posts ({offspringPosts.length})
-          </h2>
-          {offspringPosts.length > 0 ? (
-            offspringPosts.map((post, i) => (
-              <PostCard key={post.id} post={post} index={i} />
-            ))
+        <div className="px-3 pb-8 flex flex-col gap-4">
+          {loading ? (
+            <p className="text-sm text-muted-foreground text-center py-8">Loading…</p>
+          ) : posts.length > 0 ? (
+            posts.map((post, i) => <PostCard key={post.id} post={post} index={i} />)
           ) : (
-            <p className="text-sm text-muted-foreground py-8 text-center">No posts yet for this sire.</p>
+            <p className="text-sm text-muted-foreground text-center py-8">
+              No posts yet for this sire.
+            </p>
           )}
         </div>
       </div>

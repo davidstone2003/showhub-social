@@ -1,3 +1,4 @@
+import React from "react";
 import { Heart, MessageCircle, Flag } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -130,14 +131,36 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           )}
 
           {(() => {
-            const details: string[] = [];
-            if (shownBy) details.push(`Shown by ${shownBy}`);
-            if (post.placed_by) details.push(`Placed by ${post.placed_by}`);
-            if (post.sired_by) details.push(`Sired by ${post.sired_by}`);
-            if (post.dam) details.push(`Dam: ${post.dam}`);
+            const details: React.ReactNode[] = [];
+            if (shownBy) details.push(<span key="shown">Shown by {shownBy}</span>);
+            if (post.placed_by) details.push(<span key="placed">Placed by {post.placed_by}</span>);
+            if (post.sired_by) {
+              const sireId = (post as any).sire_id;
+              details.push(
+                <span key="sire">
+                  Sired by{" "}
+                  {sireId ? (
+                    <Link
+                      to={`/sire/${sireId}`}
+                      className="text-primary hover:underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {post.sired_by}
+                    </Link>
+                  ) : (
+                    post.sired_by
+                  )}
+                </span>
+              );
+            }
+            if (post.dam) details.push(<span key="dam">Dam: {post.dam}</span>);
             return details.length > 0 ? (
               <p className="text-muted-foreground" style={{ fontSize: "13px", marginTop: "3px" }}>
-                {details.join(" \u2022 ")}
+                {details.reduce<React.ReactNode[]>((acc, el, i) => {
+                  if (i > 0) acc.push(<span key={`sep-${i}`} className="mx-0.5 opacity-50">•</span>);
+                  acc.push(el);
+                  return acc;
+                }, [])}
               </p>
             ) : null;
           })()}

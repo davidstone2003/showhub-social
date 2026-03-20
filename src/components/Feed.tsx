@@ -42,6 +42,7 @@ export function Feed() {
             shown_by: w.shown_by,
             bred_by: w.bred_by || undefined,
             sired_by: w.sired_by || undefined,
+            sire_id: w.sire_id || undefined,
             dam: w.dam || undefined,
             placed_by: w.placed_by || undefined,
             win_placing: w.win_placing || undefined,
@@ -52,8 +53,11 @@ export function Feed() {
             likes: w.likes || 0,
             comments: w.comments || 0,
             saved: false,
+            user_id: w.user_id,
+            status: w.status,
           };
         });
+
         setDbPosts(mapped);
       }
       setLoading(false);
