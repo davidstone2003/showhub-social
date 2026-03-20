@@ -31,8 +31,8 @@ export function BreederIdentity({
   tier,
   variant,
 }: BreederIdentityProps) {
-  const isPaid = tier === "breeder_page";
-  const link = slug ? `/breeder/${slug}` : null;
+  const isPaid = tier === "breeder_page" || tier === "listing";
+  const link = slug && isPaid ? `/breeder/${slug}` : "/breeders";
 
   if (variant === "feed") {
     const content = (
