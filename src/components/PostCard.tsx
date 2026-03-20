@@ -169,7 +169,6 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
 /* ── Winner Detail Block ── */
 function WinnerDetails({
   winPlacing,
-  winTitle,
   showNameWithYear,
   shownBy,
   placedBy,
@@ -180,7 +179,6 @@ function WinnerDetails({
   caption,
 }: {
   winPlacing?: string;
-  winTitle?: string;
   showNameWithYear: string | null;
   shownBy?: string;
   placedBy?: string;
