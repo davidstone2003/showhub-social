@@ -1,3 +1,4 @@
+import React from "react";
 import { Heart, MessageCircle, Flag } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";

@@ -42,6 +42,42 @@ export function Feed() {
             shown_by: w.shown_by,
             bred_by: w.bred_by || undefined,
             sired_by: w.sired_by || undefined,
+            sire_id: w.sire_id || undefined,
+            dam: w.dam || undefined,
+            placed_by: w.placed_by || undefined,
+            win_placing: w.win_placing || undefined,
+            caption: w.caption || "",
+            tags: (w.tags || []).map((t: string) => ({ label: t, type: "breed" })),
+            post_type: "champion" as const,
+            created_at: w.created_at,
+            likes: w.likes || 0,
+            comments: w.comments || 0,
+            saved: false,
+            user_id: w.user_id,
+            status: w.status,
+          };
+        });
+          const profile = w.profiles;
+          const breederName = profile?.display_name || profile?.username || w.shown_by;
+          const breederSlug = profile?.username;
+          const isPro = profile?.subscription_tier === 'breeder_page' || profile?.subscription_tier === 'listing';
+
+          return {
+            id: w.id,
+            image: w.image_urls?.[0] || "/placeholder.svg",
+            breeder: {
+              id: profile?.id || "unknown",
+              name: breederName,
+              location: profile?.location || "",
+              logo: profile?.logo_url || "",
+              is_pro: isPro,
+              slug: breederSlug,
+            },
+            win_title: w.title,
+            show_name: w.show_name,
+            shown_by: w.shown_by,
+            bred_by: w.bred_by || undefined,
+            sired_by: w.sired_by || undefined,
             dam: w.dam || undefined,
             placed_by: w.placed_by || undefined,
             win_placing: w.win_placing || undefined,
