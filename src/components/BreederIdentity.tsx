@@ -133,7 +133,7 @@ export function BreederIdentity({
             {location}
           </span>
         )}
-        <span className="text-xs text-primary/70">View Breeder Page</span>
+        
       </div>
     </Link>
   );
