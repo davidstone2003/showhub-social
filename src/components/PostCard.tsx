@@ -200,8 +200,16 @@ function WinnerDetails({
         </p>
       )}
 
-      {/* Animal / win title */}
-      {winTitle && winTitle !== winPlacing && (
+      {/* Animal / win title — skip if redundant with placement */}
+      {winTitle &&
+       winPlacing &&
+       !winTitle.toLowerCase().includes(winPlacing.toLowerCase()) &&
+       !winPlacing.toLowerCase().includes(winTitle.toLowerCase()) && (
+        <p className="text-foreground font-semibold" style={{ fontSize: "14px", lineHeight: 1.3 }}>
+          {winTitle}
+        </p>
+      )}
+      {winTitle && !winPlacing && (
         <p className="text-foreground font-semibold" style={{ fontSize: "14px", lineHeight: 1.3 }}>
           {winTitle}
         </p>
