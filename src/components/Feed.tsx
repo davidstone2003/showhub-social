@@ -14,14 +14,27 @@ export function Feed() {
     async function fetchWinners() {
       const { data } = await supabase
         .from('winners')
-        .select('*, profiles:user_id(id, display_name, username, logo_url, location, subscription_tier)')
+        .select('*')
         .eq('status', 'active')
         .eq('show_on_feed', true)
         .order('created_at', { ascending: false });
 
       if (data) {
+        // Fetch profiles for posts that have user_id
+        const userIds = [...new Set(data.filter(w => w.user_id).map(w => w.user_id as string))];
+        let profilesMap: Record<string, any> = {};
+        if (userIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, display_name, username, logo_url, location, subscription_tier')
+            .in('id', userIds);
+          if (profiles) {
+            profilesMap = Object.fromEntries(profiles.map(p => [p.id, p]));
+          }
+        }
+
         const mapped: Post[] = data.map((w: any) => {
-          const profile = w.profiles;
+          const profile = w.user_id ? profilesMap[w.user_id] : null;
           const breederName = profile?.display_name || profile?.username || w.shown_by;
           const breederSlug = profile?.username;
           const isPro = profile?.subscription_tier === 'breeder_page' || profile?.subscription_tier === 'listing';
