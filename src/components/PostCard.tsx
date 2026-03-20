@@ -120,7 +120,6 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           {isWinner ? (
             <WinnerDetails
               winPlacing={post.win_placing}
-              winTitle={post.win_title}
               showNameWithYear={showNameWithYear}
               shownBy={post.shown_by}
               placedBy={post.placed_by}
