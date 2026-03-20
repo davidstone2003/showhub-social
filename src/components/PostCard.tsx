@@ -30,18 +30,20 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const isUploadedWinnerImage = post.image.includes("/storage/v1/object/public/winner-images/");
   const imageSrc = imageFailed ? "/placeholder.svg" : post.image;
 
-  const showName = post.show_name || post.breeder?.location || "";
-  const shownBy = post.shown_by || post.breeder?.name || "";
-  const winPlacing = post.win_placing;
-
-  const currentYear = new Date().getFullYear();
-  const postYear = post.created_at ? new Date(post.created_at).getFullYear() : currentYear;
-  const showYear = !isNaN(postYear) && postYear < currentYear;
-
   const status = (post as any).status || "active";
   const isFlagged = status === "flagged";
   const isRestricted = status === "restricted";
   const isRemoved = status === "removed";
+
+  const isWinner = post.post_type === "champion" || post.win_placing;
+
+  const currentYear = new Date().getFullYear();
+  const postYear = post.created_at ? new Date(post.created_at).getFullYear() : currentYear;
+  const showYearInline = !isNaN(postYear) && postYear <= currentYear && postYear > 2000;
+
+  const showNameWithYear = post.show_name
+    ? (showYearInline ? `${postYear} ${post.show_name}` : post.show_name)
+    : null;
 
   return (
     <>
@@ -74,7 +76,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </div>
         )}
 
-        {/* Admin inline flag button */}
+        {/* Admin flag button */}
         {isAdmin && (
           <button
             onClick={() => setShowFlagModal(true)}
@@ -102,7 +104,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         >
           <img
             src={imageSrc}
-            alt={showName}
+            alt={post.win_placing || post.show_name || "Post image"}
             className={cn(
               "w-full aspect-video",
               isUploadedWinnerImage ? "object-contain bg-muted" : "object-cover"
@@ -114,75 +116,36 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         </Link>
 
         {/* Content */}
-        <div className="px-3.5 pt-2 pb-1.5" style={{ lineHeight: 1.35 }}>
-          {showName && (
-            <p className="font-medium text-foreground" style={{ fontSize: "14px" }}>
-              {showName}
-              {showYear && (
-                <span className="text-muted-foreground font-normal"> · {postYear}</span>
-              )}
-            </p>
+        <div className="px-3.5 pt-2.5 pb-1.5">
+          {isWinner ? (
+            <WinnerDetails
+              winPlacing={post.win_placing}
+              winTitle={post.win_title}
+              showNameWithYear={showNameWithYear}
+              shownBy={post.shown_by}
+              placedBy={post.placed_by}
+              siredBy={post.sired_by}
+              sireId={(post as any).sire_id}
+              dam={post.dam}
+              bredBy={post.bred_by || post.breeder?.name}
+              caption={post.caption}
+            />
+          ) : (
+            <GeneralDetails
+              showName={post.show_name}
+              caption={post.caption}
+              shownBy={post.shown_by || post.breeder?.name}
+            />
           )}
 
-          {winPlacing && (
-            <p className="text-foreground" style={{ fontSize: "14px", fontWeight: 600, marginTop: "3px" }}>
-              {winPlacing}
-            </p>
-          )}
-
-          {(() => {
-            const details: React.ReactNode[] = [];
-            if (shownBy) details.push(<span key="shown">Shown by {shownBy}</span>);
-            if (post.placed_by) details.push(<span key="placed">Placed by {post.placed_by}</span>);
-            if (post.sired_by) {
-              const sireId = (post as any).sire_id;
-              details.push(
-                <span key="sire">
-                  Sired by{" "}
-                  {sireId ? (
-                    <Link
-                      to={`/sire/${sireId}`}
-                      className="text-primary hover:underline"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {post.sired_by}
-                    </Link>
-                  ) : (
-                    post.sired_by
-                  )}
-                </span>
-              );
-            }
-            if (post.dam) details.push(<span key="dam">Dam: {post.dam}</span>);
-            return details.length > 0 ? (
-              <p className="text-muted-foreground" style={{ fontSize: "13px", marginTop: "3px" }}>
-                {details.reduce<React.ReactNode[]>((acc, el, i) => {
-                  if (i > 0) acc.push(<span key={`sep-${i}`} className="mx-0.5 opacity-50">•</span>);
-                  acc.push(el);
-                  return acc;
-                }, [])}
-              </p>
-            ) : null;
-          })()}
-
-          {post.caption && !post.caption.includes("Shown By:") && post.caption.trim() && (
-            <p className="text-foreground line-clamp-2" style={{ fontSize: "14px", marginTop: "2px" }}>
-              {post.caption}
-            </p>
-          )}
-
-          <div className="flex items-center justify-end gap-3 pb-1" style={{ marginTop: "3px" }}>
+          {/* Engagement */}
+          <div className="flex items-center justify-end gap-3 pb-1 mt-2">
             <button
               onClick={handleLike}
               className="flex items-center gap-1 hover:text-destructive transition-colors"
               style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))" }}
             >
-              <Heart
-                className={cn(
-                  "w-3.5 h-3.5",
-                  liked && "fill-destructive text-destructive"
-                )}
-              />
+              <Heart className={cn("w-3.5 h-3.5", liked && "fill-destructive text-destructive")} />
               <span>{likeCount}</span>
             </button>
             <span className="flex items-center gap-1" style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))" }}>
@@ -201,5 +164,136 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         onActionComplete={onModerated}
       />
     </>
+  );
+}
+
+/* ── Winner Detail Block ── */
+function WinnerDetails({
+  winPlacing,
+  winTitle,
+  showNameWithYear,
+  shownBy,
+  placedBy,
+  siredBy,
+  sireId,
+  dam,
+  bredBy,
+  caption,
+}: {
+  winPlacing?: string;
+  winTitle?: string;
+  showNameWithYear: string | null;
+  shownBy?: string;
+  placedBy?: string;
+  siredBy?: string;
+  sireId?: string;
+  dam?: string;
+  bredBy?: string;
+  caption?: string;
+}) {
+  return (
+    <div className="space-y-1">
+      {/* Result title — strongest */}
+      {winPlacing && (
+        <p className="text-foreground font-bold" style={{ fontSize: "15px", lineHeight: 1.3 }}>
+          {winPlacing}
+        </p>
+      )}
+
+      {/* Animal / win title */}
+      {winTitle && winTitle !== winPlacing && (
+        <p className="text-foreground font-semibold" style={{ fontSize: "14px", lineHeight: 1.3 }}>
+          {winTitle}
+        </p>
+      )}
+
+      {/* Show name + year */}
+      {showNameWithYear && (
+        <p className="text-muted-foreground font-medium" style={{ fontSize: "13px" }}>
+          {showNameWithYear}
+        </p>
+      )}
+
+      {/* Stacked detail lines */}
+      <div className="pt-0.5 space-y-px">
+        {shownBy && <DetailLine label="Shown by" value={shownBy} />}
+        {placedBy && <DetailLine label="Placed by" value={placedBy} />}
+        {siredBy && (
+          <DetailLine
+            label="Sired by"
+            value={siredBy}
+            linkTo={sireId ? `/sire/${sireId}` : undefined}
+          />
+        )}
+        {dam && <DetailLine label="Dam" value={dam} />}
+        {bredBy && <DetailLine label="Bred by" value={bredBy} />}
+      </div>
+
+      {/* Caption */}
+      {caption && !caption.includes("Shown By:") && caption.trim() && (
+        <p className="text-foreground line-clamp-2 pt-0.5" style={{ fontSize: "13px" }}>
+          {caption}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* ── General Detail Block ── */
+function GeneralDetails({
+  showName,
+  caption,
+  shownBy,
+}: {
+  showName?: string;
+  caption?: string;
+  shownBy?: string;
+}) {
+  return (
+    <div className="space-y-0.5">
+      {showName && (
+        <p className="font-medium text-foreground" style={{ fontSize: "14px" }}>
+          {showName}
+        </p>
+      )}
+      {shownBy && (
+        <p className="text-muted-foreground" style={{ fontSize: "13px" }}>
+          {shownBy}
+        </p>
+      )}
+      {caption && caption.trim() && (
+        <p className="text-foreground line-clamp-2" style={{ fontSize: "14px" }}>
+          {caption}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* ── Reusable detail line ── */
+function DetailLine({
+  label,
+  value,
+  linkTo,
+}: {
+  label: string;
+  value: string;
+  linkTo?: string;
+}) {
+  return (
+    <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: 1.4 }}>
+      {label}{" "}
+      {linkTo ? (
+        <Link
+          to={linkTo}
+          className="text-primary font-medium hover:underline"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {value}
+        </Link>
+      ) : (
+        <span className="text-foreground font-medium">{value}</span>
+      )}
+    </p>
   );
 }
