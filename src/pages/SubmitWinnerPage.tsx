@@ -358,7 +358,7 @@ export default function SubmitWinnerPage() {
         </div>
 
         {/* Submit */}
-        <div className="fixed bottom-16 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent z-30 max-w-lg mx-auto">
+        <div className="fixed bottom-20 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent z-40 max-w-lg mx-auto">
           <Button
             onClick={handleSubmit}
             disabled={!isValid || submitting}
