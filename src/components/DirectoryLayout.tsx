@@ -86,12 +86,12 @@ export function DirectoryLayout({
                   key={f.label}
                   value={f.value}
                   onChange={(e) => f.onChange(e.target.value)}
-                  className="h-8 px-3 text-xs font-medium bg-muted text-foreground border-none rounded-full appearance-none focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer"
+                  className="h-7 px-2.5 text-[11px] font-medium bg-muted text-foreground border-none rounded-full appearance-none focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer"
                   style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
                     backgroundRepeat: "no-repeat",
-                    backgroundPosition: "right 10px center",
-                    paddingRight: "28px",
+                    backgroundPosition: "right 8px center",
+                    paddingRight: "22px",
                   }}
                 >
                   {f.options.map((opt) => (
