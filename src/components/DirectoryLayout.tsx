@@ -81,7 +81,7 @@ function FilterMenu({ filter }: { filter: FilterDropdown }) {
 
       {open && (
         <div
-          className="absolute left-0 top-full z-50 mt-0.5 overflow-hidden rounded-full border border-border bg-card py-0.5 shadow-sm animate-in fade-in-0 zoom-in-95 duration-100"
+          className="absolute left-0 top-full z-50 mt-0.5 overflow-hidden rounded-xl border border-border bg-card py-1 shadow-sm animate-in fade-in-0 zoom-in-95 duration-100"
           style={{ width: triggerWidth }}
         >
           {filter.options.map((option, index) => {
