@@ -72,23 +72,31 @@ export function DesktopSidebar() {
               <LogOut className="w-4 h-4" />
               Sign Out
             </button>
+            <NavLink
+              to="/submit"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-primary-foreground/10 text-primary-foreground text-sm font-semibold hover:bg-primary-foreground/20 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Add to Backdrop
+            </NavLink>
           </>
         ) : (
-          <NavLink
-            to="/auth"
-            className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
-          >
-            <LogIn className="w-4 h-4" />
-            Sign In
-          </NavLink>
+          <>
+            <NavLink
+              to="/pricing"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-primary-foreground text-primary text-sm font-semibold hover:bg-primary-foreground/90 transition-colors"
+            >
+              Join Free
+            </NavLink>
+            <NavLink
+              to="/auth"
+              className="flex items-center justify-center gap-2 w-full py-2 rounded-md text-sm font-medium text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
+            >
+              <LogIn className="w-4 h-4" />
+              Log in
+            </NavLink>
+          </>
         )}
-        <NavLink
-          to="/submit"
-          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-primary-foreground/10 text-primary-foreground text-sm font-semibold hover:bg-primary-foreground/20 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Add to Backdrop
-        </NavLink>
       </div>
     </aside>
   );
