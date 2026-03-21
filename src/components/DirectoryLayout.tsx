@@ -79,22 +79,22 @@ function FilterMenu({
         onClick={() => onOpenChange(!open)}
         aria-expanded={open}
         aria-haspopup="listbox"
-        className={`h-7 rounded-full px-2.5 text-[11px] font-medium transition-colors focus:outline-none ${
+        className={`h-8 rounded-full px-3 text-[11px] font-medium transition-colors focus:outline-none ${
           open
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted text-foreground hover:bg-muted/80"
+            ? "bg-foreground text-background"
+            : "bg-muted text-foreground hover:bg-muted/70"
         }`}
       >
         <span className="flex items-center gap-1">
           <span className="truncate">{selectedLabel}</span>
-          <ChevronDown className={`h-3 w-3 shrink-0 transition-transform ${open ? "rotate-180 text-primary-foreground/70" : "text-muted-foreground"}`} />
+          <ChevronDown className={`h-3 w-3 shrink-0 transition-transform ${open ? "rotate-180 opacity-60" : "text-muted-foreground"}`} />
         </span>
       </button>
 
       {open && (
         <div
           role="listbox"
-          className="absolute left-0 top-[calc(100%+3px)] z-50 min-w-[140px] overflow-hidden rounded-xl bg-[hsl(var(--primary)/0.95)] shadow-lg ring-1 ring-white/10 backdrop-blur-sm"
+          className="absolute left-0 top-[calc(100%+4px)] z-50 min-w-[150px] overflow-hidden rounded-xl bg-foreground/90 shadow-xl ring-1 ring-white/10 backdrop-blur-md"
         >
           {filter.options.map((option) => {
             const isSelected = option.value === filter.value;
@@ -108,10 +108,10 @@ function FilterMenu({
                   filter.onChange(option.value);
                   stableClose();
                 }}
-                className={`flex w-full items-center justify-between px-3 py-2 text-[11px] transition-colors ${
+                className={`flex w-full items-center justify-between px-3 py-2.5 text-[11px] transition-colors ${
                   isSelected
-                    ? "bg-white/20 font-semibold text-white"
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                    ? "bg-white/15 font-semibold text-white"
+                    : "text-white/60 hover:bg-white/8 hover:text-white/90"
                 }`}
               >
                 <span className="truncate">{option.label}</span>
