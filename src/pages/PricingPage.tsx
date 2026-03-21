@@ -46,7 +46,7 @@ const plans = [
     ],
     cta: "Get Featured",
   },
-] as const;
+] as any[];
 
 export default function PricingPage() {
   const [selected, setSelected] = useState("free");
