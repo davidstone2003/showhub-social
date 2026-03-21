@@ -8,16 +8,22 @@ import { Trophy, Eye, Store } from "lucide-react";
 
 const accountTypes = [
   {
-    id: "breeder",
-    icon: Trophy,
-    title: "Breeder",
-    bullets: ["Post winners, sires, listings", "Build your program profile"],
+    id: "general",
+    icon: Eye,
+    title: "General User",
+    bullets: ["Browse, follow, like, comment"],
   },
   {
     id: "exhibitor",
-    icon: Eye,
-    title: "User / Exhibitor",
-    bullets: ["Follow breeders", "Like, comment, stay updated"],
+    icon: Trophy,
+    title: "Exhibitor",
+    bullets: ["Post wins, build presence"],
+  },
+  {
+    id: "breeder",
+    icon: Trophy,
+    title: "Breeder",
+    bullets: ["Create breeder profile, post listings"],
   },
   {
     id: "vendor",
