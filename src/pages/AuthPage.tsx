@@ -9,7 +9,8 @@ import { BackdropLogo } from "@/components/RinglyLogo";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
+  const [searchParams] = useSearchParams();
+  const [isLogin, setIsLogin] = useState(searchParams.get("mode") !== "signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
