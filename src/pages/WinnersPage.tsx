@@ -124,7 +124,7 @@ export default function WinnersPage() {
       onSpeciesChange={setSpecies}
       filters={filters}
       resultCount={filtered.length}
-      resultLabel="winner"
+      resultLabel="Winner"
     >
       {loading ? (
         <div className="max-w-2xl mx-auto flex flex-col gap-6">
