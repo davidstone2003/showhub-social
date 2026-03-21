@@ -339,6 +339,8 @@ export default function SubmitWinnerPage() {
               </div>
             </div>
           )}
+          </>
+          )}
         </div>
 
         {/* Submit */}
