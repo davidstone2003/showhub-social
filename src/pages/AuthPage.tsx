@@ -33,8 +33,7 @@ export default function AuthPage() {
           .select("onboarding_completed, account_type")
           .eq("id", data.user.id)
           .single();
-        if (prof && prof.account_type === "user") {
-          // Default 'user' means they haven't picked a type yet
+        if (prof && (prof.account_type === "user" || !prof.account_type)) {
           navigate("/account-type");
         } else if (prof && !prof.onboarding_completed) {
           navigate("/onboarding");

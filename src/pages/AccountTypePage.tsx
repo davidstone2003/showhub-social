@@ -76,7 +76,7 @@ export default function AccountTypePage() {
       <div className="w-full max-w-sm bg-card rounded-2xl shadow-xl p-7 space-y-5">
         <div className="text-center">
           <h1 className="text-lg font-bold text-card-foreground">
-            How will you use the platform?
+            How will you use Backdrop?
           </h1>
           <p className="text-xs text-muted-foreground/70 mt-1">
             You can change this anytime
