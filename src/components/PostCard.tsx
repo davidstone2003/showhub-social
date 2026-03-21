@@ -6,8 +6,10 @@ import { Link } from "react-router-dom";
 import type { Post } from "@/data/mock";
 import { cn } from "@/lib/utils";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useAuth } from "@/contexts/AuthContext";
 import { AdminFlagModal } from "@/components/AdminFlagModal";
 import { BreederIdentity } from "@/components/BreederIdentity";
+import { AuthGate } from "@/components/AuthGate";
 
 interface PostCardProps {
   post: Post & { status?: string; user_id?: string | null };
@@ -20,9 +22,15 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const [likeCount, setLikeCount] = useState(post.likes);
   const [imageFailed, setImageFailed] = useState(false);
   const [showFlagModal, setShowFlagModal] = useState(false);
+  const [showAuthGate, setShowAuthGate] = useState(false);
   const { isAdmin } = useUserRole();
+  const { user } = useAuth();
 
   const handleLike = () => {
+    if (!user) {
+      setShowAuthGate(true);
+      return;
+    }
     setLiked(!liked);
     setLikeCount((c) => (liked ? c - 1 : c + 1));
   };
@@ -162,6 +170,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         postOwnerId={(post as any).user_id}
         onActionComplete={onModerated}
       />
+      <AuthGate open={showAuthGate} onOpenChange={setShowAuthGate} />
     </>
   );
 }
