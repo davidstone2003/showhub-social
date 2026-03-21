@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { toast } from "sonner";
-import { MapPin, Camera, ArrowRight, Megaphone, Plus } from "lucide-react";
+import { MapPin, Camera, ArrowRight } from "lucide-react";
 
 export default function OnboardingPage() {
   const { user, profile } = useAuth();
