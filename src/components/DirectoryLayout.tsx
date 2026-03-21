@@ -30,6 +30,8 @@ interface DirectoryLayoutProps {
 function DesktopDropdown({ filter }: { filter: FilterDropdown }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [btnWidth, setBtnWidth] = useState(0);
 
   useEffect(() => {
     if (!open) return;
@@ -40,11 +42,16 @@ function DesktopDropdown({ filter }: { filter: FilterDropdown }) {
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
+  useEffect(() => {
+    if (btnRef.current) setBtnWidth(btnRef.current.offsetWidth);
+  });
+
   const selectedLabel = filter.options.find((o) => o.value === filter.value)?.label ?? filter.label;
 
   return (
     <div ref={ref} className="relative">
       <button
+        ref={btnRef}
         onClick={() => setOpen(!open)}
         className="h-7 px-2.5 text-[11px] font-medium bg-muted text-foreground rounded-full flex items-center gap-1 hover:bg-muted/80 transition-colors"
       >
@@ -52,17 +59,20 @@ function DesktopDropdown({ filter }: { filter: FilterDropdown }) {
         <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="absolute top-full left-0 mt-1 min-w-[160px] bg-card border border-border rounded-lg shadow-md z-50 py-1 animate-in fade-in-0 zoom-in-95 duration-150">
+        <div
+          className="absolute top-full left-0 bg-card border border-border rounded-[14px] shadow-sm z-50 py-0.5 animate-in fade-in-0 zoom-in-95 duration-100 overflow-hidden"
+          style={{ marginTop: "3px", width: Math.max(btnWidth, 120) }}
+        >
           {filter.options.map((opt, i) => (
             <button
               key={opt.value}
               onClick={() => { filter.onChange(opt.value); setOpen(false); }}
-              className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-muted/60 transition-colors ${
-                filter.value === opt.value ? "font-semibold text-foreground" : "text-muted-foreground"
-              } ${i > 0 ? "border-t border-border/50" : ""}`}
+              className={`w-full text-left px-2.5 py-1.5 text-[11px] flex items-center justify-between hover:bg-muted/50 transition-colors ${
+                filter.value === opt.value ? "font-bold text-foreground bg-muted/30" : "text-muted-foreground"
+              } ${i > 0 ? "border-t border-border/30" : ""}`}
             >
-              {opt.label}
-              {filter.value === opt.value && <Check className="w-3 h-3 text-primary" />}
+              <span className="truncate">{opt.label}</span>
+              {filter.value === opt.value && <Check className="w-3 h-3 text-primary shrink-0 ml-1" />}
             </button>
           ))}
         </div>
