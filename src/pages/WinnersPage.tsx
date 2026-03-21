@@ -24,6 +24,25 @@ const yearOptions = [
   }),
 ];
 
+function inferWinnerLevel(post: Pick<Post, "win_title" | "show_name" | "caption">) {
+  const text = `${post.win_title ?? ""} ${post.show_name ?? ""} ${post.caption ?? ""}`.toLowerCase();
+
+  if (text.includes("jackpot")) return "jackpot";
+  if (text.includes("county")) return "county";
+  if (text.includes("state")) return "state";
+  if (
+    text.includes("national") ||
+    text.includes("majors") ||
+    text.includes("overall") ||
+    text.includes("classic") ||
+    text.includes("expo")
+  ) {
+    return "majors";
+  }
+
+  return "all";
+}
+
 export default function WinnersPage() {
   const [loading, setLoading] = useState(true);
   const [winners, setWinners] = useState<Post[]>([]);
@@ -103,6 +122,10 @@ export default function WinnersPage() {
       list = list.filter(
         (p) => p.show_name?.includes(year) || p.created_at?.includes(year)
       );
+    }
+
+    if (level !== "all") {
+      list = list.filter((p) => inferWinnerLevel(p) === level);
     }
 
     return list;
