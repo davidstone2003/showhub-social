@@ -176,7 +176,7 @@ export function DirectoryLayout({
           </div>
 
           {filters.length > 0 && (
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+            <div className="flex items-center gap-2">
               {filters.slice(0, 2).map((filter) => (
                 <FilterMenu
                   key={filter.label}
