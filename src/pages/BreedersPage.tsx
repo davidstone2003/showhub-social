@@ -2,20 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { useState, useMemo } from "react";
-import { MapPin, Trophy, Heart } from "lucide-react";
+import { MapPin, Trophy } from "lucide-react";
 import { DirectoryLayout, type Species, type FilterDropdown } from "@/components/DirectoryLayout";
 
 function getInitials(name: string) {
-  return name
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase();
+  return name.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
 }
 
 type BreederProfile = {
@@ -70,39 +64,28 @@ export default function BreedersPage() {
 
       return (profilesRes.data || []).map((p) => {
         const key = (p.display_name || p.username || "").toLowerCase();
-        return {
-          ...p,
-          winnerCount: winnerCounts[key] || 0,
-          sireCount: sireCounts[key]?.size || 0,
-        } as BreederProfile;
+        return { ...p, winnerCount: winnerCounts[key] || 0, sireCount: sireCounts[key]?.size || 0 } as BreederProfile;
       });
     },
   });
 
   const filtered = useMemo(() => {
     let list = [...breeders];
-
     if (search.trim()) {
       const q = search.toLowerCase();
-      list = list.filter(
-        (b) =>
-          (b.display_name || "").toLowerCase().includes(q) ||
-          b.username.toLowerCase().includes(q) ||
-          (b.location || "").toLowerCase().includes(q) ||
-          (b.bio || "").toLowerCase().includes(q)
+      list = list.filter((b) =>
+        (b.display_name || "").toLowerCase().includes(q) ||
+        b.username.toLowerCase().includes(q) ||
+        (b.location || "").toLowerCase().includes(q)
       );
     }
-
     if (stateFilter !== "all") {
       list = list.filter((b) => (b.location || "").toLowerCase().includes(stateFilter.toLowerCase()));
     }
-
-    // Sort: paid first, then by winners
     const tierRank = (t: string) => (t === "breeder_page" ? 0 : t === "listing" ? 1 : 2);
     list.sort((a, b) => tierRank(a.subscription_tier) - tierRank(b.subscription_tier) || b.winnerCount! - a.winnerCount!);
-
     return list;
-  }, [breeders, search, stateFilter, species]);
+  }, [breeders, search, stateFilter]);
 
   const isPaid = (tier: string) => tier === "breeder_page" || tier === "listing";
 
@@ -121,12 +104,12 @@ export default function BreedersPage() {
       onSpeciesChange={setSpecies}
       filters={filters}
       resultCount={filtered.length}
-      resultLabel="breeder"
+      resultLabel="Breeder"
     >
       {isLoading ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-56 rounded-xl" />
+            <Skeleton key={i} className="h-40 rounded-xl" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -139,22 +122,21 @@ export default function BreedersPage() {
           )}
         </div>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((b) => {
             const name = b.display_name || b.username;
             const link = b.username && isPaid(b.subscription_tier) ? `/breeder/${b.username}` : "/breeders";
 
             return (
-              <div
+              <Link
                 key={b.id}
-                className="bg-card border border-border rounded-xl p-4 flex flex-col gap-3 hover:shadow-md transition-shadow"
+                to={link}
+                className="block bg-card border border-border rounded-xl p-3.5 hover:shadow-sm transition-shadow"
               >
                 <div className="flex items-start gap-3">
-                  <Avatar className="h-12 w-12 border border-border shrink-0">
-                    {b.logo_url ? (
-                      <AvatarImage src={b.logo_url} alt={name} className="object-cover" />
-                    ) : null}
-                    <AvatarFallback className="text-sm font-semibold bg-muted text-muted-foreground">
+                  <Avatar className="h-11 w-11 border border-border shrink-0">
+                    {b.logo_url ? <AvatarImage src={b.logo_url} alt={name} className="object-cover" /> : null}
+                    <AvatarFallback className="text-xs font-semibold bg-muted text-muted-foreground">
                       {getInitials(name)}
                     </AvatarFallback>
                   </Avatar>
@@ -162,41 +144,24 @@ export default function BreedersPage() {
                     <div className="flex items-center gap-1.5">
                       <span className="text-sm font-bold text-foreground truncate">{name}</span>
                       {isPaid(b.subscription_tier) && (
-                        <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4 shrink-0">
-                          PRO
-                        </Badge>
+                        <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4 shrink-0">PRO</Badge>
                       )}
                     </div>
                     {b.location && (
-                      <span className="text-xs text-muted-foreground flex items-center gap-0.5 mt-0.5">
-                        <MapPin className="w-3 h-3" />
-                        {b.location}
+                      <span className="text-[11px] text-muted-foreground flex items-center gap-0.5 mt-0.5">
+                        <MapPin className="w-3 h-3" />{b.location}
                       </span>
                     )}
                   </div>
                 </div>
-
-                {b.bio && <p className="text-xs text-muted-foreground line-clamp-1">{b.bio}</p>}
-
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                {b.bio && <p className="text-[11px] text-muted-foreground line-clamp-1 mt-2">{b.bio}</p>}
+                <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-2">
                   <span className="flex items-center gap-1">
-                    <Trophy className="w-3 h-3" />
-                    {b.winnerCount} winner{b.winnerCount !== 1 ? "s" : ""}
+                    <Trophy className="w-3 h-3" />{b.winnerCount} winner{b.winnerCount !== 1 ? "s" : ""}
                   </span>
-                  <span className="flex items-center gap-1">
-                    🐏 {b.sireCount} sire{b.sireCount !== 1 ? "s" : ""}
-                  </span>
+                  <span className="flex items-center gap-1">🐏 {b.sireCount} sire{b.sireCount !== 1 ? "s" : ""}</span>
                 </div>
-
-                <div className="flex gap-2 mt-auto">
-                  <Button asChild size="sm" className="flex-1 h-8 text-xs rounded-lg">
-                    <Link to={link}>View Breeder</Link>
-                  </Button>
-                  <Button variant="outline" size="sm" className="h-8 text-xs rounded-lg px-3">
-                    <Heart className="w-3 h-3" />
-                  </Button>
-                </div>
-              </div>
+              </Link>
             );
           })}
         </div>

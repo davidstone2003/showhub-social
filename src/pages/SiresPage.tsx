@@ -32,28 +32,16 @@ const SiresPage = () => {
     async function fetchSires() {
       const [{ data: sireData }, { data: winnerData }] = await Promise.all([
         supabase.from("sires_lookup").select("id, name"),
-        supabase
-          .from("winners")
-          .select("sire_id, bred_by")
-          .eq("status", "active")
-          .not("sire_id", "is", null),
+        supabase.from("winners").select("sire_id, bred_by").eq("status", "active").not("sire_id", "is", null),
       ]);
 
       if (sireData) {
-        const sireIdsWithPosts = new Set(
-          (winnerData ?? []).map((w) => w.sire_id).filter(Boolean)
-        );
-
-        // Build breeder options from winner data
+        const sireIdsWithPosts = new Set((winnerData ?? []).map((w) => w.sire_id).filter(Boolean));
         const breeders = new Set<string>();
-        (winnerData ?? []).forEach((w) => {
-          if (w.bred_by) breeders.add(w.bred_by);
-        });
+        (winnerData ?? []).forEach((w) => { if (w.bred_by) breeders.add(w.bred_by); });
         setBreederOptions([
           { label: "All Breeders", value: "all" },
-          ...Array.from(breeders)
-            .sort()
-            .map((b) => ({ label: b, value: b })),
+          ...Array.from(breeders).sort().map((b) => ({ label: b, value: b })),
         ]);
 
         const sortedSires = [...sireData].sort((a, b) => {
@@ -62,7 +50,6 @@ const SiresPage = () => {
           if (aHas !== bHas) return aHas ? -1 : 1;
           return a.name.localeCompare(b.name);
         });
-
         setSires(sortedSires);
       }
       setLoading(false);
@@ -72,14 +59,12 @@ const SiresPage = () => {
 
   const filtered = useMemo(() => {
     let list = [...sires];
-
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter((s) => s.name.toLowerCase().includes(q));
     }
-
     return list;
-  }, [sires, search, species, breederFilter, semenFilter]);
+  }, [sires, search]);
 
   const filters: FilterDropdown[] = [
     { label: "Breeder", value: breederFilter, onChange: setBreederFilter, options: breederOptions },
@@ -97,36 +82,30 @@ const SiresPage = () => {
       onSpeciesChange={setSpecies}
       filters={filters}
       resultCount={filtered.length}
-      resultLabel="sire"
+      resultLabel="Sire"
     >
       {loading ? (
         <p className="text-sm text-muted-foreground text-center py-8">Loading…</p>
       ) : filtered.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-8">No sires found.</p>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-2.5 grid-cols-2 lg:grid-cols-3">
           {filtered.map((s) => (
             <Link
               key={s.id}
               to={`/sire/${s.id}`}
-              className="block p-4 bg-card rounded-lg border border-border hover:shadow-sm transition-shadow"
+              className="block bg-card rounded-xl border border-border overflow-hidden hover:shadow-sm transition-shadow"
             >
-              <div className="w-full aspect-square rounded-md bg-muted overflow-hidden mb-3">
+              <div className="w-full aspect-square bg-muted">
                 {s.name === "Goose" ? (
-                  <img
-                    src={gooseImage}
-                    alt={s.name}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  <img src={gooseImage} alt={s.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-4xl">🐏</div>
+                  <div className="w-full h-full flex items-center justify-center text-3xl">🐏</div>
                 )}
               </div>
-              <div className="flex items-center gap-2">
-                <Dna className="w-4 h-4 text-primary shrink-0" />
-                <p className="font-semibold text-sm text-foreground">{s.name}</p>
+              <div className="flex items-center gap-1.5 p-2.5">
+                <Dna className="w-3.5 h-3.5 text-primary shrink-0" />
+                <p className="font-semibold text-sm text-foreground truncate">{s.name}</p>
               </div>
             </Link>
           ))}
