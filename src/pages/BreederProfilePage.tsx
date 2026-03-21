@@ -10,10 +10,6 @@ import { Trophy, Dna, ShoppingBag, Star, Activity } from "lucide-react";
 import { BreederHero } from "@/components/breeder/BreederHero";
 import { BreederSection } from "@/components/breeder/BreederSection";
 import { LockedSection } from "@/components/breeder/LockedSection";
-import { UpgradeCallout } from "@/components/breeder/UpgradeCallout";
-import { LockedContact } from "@/components/upgrade/LockedContact";
-import { DirectoryHint } from "@/components/upgrade/DirectoryHint";
-import { InsightsTeaser } from "@/components/upgrade/InsightsTeaser";
 import type { Post } from "@/data/mock";
 
 type WinnerRow = {
@@ -91,8 +87,6 @@ export default function BreederProfilePage() {
 
   const tier: string = profile?.subscription_tier || "free";
   const isFeatured = tier === "featured" || tier === "breeder_page";
-  const isOwner = !!user && profile?.id === user.id;
-  const hasContact = tier === "contacted" || isFeatured;
 
   const featured = posts.filter((p) => p.is_featured);
   const winners = posts.filter((p) => p.post_type === "winner");
@@ -134,18 +128,9 @@ export default function BreederProfilePage() {
 
         <div className="max-w-2xl mx-auto px-4 py-5 space-y-6">
 
-          {/* ===== FREE TIER ===== */}
-          {tier === "free" && (
+          {/* ===== FREE / CONTACTED TIER ===== */}
+          {!isFeatured && (
             <>
-              {/* Locked contact */}
-              <LockedContact isOwner={isOwner} />
-
-              {/* Owner insights teaser */}
-              {isOwner && (
-                <InsightsTeaser profileViews={12} hasContact={false} />
-              )}
-
-              {/* Recent Posts (max 3) */}
               {recentPosts.length > 0 && (
                 <BreederSection icon={Activity} title="Recent Posts">
                   {recentPosts.map((post, i) => (
@@ -154,40 +139,14 @@ export default function BreederProfilePage() {
                 </BreederSection>
               )}
 
-              {/* Locked preview sections */}
-              <LockedSection icon={Trophy} title="Winners" count={winners.length || 3} isOwner={isOwner} />
-              <LockedSection icon={Dna} title="Sires" count={sires.length || 2} isOwner={isOwner} />
-              <LockedSection icon={Dna} title="Donors / Genetics" count={donors.length || 2} isOwner={isOwner} />
-              <LockedSection icon={ShoppingBag} title="Sales / Available" count={sales.length || 2} isOwner={isOwner} />
-
-              <UpgradeCallout variant="listing" />
+              <LockedSection icon={Trophy} title="Winners" count={winners.length || 3} isOwner={false} />
+              <LockedSection icon={Dna} title="Sires" count={sires.length || 2} isOwner={false} />
+              <LockedSection icon={Dna} title="Donors / Genetics" count={donors.length || 2} isOwner={false} />
+              <LockedSection icon={ShoppingBag} title="Sales / Available" count={sales.length || 2} isOwner={false} />
             </>
           )}
 
-          {/* ===== CONTACTED TIER ($9.99) ===== */}
-          {tier === "contacted" && (
-            <>
-              {/* Owner: directory visibility hint */}
-              {isOwner && <DirectoryHint />}
-
-              {recentPosts.length > 0 && (
-                <BreederSection icon={Activity} title="Recent Posts">
-                  {recentPosts.map((post, i) => (
-                    <PostCard key={post.id} post={toPost(post)} index={i} />
-                  ))}
-                </BreederSection>
-              )}
-
-              <LockedSection icon={Trophy} title="Winners" count={winners.length || 3} isOwner={isOwner} />
-              <LockedSection icon={Dna} title="Sires" count={sires.length || 2} isOwner={isOwner} />
-              <LockedSection icon={Dna} title="Donors / Genetics" count={donors.length || 2} isOwner={isOwner} />
-              <LockedSection icon={ShoppingBag} title="Sales / Available" count={sales.length || 2} isOwner={isOwner} />
-
-              <UpgradeCallout variant="listing" />
-            </>
-          )}
-
-          {/* ===== FEATURED / BREEDER PAGE TIER ($24.99) ===== */}
+          {/* ===== FEATURED / BREEDER PAGE TIER ===== */}
           {isFeatured && (
             <>
               {featured.length > 0 && (

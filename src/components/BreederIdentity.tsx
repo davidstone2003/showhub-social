@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BreederBadge } from "@/components/breeder/BreederBadge";
 
 interface BreederIdentityProps {
   name: string;
@@ -50,11 +51,7 @@ export function BreederIdentity({
             <span className="text-sm font-semibold text-foreground truncate group-hover:underline">
               {name}
             </span>
-            {isPaid && (
-              <span className="shrink-0 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider rounded bg-accent text-accent-foreground leading-tight">
-                Breeder Page
-              </span>
-            )}
+            {tier && <BreederBadge tier={tier} />}
           </div>
           {location && (
             <span className="text-xs text-muted-foreground flex items-center gap-0.5">
@@ -83,11 +80,7 @@ export function BreederIdentity({
         </Avatar>
         <div className="flex items-center gap-1.5 mb-0.5">
           <span className="text-sm font-semibold text-foreground">{name}</span>
-          {isPaid && (
-            <span className="shrink-0 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider rounded bg-accent text-accent-foreground leading-tight">
-              Breeder Page
-            </span>
-          )}
+          {tier && <BreederBadge tier={tier} />}
         </div>
         {location && (
           <span className="text-xs text-muted-foreground flex items-center gap-0.5 mb-1">
@@ -121,11 +114,7 @@ export function BreederIdentity({
           <span className="text-sm font-semibold text-foreground truncate group-hover:underline">
             {name}
           </span>
-          {isPaid && (
-            <span className="shrink-0 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider rounded bg-accent text-accent-foreground leading-tight">
-              Breeder Page
-            </span>
-          )}
+           {tier && <BreederBadge tier={tier} />}
         </div>
         {location && (
           <span className="text-xs text-muted-foreground flex items-center gap-0.5">
