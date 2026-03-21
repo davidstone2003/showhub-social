@@ -10,10 +10,6 @@ import { Trophy, Dna, ShoppingBag, Star, Activity } from "lucide-react";
 import { BreederHero } from "@/components/breeder/BreederHero";
 import { BreederSection } from "@/components/breeder/BreederSection";
 import { LockedSection } from "@/components/breeder/LockedSection";
-import { UpgradeCallout } from "@/components/breeder/UpgradeCallout";
-import { LockedContact } from "@/components/upgrade/LockedContact";
-import { DirectoryHint } from "@/components/upgrade/DirectoryHint";
-import { InsightsTeaser } from "@/components/upgrade/InsightsTeaser";
 import type { Post } from "@/data/mock";
 
 type WinnerRow = {
@@ -91,8 +87,6 @@ export default function BreederProfilePage() {
 
   const tier: string = profile?.subscription_tier || "free";
   const isFeatured = tier === "featured" || tier === "breeder_page";
-  const isOwner = !!user && profile?.id === user.id;
-  const hasContact = tier === "contacted" || isFeatured;
 
   const featured = posts.filter((p) => p.is_featured);
   const winners = posts.filter((p) => p.post_type === "winner");
@@ -123,6 +117,105 @@ export default function BreederProfilePage() {
     );
   }
 
+  return (
+    <Layout showDiscovery={false}>
+      <div className="min-h-screen bg-background pb-24">
+        <BreederHero
+          profile={profile}
+          tier={tier}
+          stats={isFeatured ? { winners: winners.length, sires: sires.length, posts: posts.length } : undefined}
+        />
+
+        <div className="max-w-2xl mx-auto px-4 py-5 space-y-6">
+
+          {/* ===== FREE / CONTACTED TIER ===== */}
+          {!isFeatured && (
+            <>
+              {recentPosts.length > 0 && (
+                <BreederSection icon={Activity} title="Recent Posts">
+                  {recentPosts.map((post, i) => (
+                    <PostCard key={post.id} post={toPost(post)} index={i} />
+                  ))}
+                </BreederSection>
+              )}
+
+              <LockedSection icon={Trophy} title="Winners" count={winners.length || 3} isOwner={false} />
+              <LockedSection icon={Dna} title="Sires" count={sires.length || 2} isOwner={false} />
+              <LockedSection icon={Dna} title="Donors / Genetics" count={donors.length || 2} isOwner={false} />
+              <LockedSection icon={ShoppingBag} title="Sales / Available" count={sales.length || 2} isOwner={false} />
+            </>
+          )}
+
+          {/* ===== FEATURED / BREEDER PAGE TIER ===== */}
+          {isFeatured && (
+            <>
+              {featured.length > 0 && (
+                <BreederSection icon={Star} title="Featured">
+                  {featured.map((post, i) => (
+                    <PostCard key={post.id} post={toPost(post)} index={i} />
+                  ))}
+                </BreederSection>
+              )}
+
+              {winners.length > 0 && (
+                <BreederSection icon={Trophy} title="Recent Winners">
+                  {winners.map((post, i) => (
+                    <PostCard key={post.id} post={toPost(post)} index={i} />
+                  ))}
+                </BreederSection>
+              )}
+
+              {sires.length > 0 && (
+                <BreederSection icon={Dna} title="Sires">
+                  {sires.map((post, i) => (
+                    <PostCard key={post.id} post={toPost(post)} index={i} />
+                  ))}
+                </BreederSection>
+              )}
+
+              {donors.length > 0 && (
+                <BreederSection icon={Dna} title="Donors / Genetics">
+                  {donors.map((post, i) => (
+                    <PostCard key={post.id} post={toPost(post)} index={i} />
+                  ))}
+                </BreederSection>
+              )}
+
+              {sales.length > 0 && (
+                <BreederSection icon={ShoppingBag} title="Available / For Sale">
+                  {sales.map((post, i) => (
+                    <PostCard key={post.id} post={toPost(post)} index={i} />
+                  ))}
+                </BreederSection>
+              )}
+
+              {recentPosts.length > 0 && (
+                <BreederSection icon={Activity} title="Recent Activity">
+                  {recentPosts.slice(0, 5).map((post, i) => (
+                    <PostCard key={post.id} post={toPost(post)} index={i} />
+                  ))}
+                </BreederSection>
+              )}
+            </>
+          )}
+
+          {postsLoading && (
+            <div className="space-y-3">
+              <Skeleton className="h-48 w-full rounded-xl" />
+              <Skeleton className="h-48 w-full rounded-xl" />
+            </div>
+          )}
+
+          {!postsLoading && posts.length === 0 && !isFeatured && (
+            <div className="text-center py-8">
+              <p className="text-sm text-muted-foreground">No posts yet</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </Layout>
+  );
+}
   return (
     <Layout showDiscovery={false}>
       <div className="min-h-screen bg-background pb-24">
