@@ -10,11 +10,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { AutocompleteInput } from "@/components/AutocompleteInput";
 import { PostTypeSelector, getDefaultToggles } from "@/components/PostTypeSelector";
 import type { PostType } from "@/components/PostTypeSelector";
-import { Camera, X, ImagePlus, Heart, MessageCircle, Clipboard, Sparkles, ChevronDown, ChevronUp, LogIn } from "lucide-react";
+import { Camera, X, ImagePlus, Heart, MessageCircle, LogIn } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { parseFacebookCaption } from "@/lib/parseFacebookCaption";
 import PostSuccessScreen from "@/components/PostSuccessScreen";
+import SmartUpload from "@/components/SmartUpload";
+import type { ExtractedFields } from "@/components/SmartUpload";
 
 type ImageFile = { file: File; preview: string };
 
