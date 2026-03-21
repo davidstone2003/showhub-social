@@ -10,6 +10,7 @@ interface Profile {
   logo_url: string | null;
   is_premium: boolean;
   onboarding_completed: boolean;
+  account_type: string;
 }
 
 interface AuthContextType {
