@@ -74,11 +74,11 @@ export default function AuthPage() {
       <div className="w-full max-w-sm bg-card rounded-2xl shadow-xl p-7 space-y-5">
         <div className="text-center">
           <h1 className="text-lg font-bold text-card-foreground">
-            {isLogin ? "Welcome back" : "Create your breeder profile"}
+            {isLogin ? "Welcome back" : "Join the Show Stock Network"}
           </h1>
           {!isLogin && (
             <p className="text-xs text-muted-foreground/70 mt-1">
-              Start free. Get discovered. Upgrade anytime.
+              Create your profile. Start free. Upgrade anytime.
             </p>
           )}
         </div>
