@@ -14,6 +14,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [showPw, setShowPw] = useState(false);
+  const [agreedTerms, setAgreedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
