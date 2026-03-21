@@ -104,8 +104,13 @@ export default function AuthPage() {
             className="w-full h-12 rounded-xl text-base font-bold"
             style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--foreground))" }}
           >
-            {loading ? "..." : isLogin ? "Sign In" : "Create Account"}
+            {loading ? "..." : isLogin ? "Sign In" : "Create Free Profile"}
           </Button>
+          {!isLogin && (
+            <p className="text-[11px] text-muted-foreground text-center">
+              No credit card required
+            </p>
+          )}
         </form>
 
         <p className="text-center text-sm text-muted-foreground">
