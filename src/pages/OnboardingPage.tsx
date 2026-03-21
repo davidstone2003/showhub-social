@@ -67,31 +67,6 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleEnableContact = () => {
-    navigate("/pricing");
-  };
-
-  const handleCreatePost = () => {
-    navigate("/submit");
-  };
-
-  const handleSkipToFeed = () => {
-    navigate("/");
-  };
-
-  const stepIndicator = (
-    <div className="flex gap-2 justify-center mb-6">
-      {[1, 2, 3].map((s) => (
-        <div
-          key={s}
-          className={`h-1.5 rounded-full transition-all ${
-            s === step ? "w-8 bg-gold" : s < step ? "w-8 bg-gold/40" : "w-8 bg-muted"
-          }`}
-        />
-      ))}
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-primary flex flex-col items-center justify-center px-6">
       <div className="flex justify-center mb-4">
