@@ -94,7 +94,7 @@ function FilterMenu({
       {open && (
         <div
           role="listbox"
-          className="absolute left-0 top-[calc(100%+4px)] z-50 min-w-[150px] overflow-hidden rounded-xl border border-[#E5E7EB] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
+          className="absolute left-0 top-[calc(100%+4px)] z-50 min-w-[150px] overflow-hidden rounded-[14px] border border-[#E5E7EB] bg-white py-1 shadow-[0_6px_16px_rgba(0,0,0,0.08)]"
         >
           {filter.options.map((option) => {
             const isSelected = option.value === filter.value;
@@ -108,10 +108,10 @@ function FilterMenu({
                   filter.onChange(option.value);
                   stableClose();
                 }}
-                className={`flex w-full items-center justify-between px-3 py-2.5 text-[12px] transition-colors ${
+                className={`flex w-full items-center justify-between border-b border-[#F3F4F6] px-3 py-2.5 text-[12px] last:border-b-0 transition-colors ${
                   isSelected
                     ? "bg-[#EFF6FF] font-semibold text-primary"
-                    : "text-[#111827] hover:bg-[#F3F4F6]"
+                    : "text-[#111827] hover:bg-[#F9FAFB]"
                 }`}
               >
                 <span className="truncate">{option.label}</span>
