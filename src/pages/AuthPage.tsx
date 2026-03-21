@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { BackdropLogo } from "@/components/RinglyLogo";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Check, Phone, Star } from "lucide-react";
 
 const accountTypes = [
   { id: "general", label: "General User" },
@@ -16,6 +16,117 @@ const accountTypes = [
 ] as const;
 
 type AccountTypeId = (typeof accountTypes)[number]["id"];
+
+const breederPlans = [
+  {
+    id: "free",
+    name: "Free Listing",
+    price: "Free",
+    period: "",
+    features: ["Listed in directory", "Basic breeder profile", "No contact access"],
+    cta: "Continue Free",
+    note: "No credit card required",
+  },
+  {
+    id: "contacted",
+    name: "Get Contacted",
+    price: "$9.99",
+    period: "/month",
+    icon: Phone,
+    features: ["Contact info enabled", "Social links", "Buyer inquiries"],
+    cta: "Select Plan",
+  },
+  {
+    id: "featured",
+    name: "Featured",
+    price: "$24.99",
+    period: "/month",
+    icon: Star,
+    popular: true,
+    features: ["Priority placement", "Premium badge", "Increased visibility"],
+    cta: "Select Plan",
+  },
+];
+
+function BreederPlanStep() {
+  const navigate = useNavigate();
+
+  const handleSelect = (_planId: string) => {
+    navigate("/");
+  };
+
+  return (
+    <div className="w-full max-w-sm bg-card rounded-2xl shadow-xl p-6 space-y-5">
+      <div className="text-center">
+        <h1 className="text-lg font-bold text-card-foreground">
+          Choose your breeder listing
+        </h1>
+        <p className="text-xs text-muted-foreground/70 mt-1">
+          Start free. Upgrade anytime.
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        {breederPlans.map((plan) => (
+          <div
+            key={plan.id}
+            className={`rounded-xl border-2 p-4 transition-all ${
+              plan.popular
+                ? "border-primary bg-primary/5 shadow-sm"
+                : "border-border bg-card"
+            }`}
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-card-foreground">{plan.name}</span>
+                  {plan.popular && (
+                    <span className="text-[9px] font-bold uppercase tracking-wider bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full">
+                      Most Popular
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="text-right shrink-0 ml-3">
+                <span className="text-base font-bold text-card-foreground">{plan.price}</span>
+                {plan.period && (
+                  <span className="text-[11px] text-muted-foreground">{plan.period}</span>
+                )}
+              </div>
+            </div>
+
+            <ul className="mt-2.5 space-y-1">
+              {plan.features.map((f) => (
+                <li key={f} className="flex items-center gap-2 text-xs text-card-foreground">
+                  <Check className="w-3 h-3 text-primary shrink-0" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+
+            <Button
+              onClick={() => handleSelect(plan.id)}
+              variant={plan.popular ? "default" : "outline"}
+              className="w-full mt-3 h-9 rounded-lg text-xs font-bold"
+            >
+              {plan.cta}
+            </Button>
+
+            {plan.note && (
+              <p className="text-[10px] text-muted-foreground/60 text-center mt-1">
+                {plan.note}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <p className="text-[10px] text-muted-foreground/60 text-center">
+        Cancel anytime · No long-term commitment
+      </p>
+    </div>
+  );
+}
 
 export default function AuthPage() {
   const [searchParams] = useSearchParams();
@@ -27,6 +138,7 @@ export default function AuthPage() {
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [accountType, setAccountType] = useState<AccountTypeId | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showBreederPlans, setShowBreederPlans] = useState(false);
   const navigate = useNavigate();
 
   const signupReady =
@@ -72,7 +184,7 @@ export default function AuthPage() {
           setLoading(false);
           return;
         }
-        const { error, data } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -82,6 +194,10 @@ export default function AuthPage() {
         });
         if (error) throw error;
         toast.success("Check your email to confirm your account");
+
+        if (accountType === "breeder" || accountType === "vendor") {
+          setShowBreederPlans(true);
+        }
       }
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");
@@ -96,118 +212,122 @@ export default function AuthPage() {
         <BackdropLogo size="md" onDark />
       </div>
 
-      <div className="w-full max-w-sm bg-card rounded-2xl shadow-xl p-7 space-y-5">
-        <div className="text-center">
-          <h1 className="text-lg font-bold text-card-foreground">
-            {isLogin ? "Welcome back" : "Join the Show Stock Network"}
-          </h1>
-          {!isLogin && (
-            <p className="text-xs text-muted-foreground/70 mt-1">
-              Create your profile. Start free. Upgrade anytime.
-            </p>
-          )}
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-3.5">
-          {!isLogin && (
-            <Input
-              placeholder="Display Name (e.g., Stone Show Stock)"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              className="rounded-2xl h-12 text-sm bg-background border-sand-dark"
-            />
-          )}
-          <Input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="rounded-2xl h-12 text-sm bg-background border-sand-dark"
-          />
-          <div className="relative">
-            <Input
-              type={showPw ? "text" : "password"}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="rounded-2xl h-12 text-sm bg-background border-sand-dark pr-10"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPw(!showPw)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-            >
-              {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </button>
+      {showBreederPlans ? (
+        <BreederPlanStep />
+      ) : (
+        <div className="w-full max-w-sm bg-card rounded-2xl shadow-xl p-7 space-y-5">
+          <div className="text-center">
+            <h1 className="text-lg font-bold text-card-foreground">
+              {isLogin ? "Welcome back" : "Join the Show Stock Network"}
+            </h1>
+            {!isLogin && (
+              <p className="text-xs text-muted-foreground/70 mt-1">
+                Create your profile. Start free. Upgrade anytime.
+              </p>
+            )}
           </div>
 
-          {!isLogin && (
-            <div className="space-y-2 pt-1">
-              <p className="text-xs font-semibold text-card-foreground">Select your role</p>
-              <div className="grid grid-cols-2 gap-2">
-                {accountTypes.map((t) => {
-                  const selected = accountType === t.id;
-                  return (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => setAccountType(t.id)}
-                      className={`rounded-xl px-3 py-2.5 text-xs border transition-all text-center ${
-                        selected
-                          ? "bg-[#EFF6FF] border-primary text-primary font-semibold"
-                          : "bg-white border-[#E5E7EB] text-card-foreground hover:border-primary/40"
-                      }`}
-                    >
-                      {t.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {!isLogin && (
-            <div className="flex items-start gap-2 pt-1">
-              <Checkbox
-                id="terms"
-                checked={agreedTerms}
-                onCheckedChange={(v) => setAgreedTerms(v === true)}
-                className="mt-0.5"
+          <form onSubmit={handleSubmit} className="space-y-3.5">
+            {!isLogin && (
+              <Input
+                placeholder="Display Name (e.g., Stone Show Stock)"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="rounded-2xl h-12 text-sm bg-background border-sand-dark"
               />
-              <label htmlFor="terms" className="text-xs text-muted-foreground/70 leading-snug cursor-pointer select-none">
-                I agree to the{" "}
-                <a href="/terms" target="_blank" className="underline underline-offset-2 text-primary">Terms of Use</a>{" "}
-                and{" "}
-                <a href="/privacy" target="_blank" className="underline underline-offset-2 text-primary">Privacy Policy</a>
-              </label>
+            )}
+            <Input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="rounded-2xl h-12 text-sm bg-background border-sand-dark"
+            />
+            <div className="relative">
+              <Input
+                type={showPw ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="rounded-2xl h-12 text-sm bg-background border-sand-dark pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPw(!showPw)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+              >
+                {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
-          )}
 
-          <Button
-            type="submit"
-            disabled={loading || (!isLogin && !signupReady)}
-            className="w-full h-[52px] rounded-2xl text-base font-bold"
-            style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--foreground))" }}
-          >
-            {loading ? "..." : isLogin ? "Sign In" : "Create Free Profile"}
-          </Button>
-          {!isLogin && (
-            <p className="text-[11px] text-muted-foreground/60 text-center">
-              No credit card required
-            </p>
-          )}
-        </form>
+            {!isLogin && (
+              <div className="space-y-2 pt-1">
+                <p className="text-xs font-semibold text-card-foreground">Select your role</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {accountTypes.map((t) => {
+                    const selected = accountType === t.id;
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => setAccountType(t.id)}
+                        className={`rounded-xl px-3 py-2.5 text-xs border transition-all text-center ${
+                          selected
+                            ? "bg-[#EFF6FF] border-primary text-primary font-semibold"
+                            : "bg-white border-[#E5E7EB] text-card-foreground hover:border-primary/40"
+                        }`}
+                      >
+                        {t.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
-        <p className="text-center text-sm text-muted-foreground pt-1">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="font-semibold text-primary underline underline-offset-2"
-          >
-            {isLogin ? "Sign Up" : "Sign In"}
-          </button>
-        </p>
-      </div>
+            {!isLogin && (
+              <div className="flex items-start gap-2 pt-1">
+                <Checkbox
+                  id="terms"
+                  checked={agreedTerms}
+                  onCheckedChange={(v) => setAgreedTerms(v === true)}
+                  className="mt-0.5"
+                />
+                <label htmlFor="terms" className="text-xs text-muted-foreground/70 leading-snug cursor-pointer select-none">
+                  I agree to the{" "}
+                  <a href="/terms" target="_blank" className="underline underline-offset-2 text-primary">Terms of Use</a>{" "}
+                  and{" "}
+                  <a href="/privacy" target="_blank" className="underline underline-offset-2 text-primary">Privacy Policy</a>
+                </label>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              disabled={loading || (!isLogin && !signupReady)}
+              className="w-full h-[52px] rounded-2xl text-base font-bold"
+              style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--foreground))" }}
+            >
+              {loading ? "..." : isLogin ? "Sign In" : "Create Free Profile"}
+            </Button>
+            {!isLogin && (
+              <p className="text-[11px] text-muted-foreground/60 text-center">
+                No credit card required
+              </p>
+            )}
+          </form>
+
+          <p className="text-center text-sm text-muted-foreground pt-1">
+            {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+            <button
+              onClick={() => setIsLogin(!isLogin)}
+              className="font-semibold text-primary underline underline-offset-2"
+            >
+              {isLogin ? "Sign Up" : "Sign In"}
+            </button>
+          </p>
+        </div>
+      )}
     </div>
   );
 }
