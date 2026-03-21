@@ -91,6 +91,7 @@ export default function BreederProfilePage() {
   const isFullPage = tier === "breeder_page";
   const isListing = tier === "listing";
   const isOwner = !!user && profile?.id === user.id;
+  const hasContact = tier === "contacted" || tier === "featured" || isFullPage;
 
   const featured = posts.filter((p) => p.is_featured);
   const winners = posts.filter((p) => p.post_type === "winner");
