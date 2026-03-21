@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BreederBadge } from "@/components/breeder/BreederBadge";
 
 interface BreederIdentityProps {
   name: string;
