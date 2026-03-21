@@ -86,7 +86,11 @@ export default function SubmitWinnerPage() {
     setShowSmartUpload(false);
   };
 
-  /* ── image handling ── */
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+
+  const isValid = showName.trim() && shownBy.trim();
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const newImages = files.slice(0, 3 - images.length).map((file) => ({
