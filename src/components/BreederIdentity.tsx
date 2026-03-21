@@ -80,11 +80,7 @@ export function BreederIdentity({
         </Avatar>
         <div className="flex items-center gap-1.5 mb-0.5">
           <span className="text-sm font-semibold text-foreground">{name}</span>
-          {isPaid && (
-            <span className="shrink-0 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider rounded bg-accent text-accent-foreground leading-tight">
-              Breeder Page
-            </span>
-          )}
+          {tier && <BreederBadge tier={tier} />}
         </div>
         {location && (
           <span className="text-xs text-muted-foreground flex items-center gap-0.5 mb-1">
