@@ -206,14 +206,17 @@ export default function SubmitWinnerPage() {
         )}
 
         <div className="max-w-lg mx-auto px-4 py-4 space-y-5">
-          {/* Smart Upload or Form */}
-          {showSmartUpload ? (
-            <SmartUpload
-              onExtracted={handleSmartExtracted}
-              onSkip={() => setShowSmartUpload(false)}
-            />
-          ) : (
-          <>
+          {/* Smart Upload Modal */}
+          {showSmartUpload && (
+            <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-card border border-border rounded-2xl p-5 w-full max-w-md shadow-lg">
+                <SmartUpload
+                  onExtracted={handleSmartExtracted}
+                  onSkip={() => setShowSmartUpload(false)}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Post Type + Toggles */}
           <div className="bg-card border border-border rounded-xl p-3.5">
@@ -290,6 +293,15 @@ export default function SubmitWinnerPage() {
             />
           </fieldset>
 
+          {/* Smart Upload Button */}
+          <Button
+            variant="outline"
+            onClick={() => setShowSmartUpload(true)}
+            className="w-full h-11 rounded-xl gap-2 text-sm font-semibold"
+          >
+            <Sparkles className="w-4 h-4" /> Smart Upload — Auto-fill with AI
+          </Button>
+
           {/* Preview */}
           {isValid && (
             <div className="bg-card border border-border rounded-xl overflow-hidden">
@@ -342,8 +354,6 @@ export default function SubmitWinnerPage() {
                 </div>
               </div>
             </div>
-          )}
-          </>
           )}
         </div>
 
