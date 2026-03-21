@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import gooseImage from "@/assets/sires/goose.jpeg";
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { PostCard } from "@/components/PostCard";
