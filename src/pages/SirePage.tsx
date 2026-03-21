@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import gooseImage from "@/assets/sires/goose.jpeg";
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { PostCard } from "@/components/PostCard";
@@ -103,7 +104,7 @@ export default function SirePage() {
           <div className="px-3 pb-5">
             <SireCard
               name={sire.name}
-              image="/placeholder.svg"
+              image={sire.name === "Goose" ? gooseImage : "/placeholder.svg"}
               sireName={sire.name === "Goose" ? "Chief" : undefined}
               damName={sire.name === "Goose" ? "Top Tier" : undefined}
               breederName={sire.name === "Goose" ? "Nothdurft Livestock" : "Unknown"}
