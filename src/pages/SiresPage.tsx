@@ -9,19 +9,47 @@ interface Sire {
   name: string;
 }
 
+interface WinnerSire {
+  sire_id: string | null;
+}
+
 const SiresPage = () => {
   const [sires, setSires] = useState<Sire[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchSires() {
-      const { data } = await supabase
-        .from("sires_lookup")
-        .select("*")
-        .order("name");
-      if (data) setSires(data);
+      const [{ data: sireData }, { data: winnerData }] = await Promise.all([
+        supabase.from("sires_lookup").select("id, name"),
+        supabase
+          .from("winners")
+          .select("sire_id")
+          .eq("status", "active")
+          .not("sire_id", "is", null),
+      ]);
+
+      if (sireData) {
+        const sireIdsWithPosts = new Set(
+          (winnerData as WinnerSire[] | null)?.map((winner) => winner.sire_id).filter(Boolean) ?? []
+        );
+
+        const sortedSires = [...sireData].sort((a, b) => {
+          const aHasPosts = sireIdsWithPosts.has(a.id);
+          const bHasPosts = sireIdsWithPosts.has(b.id);
+
+          if (aHasPosts !== bHasPosts) {
+            return aHasPosts ? -1 : 1;
+          }
+
+          return a.name.localeCompare(b.name);
+        });
+
+        setSires(sortedSires);
+      }
+
       setLoading(false);
     }
+
     fetchSires();
   }, []);
 
@@ -39,13 +67,13 @@ const SiresPage = () => {
               <Link
                 key={s.id}
                 to={`/sire/${s.id}`}
-                className="p-4 bg-card rounded-lg border border-border hover:shadow-sm transition-shadow"
+                className="block p-4 bg-card rounded-lg border border-border hover:shadow-sm transition-shadow"
               >
                 <div className="w-full aspect-square rounded-md bg-muted flex items-center justify-center text-4xl mb-3">
                   🐏
                 </div>
                 <div className="flex items-center gap-2">
-                  <Dna className="w-4 h-4 text-primary" />
+                  <Dna className="w-4 h-4 text-primary shrink-0" />
                   <p className="font-semibold text-sm text-foreground">{s.name}</p>
                 </div>
               </Link>
