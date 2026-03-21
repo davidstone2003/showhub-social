@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check, Facebook, Download, Copy, FileJson, ChevronDown, ChevronUp } from "lucide-react";
+import { PostListingUpsell } from "@/components/upgrade/PostListingUpsell";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
