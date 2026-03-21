@@ -143,8 +143,8 @@ export default function AuthPage() {
 
           {!isLogin && (
             <div className="space-y-2 pt-1">
-              <p className="text-xs font-semibold text-card-foreground">I am a:</p>
-              <div className="flex flex-wrap gap-2">
+              <p className="text-xs font-semibold text-card-foreground">Select your role</p>
+              <div className="grid grid-cols-2 gap-2">
                 {accountTypes.map((t) => {
                   const selected = accountType === t.id;
                   return (
@@ -152,10 +152,10 @@ export default function AuthPage() {
                       key={t.id}
                       type="button"
                       onClick={() => setAccountType(t.id)}
-                      className={`rounded-full px-3.5 py-1.5 text-xs font-medium border transition-colors ${
+                      className={`rounded-xl px-3 py-2.5 text-xs border transition-all text-center ${
                         selected
-                          ? "bg-primary/10 border-primary text-primary font-semibold"
-                          : "bg-background border-border text-muted-foreground hover:border-primary/40"
+                          ? "bg-[#EFF6FF] border-primary text-primary font-semibold"
+                          : "bg-white border-[#E5E7EB] text-card-foreground hover:border-primary/40"
                       }`}
                     >
                       {t.label}
