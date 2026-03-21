@@ -113,9 +113,26 @@ export default function AuthPage() {
             </button>
           </div>
 
+          {!isLogin && (
+            <div className="flex items-start gap-2 pt-1">
+              <Checkbox
+                id="terms"
+                checked={agreedTerms}
+                onCheckedChange={(v) => setAgreedTerms(v === true)}
+                className="mt-0.5"
+              />
+              <label htmlFor="terms" className="text-xs text-muted-foreground/70 leading-snug cursor-pointer select-none">
+                I agree to the{" "}
+                <a href="/terms" target="_blank" className="underline underline-offset-2 text-primary">Terms of Use</a>{" "}
+                and{" "}
+                <a href="/privacy" target="_blank" className="underline underline-offset-2 text-primary">Privacy Policy</a>
+              </label>
+            </div>
+          )}
+
           <Button
             type="submit"
-            disabled={loading}
+            disabled={loading || (!isLogin && !agreedTerms)}
             className="w-full h-[52px] rounded-2xl text-base font-bold"
             style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--foreground))" }}
           >
