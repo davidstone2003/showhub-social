@@ -232,7 +232,7 @@ export default function AuthPage() {
         <BackdropLogo size="md" onDark />
       </div>
 
-      {(
+      
         <div className="w-full max-w-sm bg-card rounded-2xl shadow-xl p-7 space-y-5">
           <div className="text-center">
             <h1 className="text-lg font-bold text-card-foreground">
