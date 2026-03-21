@@ -51,10 +51,9 @@ export default function AccountTypePage() {
         .eq("id", user.id);
       if (error) throw error;
 
-      if (selected === "breeder") {
+      if (selected === "breeder" || selected === "vendor") {
         navigate("/onboarding");
       } else {
-        // Mark onboarding complete for non-breeders
         await supabase
           .from("profiles")
           .update({ onboarding_completed: true })
