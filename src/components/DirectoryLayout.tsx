@@ -82,7 +82,7 @@ function FilterMenu({ filter }: { filter: FilterDropdown }) {
       {open && (
         <div
           className="absolute left-0 top-full z-50 mt-0.5 overflow-hidden rounded-xl border border-border bg-card py-1 shadow-sm animate-in fade-in-0 zoom-in-95 duration-100"
-          style={{ width: triggerWidth }}
+          style={{ minWidth: triggerWidth, width: "auto" }}
         >
           {filter.options.map((option, index) => {
             const isSelected = option.value === filter.value;
