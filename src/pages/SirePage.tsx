@@ -101,17 +101,26 @@ export default function SirePage() {
 
         {sire && (
           <div className="px-3 pb-5">
-            <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center">
-                <Dna className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-lg font-semibold text-foreground">{sire.name}</h1>
-                <p className="text-sm text-muted-foreground">
-                  {posts.length} winner {posts.length === 1 ? "post" : "posts"}
-                </p>
-              </div>
-            </div>
+            <SireCard
+              name={sire.name}
+              image="/placeholder.svg"
+              sireName={sire.name === "Goose" ? "Chief" : undefined}
+              damName={sire.name === "Goose" ? "Top Tier" : undefined}
+              breederName={sire.name === "Goose" ? "Nothdurft Livestock" : "Unknown"}
+              traits={
+                sire.name === "Goose"
+                  ? ["Short bladed", "Massive center body", "Dense muscle", "Big paws", "Shallow made", "Three dimensional"]
+                  : []
+              }
+              description={
+                sire.name === "Goose"
+                  ? "Full brother to the 23 Reserve Grand NWSS. Goose is in a league of his own. From day one, his presence stood out. Shallow built, massive muscled, with huge feet and a freaky skeleton. This one is built to generate big time wethers."
+                  : undefined
+              }
+            />
+            <p className="text-sm text-muted-foreground mt-3">
+              {posts.length} winner {posts.length === 1 ? "post" : "posts"}
+            </p>
           </div>
         )}
 
