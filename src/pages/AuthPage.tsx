@@ -222,15 +222,17 @@ export default function AuthPage() {
     }
   };
 
+  if (showBreederPlans) {
+    return <BreederPlanStep />;
+  }
+
   return (
     <div className="min-h-screen bg-primary flex flex-col items-center justify-center px-6">
       <div className="flex justify-center mb-4">
         <BackdropLogo size="md" onDark />
       </div>
 
-      {showBreederPlans ? (
-        <BreederPlanStep />
-      ) : (
+      {(
         <div className="w-full max-w-sm bg-card rounded-2xl shadow-xl p-7 space-y-5">
           <div className="text-center">
             <h1 className="text-lg font-bold text-card-foreground">
