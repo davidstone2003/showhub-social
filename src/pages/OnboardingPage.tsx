@@ -10,9 +10,8 @@ import { toast } from "sonner";
 import { MapPin, Camera, ArrowRight } from "lucide-react";
 
 export default function OnboardingPage() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const [saving, setSaving] = useState(false);
   const [location, setLocation] = useState("");
   const [bio, setBio] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -27,7 +26,7 @@ export default function OnboardingPage() {
     setPhotoPreview(URL.createObjectURL(file));
   };
 
-  const handleStep1 = async () => {
+  const handleSubmit = async () => {
     if (!user) return;
     setSaving(true);
     try {
@@ -74,155 +73,78 @@ export default function OnboardingPage() {
       </div>
 
       <div className="w-full max-w-sm bg-card rounded-2xl shadow-xl p-7 space-y-5">
-        {stepIndicator}
+        <div className="text-center">
+          <h1 className="text-lg font-bold text-card-foreground">
+            Let's set up your profile
+          </h1>
+          <p className="text-xs text-muted-foreground/70 mt-1">
+            Help buyers find and recognize you
+          </p>
+        </div>
 
-        {step === 1 && (
-          <>
-            <div className="text-center">
-              <h1 className="text-lg font-bold text-card-foreground">
-                Let's set up your breeder profile
-              </h1>
-              <p className="text-xs text-muted-foreground/70 mt-1">
-                Help buyers find and recognize you
-              </p>
-            </div>
-
-            <div className="space-y-3.5">
-              {/* Photo upload */}
-              <div className="flex flex-col items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => fileRef.current?.click()}
-                  className="w-20 h-20 rounded-full bg-muted border-2 border-dashed border-sand-dark flex items-center justify-center overflow-hidden hover:border-gold transition-colors"
-                >
-                  {photoPreview ? (
-                    <img
-                      src={photoPreview}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <Camera className="w-6 h-6 text-muted-foreground" />
-                  )}
-                </button>
-                <span className="text-[11px] text-muted-foreground">
-                  Add profile photo
-                </span>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handlePhotoSelect}
+        <div className="space-y-3.5">
+          {/* Photo upload */}
+          <div className="flex flex-col items-center gap-2">
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              className="w-20 h-20 rounded-full bg-muted border-2 border-dashed border-sand-dark flex items-center justify-center overflow-hidden hover:border-gold transition-colors"
+            >
+              {photoPreview ? (
+                <img
+                  src={photoPreview}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
                 />
-              </div>
+              ) : (
+                <Camera className="w-6 h-6 text-muted-foreground" />
+              )}
+            </button>
+            <span className="text-[11px] text-muted-foreground">
+              Add profile photo
+            </span>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoSelect}
+            />
+          </div>
 
-              {/* Location */}
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Location (e.g., Oklahoma)"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="rounded-2xl h-12 text-sm bg-background border-sand-dark pl-9"
-                />
-              </div>
+          {/* Location */}
+          <div className="relative">
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Location (e.g., Oklahoma)"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="rounded-2xl h-12 text-sm bg-background border-sand-dark pl-9"
+            />
+          </div>
 
-              {/* Bio */}
-              <Textarea
-                placeholder="Short bio (optional)"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                rows={3}
-                className="rounded-2xl text-sm bg-background border-sand-dark resize-none"
-              />
+          {/* Bio */}
+          <Textarea
+            placeholder="Short bio (optional)"
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            rows={3}
+            className="rounded-2xl text-sm bg-background border-sand-dark resize-none"
+          />
 
-              <Button
-                onClick={handleStep1}
-                disabled={saving}
-                className="w-full h-[52px] rounded-2xl text-base font-bold"
-                style={{
-                  backgroundColor: "hsl(var(--gold))",
-                  color: "hsl(var(--foreground))",
-                }}
-              >
-                {saving ? "Saving..." : "Continue"}
-                {!saving && <ArrowRight className="w-4 h-4 ml-1" />}
-              </Button>
-            </div>
-          </>
-        )}
-
-        {step === 2 && (
-          <>
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-3">
-                <Megaphone className="w-6 h-6 text-gold" />
-              </div>
-              <h1 className="text-lg font-bold text-card-foreground">
-                Let buyers contact you
-              </h1>
-              <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                Buyers can't reach you unless you enable contact. Add your phone,
-                email, and social links so they can find you.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <Button
-                onClick={handleEnableContact}
-                className="w-full h-[52px] rounded-2xl text-base font-bold"
-                style={{
-                  backgroundColor: "hsl(var(--gold))",
-                  color: "hsl(var(--foreground))",
-                }}
-              >
-                Enable Contact – $9.99/month
-              </Button>
-              <button
-                onClick={() => setStep(3)}
-                className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
-              >
-                Skip for now
-              </button>
-            </div>
-          </>
-        )}
-
-        {step === 3 && (
-          <>
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center mx-auto mb-3">
-                <Plus className="w-6 h-6 text-gold" />
-              </div>
-              <h1 className="text-lg font-bold text-card-foreground">
-                Add your first post
-              </h1>
-              <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                Show your animals, wins, or listings to start getting noticed.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <Button
-                onClick={handleCreatePost}
-                className="w-full h-[52px] rounded-2xl text-base font-bold"
-                style={{
-                  backgroundColor: "hsl(var(--gold))",
-                  color: "hsl(var(--foreground))",
-                }}
-              >
-                Create Post
-              </Button>
-              <button
-                onClick={handleSkipToFeed}
-                className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
-              >
-                Skip for now
-              </button>
-            </div>
-          </>
-        )}
+          <Button
+            onClick={handleSubmit}
+            disabled={saving}
+            className="w-full h-[52px] rounded-2xl text-base font-bold"
+            style={{
+              backgroundColor: "hsl(var(--gold))",
+              color: "hsl(var(--foreground))",
+            }}
+          >
+            {saving ? "Saving..." : "Continue"}
+            {!saving && <ArrowRight className="w-4 h-4 ml-1" />}
+          </Button>
+        </div>
       </div>
     </div>
   );
