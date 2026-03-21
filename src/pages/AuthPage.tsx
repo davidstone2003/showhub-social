@@ -33,10 +33,14 @@ export default function AuthPage() {
           .select("onboarding_completed, account_type")
           .eq("id", data.user.id)
           .single();
-        if (prof && (prof.account_type === "user" || !prof.account_type)) {
+        if (prof && (!prof.account_type || prof.account_type === "user")) {
           navigate("/account-type");
         } else if (prof && !prof.onboarding_completed) {
-          navigate("/onboarding");
+          if (prof.account_type === "breeder" || prof.account_type === "vendor") {
+            navigate("/onboarding");
+          } else {
+            navigate("/");
+          }
         } else {
           navigate("/");
         }
