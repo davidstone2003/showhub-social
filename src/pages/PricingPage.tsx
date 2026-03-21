@@ -8,12 +8,12 @@ import { cn } from "@/lib/utils";
 const plans = [
   {
     id: "free",
-    name: "Free",
-    price: "$0",
+    name: "Basic Listing",
+    price: "Free",
     period: "",
-    description: "Basic directory listing",
-    features: ["Basic profile", "Show in directory", "Post winners"],
-    cta: "Continue Free",
+    description: "Get started in the directory",
+    features: ["Listed in directory", "Basic profile", "Limited content", "No contact access"],
+    cta: "Get Started",
   },
   {
     id: "contacted",
@@ -22,28 +22,18 @@ const plans = [
     period: "/month",
     description: "Let buyers reach you",
     icon: Phone,
-    features: [
-      "Enable call, text, email",
-      "Add social links",
-      "Buyers can contact you directly",
-    ],
+    features: ["Call, text, email", "Social links", "Contact form"],
     cta: "Enable Contact",
   },
   {
     id: "featured",
-    name: "Get Seen",
+    name: "Featured Breeder",
     price: "$24.99",
     period: "/month",
     description: "Stand out in the directory",
     icon: Star,
     popular: true,
-    features: [
-      "Everything in Get Contacted",
-      "Featured placement in directory",
-      "Higher search ranking",
-      "Profile analytics",
-      "Premium badge",
-    ],
+    features: ["Featured placement", "Higher search ranking", "Premium badge", "Profile analytics"],
     cta: "Get Featured",
   },
 ] as any[];
@@ -66,10 +56,10 @@ export default function PricingPage() {
       <div className="min-h-screen bg-background pb-24">
         <div className="max-w-lg mx-auto px-4 pt-10 pb-6">
           <h1 className="text-2xl font-bold text-foreground text-center">
-            Choose your plan
+            Join the Show Stock Network
           </h1>
           <p className="text-sm text-muted-foreground text-center mt-2">
-            You can upgrade or change anytime
+            Create your profile. Upgrade anytime.
           </p>
 
           <div className="mt-8 space-y-3">
