@@ -38,7 +38,7 @@ export function MobileHeader() {
           ) : (
             <>
               <Link
-                to="/pricing"
+                to="/auth"
                 className="flex items-center bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-all shrink-0"
                 style={{ borderRadius: '10px', height: '34px', padding: '0 14px', fontSize: '13px' }}
               >
