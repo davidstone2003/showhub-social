@@ -83,7 +83,7 @@ export function DesktopSidebar() {
         ) : (
           <>
             <NavLink
-              to="/auth"
+              to="/auth?mode=signup"
               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-primary-foreground text-primary text-sm font-semibold hover:bg-primary-foreground/90 transition-colors"
             >
               Join Free

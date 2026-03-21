@@ -25,7 +25,7 @@ export function AuthGate({ open, onOpenChange }: AuthGateProps) {
         </DialogHeader>
         <div className="flex flex-col gap-2 pt-2">
           <Button asChild>
-            <Link to="/auth">Join Free</Link>
+            <Link to="/auth?mode=signup">Join Free</Link>
           </Button>
           <Button variant="ghost" asChild>
             <Link to="/auth">Already have an account? Log in</Link>
