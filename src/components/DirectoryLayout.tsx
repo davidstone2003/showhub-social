@@ -1,7 +1,6 @@
-import { ReactNode, useState, useRef, useEffect } from "react";
+import { ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Search, ChevronDown, Check } from "lucide-react";
 import { Layout } from "@/components/Layout";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const speciesOptions = ["All", "Sheep", "Goats", "Cattle", "Pigs"] as const;
 export type Species = (typeof speciesOptions)[number];
@@ -27,54 +26,86 @@ interface DirectoryLayoutProps {
   children: ReactNode;
 }
 
-function DesktopDropdown({ filter }: { filter: FilterDropdown }) {
+function FilterMenu({ filter }: { filter: FilterDropdown }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const btnRef = useRef<HTMLButtonElement>(null);
-  const [btnWidth, setBtnWidth] = useState(0);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [triggerWidth, setTriggerWidth] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+    };
   }, [open]);
 
-  useEffect(() => {
-    if (btnRef.current) setBtnWidth(btnRef.current.offsetWidth);
-  });
+  useLayoutEffect(() => {
+    const updateWidth = () => {
+      if (triggerRef.current) {
+        setTriggerWidth(triggerRef.current.offsetWidth);
+      }
+    };
 
-  const selectedLabel = filter.options.find((o) => o.value === filter.value)?.label ?? filter.label;
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
+
+  const selectedLabel = filter.options.find((option) => option.value === filter.value)?.label ?? filter.label;
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={rootRef} className="relative shrink-0">
       <button
-        ref={btnRef}
-        onClick={() => setOpen(!open)}
-        className="h-7 px-2.5 text-[11px] font-medium bg-muted text-foreground rounded-full flex items-center gap-1 hover:bg-muted/80 transition-colors"
+        ref={triggerRef}
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className="h-7 rounded-full bg-muted px-2.5 text-[11px] font-medium text-foreground transition-colors hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-ring"
       >
-        {selectedLabel}
-        <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+        <span className="flex items-center gap-1">
+          <span className="truncate">{selectedLabel}</span>
+          <ChevronDown className={`h-3 w-3 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+        </span>
       </button>
+
       {open && (
         <div
-          className="absolute top-full left-0 bg-card border border-border rounded-[14px] shadow-sm z-50 py-0.5 animate-in fade-in-0 zoom-in-95 duration-100 overflow-hidden"
-          style={{ marginTop: "3px", width: Math.max(btnWidth, 120) }}
+          className="absolute left-0 top-full z-50 mt-0.5 overflow-hidden rounded-full border border-border bg-card py-0.5 shadow-sm animate-in fade-in-0 zoom-in-95 duration-100"
+          style={{ width: triggerWidth }}
         >
-          {filter.options.map((opt, i) => (
-            <button
-              key={opt.value}
-              onClick={() => { filter.onChange(opt.value); setOpen(false); }}
-              className={`w-full text-left px-2.5 py-1.5 text-[11px] flex items-center justify-between hover:bg-muted/50 transition-colors ${
-                filter.value === opt.value ? "font-bold text-foreground bg-muted/30" : "text-muted-foreground"
-              } ${i > 0 ? "border-t border-border/30" : ""}`}
-            >
-              <span className="truncate">{opt.label}</span>
-              {filter.value === opt.value && <Check className="w-3 h-3 text-primary shrink-0 ml-1" />}
-            </button>
-          ))}
+          {filter.options.map((option, index) => {
+            const isSelected = option.value === filter.value;
+
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => {
+                  filter.onChange(option.value);
+                  setOpen(false);
+                }}
+                className={`flex w-full items-center justify-between px-2.5 py-1.5 text-[11px] transition-colors ${
+                  isSelected
+                    ? "bg-muted/50 font-semibold text-foreground"
+                    : "text-muted-foreground hover:bg-muted/30"
+                } ${index > 0 ? "border-t border-border/40" : ""}`}
+              >
+                <span className="truncate text-left">{option.label}</span>
+                {isSelected ? <Check className="ml-1 h-3 w-3 shrink-0 text-primary" /> : null}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
@@ -94,82 +125,55 @@ export function DirectoryLayout({
   resultLabel = "result",
   children,
 }: DirectoryLayoutProps) {
-  const isMobile = useIsMobile();
-
   return (
     <Layout showDiscovery={false}>
-      <div className="max-w-5xl mx-auto px-3 lg:px-6 pb-24">
-        {/* Header */}
-        <div className="pt-4 pb-2">
+      <div className="mx-auto max-w-5xl px-3 pb-24 lg:px-6">
+        <div className="pb-2 pt-4">
           <h1 className="text-lg font-bold text-foreground">{title}</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
         </div>
 
-        {/* Sticky filters */}
-        <div className="sticky top-[44px] lg:top-0 z-30 bg-background pb-2 space-y-2">
-          {/* Species pills */}
+        <div className="sticky top-[44px] z-30 space-y-2 bg-background pb-2 lg:top-0">
           <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
-            {speciesOptions.map((s) => (
+            {speciesOptions.map((option) => (
               <button
-                key={s}
-                onClick={() => onSpeciesChange(s)}
-                className={`shrink-0 font-semibold transition-colors text-[11px] leading-[14px] h-7 px-3 rounded-full ${
-                  species === s
+                key={option}
+                onClick={() => onSpeciesChange(option)}
+                className={`h-7 shrink-0 rounded-full px-3 text-[11px] font-semibold leading-[14px] transition-colors ${
+                  species === option
                     ? "bg-primary text-primary-foreground"
-                    : "bg-transparent text-muted-foreground border border-border hover:border-foreground/40"
+                    : "border border-border bg-transparent text-muted-foreground hover:border-foreground/40"
                 }`}
               >
-                {s}
+                {option}
               </button>
             ))}
           </div>
 
-          {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               placeholder={searchPlaceholder}
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full h-9 pl-9 pr-3 bg-muted border-none rounded-full text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              className="h-9 w-full rounded-full border-none bg-muted pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
 
-          {/* Filters */}
           {filters.length > 0 && (
-            <div className="flex items-center gap-2">
-              {filters.slice(0, 2).map((f) =>
-                isMobile ? (
-                  <select
-                    key={f.label}
-                    value={f.value}
-                    onChange={(e) => f.onChange(e.target.value)}
-                    className="h-7 px-2.5 text-[11px] font-medium bg-muted text-foreground border-none rounded-full appearance-none focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer"
-                    style={{
-                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
-                      backgroundRepeat: "no-repeat",
-                      backgroundPosition: "right 8px center",
-                      paddingRight: "22px",
-                    }}
-                  >
-                    {f.options.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <DesktopDropdown key={f.label} filter={f} />
-                )
-              )}
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+              {filters.slice(0, 2).map((filter) => (
+                <FilterMenu key={filter.label} filter={filter} />
+              ))}
             </div>
           )}
         </div>
 
-        {/* Result count */}
-        <p className="text-[11px] text-muted-foreground mb-2 mt-1">
-          {resultCount} {resultLabel}{resultCount !== 1 ? "s" : ""}
+        <p className="mb-2 mt-1 text-[11px] text-muted-foreground">
+          {resultCount} {resultLabel}
+          {resultCount !== 1 ? "s" : ""}
         </p>
 
-        {/* Content */}
         {children}
       </div>
     </Layout>
