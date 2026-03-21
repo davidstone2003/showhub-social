@@ -56,74 +56,90 @@ function BreederPlanStep() {
   };
 
   return (
-    <div className="w-full max-w-sm bg-card rounded-2xl shadow-xl p-6 space-y-5">
-      <div className="text-center">
-        <h1 className="text-lg font-bold text-card-foreground">
-          Choose your breeder listing
-        </h1>
-        <p className="text-xs text-muted-foreground/70 mt-1">
-          Start free. Upgrade anytime.
-        </p>
-      </div>
+    <div className="min-h-screen bg-background flex flex-col px-5 pt-14 pb-10">
+      <div className="w-full max-w-md mx-auto space-y-6">
+        <div className="text-center space-y-1.5">
+          <h1 className="text-xl font-bold text-foreground">
+            Choose your breeder listing
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Start free. Upgrade anytime.
+          </p>
+          <p className="text-xs text-muted-foreground/60">
+            Most breeders start free and upgrade when ready
+          </p>
+        </div>
 
-      <div className="space-y-3">
-        {breederPlans.map((plan) => (
-          <div
-            key={plan.id}
-            className={`rounded-xl border-2 p-4 transition-all ${
-              plan.popular
-                ? "border-primary bg-primary/5 shadow-sm"
-                : "border-border bg-card"
-            }`}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-card-foreground">{plan.name}</span>
-                  {plan.popular && (
-                    <span className="text-[9px] font-bold uppercase tracking-wider bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full">
-                      Most Popular
-                    </span>
+        <div className="space-y-3">
+          {breederPlans.map((plan) => (
+            <div
+              key={plan.id}
+              className={`rounded-xl border-2 p-4 transition-all ${
+                plan.popular
+                  ? "border-primary bg-primary/5 shadow-sm"
+                  : "border-border bg-card"
+              }`}
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-foreground">{plan.name}</span>
+                    {plan.popular && (
+                      <span className="text-[9px] font-bold uppercase tracking-wider bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full">
+                        Most Popular
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="text-right shrink-0 ml-3">
+                  <span className="text-base font-bold text-foreground">{plan.price}</span>
+                  {plan.period && (
+                    <span className="text-[11px] text-muted-foreground">{plan.period}</span>
                   )}
                 </div>
               </div>
-              <div className="text-right shrink-0 ml-3">
-                <span className="text-base font-bold text-card-foreground">{plan.price}</span>
-                {plan.period && (
-                  <span className="text-[11px] text-muted-foreground">{plan.period}</span>
-                )}
-              </div>
+
+              <ul className="mt-2.5 space-y-1">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-center gap-2 text-xs text-foreground">
+                    <Check className="w-3 h-3 text-primary shrink-0" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <Button
+                onClick={() => handleSelect(plan.id)}
+                variant={plan.id === "free" ? "default" : plan.popular ? "default" : "outline"}
+                className={`w-full mt-3 h-10 rounded-lg text-xs font-bold ${
+                  plan.id === "free"
+                    ? ""
+                    : plan.popular
+                    ? ""
+                    : ""
+                }`}
+                style={
+                  plan.id === "free"
+                    ? { backgroundColor: "hsl(var(--gold))", color: "hsl(var(--foreground))" }
+                    : undefined
+                }
+              >
+                {plan.cta}
+              </Button>
+
+              {plan.note && (
+                <p className="text-[10px] text-muted-foreground/60 text-center mt-1">
+                  {plan.note}
+                </p>
+              )}
             </div>
+          ))}
+        </div>
 
-            <ul className="mt-2.5 space-y-1">
-              {plan.features.map((f) => (
-                <li key={f} className="flex items-center gap-2 text-xs text-card-foreground">
-                  <Check className="w-3 h-3 text-primary shrink-0" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-
-            <Button
-              onClick={() => handleSelect(plan.id)}
-              variant={plan.popular ? "default" : "outline"}
-              className="w-full mt-3 h-9 rounded-lg text-xs font-bold"
-            >
-              {plan.cta}
-            </Button>
-
-            {plan.note && (
-              <p className="text-[10px] text-muted-foreground/60 text-center mt-1">
-                {plan.note}
-              </p>
-            )}
-          </div>
-        ))}
+        <p className="text-[11px] text-muted-foreground/60 text-center">
+          Cancel anytime · No long-term commitment
+        </p>
       </div>
-
-      <p className="text-[10px] text-muted-foreground/60 text-center">
-        Cancel anytime · No long-term commitment
-      </p>
     </div>
   );
 }
@@ -206,15 +222,17 @@ export default function AuthPage() {
     }
   };
 
+  if (showBreederPlans) {
+    return <BreederPlanStep />;
+  }
+
   return (
     <div className="min-h-screen bg-primary flex flex-col items-center justify-center px-6">
       <div className="flex justify-center mb-4">
         <BackdropLogo size="md" onDark />
       </div>
 
-      {showBreederPlans ? (
-        <BreederPlanStep />
-      ) : (
+      
         <div className="w-full max-w-sm bg-card rounded-2xl shadow-xl p-7 space-y-5">
           <div className="text-center">
             <h1 className="text-lg font-bold text-card-foreground">
@@ -327,7 +345,7 @@ export default function AuthPage() {
             </button>
           </p>
         </div>
-      )}
+      
     </div>
   );
 }
