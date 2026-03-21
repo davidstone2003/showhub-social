@@ -17,6 +17,7 @@ import BreederProfilePage from "./pages/BreederProfilePage";
 import AdminPage from "./pages/AdminPage";
 import PricingPage from "./pages/PricingPage";
 import OnboardingPage from "./pages/OnboardingPage";
+import AccountTypePage from "./pages/AccountTypePage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
