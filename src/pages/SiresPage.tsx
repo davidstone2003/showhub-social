@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Dna } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import gooseImage from "@/assets/sires/goose.jpeg";
 
 interface Sire {
   id: string;
@@ -69,8 +70,18 @@ const SiresPage = () => {
                 to={`/sire/${s.id}`}
                 className="block p-4 bg-card rounded-lg border border-border hover:shadow-sm transition-shadow"
               >
-                <div className="w-full aspect-square rounded-md bg-muted flex items-center justify-center text-4xl mb-3">
-                  🐏
+                <div className="w-full aspect-square rounded-md bg-muted overflow-hidden mb-3">
+                  {s.name === "Goose" ? (
+                    <img
+                      src={gooseImage}
+                      alt={s.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-4xl">🐏</div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <Dna className="w-4 h-4 text-primary shrink-0" />
