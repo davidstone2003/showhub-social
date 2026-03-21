@@ -170,6 +170,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         postOwnerId={(post as any).user_id}
         onActionComplete={onModerated}
       />
+      <AuthGate open={showAuthGate} onOpenChange={setShowAuthGate} />
     </>
   );
 }
