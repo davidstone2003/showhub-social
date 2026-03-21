@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
@@ -13,14 +12,15 @@ const plans = [
     period: "",
     description: "Get started in the directory",
     features: ["Listed in directory", "Basic profile", "Limited content", "No contact access"],
-    cta: "Get Started",
+    cta: "Get Started (Free)",
+    note: "No credit card required",
   },
   {
     id: "contacted",
     name: "Get Contacted",
     price: "$9.99",
     period: "/month",
-    description: "Let buyers reach you",
+    description: "Let buyers contact you directly",
     icon: Phone,
     features: ["Call, text, email", "Social links", "Contact form"],
     cta: "Enable Contact",
@@ -30,24 +30,23 @@ const plans = [
     name: "Featured Breeder",
     price: "$24.99",
     period: "/month",
-    description: "Stand out in the directory",
+    description: "Show up first and get more buyers",
     icon: Star,
     popular: true,
     features: ["Featured placement", "Higher search ranking", "Premium badge", "Profile analytics"],
     cta: "Get Featured",
   },
-] as any[];
+];
 
 export default function PricingPage() {
-  const [selected, setSelected] = useState("free");
   const navigate = useNavigate();
 
-  const handleContinue = () => {
-    if (selected === "free") {
-      navigate("/");
+  const handleSelect = (planId: string) => {
+    if (planId === "free") {
+      navigate("/auth");
     } else {
       // TODO: wire to Stripe checkout
-      navigate("/");
+      navigate("/auth");
     }
   };
 
@@ -59,77 +58,78 @@ export default function PricingPage() {
             Join the Show Stock Network
           </h1>
           <p className="text-sm text-muted-foreground text-center mt-2">
-            Create your profile. Upgrade anytime.
+            Create your profile. Start free. Upgrade anytime.
           </p>
 
           <div className="mt-8 space-y-3">
-            {plans.map((plan) => {
-              const isSelected = selected === plan.id;
-              return (
-                <button
-                  key={plan.id}
-                  onClick={() => setSelected(plan.id)}
-                  className={cn(
-                    "w-full text-left rounded-xl border-2 p-4 transition-all",
-                    isSelected
-                      ? "border-primary bg-primary/5"
-                      : "border-border bg-card hover:border-muted-foreground/30"
-                  )}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-base font-bold text-foreground">
-                          {plan.name}
-                        </span>
-                        {plan.popular && (
-                          <span className="text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
-                            Popular
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {plan.description}
-                      </p>
-                    </div>
-                    <div className="text-right flex-shrink-0 ml-3">
-                      <span className="text-lg font-bold text-foreground">
-                        {plan.price}
+            {plans.map((plan) => (
+              <div
+                key={plan.id}
+                className={cn(
+                  "rounded-xl border-2 p-4 transition-all",
+                  plan.popular
+                    ? "border-primary bg-primary/5 shadow-md"
+                    : "border-border bg-card hover:border-muted-foreground/30"
+                )}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base font-bold text-foreground">
+                        {plan.name}
                       </span>
-                      {plan.period && (
-                        <span className="text-xs text-muted-foreground">
-                          {plan.period}
+                      {plan.popular && (
+                        <span className="text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+                          Most Popular
                         </span>
                       )}
                     </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {plan.description}
+                    </p>
                   </div>
+                  <div className="text-right flex-shrink-0 ml-3">
+                    <span className="text-lg font-bold text-foreground">
+                      {plan.price}
+                    </span>
+                    {plan.period && (
+                      <span className="text-xs text-muted-foreground">
+                        {plan.period}
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-                  {isSelected && (
-                    <ul className="mt-3 space-y-1.5">
-                      {plan.features.map((f) => (
-                        <li
-                          key={f}
-                          className="flex items-center gap-2 text-xs text-foreground"
-                        >
-                          <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </button>
-              );
-            })}
+                <ul className="mt-3 space-y-1.5">
+                  {plan.features.map((f) => (
+                    <li
+                      key={f}
+                      className="flex items-center gap-2 text-xs text-foreground"
+                    >
+                      <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+
+                <Button
+                  onClick={() => handleSelect(plan.id)}
+                  variant={plan.popular ? "default" : "outline"}
+                  className="w-full mt-4 h-10 rounded-lg text-sm font-bold"
+                >
+                  {plan.cta}
+                </Button>
+
+                {plan.note && (
+                  <p className="text-[11px] text-muted-foreground text-center mt-1.5">
+                    {plan.note}
+                  </p>
+                )}
+              </div>
+            ))}
           </div>
 
-          <Button
-            onClick={handleContinue}
-            className="w-full mt-6 h-12 rounded-xl text-base font-bold"
-          >
-            {plans.find((p) => p.id === selected)?.cta || "Continue"}
-          </Button>
-
-          <p className="text-[11px] text-muted-foreground text-center mt-3">
+          <p className="text-[11px] text-muted-foreground text-center mt-6">
             Cancel anytime · No long-term commitment
           </p>
         </div>
