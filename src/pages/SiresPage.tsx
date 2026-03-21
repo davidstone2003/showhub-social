@@ -8,6 +8,9 @@ import gooseImage from "@/assets/sires/goose.jpeg";
 interface Sire {
   id: string;
   name: string;
+  breederName: string | null;
+  species: Species;
+  semenType: string;
 }
 
 const semenOptions = [
@@ -50,7 +53,22 @@ const SiresPage = () => {
           if (aHas !== bHas) return aHas ? -1 : 1;
           return a.name.localeCompare(b.name);
         });
-        setSires(sortedSires);
+
+        const breederBySireId = new Map<string, string>();
+        (winnerData ?? []).forEach((winner) => {
+          if (winner.sire_id && winner.bred_by && !breederBySireId.has(winner.sire_id)) {
+            breederBySireId.set(winner.sire_id, winner.bred_by);
+          }
+        });
+
+        setSires(
+          sortedSires.map((sire) => ({
+            ...sire,
+            breederName: breederBySireId.get(sire.id) ?? null,
+            species: "Sheep",
+            semenType: "all",
+          }))
+        );
       }
       setLoading(false);
     }
@@ -59,12 +77,26 @@ const SiresPage = () => {
 
   const filtered = useMemo(() => {
     let list = [...sires];
+
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter((s) => s.name.toLowerCase().includes(q));
     }
+
+    if (species !== "All") {
+      list = list.filter((s) => s.species === species);
+    }
+
+    if (breederFilter !== "all") {
+      list = list.filter((s) => s.breederName === breederFilter);
+    }
+
+    if (semenFilter !== "all") {
+      list = list.filter((s) => s.semenType === semenFilter);
+    }
+
     return list;
-  }, [sires, search]);
+  }, [sires, search, species, breederFilter, semenFilter]);
 
   const filters: FilterDropdown[] = [
     { label: "Breeder", value: breederFilter, onChange: setBreederFilter, options: breederOptions },

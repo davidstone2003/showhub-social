@@ -71,6 +71,7 @@ export default function BreedersPage() {
 
   const filtered = useMemo(() => {
     let list = [...breeders];
+
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter((b) =>
@@ -79,13 +80,23 @@ export default function BreedersPage() {
         (b.location || "").toLowerCase().includes(q)
       );
     }
+
     if (stateFilter !== "all") {
       list = list.filter((b) => (b.location || "").toLowerCase().includes(stateFilter.toLowerCase()));
     }
+
+    if (species !== "All") {
+      const q = species.toLowerCase();
+      list = list.filter((b) => {
+        const haystack = `${b.display_name || ""} ${b.username} ${b.bio || ""}`.toLowerCase();
+        return haystack.includes(q);
+      });
+    }
+
     const tierRank = (t: string) => (t === "breeder_page" ? 0 : t === "listing" ? 1 : 2);
     list.sort((a, b) => tierRank(a.subscription_tier) - tierRank(b.subscription_tier) || b.winnerCount! - a.winnerCount!);
     return list;
-  }, [breeders, search, stateFilter]);
+  }, [breeders, search, species, stateFilter]);
 
   const isPaid = (tier: string) => tier === "breeder_page" || tier === "listing";
 
