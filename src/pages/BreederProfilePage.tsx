@@ -216,13 +216,3 @@ export default function BreederProfilePage() {
     </Layout>
   );
 }
-          {!postsLoading && posts.length === 0 && !isFeatured && (
-            <div className="text-center py-8">
-              <p className="text-sm text-muted-foreground">No posts yet</p>
-            </div>
-          )}
-        </div>
-      </div>
-    </Layout>
-  );
-}
