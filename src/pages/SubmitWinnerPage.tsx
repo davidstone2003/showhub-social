@@ -185,7 +185,7 @@ export default function SubmitWinnerPage() {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="min-h-screen bg-background pb-24">
+      <div className="min-h-screen bg-background pb-40">
         {/* Header */}
         <div className="sticky top-0 z-20 bg-card border-b border-border px-4 py-3">
           <h1 className="text-lg font-bold text-foreground">Backdrop</h1>
