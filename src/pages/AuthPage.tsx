@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { Eye, EyeOff } from "lucide-react";
@@ -13,6 +14,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [showPw, setShowPw] = useState(false);
+  const [agreedTerms, setAgreedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -111,9 +113,26 @@ export default function AuthPage() {
             </button>
           </div>
 
+          {!isLogin && (
+            <div className="flex items-start gap-2 pt-1">
+              <Checkbox
+                id="terms"
+                checked={agreedTerms}
+                onCheckedChange={(v) => setAgreedTerms(v === true)}
+                className="mt-0.5"
+              />
+              <label htmlFor="terms" className="text-xs text-muted-foreground/70 leading-snug cursor-pointer select-none">
+                I agree to the{" "}
+                <a href="/terms" target="_blank" className="underline underline-offset-2 text-primary">Terms of Use</a>{" "}
+                and{" "}
+                <a href="/privacy" target="_blank" className="underline underline-offset-2 text-primary">Privacy Policy</a>
+              </label>
+            </div>
+          )}
+
           <Button
             type="submit"
-            disabled={loading}
+            disabled={loading || (!isLogin && !agreedTerms)}
             className="w-full h-[52px] rounded-2xl text-base font-bold"
             style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--foreground))" }}
           >
