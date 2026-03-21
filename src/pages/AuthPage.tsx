@@ -51,18 +51,19 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
-      <div className="w-full max-w-sm space-y-8">
+    <div className="min-h-screen bg-primary flex flex-col items-center justify-center px-6">
+      <div className="flex justify-center mb-6">
+        <BackdropLogo size="lg" onDark />
+      </div>
+
+      <div className="w-full max-w-sm bg-card rounded-2xl shadow-lg p-8 space-y-6">
         <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <BackdropLogo size="lg" />
-          </div>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h1 className="text-xl font-bold text-card-foreground">
+            {isLogin ? "Welcome back" : "Create your breeder profile"}
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
             {isLogin ? "Sign in to your account" : "Start free. Get discovered. Upgrade anytime."}
           </p>
-          {!isLogin && (
-            <h1 className="text-xl font-bold text-foreground mt-3">Create your breeder profile</h1>
-          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -71,7 +72,7 @@ export default function AuthPage() {
               placeholder="Display Name (e.g., Stone Show Stock)"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              className="rounded-xl h-12 text-sm bg-card border-border"
+              className="rounded-xl h-12 text-sm bg-background border-border"
             />
           )}
           <Input
@@ -79,7 +80,7 @@ export default function AuthPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="rounded-xl h-12 text-sm bg-card border-border"
+            className="rounded-xl h-12 text-sm bg-background border-border"
           />
           <div className="relative">
             <Input
@@ -87,7 +88,7 @@ export default function AuthPage() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-xl h-12 text-sm bg-card border-border pr-10"
+              className="rounded-xl h-12 text-sm bg-background border-border pr-10"
             />
             <button
               type="button"
@@ -117,7 +118,7 @@ export default function AuthPage() {
           {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
           <button
             onClick={() => setIsLogin(!isLogin)}
-            className="font-semibold text-foreground hover:underline"
+            className="font-semibold text-primary hover:underline"
           >
             {isLogin ? "Sign Up" : "Sign In"}
           </button>
