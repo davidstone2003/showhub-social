@@ -69,40 +69,21 @@ export default function SubmitWinnerPage() {
     caption: string; imageUrls: string[];
   } | null>(null);
 
-  /* Facebook import state */
-  const [importOpen, setImportOpen] = useState(false);
-  const [importText, setImportText] = useState("");
-  const [importSuccess, setImportSuccess] = useState(false);
+  /* Smart Upload step */
+  const [showSmartUpload, setShowSmartUpload] = useState(true);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
-
-  const isValid = showName.trim() && shownBy.trim();
-
-  /* ── Facebook import ── */
-  const handleAutoFill = () => {
-    if (!importText.trim()) return;
-    const parsed = parseFacebookCaption(importText);
-    let filled = 0;
-    if (parsed.showName) { setShowName(parsed.showName); setShowId(null); filled++; }
-    if (parsed.winPlacing) { setWinPlacing(parsed.winPlacing); filled++; }
-    if (parsed.shownBy) { setShownBy(parsed.shownBy); filled++; }
-    if (parsed.placedBy) { setPlacedBy(parsed.placedBy); filled++; }
-    if (parsed.siredBy) { setSireName(parsed.siredBy); setSireId(null); filled++; }
-    if (parsed.dam) { setDamName(parsed.dam); filled++; }
-    if (parsed.caption) { setCaption(parsed.caption); filled++; }
-
-    if (filled > 0) {
-      setImportSuccess(true);
-      toast.success(`Auto-filled ${filled} field${filled > 1 ? "s" : ""}`, {
-        description: "Review and edit below before posting.",
-      });
-    } else {
-      setCaption(importText);
-      toast("Couldn't detect structured fields", {
-        description: "Text added as caption. Fill fields manually.",
-      });
+  const handleSmartExtracted = (fields: ExtractedFields) => {
+    if (fields.showName) { setShowName(fields.showName); setShowId(null); }
+    if (fields.winPlacing) setWinPlacing(fields.winPlacing);
+    if (fields.shownBy) setShownBy(fields.shownBy);
+    if (fields.placedBy) setPlacedBy(fields.placedBy);
+    if (fields.siredBy) { setSireName(fields.siredBy); setSireId(null); }
+    if (fields.dam) setDamName(fields.dam);
+    if (fields.caption) setCaption(fields.caption);
+    if (fields.imageFile && fields.imagePreview) {
+      setImages([{ file: fields.imageFile, preview: fields.imagePreview }]);
     }
+    setShowSmartUpload(false);
   };
 
   /* ── image handling ── */
