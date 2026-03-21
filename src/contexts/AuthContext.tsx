@@ -9,6 +9,7 @@ interface Profile {
   bio: string | null;
   logo_url: string | null;
   is_premium: boolean;
+  onboarding_completed: boolean;
 }
 
 interface AuthContextType {
