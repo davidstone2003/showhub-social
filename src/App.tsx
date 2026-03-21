@@ -17,6 +17,7 @@ import BreederProfilePage from "./pages/BreederProfilePage";
 import AdminPage from "./pages/AdminPage";
 import PricingPage from "./pages/PricingPage";
 import OnboardingPage from "./pages/OnboardingPage";
+import AccountTypePage from "./pages/AccountTypePage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
+            <Route path="/account-type" element={<AccountTypePage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

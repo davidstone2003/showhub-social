@@ -27,13 +27,16 @@ export default function AuthPage() {
       if (isLogin) {
         const { error, data } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        // Check if onboarding is completed
+        // Check account type and onboarding
         const { data: prof } = await supabase
           .from("profiles")
-          .select("onboarding_completed")
+          .select("onboarding_completed, account_type")
           .eq("id", data.user.id)
           .single();
-        if (prof && !prof.onboarding_completed) {
+        if (prof && prof.account_type === "user") {
+          // Default 'user' means they haven't picked a type yet
+          navigate("/account-type");
+        } else if (prof && !prof.onboarding_completed) {
           navigate("/onboarding");
         } else {
           navigate("/");
