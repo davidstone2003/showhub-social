@@ -51,7 +51,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-primary flex flex-col items-center justify-start px-6 pt-[18vh]">
+    <div className="min-h-screen bg-primary flex flex-col items-center justify-center px-6">
       <div className="flex justify-center mb-4">
         <BackdropLogo size="md" onDark />
       </div>
