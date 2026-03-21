@@ -137,6 +137,11 @@ export default function BreederProfilePage() {
             <UpgradeCallout variant="banner" />
           )}
 
+          {/* Contact section */}
+          {!hasContact && (
+            <LockedContact isOwner={isOwner} />
+          )}
+
           {/* ===== BREEDER PAGE (full) ===== */}
           {isFullPage && (
             <>
