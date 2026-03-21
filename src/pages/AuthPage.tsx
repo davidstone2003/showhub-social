@@ -58,8 +58,11 @@ export default function AuthPage() {
             <BackdropLogo size="lg" />
           </div>
           <p className="text-sm text-muted-foreground mt-2">
-            {isLogin ? "Sign in to your account" : "Create your breeder account"}
+            {isLogin ? "Sign in to your account" : "Start free. Get discovered. Upgrade anytime."}
           </p>
+          {!isLogin && (
+            <h1 className="text-xl font-bold text-foreground mt-3">Create your breeder profile</h1>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
