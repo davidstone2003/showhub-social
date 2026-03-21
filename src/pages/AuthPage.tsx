@@ -23,9 +23,19 @@ export default function AuthPage() {
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error, data } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        navigate("/");
+        // Check if onboarding is completed
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("onboarding_completed")
+          .eq("id", data.user.id)
+          .single();
+        if (prof && !prof.onboarding_completed) {
+          navigate("/onboarding");
+        } else {
+          navigate("/");
+        }
       } else {
         if (!displayName.trim()) {
           toast.error("Display name is required");
