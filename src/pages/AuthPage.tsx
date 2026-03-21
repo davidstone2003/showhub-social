@@ -51,28 +51,30 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-primary flex flex-col items-center justify-center px-6">
-      <div className="flex justify-center mb-6">
-        <BackdropLogo size="lg" onDark />
+    <div className="min-h-screen bg-primary flex flex-col items-center justify-start px-6 pt-[18vh]">
+      <div className="flex justify-center mb-4">
+        <BackdropLogo size="md" onDark />
       </div>
 
-      <div className="w-full max-w-sm bg-card rounded-2xl shadow-lg p-8 space-y-6">
+      <div className="w-full max-w-sm bg-card rounded-2xl shadow-xl p-7 space-y-5">
         <div className="text-center">
-          <h1 className="text-xl font-bold text-card-foreground">
+          <h1 className="text-lg font-bold text-card-foreground">
             {isLogin ? "Welcome back" : "Create your breeder profile"}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {isLogin ? "Sign in to your account" : "Start free. Get discovered. Upgrade anytime."}
-          </p>
+          {!isLogin && (
+            <p className="text-xs text-muted-foreground/70 mt-1">
+              Start free. Get discovered. Upgrade anytime.
+            </p>
+          )}
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3.5">
           {!isLogin && (
             <Input
               placeholder="Display Name (e.g., Stone Show Stock)"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              className="rounded-xl h-12 text-sm bg-background border-border"
+              className="rounded-2xl h-12 text-sm bg-background border-sand-dark"
             />
           )}
           <Input
@@ -80,7 +82,7 @@ export default function AuthPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="rounded-xl h-12 text-sm bg-background border-border"
+            className="rounded-2xl h-12 text-sm bg-background border-sand-dark"
           />
           <div className="relative">
             <Input
@@ -88,7 +90,7 @@ export default function AuthPage() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-xl h-12 text-sm bg-background border-border pr-10"
+              className="rounded-2xl h-12 text-sm bg-background border-sand-dark pr-10"
             />
             <button
               type="button"
@@ -102,23 +104,23 @@ export default function AuthPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-12 rounded-xl text-base font-bold"
+            className="w-full h-[52px] rounded-2xl text-base font-bold"
             style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--foreground))" }}
           >
             {loading ? "..." : isLogin ? "Sign In" : "Create Free Profile"}
           </Button>
           {!isLogin && (
-            <p className="text-[11px] text-muted-foreground text-center">
+            <p className="text-[11px] text-muted-foreground/60 text-center">
               No credit card required
             </p>
           )}
         </form>
 
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="text-center text-sm text-muted-foreground pt-1">
           {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
           <button
             onClick={() => setIsLogin(!isLogin)}
-            className="font-semibold text-primary hover:underline"
+            className="font-semibold text-primary underline underline-offset-2"
           >
             {isLogin ? "Sign Up" : "Sign In"}
           </button>
