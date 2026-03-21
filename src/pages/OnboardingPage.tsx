@@ -12,7 +12,7 @@ import { MapPin, Camera, ArrowRight } from "lucide-react";
 export default function OnboardingPage() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
+  const [saving, setSaving] = useState(false);
   const [location, setLocation] = useState("");
   const [bio, setBio] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
