@@ -8,6 +8,15 @@ import { toast } from "sonner";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { Eye, EyeOff } from "lucide-react";
 
+const accountTypes = [
+  { id: "general", label: "General User" },
+  { id: "exhibitor", label: "Exhibitor" },
+  { id: "breeder", label: "Breeder" },
+  { id: "vendor", label: "Vendor" },
+] as const;
+
+type AccountTypeId = (typeof accountTypes)[number]["id"];
+
 export default function AuthPage() {
   const [searchParams] = useSearchParams();
   const [isLogin, setIsLogin] = useState(searchParams.get("mode") !== "signup");
@@ -16,8 +25,16 @@ export default function AuthPage() {
   const [displayName, setDisplayName] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [agreedTerms, setAgreedTerms] = useState(false);
+  const [accountType, setAccountType] = useState<AccountTypeId | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const signupReady =
+    displayName.trim() &&
+    email.trim() &&
+    password.trim() &&
+    agreedTerms &&
+    accountType !== null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +45,6 @@ export default function AuthPage() {
       if (isLogin) {
         const { error, data } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        // Check account type and onboarding
         const { data: prof } = await supabase
           .from("profiles")
           .select("onboarding_completed, account_type")
@@ -51,11 +67,16 @@ export default function AuthPage() {
           setLoading(false);
           return;
         }
-        const { error } = await supabase.auth.signUp({
+        if (!accountType) {
+          toast.error("Please select an account type");
+          setLoading(false);
+          return;
+        }
+        const { error, data } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: { display_name: displayName.trim() },
+            data: { display_name: displayName.trim(), account_type: accountType },
             emailRedirectTo: window.location.origin,
           },
         });
@@ -121,6 +142,31 @@ export default function AuthPage() {
           </div>
 
           {!isLogin && (
+            <div className="space-y-2 pt-1">
+              <p className="text-xs font-semibold text-card-foreground">I am a:</p>
+              <div className="flex flex-wrap gap-2">
+                {accountTypes.map((t) => {
+                  const selected = accountType === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setAccountType(t.id)}
+                      className={`rounded-full px-3.5 py-1.5 text-xs font-medium border transition-colors ${
+                        selected
+                          ? "bg-primary/10 border-primary text-primary font-semibold"
+                          : "bg-background border-border text-muted-foreground hover:border-primary/40"
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {!isLogin && (
             <div className="flex items-start gap-2 pt-1">
               <Checkbox
                 id="terms"
@@ -139,7 +185,7 @@ export default function AuthPage() {
 
           <Button
             type="submit"
-            disabled={loading || (!isLogin && !agreedTerms)}
+            disabled={loading || (!isLogin && !signupReady)}
             className="w-full h-[52px] rounded-2xl text-base font-bold"
             style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--foreground))" }}
           >
