@@ -11,6 +11,7 @@ import { BreederHero } from "@/components/breeder/BreederHero";
 import { BreederSection } from "@/components/breeder/BreederSection";
 import { LockedSection } from "@/components/breeder/LockedSection";
 import { UpgradeCallout } from "@/components/breeder/UpgradeCallout";
+import { LockedContact } from "@/components/upgrade/LockedContact";
 import type { Post } from "@/data/mock";
 
 type WinnerRow = {
@@ -90,6 +91,7 @@ export default function BreederProfilePage() {
   const isFullPage = tier === "breeder_page";
   const isListing = tier === "listing";
   const isOwner = !!user && profile?.id === user.id;
+  const hasContact = tier === "contacted" || tier === "featured" || isFullPage;
 
   const featured = posts.filter((p) => p.is_featured);
   const winners = posts.filter((p) => p.post_type === "winner");
@@ -133,6 +135,11 @@ export default function BreederProfilePage() {
           {/* Owner upgrade banner */}
           {isOwner && !isFullPage && (
             <UpgradeCallout variant="banner" />
+          )}
+
+          {/* Contact section */}
+          {!hasContact && (
+            <LockedContact isOwner={isOwner} />
           )}
 
           {/* ===== BREEDER PAGE (full) ===== */}

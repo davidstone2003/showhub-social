@@ -15,6 +15,7 @@ import SubmitWinnerPage from "./pages/SubmitWinnerPage";
 import AuthPage from "./pages/AuthPage";
 import BreederProfilePage from "./pages/BreederProfilePage";
 import AdminPage from "./pages/AdminPage";
+import PricingPage from "./pages/PricingPage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/submit" element={<SubmitWinnerPage />} />
             <Route path="/breeder/:username" element={<BreederProfilePage />} />
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
