@@ -12,6 +12,8 @@ import { BreederSection } from "@/components/breeder/BreederSection";
 import { LockedSection } from "@/components/breeder/LockedSection";
 import { UpgradeCallout } from "@/components/breeder/UpgradeCallout";
 import { LockedContact } from "@/components/upgrade/LockedContact";
+import { DirectoryHint } from "@/components/upgrade/DirectoryHint";
+import { InsightsTeaser } from "@/components/upgrade/InsightsTeaser";
 import type { Post } from "@/data/mock";
 
 type WinnerRow = {
@@ -88,17 +90,16 @@ export default function BreederProfilePage() {
   });
 
   const tier: string = profile?.subscription_tier || "free";
-  const isFullPage = tier === "breeder_page";
-  const isListing = tier === "listing";
+  const isFeatured = tier === "featured" || tier === "breeder_page";
   const isOwner = !!user && profile?.id === user.id;
-  const hasContact = tier === "contacted" || tier === "featured" || isFullPage;
+  const hasContact = tier === "contacted" || isFeatured;
 
   const featured = posts.filter((p) => p.is_featured);
   const winners = posts.filter((p) => p.post_type === "winner");
   const sires = posts.filter((p) => p.post_type === "sire");
   const donors = posts.filter((p) => p.post_type === "donor");
   const sales = posts.filter((p) => p.post_type === "sale");
-  const recentPosts = posts.slice(0, isFullPage ? 10 : 3);
+  const recentPosts = posts.slice(0, isFeatured ? 10 : 3);
 
   if (profileLoading) {
     return (
@@ -127,23 +128,67 @@ export default function BreederProfilePage() {
       <div className="min-h-screen bg-background pb-24">
         <BreederHero
           profile={profile}
-          isFullPage={isFullPage}
-          stats={isFullPage ? { winners: winners.length, sires: sires.length, posts: posts.length } : undefined}
+          tier={tier}
+          stats={isFeatured ? { winners: winners.length, sires: sires.length, posts: posts.length } : undefined}
         />
 
         <div className="max-w-2xl mx-auto px-4 py-5 space-y-6">
-          {/* Owner upgrade banner */}
-          {isOwner && !isFullPage && (
-            <UpgradeCallout variant="banner" />
+
+          {/* ===== FREE TIER ===== */}
+          {tier === "free" && (
+            <>
+              {/* Locked contact */}
+              <LockedContact isOwner={isOwner} />
+
+              {/* Owner insights teaser */}
+              {isOwner && (
+                <InsightsTeaser profileViews={12} hasContact={false} />
+              )}
+
+              {/* Recent Posts (max 3) */}
+              {recentPosts.length > 0 && (
+                <BreederSection icon={Activity} title="Recent Posts">
+                  {recentPosts.map((post, i) => (
+                    <PostCard key={post.id} post={toPost(post)} index={i} />
+                  ))}
+                </BreederSection>
+              )}
+
+              {/* Locked preview sections */}
+              <LockedSection icon={Trophy} title="Winners" count={winners.length || 3} isOwner={isOwner} />
+              <LockedSection icon={Dna} title="Sires" count={sires.length || 2} isOwner={isOwner} />
+              <LockedSection icon={Dna} title="Donors / Genetics" count={donors.length || 2} isOwner={isOwner} />
+              <LockedSection icon={ShoppingBag} title="Sales / Available" count={sales.length || 2} isOwner={isOwner} />
+
+              <UpgradeCallout variant="listing" />
+            </>
           )}
 
-          {/* Contact section */}
-          {!hasContact && (
-            <LockedContact isOwner={isOwner} />
+          {/* ===== CONTACTED TIER ($9.99) ===== */}
+          {tier === "contacted" && (
+            <>
+              {/* Owner: directory visibility hint */}
+              {isOwner && <DirectoryHint />}
+
+              {recentPosts.length > 0 && (
+                <BreederSection icon={Activity} title="Recent Posts">
+                  {recentPosts.map((post, i) => (
+                    <PostCard key={post.id} post={toPost(post)} index={i} />
+                  ))}
+                </BreederSection>
+              )}
+
+              <LockedSection icon={Trophy} title="Winners" count={winners.length || 3} isOwner={isOwner} />
+              <LockedSection icon={Dna} title="Sires" count={sires.length || 2} isOwner={isOwner} />
+              <LockedSection icon={Dna} title="Donors / Genetics" count={donors.length || 2} isOwner={isOwner} />
+              <LockedSection icon={ShoppingBag} title="Sales / Available" count={sales.length || 2} isOwner={isOwner} />
+
+              <UpgradeCallout variant="listing" />
+            </>
           )}
 
-          {/* ===== BREEDER PAGE (full) ===== */}
-          {isFullPage && (
+          {/* ===== FEATURED / BREEDER PAGE TIER ($24.99) ===== */}
+          {isFeatured && (
             <>
               {featured.length > 0 && (
                 <BreederSection icon={Star} title="Featured">
@@ -195,29 +240,6 @@ export default function BreederProfilePage() {
             </>
           )}
 
-          {/* ===== LISTING PAGE ===== */}
-          {(isListing || tier === "free") && (
-            <>
-              {/* Recent Posts Preview (max 3) */}
-              {recentPosts.length > 0 && (
-                <BreederSection icon={Activity} title="Recent Posts">
-                  {recentPosts.map((post, i) => (
-                    <PostCard key={post.id} post={toPost(post)} index={i} />
-                  ))}
-                </BreederSection>
-              )}
-
-              {/* Locked preview sections */}
-              <LockedSection icon={Trophy} title="Winners" count={winners.length || 3} isOwner={isOwner} />
-              <LockedSection icon={Dna} title="Sires" count={sires.length || 2} isOwner={isOwner} />
-              <LockedSection icon={Dna} title="Donors / Genetics" count={donors.length || 2} isOwner={isOwner} />
-              <LockedSection icon={ShoppingBag} title="Sales / Available" count={sales.length || 2} isOwner={isOwner} />
-
-              {/* Upgrade CTA */}
-              <UpgradeCallout variant="listing" />
-            </>
-          )}
-
           {postsLoading && (
             <div className="space-y-3">
               <Skeleton className="h-48 w-full rounded-xl" />
@@ -225,7 +247,7 @@ export default function BreederProfilePage() {
             </div>
           )}
 
-          {!postsLoading && posts.length === 0 && !isFullPage && (
+          {!postsLoading && posts.length === 0 && !isFeatured && (
             <div className="text-center py-8">
               <p className="text-sm text-muted-foreground">No posts yet</p>
             </div>
