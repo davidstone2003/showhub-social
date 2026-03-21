@@ -59,7 +59,7 @@ export default function OnboardingPage() {
         .eq("id", user.id);
       if (error) throw error;
 
-      setStep(2);
+      navigate("/pricing?onboarding=true");
     } catch (err: any) {
       toast.error(err.message || "Could not save profile");
     } finally {
