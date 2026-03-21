@@ -79,7 +79,7 @@ export default function PricingPage() {
                         {plan.name}
                       </span>
                       {plan.popular && (
-                        <span className="text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground px-2 py-0.5 rounded-full leading-normal inline-flex items-center">
                           Most Popular
                         </span>
                       )}
