@@ -104,7 +104,7 @@ export default function SirePage() {
           <div className="px-3 pb-5">
             <SireCard
               name={sire.name}
-              image="/placeholder.svg"
+              image={sire.name === "Goose" ? gooseImage : "/placeholder.svg"}
               sireName={sire.name === "Goose" ? "Chief" : undefined}
               damName={sire.name === "Goose" ? "Top Tier" : undefined}
               breederName={sire.name === "Goose" ? "Nothdurft Livestock" : "Unknown"}
