@@ -35,18 +35,20 @@ function FilterMenu({ filter }: { filter: FilterDropdown }) {
   useEffect(() => {
     if (!open) return;
 
-    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+    const handlePointerDown = (event: MouseEvent) => {
       if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
         setOpen(false);
       }
     };
 
-    document.addEventListener("mousedown", handlePointerDown);
-    document.addEventListener("touchstart", handlePointerDown);
+    // Delay listener attachment to avoid catching the same click that opened
+    const timer = setTimeout(() => {
+      document.addEventListener("mousedown", handlePointerDown);
+    }, 0);
 
     return () => {
+      clearTimeout(timer);
       document.removeEventListener("mousedown", handlePointerDown);
-      document.removeEventListener("touchstart", handlePointerDown);
     };
   }, [open]);
 
