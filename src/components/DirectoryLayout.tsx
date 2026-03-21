@@ -1,13 +1,6 @@
-import { ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { Search, ChevronDown, Check } from "lucide-react";
 import { Layout } from "@/components/Layout";
-import { useIsMobile } from "@/hooks/use-mobile";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
 
 const speciesOptions = ["All", "Sheep", "Goats", "Cattle", "Pigs"] as const;
 export type Species = (typeof speciesOptions)[number];
@@ -44,117 +37,90 @@ function FilterMenu({
   onOpenChange: (next: boolean) => void;
   onClose: () => void;
 }) {
-  const isMobile = useIsMobile();
   const rootRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const [triggerWidth, setTriggerWidth] = useState<number | undefined>(undefined);
 
   const selectedLabel = filter.options.find((option) => option.value === filter.value)?.label ?? filter.label;
 
-  useEffect(() => {
-    if (!open || isMobile) return;
+  const stableClose = useCallback(() => onClose(), [onClose]);
 
-    const handlePointerDown = (event: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
-        onClose();
+  useEffect(() => {
+    if (!open) return;
+
+    const handleDown = (e: MouseEvent | TouchEvent) => {
+      const target = "touches" in e ? (e as TouchEvent).target : (e as MouseEvent).target;
+      if (rootRef.current && !rootRef.current.contains(target as Node)) {
+        stableClose();
       }
     };
 
-    const timer = setTimeout(() => {
-      document.addEventListener("mousedown", handlePointerDown);
-    }, 0);
+    const raf = requestAnimationFrame(() => {
+      document.addEventListener("mousedown", handleDown, true);
+      document.addEventListener("touchstart", handleDown, true);
+    });
 
     return () => {
-      clearTimeout(timer);
-      document.removeEventListener("mousedown", handlePointerDown);
+      cancelAnimationFrame(raf);
+      document.removeEventListener("mousedown", handleDown, true);
+      document.removeEventListener("touchstart", handleDown, true);
     };
-  }, [isMobile, onClose, open]);
+  }, [open, stableClose]);
 
   useEffect(() => {
-    if (!open || isMobile) return;
-
-    const closeMenu = () => onClose();
-
-    window.addEventListener("scroll", closeMenu, true);
-    window.addEventListener("resize", closeMenu);
-
-    return () => {
-      window.removeEventListener("scroll", closeMenu, true);
-      window.removeEventListener("resize", closeMenu);
-    };
-  }, [isMobile, onClose, open]);
-
-  useLayoutEffect(() => {
-    const updateWidth = () => {
-      if (triggerRef.current) {
-        setTriggerWidth(triggerRef.current.offsetWidth);
-      }
-    };
-
-    updateWidth();
-    window.addEventListener("resize", updateWidth);
-
-    return () => window.removeEventListener("resize", updateWidth);
-  }, [selectedLabel, isMobile]);
-
-  const optionButtons = filter.options.map((option, index) => {
-    const isSelected = option.value === filter.value;
-
-    return (
-      <button
-        key={option.value}
-        type="button"
-        onClick={() => {
-          filter.onChange(option.value);
-          onClose();
-        }}
-        className={`flex w-full items-center justify-between px-3 py-2 text-left text-[11px] transition-colors ${
-          isSelected
-            ? "bg-muted font-semibold text-foreground"
-            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-        } ${index > 0 ? "border-t border-border/60" : ""}`}
-      >
-        <span className="truncate">{option.label}</span>
-        {isSelected ? <Check className="ml-2 h-3.5 w-3.5 shrink-0 text-primary" /> : null}
-      </button>
-    );
-  });
+    if (!open) return;
+    const close = () => stableClose();
+    window.addEventListener("scroll", close, true);
+    return () => window.removeEventListener("scroll", close, true);
+  }, [open, stableClose]);
 
   return (
     <div ref={rootRef} className="relative shrink-0">
       <button
-        ref={triggerRef}
         type="button"
         onClick={() => onOpenChange(!open)}
         aria-expanded={open}
         aria-haspopup="listbox"
-        className="h-8 rounded-2xl border border-border bg-background px-3 text-[11px] font-medium text-foreground shadow-sm transition-colors hover:bg-muted/40 focus:outline-none focus:ring-2 focus:ring-ring"
+        className={`h-7 rounded-full px-2.5 text-[11px] font-medium transition-colors focus:outline-none ${
+          open
+            ? "bg-primary text-primary-foreground"
+            : "bg-muted text-foreground hover:bg-muted/80"
+        }`}
       >
         <span className="flex items-center gap-1">
           <span className="truncate">{selectedLabel}</span>
-          <ChevronDown className={`h-3 w-3 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+          <ChevronDown className={`h-3 w-3 shrink-0 transition-transform ${open ? "rotate-180 text-primary-foreground/70" : "text-muted-foreground"}`} />
         </span>
       </button>
 
-      {isMobile ? (
-        <Drawer open={open} onOpenChange={onOpenChange} shouldScaleBackground={false}>
-          <DrawerContent className="max-h-[60vh] rounded-t-[24px] px-0 pb-4">
-            <DrawerHeader className="px-4 pb-2 pt-3 text-left">
-              <DrawerTitle className="text-sm font-semibold text-foreground">{filter.label}</DrawerTitle>
-            </DrawerHeader>
-            <div className="overflow-hidden border-y border-border bg-background">
-              {optionButtons}
-            </div>
-          </DrawerContent>
-        </Drawer>
-      ) : open ? (
+      {open && (
         <div
-          className="absolute left-0 top-[calc(100%+2px)] z-50 overflow-hidden rounded-2xl border border-border bg-background shadow-sm animate-in fade-in-0 zoom-in-95 duration-100"
-          style={{ width: triggerWidth }}
+          role="listbox"
+          className="absolute left-0 top-[calc(100%+3px)] z-50 min-w-[140px] overflow-hidden rounded-xl bg-[hsl(var(--primary)/0.95)] shadow-lg ring-1 ring-white/10 backdrop-blur-sm"
         >
-          {optionButtons}
+          {filter.options.map((option) => {
+            const isSelected = option.value === filter.value;
+            return (
+              <button
+                key={option.value}
+                role="option"
+                aria-selected={isSelected}
+                type="button"
+                onClick={() => {
+                  filter.onChange(option.value);
+                  stableClose();
+                }}
+                className={`flex w-full items-center justify-between px-3 py-2 text-[11px] transition-colors ${
+                  isSelected
+                    ? "bg-white/20 font-semibold text-white"
+                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                <span className="truncate">{option.label}</span>
+                {isSelected && <Check className="ml-2 h-3 w-3 shrink-0 text-white" />}
+              </button>
+            );
+          })}
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
