@@ -126,6 +126,7 @@ export type Database = {
           is_premium: boolean
           location: string | null
           logo_url: string | null
+          onboarding_completed: boolean
           phone: string | null
           subscription_tier: string
           tagline: string | null
@@ -143,6 +144,7 @@ export type Database = {
           is_premium?: boolean
           location?: string | null
           logo_url?: string | null
+          onboarding_completed?: boolean
           phone?: string | null
           subscription_tier?: string
           tagline?: string | null
@@ -160,6 +162,7 @@ export type Database = {
           is_premium?: boolean
           location?: string | null
           logo_url?: string | null
+          onboarding_completed?: boolean
           phone?: string | null
           subscription_tier?: string
           tagline?: string | null
