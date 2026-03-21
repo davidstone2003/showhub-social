@@ -58,8 +58,11 @@ export default function AuthPage() {
             <BackdropLogo size="lg" />
           </div>
           <p className="text-sm text-muted-foreground mt-2">
-            {isLogin ? "Sign in to your account" : "Create your breeder account"}
+            {isLogin ? "Sign in to your account" : "Start free. Get discovered. Upgrade anytime."}
           </p>
+          {!isLogin && (
+            <h1 className="text-xl font-bold text-foreground mt-3">Create your breeder profile</h1>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -101,8 +104,13 @@ export default function AuthPage() {
             className="w-full h-12 rounded-xl text-base font-bold"
             style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--foreground))" }}
           >
-            {loading ? "..." : isLogin ? "Sign In" : "Create Account"}
+            {loading ? "..." : isLogin ? "Sign In" : "Create Free Profile"}
           </Button>
+          {!isLogin && (
+            <p className="text-[11px] text-muted-foreground text-center">
+              No credit card required
+            </p>
+          )}
         </form>
 
         <p className="text-center text-sm text-muted-foreground">
