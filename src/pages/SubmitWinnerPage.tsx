@@ -70,7 +70,7 @@ export default function SubmitWinnerPage() {
   } | null>(null);
 
   /* Smart Upload step */
-  const [showSmartUpload, setShowSmartUpload] = useState(true);
+  const [showSmartUpload, setShowSmartUpload] = useState(false);
 
   const handleSmartExtracted = (fields: ExtractedFields) => {
     if (fields.showName) { setShowName(fields.showName); setShowId(null); }
