@@ -56,10 +56,10 @@ export default function PricingPage() {
       <div className="min-h-screen bg-background pb-24">
         <div className="max-w-lg mx-auto px-4 pt-10 pb-6">
           <h1 className="text-2xl font-bold text-foreground text-center">
-            Choose your plan
+            Join the Show Stock Network
           </h1>
           <p className="text-sm text-muted-foreground text-center mt-2">
-            You can upgrade or change anytime
+            Create your profile. Upgrade anytime.
           </p>
 
           <div className="mt-8 space-y-3">
