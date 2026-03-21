@@ -11,6 +11,7 @@ import { BreederHero } from "@/components/breeder/BreederHero";
 import { BreederSection } from "@/components/breeder/BreederSection";
 import { LockedSection } from "@/components/breeder/LockedSection";
 import { UpgradeCallout } from "@/components/breeder/UpgradeCallout";
+import { LockedContact } from "@/components/upgrade/LockedContact";
 import type { Post } from "@/data/mock";
 
 type WinnerRow = {

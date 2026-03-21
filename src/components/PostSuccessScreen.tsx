@@ -193,6 +193,7 @@ export default function PostSuccessScreen({ data }: { data: WinData }) {
             </div>
           )}
         </div>
+        <PostListingUpsell />
       </div>
 
       {/* Back to feed */}
