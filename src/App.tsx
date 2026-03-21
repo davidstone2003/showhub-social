@@ -15,6 +15,7 @@ import SubmitWinnerPage from "./pages/SubmitWinnerPage";
 import AuthPage from "./pages/AuthPage";
 import BreederProfilePage from "./pages/BreederProfilePage";
 import AdminPage from "./pages/AdminPage";
+import PricingPage from "./pages/PricingPage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
