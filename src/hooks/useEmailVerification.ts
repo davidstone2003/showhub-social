@@ -1,23 +1,24 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "sonner";
 
 export function useEmailVerification() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [showVerifyModal, setShowVerifyModal] = useState(false);
 
-  const isVerified = !!user?.email_confirmed_at;
+  const isVerified = profile?.email_verified ?? false;
 
-  const requireVerification = (): boolean => {
+  const requireVerification = useCallback((): boolean => {
     if (!user) return false;
     if (isVerified) return false;
     setShowVerifyModal(true);
     return true; // blocked
-  };
+  }, [user, isVerified]);
 
   const resendVerification = async () => {
     if (!user?.email) return;
+    // Send a magic link as a verification mechanism
     const { error } = await supabase.auth.resend({
       type: "signup",
       email: user.email,

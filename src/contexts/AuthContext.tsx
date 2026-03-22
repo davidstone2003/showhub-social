@@ -13,6 +13,7 @@ interface Profile {
   is_premium: boolean;
   onboarding_completed: boolean;
   account_type: string;
+  email_verified: boolean;
 }
 
 interface AuthContextType {
