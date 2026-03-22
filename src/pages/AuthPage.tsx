@@ -174,12 +174,20 @@ export default function AuthPage() {
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
           {!isLogin && (
-            <Input
-              placeholder="Display Name (e.g., Stone Show Stock)"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              className="rounded-2xl h-12 text-sm bg-background border-sand-dark"
-            />
+            <div className="flex gap-2">
+              <Input
+                placeholder="First Name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="rounded-2xl h-12 text-sm bg-background border-sand-dark"
+              />
+              <Input
+                placeholder="Last Name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="rounded-2xl h-12 text-sm bg-background border-sand-dark"
+              />
+            </div>
           )}
           <Input
             type="email"
