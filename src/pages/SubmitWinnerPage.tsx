@@ -232,6 +232,15 @@ export default function SubmitWinnerPage() {
             />
           </div>
 
+          {/* Post As Identity */}
+          {user && (
+            <IdentitySelector
+              value={postedAsBreederId}
+              onChange={setPostedAsBreederId}
+              postType={postType}
+            />
+          )}
+
           {/* Photo Upload */}
           <PhotoUpload
             images={images}
