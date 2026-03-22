@@ -10,6 +10,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AdminFlagModal } from "@/components/AdminFlagModal";
 import { BreederIdentity } from "@/components/BreederIdentity";
 import { AuthGate } from "@/components/AuthGate";
+import { useEmailVerification } from "@/hooks/useEmailVerification";
+import { VerifyEmailModal } from "@/components/VerifyEmailModal";
 
 interface PostCardProps {
   post: Post & { status?: string; user_id?: string | null };
