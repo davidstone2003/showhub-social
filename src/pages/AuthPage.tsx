@@ -45,8 +45,17 @@ function IntentScreen({ onBack }: { onBack?: () => void }) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col px-5 pt-20 pb-10">
+    <div className="min-h-screen bg-background flex flex-col px-5 pt-12 pb-10">
       <div className="w-full max-w-sm mx-auto space-y-8">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </button>
+        )}
         <div className="text-center space-y-2">
           <div className="flex justify-center mb-6">
             <BackdropLogo size="md" />
