@@ -2,6 +2,7 @@ import { DesktopSidebar } from "./DesktopSidebar";
 import { MobileNav } from "./MobileNav";
 import { MobileHeader } from "./MobileHeader";
 import { DiscoveryPanel } from "./DiscoveryPanel";
+import { VerifyEmailBanner } from "./VerifyEmailBanner";
 
 interface LayoutProps {
   children: React.ReactNode;
