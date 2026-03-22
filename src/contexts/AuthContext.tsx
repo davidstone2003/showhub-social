@@ -6,6 +6,8 @@ interface Profile {
   id: string;
   username: string;
   display_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
   bio: string | null;
   logo_url: string | null;
   is_premium: boolean;
