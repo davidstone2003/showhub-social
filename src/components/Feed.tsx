@@ -26,27 +26,60 @@ export function Feed() {
         if (userIds.length > 0) {
           const { data: profiles } = await supabase
             .from('profiles')
-            .select('id, display_name, username, logo_url, location, subscription_tier')
+            .select('id, display_name, first_name, last_name, username, logo_url, location, subscription_tier')
             .in('id', userIds);
           if (profiles) {
             profilesMap = Object.fromEntries(profiles.map(p => [p.id, p]));
           }
         }
 
+        // Fetch breeder_profiles for posts that have posted_as_breeder_id
+        const breederIds = [...new Set(data.filter(w => w.posted_as_breeder_id).map(w => w.posted_as_breeder_id as string))];
+        let breederProfilesMap: Record<string, any> = {};
+        if (breederIds.length > 0) {
+          const { data: bps } = await supabase
+            .from('breeder_profiles')
+            .select('id, breeder_name, breeder_slug, logo_url, location')
+            .in('id', breederIds);
+          if (bps) {
+            breederProfilesMap = Object.fromEntries(bps.map(bp => [bp.id, bp]));
+          }
+        }
+
         const mapped: Post[] = data.map((w: any) => {
           const profile = w.user_id ? profilesMap[w.user_id] : null;
-          const breederName = w.bred_by || profile?.display_name || profile?.username || w.shown_by;
-          const breederSlug = profile?.username;
-          const isPro = profile?.subscription_tier === 'breeder_page' || profile?.subscription_tier === 'listing';
+          const bp = w.posted_as_breeder_id ? breederProfilesMap[w.posted_as_breeder_id] : null;
+
+          // If posted as breeder, use breeder profile identity
+          let breederName: string;
+          let breederSlug: string | undefined;
+          let breederLogo: string;
+          let breederLocation: string;
+          let isPro: boolean;
+
+          if (bp) {
+            breederName = bp.breeder_name;
+            breederSlug = bp.breeder_slug;
+            breederLogo = bp.logo_url || profile?.logo_url || "";
+            breederLocation = bp.location || profile?.location || "";
+            isPro = true; // posted as breeder = treat as pro
+          } else {
+            const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ");
+            breederName = w.bred_by || fullName || profile?.display_name || profile?.username || w.shown_by;
+            breederSlug = profile?.username;
+            breederLogo = profile?.logo_url || "";
+            breederLocation = profile?.location || "";
+            isPro = profile?.subscription_tier === 'breeder_page' || profile?.subscription_tier === 'listing';
+          }
 
           return {
             id: w.id,
             image: w.image_urls?.[0] || "/placeholder.svg",
             breeder: {
-              id: profile?.id || "unknown",
+              id: bp?.id || profile?.id || "unknown",
               name: breederName,
-              location: profile?.location || "",
-              logo: profile?.logo_url || "",
+              location: breederLocation,
+              logo: breederLogo,
               is_pro: isPro,
               slug: breederSlug,
             },
