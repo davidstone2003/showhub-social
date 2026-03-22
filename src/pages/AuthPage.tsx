@@ -108,6 +108,11 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [showPw, setShowPw] = useState(false);
+  const [agreedTerms, setAgreedTerms] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showIntent, setShowIntent] = useState(false);
+  const navigate = useNavigate();
 
   const signupReady =
     firstName.trim() &&
