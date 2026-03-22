@@ -27,12 +27,14 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const [showAuthGate, setShowAuthGate] = useState(false);
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
+  const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
 
   const handleLike = () => {
     if (!user) {
       setShowAuthGate(true);
       return;
     }
+    if (requireVerification()) return;
     setLiked(!liked);
     setLikeCount((c) => (liked ? c - 1 : c + 1));
   };
