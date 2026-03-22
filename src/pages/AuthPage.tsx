@@ -85,7 +85,8 @@ export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(searchParams.get("mode") !== "signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -93,7 +94,8 @@ export default function AuthPage() {
   const navigate = useNavigate();
 
   const signupReady =
-    displayName.trim() &&
+    firstName.trim() &&
+    lastName.trim() &&
     email.trim() &&
     password.trim() &&
     agreedTerms;
