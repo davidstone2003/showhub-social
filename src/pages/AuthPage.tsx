@@ -169,8 +169,15 @@ export default function AuthPage() {
         });
         if (error) throw error;
         toast.success("Check your email to confirm your account, then sign in.");
-        setIsLogin(true);
+        sessionStorage.removeItem("signup_first");
+        sessionStorage.removeItem("signup_last");
+        sessionStorage.removeItem("signup_email");
+        setFirstName("");
+        setLastName("");
+        setEmail("");
         setPassword("");
+        setAgreedTerms(false);
+        setIsLogin(true);
       }
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");
