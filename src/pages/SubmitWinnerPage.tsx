@@ -11,6 +11,7 @@ import { AutocompleteInput } from "@/components/AutocompleteInput";
 import { PostTypeSelector, getDefaultToggles } from "@/components/PostTypeSelector";
 import type { PostType } from "@/components/PostTypeSelector";
 import { Camera, X, ImagePlus, Heart, MessageCircle, LogIn, Sparkles } from "lucide-react";
+import { IdentitySelector } from "@/components/IdentitySelector";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import PostSuccessScreen from "@/components/PostSuccessScreen";
