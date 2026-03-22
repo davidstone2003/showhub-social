@@ -6,13 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { BackdropLogo } from "@/components/RinglyLogo";
-import { Eye, EyeOff, Trophy, Search, Megaphone, ShoppingBag } from "lucide-react";
+import { Eye, EyeOff, Tractor, Award, Store, Heart } from "lucide-react";
 
-const intentOptions = [
-  { id: "exhibitor", label: "Post a Win", icon: Trophy, accountType: "exhibitor" },
-  { id: "general", label: "Find Winners", icon: Search, accountType: "general" },
-  { id: "breeder", label: "Promote My Program", icon: Megaphone, accountType: "breeder" },
-  { id: "vendor", label: "Sell Livestock", icon: ShoppingBag, accountType: "vendor" },
+const roleOptions = [
+  { id: "breeder", label: "Breeder", description: "Promote your program, sires, and winners", icon: Tractor, accountType: "breeder" },
+  { id: "exhibitor", label: "Exhibitor", description: "Post wins and build your record", icon: Award, accountType: "exhibitor" },
+  { id: "vendor", label: "Vendor", description: "Sell agricultural / livestock products and services", icon: Store, accountType: "vendor" },
+  { id: "fan", label: "Fan", description: "Follow shows, breeders, and results", icon: Heart, accountType: "general" },
 ] as const;
 
 function IntentScreen() {
@@ -32,6 +32,8 @@ function IntentScreen() {
 
       if (accountType === "breeder" || accountType === "vendor") {
         navigate("/onboarding");
+      } else if (accountType === "exhibitor") {
+        navigate("/submit");
       } else {
         navigate("/");
       }
@@ -50,15 +52,15 @@ function IntentScreen() {
             <BackdropLogo size="md" />
           </div>
           <h1 className="text-xl font-bold text-foreground">
-            What brings you here?
+            How do you use Backdrop?
           </h1>
           <p className="text-sm text-muted-foreground">
-            We'll personalize your experience
+            Pick what fits best. You can change this anytime.
           </p>
         </div>
 
         <div className="space-y-3">
-          {intentOptions.map((opt) => {
+          {roleOptions.map((opt) => {
             const Icon = opt.icon;
             return (
               <button
@@ -70,7 +72,10 @@ function IntentScreen() {
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                   <Icon className="w-5 h-5 text-primary" />
                 </div>
-                <span className="text-sm font-semibold text-foreground">{opt.label}</span>
+                <div className="flex-1 min-w-0">
+                  <span className="text-sm font-semibold text-foreground block">{opt.label}</span>
+                  <span className="text-xs text-muted-foreground">{opt.description}</span>
+                </div>
               </button>
             );
           })}
