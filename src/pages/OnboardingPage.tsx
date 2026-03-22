@@ -19,6 +19,8 @@ function slugify(text: string) {
 export default function OnboardingPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isVendor = searchParams.get("type") === "vendor";
   const [breederName, setBreederName] = useState("");
   const [location, setLocation] = useState("");
   const [bio, setBio] = useState("");
