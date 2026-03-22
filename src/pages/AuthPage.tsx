@@ -159,7 +159,7 @@ export default function AuthPage() {
           setLoading(false);
           return;
         }
-        const { error } = await supabase.auth.signUp({
+        const { error, data } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -168,9 +168,13 @@ export default function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Check your email to confirm your account, then sign in.");
-        setIsLogin(true);
-        setPassword("");
+        if (data.user) {
+          setShowIntent(true);
+        } else {
+          toast.success("Check your email to confirm your account, then sign in.");
+          setIsLogin(true);
+          setPassword("");
+        }
       }
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");
