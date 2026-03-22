@@ -168,8 +168,9 @@ export default function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Check your email to confirm your account");
-        setShowIntent(true);
+        toast.success("Check your email to confirm your account, then sign in.");
+        setIsLogin(true);
+        setPassword("");
       }
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");
