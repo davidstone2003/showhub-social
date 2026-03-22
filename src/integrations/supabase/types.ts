@@ -153,6 +153,7 @@ export type Database = {
           bio: string | null
           created_at: string
           display_name: string | null
+          email_verified: boolean
           facebook_url: string | null
           first_name: string | null
           hero_image_url: string | null
@@ -174,6 +175,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          email_verified?: boolean
           facebook_url?: string | null
           first_name?: string | null
           hero_image_url?: string | null
@@ -195,6 +197,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          email_verified?: boolean
           facebook_url?: string | null
           first_name?: string | null
           hero_image_url?: string | null
