@@ -9,9 +9,17 @@ import { BackdropLogo } from "@/components/RinglyLogo";
 import { toast } from "sonner";
 import { MapPin, Camera, ArrowRight } from "lucide-react";
 
+function slugify(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 export default function OnboardingPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [breederName, setBreederName] = useState("");
   const [location, setLocation] = useState("");
   const [bio, setBio] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -27,7 +35,7 @@ export default function OnboardingPage() {
   };
 
   const handleSubmit = async () => {
-    if (!user) return;
+    if (!user || !breederName.trim()) return;
     setSaving(true);
     try {
       let logoUrl: string | null = null;
@@ -45,6 +53,22 @@ export default function OnboardingPage() {
         logoUrl = urlData.publicUrl;
       }
 
+      const slug = slugify(breederName.trim());
+
+      // Create breeder profile
+      const { error: bpError } = await supabase
+        .from("breeder_profiles")
+        .insert({
+          owner_user_id: user.id,
+          breeder_name: breederName.trim(),
+          breeder_slug: slug,
+          location: location.trim() || null,
+          logo_url: logoUrl,
+          short_bio: bio.trim() || null,
+        });
+      if (bpError) throw bpError;
+
+      // Update user profile
       const updates: Record<string, unknown> = {
         onboarding_completed: true,
       };
@@ -75,10 +99,10 @@ export default function OnboardingPage() {
       <div className="w-full max-w-sm bg-card rounded-2xl shadow-xl p-7 space-y-5">
         <div className="text-center">
           <h1 className="text-lg font-bold text-card-foreground">
-            Let's set up your profile
+            Set up your breeder profile
           </h1>
           <p className="text-xs text-muted-foreground/70 mt-1">
-            Help buyers find and recognize you
+            Help buyers find and recognize your program
           </p>
         </div>
 
@@ -101,7 +125,7 @@ export default function OnboardingPage() {
               )}
             </button>
             <span className="text-[11px] text-muted-foreground">
-              Add profile photo
+              Add logo or photo
             </span>
             <input
               ref={fileRef}
@@ -111,6 +135,14 @@ export default function OnboardingPage() {
               onChange={handlePhotoSelect}
             />
           </div>
+
+          {/* Breeder / Farm Name */}
+          <Input
+            placeholder="Breeder / Farm Name *"
+            value={breederName}
+            onChange={(e) => setBreederName(e.target.value)}
+            className="rounded-2xl h-12 text-sm bg-background border-sand-dark"
+          />
 
           {/* Location */}
           <div className="relative">
@@ -134,7 +166,7 @@ export default function OnboardingPage() {
 
           <Button
             onClick={handleSubmit}
-            disabled={saving}
+            disabled={saving || !breederName.trim()}
             className="w-full h-[52px] rounded-2xl text-base font-bold"
             style={{
               backgroundColor: "hsl(var(--gold))",
