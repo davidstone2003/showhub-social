@@ -15,7 +15,7 @@ const roleOptions = [
   { id: "fan", label: "Fan", description: "Follow shows, breeders, and results", icon: Heart, accountType: "general" },
 ] as const;
 
-function IntentScreen() {
+function IntentScreen({ onBack }: { onBack?: () => void }) {
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
 
