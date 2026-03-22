@@ -116,6 +116,7 @@ export default function SubmitWinnerPage() {
   /* ── submit ── */
   const handleSubmit = async () => {
     if (!isValid || submitting) return;
+    if (requireVerification()) return;
     setSubmitting(true);
     try {
       const imageUrls: string[] = [];
