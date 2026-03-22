@@ -30,6 +30,11 @@ function IntentScreen({ onBack }: { onBack?: () => void }) {
           .eq("id", user.id);
       }
 
+      // Clear saved form data on successful role selection
+      sessionStorage.removeItem("signup_first");
+      sessionStorage.removeItem("signup_last");
+      sessionStorage.removeItem("signup_email");
+
       if (accountType === "breeder" || accountType === "vendor") {
         navigate("/onboarding");
       } else if (accountType === "exhibitor") {
