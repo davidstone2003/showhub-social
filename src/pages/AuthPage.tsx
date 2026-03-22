@@ -97,15 +97,22 @@ function IntentScreen({ onBack }: { onBack?: () => void }) {
 export default function AuthPage() {
   const [searchParams] = useSearchParams();
   const [isLogin, setIsLogin] = useState(searchParams.get("mode") !== "signup");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => sessionStorage.getItem("signup_email") || "");
   const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [firstName, setFirstName] = useState(() => sessionStorage.getItem("signup_first") || "");
+  const [lastName, setLastName] = useState(() => sessionStorage.getItem("signup_last") || "");
   const [showPw, setShowPw] = useState(false);
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showIntent, setShowIntent] = useState(false);
   const navigate = useNavigate();
+
+  // Persist form fields to sessionStorage
+  React.useEffect(() => {
+    sessionStorage.setItem("signup_first", firstName);
+    sessionStorage.setItem("signup_last", lastName);
+    sessionStorage.setItem("signup_email", email);
+  }, [firstName, lastName, email]);
 
   const signupReady =
     firstName.trim() &&
