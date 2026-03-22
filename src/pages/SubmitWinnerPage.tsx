@@ -192,6 +192,7 @@ export default function SubmitWinnerPage() {
 
   return (
     <Layout showDiscovery={false}>
+      <VerifyEmailModal open={showVerifyModal} onOpenChange={setShowVerifyModal} onResend={resendVerification} />
       <div className="min-h-screen bg-background pb-40">
         {/* Header */}
         <div className="sticky top-0 z-20 bg-card border-b border-border px-4 py-3">
