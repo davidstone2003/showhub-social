@@ -10,6 +10,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AdminFlagModal } from "@/components/AdminFlagModal";
 import { BreederIdentity } from "@/components/BreederIdentity";
 import { AuthGate } from "@/components/AuthGate";
+import { useEmailVerification } from "@/hooks/useEmailVerification";
+import { VerifyEmailModal } from "@/components/VerifyEmailModal";
 
 interface PostCardProps {
   post: Post & { status?: string; user_id?: string | null };
@@ -25,12 +27,14 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const [showAuthGate, setShowAuthGate] = useState(false);
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
+  const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
 
   const handleLike = () => {
     if (!user) {
       setShowAuthGate(true);
       return;
     }
+    if (requireVerification()) return;
     setLiked(!liked);
     setLikeCount((c) => (liked ? c - 1 : c + 1));
   };
@@ -171,6 +175,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         onActionComplete={onModerated}
       />
       <AuthGate open={showAuthGate} onOpenChange={setShowAuthGate} />
+      <VerifyEmailModal open={showVerifyModal} onOpenChange={setShowVerifyModal} onResend={resendVerification} />
     </>
   );
 }

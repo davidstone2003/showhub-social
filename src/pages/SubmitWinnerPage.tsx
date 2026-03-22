@@ -4,6 +4,8 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEmailVerification } from "@/hooks/useEmailVerification";
+import { VerifyEmailModal } from "@/components/VerifyEmailModal";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -46,6 +48,7 @@ const ensureLookupEntry = async (
 /* ── page ── */
 export default function SubmitWinnerPage() {
   const { user, profile } = useAuth();
+  const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
   const isPremium = profile?.is_premium ?? false;
 
   const [images, setImages] = useState<ImageFile[]>([]);
@@ -113,6 +116,7 @@ export default function SubmitWinnerPage() {
   /* ── submit ── */
   const handleSubmit = async () => {
     if (!isValid || submitting) return;
+    if (requireVerification()) return;
     setSubmitting(true);
     try {
       const imageUrls: string[] = [];
@@ -188,6 +192,7 @@ export default function SubmitWinnerPage() {
 
   return (
     <Layout showDiscovery={false}>
+      <VerifyEmailModal open={showVerifyModal} onOpenChange={setShowVerifyModal} onResend={resendVerification} />
       <div className="min-h-screen bg-background pb-40">
         {/* Header */}
         <div className="sticky top-0 z-20 bg-card border-b border-border px-4 py-3">

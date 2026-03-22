@@ -13,6 +13,7 @@ interface Profile {
   is_premium: boolean;
   onboarding_completed: boolean;
   account_type: string;
+  email_verified: boolean;
 }
 
 interface AuthContextType {
@@ -52,6 +53,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async (_event, session) => {
         setSession(session);
         if (session?.user) {
+          // If user just confirmed email, mark profile as verified
+          if (_event === "USER_UPDATED" && session.user.email_confirmed_at) {
+            await supabase
+              .from("profiles")
+              .update({ email_verified: true } as any)
+              .eq("id", session.user.id);
+          }
           setTimeout(() => fetchProfile(session.user.id), 0);
         } else {
           setProfile(null);
