@@ -165,7 +165,7 @@ export default function AuthPage() {
   };
 
   if (showIntent) {
-    return <IntentScreen />;
+    return <IntentScreen onBack={() => setShowIntent(false)} />;
   }
 
   return (
