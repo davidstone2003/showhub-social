@@ -147,7 +147,7 @@ export default function OnboardingPage() {
 
           {/* Breeder / Farm Name */}
           <Input
-            placeholder="Breeder / Farm Name *"
+            placeholder={isVendor ? "Business Name *" : "Breeder / Farm Name *"}
             value={breederName}
             onChange={(e) => setBreederName(e.target.value)}
             className="rounded-2xl h-12 text-sm bg-background border-sand-dark"
