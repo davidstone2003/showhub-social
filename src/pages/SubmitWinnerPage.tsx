@@ -151,6 +151,7 @@ export default function SubmitWinnerPage() {
         show_id: resolvedShowId,
         date: format(new Date(), "yyyy-MM-dd"),
         user_id: user?.id || null,
+        posted_as_breeder_id: postedAsBreederId,
         post_type: postType,
         show_on_feed: toggles.feed,
         show_on_breeder_page: toggles.breederPage,
