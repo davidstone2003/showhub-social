@@ -191,8 +191,18 @@ export default function SubmitWinnerPage() {
       <div className="min-h-screen bg-background pb-40">
         {/* Header */}
         <div className="sticky top-0 z-20 bg-card border-b border-border px-4 py-3">
-          <h1 className="text-lg font-bold text-foreground">Backdrop</h1>
-          <p className="text-xs text-muted-foreground">Put your win on the backdrop</p>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            <div>
+              <h1 className="text-lg font-bold text-foreground">Backdrop</h1>
+              <p className="text-xs text-muted-foreground">Put your win on the backdrop</p>
+            </div>
+          </div>
         </div>
 
         {/* Auth prompt */}
