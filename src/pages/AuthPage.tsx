@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { BackdropLogo } from "@/components/RinglyLogo";
-import { Eye, EyeOff, Tractor, Award, Store, Heart } from "lucide-react";
+import { Eye, EyeOff, Tractor, Award, Store, Heart, ArrowLeft } from "lucide-react";
 
 const roleOptions = [
   { id: "breeder", label: "Breeder", description: "Promote your program, sires, and winners", icon: Tractor, accountType: "breeder" },
