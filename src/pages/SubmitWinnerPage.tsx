@@ -4,6 +4,8 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEmailVerification } from "@/hooks/useEmailVerification";
+import { VerifyEmailModal } from "@/components/VerifyEmailModal";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
