@@ -48,6 +48,7 @@ const ensureLookupEntry = async (
 /* ── page ── */
 export default function SubmitWinnerPage() {
   const { user, profile } = useAuth();
+  const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
   const isPremium = profile?.is_premium ?? false;
 
   const [images, setImages] = useState<ImageFile[]>([]);
