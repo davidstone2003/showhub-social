@@ -97,6 +97,13 @@ export default function OnboardingPage() {
       </div>
 
       <div className="w-full max-w-sm bg-card rounded-2xl shadow-xl p-7 space-y-5">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back
+        </button>
         <div className="text-center">
           <h1 className="text-lg font-bold text-card-foreground">
             Set up your breeder profile
