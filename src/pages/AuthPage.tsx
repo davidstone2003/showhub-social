@@ -152,7 +152,7 @@ export default function AuthPage() {
           setLoading(false);
           return;
         }
-        const { error, data } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -161,16 +161,9 @@ export default function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Check your email to confirm your account, then sign in.");
-        sessionStorage.removeItem("signup_first");
-        sessionStorage.removeItem("signup_last");
-        sessionStorage.removeItem("signup_email");
-        setFirstName("");
-        setLastName("");
-        setEmail("");
-        setPassword("");
-        setAgreedTerms(false);
-        setIsLogin(true);
+        toast.success("Check your email to confirm your account.");
+        // Auto-confirmed: user is now logged in, show intent screen
+        setShowIntent(true);
       }
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");
