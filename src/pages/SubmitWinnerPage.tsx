@@ -11,6 +11,7 @@ import { AutocompleteInput } from "@/components/AutocompleteInput";
 import { PostTypeSelector, getDefaultToggles } from "@/components/PostTypeSelector";
 import type { PostType } from "@/components/PostTypeSelector";
 import { Camera, X, ImagePlus, Heart, MessageCircle, LogIn, Sparkles } from "lucide-react";
+import { IdentitySelector } from "@/components/IdentitySelector";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import PostSuccessScreen from "@/components/PostSuccessScreen";
@@ -62,6 +63,7 @@ export default function SubmitWinnerPage() {
   /* Post type + toggles */
   const [postType, setPostType] = useState<PostType>("winner");
   const [toggles, setToggles] = useState(getDefaultToggles("winner"));
+  const [postedAsBreederId, setPostedAsBreederId] = useState<string | null>(null);
 
   const [successData, setSuccessData] = useState<{
     showName: string; winPlacing: string; shownBy: string;
@@ -149,6 +151,7 @@ export default function SubmitWinnerPage() {
         show_id: resolvedShowId,
         date: format(new Date(), "yyyy-MM-dd"),
         user_id: user?.id || null,
+        posted_as_breeder_id: postedAsBreederId,
         post_type: postType,
         show_on_feed: toggles.feed,
         show_on_breeder_page: toggles.breederPage,
@@ -228,6 +231,15 @@ export default function SubmitWinnerPage() {
               isPremium={isPremium}
             />
           </div>
+
+          {/* Post As Identity */}
+          {user && (
+            <IdentitySelector
+              value={postedAsBreederId}
+              onChange={setPostedAsBreederId}
+              postType={postType}
+            />
+          )}
 
           {/* Photo Upload */}
           <PhotoUpload

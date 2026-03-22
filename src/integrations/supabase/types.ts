@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      breeder_profiles: {
+        Row: {
+          breeder_name: string
+          breeder_slug: string
+          created_at: string
+          id: string
+          location: string | null
+          logo_url: string | null
+          owner_user_id: string
+          short_bio: string | null
+        }
+        Insert: {
+          breeder_name: string
+          breeder_slug: string
+          created_at?: string
+          id?: string
+          location?: string | null
+          logo_url?: string | null
+          owner_user_id: string
+          short_bio?: string | null
+        }
+        Update: {
+          breeder_name?: string
+          breeder_slug?: string
+          created_at?: string
+          id?: string
+          location?: string | null
+          logo_url?: string | null
+          owner_user_id?: string
+          short_bio?: string | null
+        }
+        Relationships: []
+      }
       breeders_lookup: {
         Row: {
           created_at: string
@@ -121,10 +154,12 @@ export type Database = {
           created_at: string
           display_name: string | null
           facebook_url: string | null
+          first_name: string | null
           hero_image_url: string | null
           id: string
           instagram_url: string | null
           is_premium: boolean
+          last_name: string | null
           location: string | null
           logo_url: string | null
           onboarding_completed: boolean
@@ -140,10 +175,12 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           facebook_url?: string | null
+          first_name?: string | null
           hero_image_url?: string | null
           id: string
           instagram_url?: string | null
           is_premium?: boolean
+          last_name?: string | null
           location?: string | null
           logo_url?: string | null
           onboarding_completed?: boolean
@@ -159,10 +196,12 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           facebook_url?: string | null
+          first_name?: string | null
           hero_image_url?: string | null
           id?: string
           instagram_url?: string | null
           is_premium?: boolean
+          last_name?: string | null
           location?: string | null
           logo_url?: string | null
           onboarding_completed?: boolean
@@ -243,6 +282,7 @@ export type Database = {
           likes: number
           placed_by: string | null
           post_type: string
+          posted_as_breeder_id: string | null
           show_id: string | null
           show_name: string
           show_on_breeder_page: boolean
@@ -271,6 +311,7 @@ export type Database = {
           likes?: number
           placed_by?: string | null
           post_type?: string
+          posted_as_breeder_id?: string | null
           show_id?: string | null
           show_name: string
           show_on_breeder_page?: boolean
@@ -299,6 +340,7 @@ export type Database = {
           likes?: number
           placed_by?: string | null
           post_type?: string
+          posted_as_breeder_id?: string | null
           show_id?: string | null
           show_name?: string
           show_on_breeder_page?: boolean
@@ -319,6 +361,13 @@ export type Database = {
             columns: ["breeder_id"]
             isOneToOne: false
             referencedRelation: "breeders_lookup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "winners_posted_as_breeder_id_fkey"
+            columns: ["posted_as_breeder_id"]
+            isOneToOne: false
+            referencedRelation: "breeder_profiles"
             referencedColumns: ["id"]
           },
           {

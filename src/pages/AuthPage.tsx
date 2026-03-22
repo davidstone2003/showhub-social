@@ -85,7 +85,8 @@ export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(searchParams.get("mode") !== "signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -93,7 +94,8 @@ export default function AuthPage() {
   const navigate = useNavigate();
 
   const signupReady =
-    displayName.trim() &&
+    firstName.trim() &&
+    lastName.trim() &&
     email.trim() &&
     password.trim() &&
     agreedTerms;
@@ -124,8 +126,8 @@ export default function AuthPage() {
           navigate("/");
         }
       } else {
-        if (!displayName.trim()) {
-          toast.error("Display name is required");
+        if (!firstName.trim() || !lastName.trim()) {
+          toast.error("First and last name are required");
           setLoading(false);
           return;
         }
@@ -133,7 +135,7 @@ export default function AuthPage() {
           email,
           password,
           options: {
-            data: { display_name: displayName.trim() },
+            data: { first_name: firstName.trim(), last_name: lastName.trim() },
             emailRedirectTo: window.location.origin,
           },
         });
@@ -172,12 +174,20 @@ export default function AuthPage() {
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
           {!isLogin && (
-            <Input
-              placeholder="Display Name (e.g., Stone Show Stock)"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              className="rounded-2xl h-12 text-sm bg-background border-sand-dark"
-            />
+            <div className="flex gap-2">
+              <Input
+                placeholder="First Name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="rounded-2xl h-12 text-sm bg-background border-sand-dark"
+              />
+              <Input
+                placeholder="Last Name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="rounded-2xl h-12 text-sm bg-background border-sand-dark"
+              />
+            </div>
           )}
           <Input
             type="email"
