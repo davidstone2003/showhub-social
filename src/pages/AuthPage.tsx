@@ -126,8 +126,8 @@ export default function AuthPage() {
           navigate("/");
         }
       } else {
-        if (!displayName.trim()) {
-          toast.error("Display name is required");
+        if (!firstName.trim() || !lastName.trim()) {
+          toast.error("First and last name are required");
           setLoading(false);
           return;
         }
@@ -135,7 +135,7 @@ export default function AuthPage() {
           email,
           password,
           options: {
-            data: { display_name: displayName.trim() },
+            data: { first_name: firstName.trim(), last_name: lastName.trim() },
             emailRedirectTo: window.location.origin,
           },
         });
