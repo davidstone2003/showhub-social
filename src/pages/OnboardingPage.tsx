@@ -108,10 +108,10 @@ export default function OnboardingPage() {
         </button>
         <div className="text-center">
           <h1 className="text-lg font-bold text-card-foreground">
-            Set up your breeder profile
+            {isVendor ? "Set up your vendor account" : "Set up your breeder profile"}
           </h1>
           <p className="text-xs text-muted-foreground/70 mt-1">
-            Help buyers find and recognize your program
+            {isVendor ? "Help customers find your products and services" : "Help buyers find and recognize your program"}
           </p>
         </div>
 
