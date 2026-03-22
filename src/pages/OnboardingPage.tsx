@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,8 @@ function slugify(text: string) {
 export default function OnboardingPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isVendor = searchParams.get("type") === "vendor";
   const [breederName, setBreederName] = useState("");
   const [location, setLocation] = useState("");
   const [bio, setBio] = useState("");
@@ -106,10 +108,10 @@ export default function OnboardingPage() {
         </button>
         <div className="text-center">
           <h1 className="text-lg font-bold text-card-foreground">
-            Set up your breeder profile
+            {isVendor ? "Set up your vendor account" : "Set up your breeder profile"}
           </h1>
           <p className="text-xs text-muted-foreground/70 mt-1">
-            Help buyers find and recognize your program
+            {isVendor ? "Help customers find your products and services" : "Help buyers find and recognize your program"}
           </p>
         </div>
 
@@ -145,7 +147,7 @@ export default function OnboardingPage() {
 
           {/* Breeder / Farm Name */}
           <Input
-            placeholder="Breeder / Farm Name *"
+            placeholder={isVendor ? "Business Name *" : "Breeder / Farm Name *"}
             value={breederName}
             onChange={(e) => setBreederName(e.target.value)}
             className="rounded-2xl h-12 text-sm bg-background border-sand-dark"

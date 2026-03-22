@@ -35,8 +35,10 @@ function IntentScreen({ onBack }: { onBack?: () => void }) {
       sessionStorage.removeItem("signup_last");
       sessionStorage.removeItem("signup_email");
 
-      if (accountType === "breeder" || accountType === "vendor") {
+      if (accountType === "breeder") {
         navigate("/onboarding");
+      } else if (accountType === "vendor") {
+        navigate("/onboarding?type=vendor");
       } else if (accountType === "exhibitor") {
         navigate("/submit");
       } else {
