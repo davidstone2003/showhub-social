@@ -175,6 +175,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         onActionComplete={onModerated}
       />
       <AuthGate open={showAuthGate} onOpenChange={setShowAuthGate} />
+      <VerifyEmailModal open={showVerifyModal} onOpenChange={setShowVerifyModal} onResend={resendVerification} />
     </>
   );
 }
