@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { BackdropLogo } from "@/components/RinglyLogo";
-import { Eye, EyeOff, Tractor, Award, Store, Heart } from "lucide-react";
+import { Eye, EyeOff, Tractor, Award, Store, Heart, ArrowLeft } from "lucide-react";
 
 const roleOptions = [
   { id: "breeder", label: "Breeder", description: "Promote your program, sires, and winners", icon: Tractor, accountType: "breeder" },
@@ -15,7 +15,7 @@ const roleOptions = [
   { id: "fan", label: "Fan", description: "Follow shows, breeders, and results", icon: Heart, accountType: "general" },
 ] as const;
 
-function IntentScreen() {
+function IntentScreen({ onBack }: { onBack?: () => void }) {
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
 
@@ -45,8 +45,17 @@ function IntentScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col px-5 pt-20 pb-10">
+    <div className="min-h-screen bg-background flex flex-col px-5 pt-12 pb-10">
       <div className="w-full max-w-sm mx-auto space-y-8">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </button>
+        )}
         <div className="text-center space-y-2">
           <div className="flex justify-center mb-6">
             <BackdropLogo size="md" />
@@ -156,7 +165,7 @@ export default function AuthPage() {
   };
 
   if (showIntent) {
-    return <IntentScreen />;
+    return <IntentScreen onBack={() => setShowIntent(false)} />;
   }
 
   return (
