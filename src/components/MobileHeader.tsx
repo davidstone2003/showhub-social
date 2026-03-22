@@ -1,11 +1,11 @@
-import { LogOut, Plus, Search, User } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
 import { NotificationBell } from "@/components/NotificationBell";
 
 export function MobileHeader() {
-  const { user, profile, signOut } = useAuth();
+  const { user } = useAuth();
 
   return (
     <header className="lg:hidden sticky top-0 z-40 bg-card border-b border-border" style={{ padding: '8px 12px' }}>
@@ -20,19 +20,6 @@ export function MobileHeader() {
           {user ? (
             <>
               <NotificationBell />
-              <Link
-                to={profile ? `/breeder/${profile.username}` : "#"}
-                className="p-2 rounded-lg hover:bg-muted transition-colors"
-              >
-                <User className="w-5 h-5 text-foreground" />
-              </Link>
-              <button
-                onClick={signOut}
-                className="p-2 rounded-lg hover:bg-muted transition-colors"
-                aria-label="Sign out"
-              >
-                <LogOut className="w-5 h-5 text-muted-foreground" />
-              </button>
               <Link
                 to="/submit"
                 className="flex items-center gap-1.5 bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-all shrink-0"
