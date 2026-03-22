@@ -52,7 +52,7 @@ export function AdminContentTab({ filter }: AdminContentTabProps) {
     setLoading(false);
   };
 
-  useState(() => { fetchPosts(); });
+  useEffect(() => { fetchPosts(); }, [filter]);
 
   const restorePost = async (postId: string) => {
     await supabase.from("winners").update({ status: "active" as any }).eq("id", postId);
