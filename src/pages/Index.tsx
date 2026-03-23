@@ -4,8 +4,10 @@ import { LiveRingFeed } from "@/components/LiveFeed";
 import { WinnersTab } from "@/components/WinnersTab";
 import { SalesTab } from "@/components/SalesTab";
 import { cn } from "@/lib/utils";
-import { ChevronRight, X } from "lucide-react";
+import { ChevronRight, X, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 type TopPill = "shows" | "sales";
 type ShowSub = "live" | "winners";
@@ -16,6 +18,7 @@ interface Show {
 }
 
 const Index = () => {
+  const { user } = useAuth();
   const [topPill, setTopPill] = useState<TopPill>("shows");
   const [showSub, setShowSub] = useState<ShowSub>("live");
   const [shows, setShows] = useState<Show[]>([]);
@@ -30,7 +33,6 @@ const Index = () => {
         .order("name", { ascending: true });
       if (data && data.length > 0) {
         setShows(data);
-        // Auto-select first show
         if (!selectedShow) setSelectedShow(data[0]);
       }
     }
@@ -39,18 +41,20 @@ const Index = () => {
 
   return (
     <Layout showDiscovery={false}>
-      {/* Top pills */}
-      <div className="sticky top-[44px] lg:top-0 z-30 bg-background border-b border-border">
+      {/* Sticky nav bar */}
+      <div className="sticky top-[44px] lg:top-0 z-30 bg-card border-b border-border">
+        {/* Primary pills */}
         <div className="flex gap-2 px-4 py-2 max-w-2xl mx-auto">
           {(["shows", "sales"] as TopPill[]).map((pill) => (
             <button
               key={pill}
               onClick={() => setTopPill(pill)}
               className={cn(
-                "flex-1 py-1.5 rounded-full text-sm font-semibold capitalize transition-colors text-center",
+                "flex-1 rounded-full text-sm font-semibold capitalize transition-all text-center",
+                "py-[7px]",
                 topPill === pill
-                  ? "bg-primary text-primary-foreground"
-                  : "border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-primary/8 text-primary hover:bg-primary/15"
               )}
             >
               {pill}
@@ -58,18 +62,25 @@ const Index = () => {
           ))}
         </div>
 
-        {/* Show header + sub-pills (only in Shows view) */}
+        {/* Show header + sub-pills */}
         {topPill === "shows" && selectedShow && (
           <div className="max-w-2xl mx-auto">
-            {/* Show name — tappable */}
+            {/* Show name + meta */}
             <button
               onClick={() => setShowPicker(true)}
-              className="flex items-center gap-1 px-4 py-1.5 w-full text-left"
+              className="flex items-center gap-1.5 px-4 py-1.5 w-full text-left group"
             >
-              <span className="text-foreground font-bold truncate" style={{ fontSize: 16 }}>
-                {selectedShow.name}
-              </span>
-              <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1">
+                  <span className="text-foreground font-bold truncate" style={{ fontSize: 15 }}>
+                    {selectedShow.name}
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                </div>
+                <p className="text-muted-foreground truncate" style={{ fontSize: 11 }}>
+                  March 2026 • Kansas City
+                </p>
+              </div>
             </button>
 
             {/* Sub-pills */}
@@ -79,14 +90,15 @@ const Index = () => {
                   key={sub}
                   onClick={() => setShowSub(sub)}
                   className={cn(
-                    "px-4 py-1 rounded-lg text-xs font-semibold capitalize transition-colors",
+                    "inline-flex items-center rounded-full text-xs font-semibold capitalize transition-all",
+                    "px-3 py-[5px]",
                     showSub === sub
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "bg-primary/8 text-primary hover:bg-primary/15"
                   )}
                 >
                   {sub === "live" && (
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500 mr-1 animate-pulse" />
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 mr-1.5 animate-pulse" />
                   )}
                   {sub}
                 </button>

@@ -61,8 +61,14 @@ export function WinnersTab({ showId }: WinnersTabProps) {
   if (winners.length === 0) {
     return (
       <div className="text-center py-16 px-4">
-        <p className="text-muted-foreground text-sm">No winners yet</p>
-        <p className="text-xs text-muted-foreground mt-1">Results will appear here as they're posted</p>
+        <p className="text-muted-foreground text-sm font-medium">No winners posted yet</p>
+        <Link
+          to="/submit"
+          className="inline-flex items-center gap-1.5 mt-3 bg-primary text-primary-foreground font-semibold rounded-full px-5 py-2 text-sm hover:bg-primary/90 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Post Result
+        </Link>
       </div>
     );
   }

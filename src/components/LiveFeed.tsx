@@ -95,8 +95,8 @@ export function LiveRingFeed({ showId }: LiveRingFeedProps) {
   if (results.length === 0) {
     return (
       <div className="text-center py-16 px-4">
-        <p className="text-muted-foreground text-sm">No live results yet today</p>
-        <p className="text-xs text-muted-foreground mt-1">Results will appear here as they're posted</p>
+        <p className="text-muted-foreground text-sm font-medium">Waiting for results…</p>
+        <p className="text-xs text-muted-foreground mt-1">Updates will appear here as they happen</p>
       </div>
     );
   }
