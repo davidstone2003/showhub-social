@@ -80,7 +80,7 @@ export function LiveRingFeed({ showId }: LiveRingFeedProps) {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, []);
+  }, [showId]);
 
   if (loading) {
     return (
