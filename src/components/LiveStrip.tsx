@@ -60,53 +60,53 @@ export function LiveStrip({ show }: LiveStripProps) {
 
   if (loading) return null;
 
+  const livePath = show ? `/winners?show=${show.id}` : "/winners";
+
   return (
-    <div className="mx-3 mt-3 rounded-xl border border-border bg-card overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-border">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="inline-block w-2 h-2 rounded-full bg-destructive animate-pulse shrink-0" />
-          <span className="text-xs font-bold text-foreground truncate">
+    <Link
+      to={livePath}
+      className="mx-3 mt-2 mb-1 block rounded-lg border border-border bg-card hover:bg-accent/30 transition-colors active:bg-accent/50"
+    >
+      {/* Single-line header with results inline */}
+      <div className="flex items-center justify-between px-3 py-1.5">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-destructive animate-pulse shrink-0" />
+          <span className="text-[11px] font-bold text-foreground truncate">
             {show?.name || "Live"}
           </span>
-          <span className="text-[10px] font-semibold text-destructive uppercase tracking-wide shrink-0">
+          <span className="text-[10px] font-semibold text-destructive shrink-0">
             LIVE
           </span>
         </div>
-        <Link
-          to={show ? `/winners?show=${show.id}` : "/winners"}
-          className="text-[11px] font-semibold text-primary hover:underline shrink-0"
-        >
-          View All
-        </Link>
+        <span className="text-[10px] font-medium text-primary shrink-0">View</span>
       </div>
 
-      {/* Results or empty */}
+      {/* Compact results or CTA */}
       {results.length > 0 ? (
-        <div className="divide-y divide-border">
+        <div className="px-3 pb-1.5 flex flex-col gap-0.5">
           {results.map((r) => (
-            <div key={r.id} className="flex items-center gap-2 px-3 py-1.5">
-              <span className="text-xs font-semibold text-foreground truncate">
+            <div key={r.id} className="flex items-center gap-1.5 text-[11px] leading-tight">
+              <span className="font-semibold text-foreground truncate">
                 {r.winPlacing || "Result"}
               </span>
-              <span className="text-[11px] text-muted-foreground truncate">
-                {r.shownBy}
-              </span>
+              <span className="text-muted-foreground truncate">— {r.shownBy}</span>
             </div>
           ))}
         </div>
       ) : (
-        <div className="flex items-center justify-between px-3 py-2.5">
-          <p className="text-xs text-muted-foreground">No live results yet</p>
-          <Link
-            to="/submit"
-            className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+        <div className="flex items-center justify-between px-3 pb-1.5">
+          <span className="text-[11px] text-muted-foreground">Live updates coming</span>
+          <span
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-primary"
           >
-            <Plus className="w-3 h-3" />
-            Post Result
-          </Link>
+            <Link to="/submit" className="inline-flex items-center gap-0.5 hover:underline">
+              <Plus className="w-3 h-3" />
+              Post
+            </Link>
+          </span>
         </div>
       )}
-    </div>
+    </Link>
   );
 }
