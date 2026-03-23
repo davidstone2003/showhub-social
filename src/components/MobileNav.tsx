@@ -1,10 +1,10 @@
-import { Home, Trophy, DollarSign, Users, FolderHeart, ShoppingBag } from "lucide-react";
+import { Home, Trophy, Users, FolderHeart, ShoppingBag } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const navItems = [
   { icon: Home, label: "Home", to: "/" },
   { icon: Trophy, label: "Winners", to: "/winners" },
-  { icon: DollarSign, label: "Sales", to: "/sales" },
+  { emoji: "💰", label: "Sales", to: "/sales" },
   { icon: Users, label: "Breeders", to: "/breeders" },
   { icon: FolderHeart, label: "Repo", to: "/repo" },
   { icon: ShoppingBag, label: "Market", to: "/market" },
