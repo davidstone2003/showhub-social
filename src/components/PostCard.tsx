@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
 import { Heart, MessageCircle, Flag } from "lucide-react";
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import type { Post } from "@/data/mock";
@@ -8,7 +7,6 @@ import { cn } from "@/lib/utils";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/contexts/AuthContext";
 import { AdminFlagModal } from "@/components/AdminFlagModal";
-import { BreederIdentity } from "@/components/BreederIdentity";
 import { AuthGate } from "@/components/AuthGate";
 import { useEmailVerification } from "@/hooks/useEmailVerification";
 import { VerifyEmailModal } from "@/components/VerifyEmailModal";
@@ -30,10 +28,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
 
   const handleLike = () => {
-    if (!user) {
-      setShowAuthGate(true);
-      return;
-    }
+    if (!user) { setShowAuthGate(true); return; }
     if (requireVerification()) return;
     setLiked(!liked);
     setLikeCount((c) => (liked ? c - 1 : c + 1));
@@ -47,79 +42,70 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const isRestricted = status === "restricted";
   const isRemoved = status === "removed";
 
-  const isWinner = post.post_type === "champion" || post.win_placing;
-
+  // Build title: win_placing or show_name
   const currentYear = new Date().getFullYear();
   const postYear = post.created_at ? new Date(post.created_at).getFullYear() : currentYear;
-  const showYearInline = !isNaN(postYear) && postYear <= currentYear && postYear > 2000;
-
-  const showNameWithYear = post.show_name
-    ? (showYearInline ? `${postYear} ${post.show_name}` : post.show_name)
-    : null;
+  const yearPrefix = !isNaN(postYear) && postYear <= currentYear && postYear > 2000 ? `${postYear} ` : "";
+  
+  const title = post.win_placing || post.show_name || "New Post";
+  
+  // Build single context line
+  const contextParts: string[] = [];
+  if (post.shown_by) contextParts.push(post.shown_by);
+  if (post.show_name && post.win_placing) contextParts.push(`${yearPrefix}${post.show_name}`);
+  if (post.breeder?.name && !contextParts.includes(post.breeder.name)) contextParts.push(post.breeder.name);
+  const contextLine = contextParts.join(" • ");
 
   return (
     <>
       <motion.article
-        initial={{ opacity: 0, y: 6 }}
+        initial={{ opacity: 0, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.25, delay: index * 0.03 }}
+        transition={{ duration: 0.2, delay: index * 0.02 }}
         className={cn(
           "bg-card overflow-hidden relative",
           isFlagged && "ring-2 ring-amber-400",
           isRestricted && "ring-2 ring-orange-400 opacity-75",
           isRemoved && "ring-2 ring-destructive opacity-50"
         )}
-        style={{ borderRadius: "12px", boxShadow: "var(--shadow-card)" }}
+        style={{ borderRadius: "10px", boxShadow: "0 1px 2px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)" }}
       >
         {/* Status banner */}
         {status !== "active" && (
-          <div
-            className={cn(
-              "px-3 py-1.5 text-xs font-semibold flex items-center gap-1.5",
-              isFlagged && "bg-amber-50 text-amber-800",
-              isRestricted && "bg-orange-50 text-orange-800",
-              isRemoved && "bg-red-50 text-red-800"
-            )}
-          >
+          <div className={cn(
+            "px-3 py-1 text-xs font-semibold flex items-center gap-1.5",
+            isFlagged && "bg-amber-50 text-amber-800",
+            isRestricted && "bg-orange-50 text-orange-800",
+            isRemoved && "bg-red-50 text-red-800"
+          )}>
             <Flag className="w-3 h-3" />
-            {isFlagged && "This post has been flagged for review"}
-            {isRestricted && "This post is restricted"}
-            {isRemoved && "This post has been removed"}
+            {isFlagged && "Flagged for review"}
+            {isRestricted && "Restricted"}
+            {isRemoved && "Removed"}
           </div>
         )}
 
-        {/* Admin flag button */}
+        {/* Admin flag */}
         {isAdmin && (
           <button
             onClick={() => setShowFlagModal(true)}
             className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-card/80 backdrop-blur-sm border border-border hover:bg-destructive/10 transition-colors"
-            title="Moderate post"
           >
             <Flag className="w-3.5 h-3.5 text-muted-foreground" />
           </button>
         )}
 
-        {/* Breeder Header */}
-        <BreederIdentity
-          name={post.breeder?.name || "Unknown"}
-          slug={(post.breeder as any)?.slug || post.breeder?.id}
-          logoUrl={post.breeder?.logo || null}
-          location={post.breeder?.location || null}
-          tier={post.breeder?.is_pro ? "breeder_page" : "free"}
-          variant="feed"
-        />
-
-        {/* Image */}
+        {/* Full-width image */}
         <Link
           to={post.animal_id ? `/animal/${post.animal_id}` : "#"}
           className="block w-full overflow-hidden bg-muted"
         >
           <img
             src={imageSrc}
-            alt={post.win_placing || post.show_name || "Post image"}
+            alt={title}
             className={cn(
-              "w-full aspect-video",
-              isUploadedWinnerImage ? "object-contain bg-muted" : "object-cover"
+              "w-full",
+              isUploadedWinnerImage ? "aspect-[4/5] object-contain bg-muted" : "aspect-[4/5] object-cover"
             )}
             loading="lazy"
             decoding="async"
@@ -127,30 +113,26 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           />
         </Link>
 
-        {/* Content */}
-        <div className="px-3.5 pt-2.5 pb-1.5">
-          {isWinner ? (
-            <WinnerDetails
-              winPlacing={post.win_placing}
-              showNameWithYear={showNameWithYear}
-              shownBy={post.shown_by}
-              placedBy={post.placed_by}
-              siredBy={post.sired_by}
-              sireId={(post as any).sire_id}
-              dam={post.dam}
-              bredBy={post.bred_by || post.breeder?.name}
-              caption={post.caption}
-            />
-          ) : (
-            <GeneralDetails
-              showName={post.show_name}
-              caption={post.caption}
-              shownBy={post.shown_by || post.breeder?.name}
-            />
+        {/* Title + context + engagement */}
+        <div style={{ padding: "8px 12px 12px" }}>
+          <p
+            className="text-foreground font-semibold truncate"
+            style={{ fontSize: "16px", lineHeight: 1.3 }}
+          >
+            {title}
+          </p>
+
+          {contextLine && (
+            <p
+              className="text-muted-foreground truncate"
+              style={{ fontSize: "13px", lineHeight: 1.3, marginTop: "3px" }}
+            >
+              {contextLine}
+            </p>
           )}
 
-          {/* Engagement */}
-          <div className="flex items-center justify-end gap-3 pb-1 mt-2">
+          {/* Engagement row */}
+          <div className="flex items-center justify-end gap-3" style={{ marginTop: "8px" }}>
             <button
               onClick={handleLike}
               className="flex items-center gap-1 hover:text-destructive transition-colors"
@@ -167,136 +149,9 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         </div>
       </motion.article>
 
-      <AdminFlagModal
-        open={showFlagModal}
-        onOpenChange={setShowFlagModal}
-        postId={post.id}
-        postOwnerId={(post as any).user_id}
-        onActionComplete={onModerated}
-      />
+      <AdminFlagModal open={showFlagModal} onOpenChange={setShowFlagModal} postId={post.id} postOwnerId={(post as any).user_id} onActionComplete={onModerated} />
       <AuthGate open={showAuthGate} onOpenChange={setShowAuthGate} />
       <VerifyEmailModal open={showVerifyModal} onOpenChange={setShowVerifyModal} onResend={resendVerification} />
     </>
-  );
-}
-
-/* ── Winner Detail Block ── */
-function WinnerDetails({
-  winPlacing,
-  showNameWithYear,
-  shownBy,
-  placedBy,
-  siredBy,
-  sireId,
-  dam,
-  bredBy,
-  caption,
-}: {
-  winPlacing?: string;
-  showNameWithYear: string | null;
-  shownBy?: string;
-  placedBy?: string;
-  siredBy?: string;
-  sireId?: string;
-  dam?: string;
-  bredBy?: string;
-  caption?: string;
-}) {
-  return (
-    <div className="space-y-1">
-      {/* Result / placement — strongest */}
-      {winPlacing && (
-        <p className="text-foreground font-bold" style={{ fontSize: "15px", lineHeight: 1.3 }}>
-          {winPlacing}
-        </p>
-      )}
-
-      {/* Show name + year */}
-      {showNameWithYear && (
-        <p className="text-muted-foreground font-medium" style={{ fontSize: "13px" }}>
-          {showNameWithYear}
-        </p>
-      )}
-
-      {/* Stacked detail lines */}
-      <div className="pt-0.5 space-y-px">
-        {shownBy && <DetailLine label="Shown by" value={shownBy} />}
-        {placedBy && <DetailLine label="Placed by" value={placedBy} />}
-        {siredBy && (
-          <DetailLine
-            label="Sired by"
-            value={siredBy}
-            linkTo={sireId ? `/sire/${sireId}` : undefined}
-          />
-        )}
-        {dam && <DetailLine label="Dam" value={dam} />}
-      </div>
-
-      {/* Caption */}
-      {caption && !caption.includes("Shown By:") && caption.trim() && (
-        <p className="text-foreground line-clamp-2 pt-0.5" style={{ fontSize: "13px" }}>
-          {caption}
-        </p>
-      )}
-    </div>
-  );
-}
-
-/* ── General Detail Block ── */
-function GeneralDetails({
-  showName,
-  caption,
-  shownBy,
-}: {
-  showName?: string;
-  caption?: string;
-  shownBy?: string;
-}) {
-  return (
-    <div className="space-y-0.5">
-      {showName && (
-        <p className="font-medium text-foreground" style={{ fontSize: "14px" }}>
-          {showName}
-        </p>
-      )}
-      {shownBy && (
-        <p className="text-muted-foreground" style={{ fontSize: "13px" }}>
-          {shownBy}
-        </p>
-      )}
-      {caption && caption.trim() && (
-        <p className="text-foreground line-clamp-2" style={{ fontSize: "14px" }}>
-          {caption}
-        </p>
-      )}
-    </div>
-  );
-}
-
-/* ── Reusable detail line ── */
-function DetailLine({
-  label,
-  value,
-  linkTo,
-}: {
-  label: string;
-  value: string;
-  linkTo?: string;
-}) {
-  return (
-    <p className="text-muted-foreground" style={{ fontSize: "13px", lineHeight: 1.4 }}>
-      {label}{" "}
-      {linkTo ? (
-        <Link
-          to={linkTo}
-          className="text-primary font-medium hover:underline"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {value}
-        </Link>
-      ) : (
-        <span className="text-foreground font-medium">{value}</span>
-      )}
-    </p>
   );
 }
