@@ -62,40 +62,41 @@ const Index = () => {
           ))}
         </div>
 
-        {/* Show header + sub-pills */}
+      {/* Show header + sub-pills */}
         {topPill === "shows" && selectedShow && (
           <div className="max-w-2xl mx-auto">
             {/* Show name + meta */}
             <button
               onClick={() => setShowPicker(true)}
-              className="flex items-center gap-1.5 px-4 py-1.5 w-full text-left group"
+              className="flex items-center gap-1.5 px-4 py-2.5 w-full text-left group active:bg-muted/40 transition-colors"
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
-                  <span className="text-foreground font-bold truncate" style={{ fontSize: 15 }}>
+                  <span className="text-foreground font-bold truncate" style={{ fontSize: 16 }}>
                     {selectedShow.name}
                   </span>
-                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 group-hover:translate-x-0.5 transition-transform" />
                 </div>
-                <p className="text-muted-foreground truncate" style={{ fontSize: 11 }}>
+                <p className="text-muted-foreground truncate mt-0.5" style={{ fontSize: 12 }}>
                   March 2026 • Kansas City
                 </p>
               </div>
             </button>
 
             {/* Sub-pills */}
-            <div className="flex gap-1.5 px-4 pb-2">
+            <div className="flex gap-2 px-4 pt-1 pb-2.5">
               {(["live", "winners"] as ShowSub[]).map((sub) => (
                 <button
                   key={sub}
                   onClick={() => setShowSub(sub)}
                   className={cn(
-                    "inline-flex items-center rounded-full text-xs font-semibold capitalize transition-all",
-                    "px-3 py-[5px]",
+                    "inline-flex items-center rounded-full font-semibold capitalize transition-all",
+                    "px-3.5 text-xs",
                     showSub === sub
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "bg-primary/8 text-primary hover:bg-primary/15"
                   )}
+                  style={{ height: 30, lineHeight: '30px' }}
                 >
                   {sub === "live" && (
                     <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 mr-1.5 animate-pulse" />
