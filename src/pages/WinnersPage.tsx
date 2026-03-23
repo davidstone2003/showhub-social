@@ -1,147 +1,144 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Layout } from "@/components/Layout";
-import { Search, SlidersHorizontal, Bookmark, ChevronDown, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Search, SlidersHorizontal } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { normalizePlace, SLOT_ORDER, SLOT_LABELS, SLOT_ICONS, type PlacementSlot } from "@/lib/normalizePlace";
+import { Skeleton } from "@/components/ui/skeleton";
 
-/* ── mock live updates ── */
-const liveUpdates = [
-  { id: "1", text: "Grand Champion Blackface selected", time: "2m ago" },
-  { id: "2", text: "Class 7 posted", time: "5m ago" },
-  { id: "3", text: "Reserve just slapped", time: "8m ago" },
-  { id: "4", text: "Commercial ewe results rolling in", time: "12m ago" },
-];
-
-/* ── mock saved views ── */
-const savedViews = ["All Results", "My Views", "Grand Only", "Beatty Bred", "Goose Offspring"];
-
-/* ── mock official results ── */
-interface ResultEntry {
-  placing: string;
-  exhibitor: string;
-  bredBy: string;
-}
-interface ClassEntry {
-  className: string;
-  placing: string;
-  exhibitor: string;
-  bredBy: string;
-}
-interface ShowResultBlock {
+/* ── Types ── */
+interface WinnerRow {
   id: string;
-  showName: string;
+  show_name: string;
+  win_placing: string | null;
+  shown_by: string;
+  bred_by: string | null;
+  placed_by: string | null;
+  sired_by: string | null;
+  dam: string | null;
+  image_urls: string[] | null;
   date: string;
-  location: string;
-  judge: string;
-  overallWinners: ResultEntry[];
-  classResults: ClassEntry[];
+  created_at: string;
+  species: string | null;
 }
 
-const mockResults: ShowResultBlock[] = [
-  {
-    id: "naile-commercial",
-    showName: "NAILE Commercial Ewe Show",
-    date: "Nov. 14, 2025",
-    location: "Louisville, KY",
-    judge: "Mike Stitzlein",
-    overallWinners: [
-      { placing: "Grand Champion Commercial Ewe", exhibitor: "Kaden Derrer", bredBy: "Camp Creek" },
-      { placing: "Reserve Champion Commercial Ewe", exhibitor: "Landrie Sutton", bredBy: "Beatty" },
-      { placing: "3rd Overall Commercial Ewe", exhibitor: "Kayla Pittman", bredBy: "Chapman" },
-      { placing: "4th Overall Commercial Ewe", exhibitor: "Carson Nahrup", bredBy: "TKM" },
-    ],
-    classResults: [
-      { className: "Class 1", placing: "1st", exhibitor: "Wyatt Nixon", bredBy: "JFSS" },
-      { className: "Class 1", placing: "2nd", exhibitor: "Kylie Jones", bredBy: "Triple D" },
-      { className: "Class 2", placing: "1st", exhibitor: "Emery Yoho", bredBy: "Silver Smith" },
-      { className: "Class 2", placing: "2nd", exhibitor: "Mason Cole", bredBy: "Stone" },
-      { className: "Class 3", placing: "1st", exhibitor: "Hailey Fox", bredBy: "Beatty" },
-      { className: "Class 3", placing: "2nd", exhibitor: "Tanner Lee", bredBy: "Pine Creek" },
-    ],
-  },
-  {
-    id: "arizona-nationals",
-    showName: "Arizona Nationals Market Lamb Show",
-    date: "Dec. 3, 2025",
-    location: "Phoenix, AZ",
-    judge: "Scott Greiner",
-    overallWinners: [
-      { placing: "Grand Champion Market Lamb", exhibitor: "Maci Zerbach", bredBy: "Stone Show Stock" },
-      { placing: "Reserve Champion Market Lamb", exhibitor: "Karson Neuse", bredBy: "Beatty" },
-    ],
-    classResults: [
-      { className: "Class 1", placing: "1st", exhibitor: "Braden Wells", bredBy: "Camp Creek" },
-      { className: "Class 1", placing: "2nd", exhibitor: "Addison Yates", bredBy: "JFSS" },
-    ],
-  },
-];
-
-const INITIAL_CLASSES = 4;
-
-function ShowBlock({ block }: { block: ShowResultBlock }) {
-  const [expanded, setExpanded] = useState(false);
-  const [showAllClasses, setShowAllClasses] = useState(false);
-  const visibleClasses = showAllClasses ? block.classResults : block.classResults.slice(0, INITIAL_CLASSES);
-
-  return (
-    <div className="border-b border-border pb-4 last:border-b-0 last:pb-0">
-      {/* Show header */}
-      <h3 className="text-[15px] font-bold text-foreground leading-snug">{block.showName}</h3>
-      <p className="text-[12px] text-muted-foreground mt-0.5">
-        {block.date} • {block.location} • Judge: {block.judge}
-      </p>
-
-      {/* Overall winners */}
-      <div className="mt-3 space-y-1.5">
-        <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Overall Winners</p>
-        {block.overallWinners.map((w, i) => (
-          <div key={i} className="py-1">
-            <p className="text-[13px] font-semibold text-foreground leading-tight">{w.placing}</p>
-            <p className="text-[12px] text-muted-foreground">{w.exhibitor} • Bred by {w.bredBy}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Collapsible class results */}
-      <div className="mt-3">
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-1 text-[12px] font-semibold text-primary"
-        >
-          {expanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-          Class Results ({block.classResults.length})
-        </button>
-
-        {expanded && (
-          <div className="mt-2 space-y-0.5">
-            {visibleClasses.map((c, i) => (
-              <div key={i} className="flex items-baseline gap-2 py-0.5">
-                <span className="text-[11px] text-muted-foreground font-medium shrink-0 w-14">{c.className}</span>
-                <span className="text-[12px] text-muted-foreground shrink-0 w-6">{c.placing}</span>
-                <span className="text-[12px] text-foreground">{c.exhibitor}</span>
-                <span className="text-[11px] text-muted-foreground">• {c.bredBy}</span>
-              </div>
-            ))}
-            {!showAllClasses && block.classResults.length > INITIAL_CLASSES && (
-              <button
-                onClick={() => setShowAllClasses(true)}
-                className="text-[12px] font-semibold text-primary mt-1"
-              >
-                Show More Classes
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
+interface SlotEntry {
+  slot: PlacementSlot;
+  exhibitor: string;
+  breeder: string | null;
+  image: string | null;
+  rawPlacing: string | null;
 }
 
+interface ShowBlock {
+  showName: string;
+  latestDate: string;
+  species: string | null;
+  slots: SlotEntry[];
+  classCount: number;
+}
+
+/* ── Page ── */
 export default function WinnersPage() {
-  const [activeView, setActiveView] = useState("All Results");
+  const [rows, setRows] = useState<WinnerRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase
+        .from("winners")
+        .select("id, show_name, win_placing, shown_by, bred_by, placed_by, sired_by, dam, image_urls, date, created_at, species")
+        .eq("status", "active")
+        .eq("show_on_winners_archive", true)
+        .order("created_at", { ascending: false })
+        .limit(500);
+      setRows(data || []);
+      setLoading(false);
+    }
+    load();
+  }, []);
+
+  /* Compile into show blocks */
+  const shows = useMemo(() => {
+    const grouped = new Map<string, WinnerRow[]>();
+    for (const r of rows) {
+      const key = r.show_name.trim().toLowerCase();
+      if (!grouped.has(key)) grouped.set(key, []);
+      grouped.get(key)!.push(r);
+    }
+
+    const blocks: ShowBlock[] = [];
+    for (const [, posts] of grouped) {
+      const filledSlots = new Map<PlacementSlot, SlotEntry>();
+      let classCount = 0;
+
+      for (const p of posts) {
+        const slot = normalizePlace(p.win_placing);
+        if (!slot) {
+          classCount++;
+          continue;
+        }
+        if (filledSlots.has(slot)) {
+          // Upgrade: replace if this post has an image and existing doesn't
+          const existing = filledSlots.get(slot)!;
+          const newImg = p.image_urls?.[0] || null;
+          if (!existing.image && newImg) {
+            filledSlots.set(slot, {
+              slot,
+              exhibitor: p.shown_by,
+              breeder: p.bred_by,
+              image: newImg,
+              rawPlacing: p.win_placing,
+            });
+          }
+          continue;
+        }
+        filledSlots.set(slot, {
+          slot,
+          exhibitor: p.shown_by,
+          breeder: p.bred_by,
+          image: p.image_urls?.[0] || null,
+          rawPlacing: p.win_placing,
+        });
+      }
+
+      const orderedSlots = SLOT_ORDER
+        .filter((s) => filledSlots.has(s))
+        .map((s) => filledSlots.get(s)!);
+
+      // Also add empty slots for grand/reserve if not filled
+      const displaySlots: SlotEntry[] = [];
+      for (const s of SLOT_ORDER.slice(0, 2)) {
+        if (filledSlots.has(s)) {
+          displaySlots.push(filledSlots.get(s)!);
+        } else {
+          displaySlots.push({ slot: s, exhibitor: "—", breeder: null, image: null, rawPlacing: null });
+        }
+      }
+      // Add 3rd-5th only if they exist
+      for (const s of SLOT_ORDER.slice(2)) {
+        if (filledSlots.has(s)) displaySlots.push(filledSlots.get(s)!);
+      }
+
+      const ref = posts[0];
+      blocks.push({
+        showName: ref.show_name,
+        latestDate: ref.date || ref.created_at,
+        species: ref.species,
+        slots: displaySlots,
+        classCount,
+      });
+    }
+
+    // Sort by most recent activity
+    blocks.sort((a, b) => new Date(b.latestDate).getTime() - new Date(a.latestDate).getTime());
+    return blocks;
+  }, [rows]);
 
   return (
     <Layout showDiscovery={false}>
       <div className="mx-auto max-w-2xl pb-24">
-        {/* ─── Header ─── */}
+        {/* Header */}
         <div className="sticky top-0 z-10 bg-background border-b border-border px-4 py-3 flex items-center justify-between">
           <h1 className="text-lg font-bold text-foreground">Winners</h1>
           <div className="flex items-center gap-3">
@@ -154,88 +151,109 @@ export default function WinnersPage() {
           </div>
         </div>
 
-        {/* ─── Section 1: LIVE ─── */}
-        <div className="px-4 pt-3">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="flex items-center gap-1.5 rounded-full bg-destructive/10 px-2.5 py-1 text-[11px] font-bold text-destructive">
-              <span className="h-1.5 w-1.5 rounded-full bg-destructive animate-pulse" />
-              LIVE
-            </span>
-            <span className="text-[12px] text-muted-foreground">American Royal</span>
-          </div>
-
-          <div className="space-y-0">
-            {liveUpdates.map((u) => (
-              <div
-                key={u.id}
-                className="flex items-start justify-between py-2 border-b border-border/50 last:border-b-0"
-              >
-                <div className="flex items-start gap-2 min-w-0">
-                  <span className="text-[13px] mt-px">🏆</span>
-                  <p className="text-[13px] text-foreground leading-snug">{u.text}</p>
-                </div>
-                <span className="text-[11px] text-muted-foreground shrink-0 ml-3">{u.time}</span>
-              </div>
-            ))}
-          </div>
-
-          <button className="mt-2 mb-1 text-[12px] font-semibold text-primary">
-            View All Live Updates →
-          </button>
-        </div>
-
-        {/* ─── Divider ─── */}
-        <div className="h-2 bg-muted/30 mt-3" />
-
-        {/* ─── Section 2: Official Results ─── */}
+        {/* Content */}
         <div className="px-4 pt-4">
-          <h2 className="text-[15px] font-bold text-foreground mb-3">Official Results</h2>
-
-          {/* Filters row */}
-          <div className="flex items-center gap-2 mb-3 overflow-x-auto pb-1 scrollbar-none">
-            <FilterChip label="Show" />
-            <FilterChip label="Year" />
-            <FilterChip label="Breed" />
-            <button className="flex items-center gap-1 shrink-0 rounded-lg border border-primary/30 bg-primary/5 px-2.5 py-1.5 text-[12px] font-semibold text-primary">
-              <Bookmark className="w-3 h-3" />
-              Save View
-            </button>
-          </div>
-
-          {/* Saved view pills */}
-          <div className="flex items-center gap-1.5 mb-4 overflow-x-auto pb-1 scrollbar-none">
-            {savedViews.map((v) => (
-              <button
-                key={v}
-                onClick={() => setActiveView(v)}
-                className={`shrink-0 rounded-full px-3 py-1 text-[12px] font-medium transition-colors ${
-                  activeView === v
-                    ? "bg-foreground text-background"
-                    : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                }`}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
-
-          {/* Result blocks grouped by show */}
-          <div className="space-y-5">
-            {mockResults.map((block) => (
-              <ShowBlock key={block.id} block={block} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="space-y-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton className="h-5 w-48" />
+                  <Skeleton className="h-3 w-32" />
+                  <Skeleton className="h-16 w-full" />
+                </div>
+              ))}
+            </div>
+          ) : shows.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-muted-foreground text-sm">No results posted yet</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {shows.map((block) => (
+                <ShowResultBlock key={block.showName} block={block} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </Layout>
   );
 }
 
-function FilterChip({ label }: { label: string }) {
+/* ── Show Result Block ── */
+function ShowResultBlock({ block }: { block: ShowBlock }) {
+  const year = new Date(block.latestDate).getFullYear();
+
   return (
-    <button className="flex items-center gap-1 shrink-0 rounded-lg border border-border bg-card px-2.5 py-1.5 text-[12px] font-medium text-muted-foreground hover:bg-muted/50 transition-colors">
-      {label}
-      <ChevronDown className="w-3 h-3" />
-    </button>
+    <div className="border-b border-border pb-5 last:border-b-0">
+      {/* Show header */}
+      <div className="mb-3">
+        <h3 className="text-[15px] font-bold text-foreground leading-snug">
+          {block.showName}
+          {block.species && (
+            <span className="text-muted-foreground font-normal"> • {block.species}</span>
+          )}
+        </h3>
+        <p className="text-[12px] text-muted-foreground mt-0.5">{year}</p>
+      </div>
+
+      {/* Placement slots */}
+      <div className="space-y-3">
+        {block.slots.map((entry, i) => (
+          <PlacementRow key={entry.slot} entry={entry} showImage={i === 0} />
+        ))}
+      </div>
+
+      {/* Class results hint */}
+      {block.classCount > 0 && (
+        <p className="text-[12px] text-muted-foreground mt-3">
+          + {block.classCount} class result{block.classCount > 1 ? "s" : ""}
+        </p>
+      )}
+
+      {/* View All */}
+      <Link
+        to={`/events/${encodeURIComponent(block.showName)}/results`}
+        className="inline-block mt-2 text-[12px] font-semibold text-primary"
+      >
+        View All Results →
+      </Link>
+    </div>
+  );
+}
+
+/* ── Placement Row ── */
+function PlacementRow({ entry, showImage }: { entry: SlotEntry; showImage: boolean }) {
+  const icon = SLOT_ICONS[entry.slot];
+  const label = SLOT_LABELS[entry.slot];
+  const isEmpty = entry.exhibitor === "—";
+
+  return (
+    <div className="flex gap-3">
+      {/* Image for Grand only */}
+      {showImage && entry.image && (
+        <img
+          src={entry.image}
+          alt={label}
+          className="w-16 h-16 rounded-lg object-cover shrink-0 bg-muted"
+          loading="lazy"
+        />
+      )}
+
+      <div className="min-w-0">
+        <p className="text-[12px] text-muted-foreground font-medium leading-tight">
+          {icon && <span className="mr-1">{icon}</span>}
+          {label}
+        </p>
+        <p className={`text-[14px] leading-snug mt-0.5 ${isEmpty ? "text-muted-foreground/50" : "text-foreground font-semibold"}`}>
+          {entry.exhibitor}
+        </p>
+        {entry.breeder && !isEmpty && (
+          <p className="text-[12px] text-muted-foreground mt-0.5">
+            Bred by {entry.breeder}
+          </p>
+        )}
+      </div>
+    </div>
   );
 }
