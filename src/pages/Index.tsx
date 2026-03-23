@@ -36,19 +36,19 @@ const Index = () => {
     <Layout showDiscovery={false}>
       {/* Compact segmented toggle */}
       <div className="sticky top-[44px] lg:top-0 z-30 bg-card border-b border-border">
-        <div className="flex justify-center px-4 py-2 max-w-2xl mx-auto">
-          <div className="inline-flex rounded-lg bg-muted p-0.5">
+        <div className="flex justify-center px-4 py-1.5 max-w-2xl mx-auto">
+          <div className="inline-flex rounded-md bg-muted/60 p-0.5">
             {(["shows", "sales"] as TopPill[]).map((pill) => (
               <button
                 key={pill}
                 onClick={() => setTopPill(pill)}
                 className={cn(
-                  "rounded-md px-4 text-xs font-semibold capitalize transition-all",
+                  "rounded px-3.5 text-[11px] font-semibold capitalize transition-all",
                   topPill === pill
                     ? "bg-primary/10 text-primary shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 )}
-                style={{ height: 30, lineHeight: '30px' }}
+                style={{ height: 26, lineHeight: '26px' }}
               >
                 {pill}
               </button>

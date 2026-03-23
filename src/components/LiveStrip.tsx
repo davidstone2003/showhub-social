@@ -24,7 +24,7 @@ export function LiveStrip({ show }: LiveStripProps) {
         .select("id, win_placing, shown_by, created_at")
         .eq("status", "active")
         .order("created_at", { ascending: false })
-        .limit(3);
+        .limit(2);
 
       if (show) {
         query = query.eq("show_id", show.id);
@@ -64,37 +64,31 @@ export function LiveStrip({ show }: LiveStripProps) {
   return (
     <Link
       to={livePath}
-      className="mx-3 mt-2 mb-1 block rounded-lg border border-border bg-card hover:bg-accent/30 transition-colors active:bg-accent/50"
+      className="mx-3 mt-1.5 mb-0.5 block rounded-lg border border-border bg-card hover:bg-accent/30 transition-colors active:bg-accent/50"
     >
-      {/* Single-line header with results inline */}
-      <div className="flex items-center justify-between px-3 py-1.5">
+      <div className="flex items-center justify-between px-2.5 py-1">
         <div className="flex items-center gap-1.5 min-w-0">
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-destructive animate-pulse shrink-0" />
           <span className="text-[11px] font-bold text-foreground truncate">
             {show?.name || "Live"}
           </span>
-          <span className="text-[10px] font-semibold text-destructive shrink-0">
-            LIVE
-          </span>
+          <span className="text-[9px] font-semibold text-destructive shrink-0">LIVE</span>
         </div>
-        <span className="text-[10px] font-medium text-primary shrink-0">View</span>
+        <span className="text-[10px] font-semibold text-primary shrink-0">Open Live</span>
       </div>
 
-      {/* Compact results or CTA */}
       {results.length > 0 ? (
-        <div className="px-3 pb-1.5 flex flex-col gap-0.5">
+        <div className="px-2.5 pb-1 flex flex-col">
           {results.map((r) => (
-            <div key={r.id} className="flex items-center gap-1.5 text-[11px] leading-tight">
-              <span className="font-semibold text-foreground truncate">
-                {r.winPlacing || "Result"}
-              </span>
+            <div key={r.id} className="flex items-center gap-1.5 text-[11px] leading-snug">
+              <span className="font-semibold text-foreground truncate">{r.winPlacing || "Result"}</span>
               <span className="text-muted-foreground truncate">— {r.shownBy}</span>
             </div>
           ))}
         </div>
       ) : (
-        <div className="px-3 pb-1.5">
-          <span className="text-[11px] text-muted-foreground">Be first to post</span>
+        <div className="px-2.5 pb-1">
+          <span className="text-[11px] text-muted-foreground">No results yet — start the feed</span>
         </div>
       )}
     </Link>
