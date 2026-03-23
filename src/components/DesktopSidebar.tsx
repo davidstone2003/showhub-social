@@ -36,7 +36,11 @@ export function DesktopSidebar() {
               }`
             }
           >
-            <item.icon className="w-4.5 h-4.5" />
+            {"emoji" in item ? (
+              <span className="text-[18px] leading-[18px]">{item.emoji}</span>
+            ) : (
+              <item.icon className="w-4.5 h-4.5" />
+            )}
             {item.label}
           </NavLink>
         ))}
