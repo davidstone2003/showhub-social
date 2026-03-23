@@ -14,6 +14,7 @@ export interface Breeder {
   location: string;
   logo: string;
   is_pro: boolean;
+  slug?: string;
 }
 
 export interface Sire {
