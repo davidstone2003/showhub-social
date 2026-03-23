@@ -94,17 +94,8 @@ export function LiveStrip({ show }: LiveStripProps) {
           ))}
         </div>
       ) : (
-        <div className="flex items-center justify-between px-3 pb-1.5">
-          <span className="text-[11px] text-muted-foreground">Live updates coming</span>
-          <span
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-primary"
-          >
-            <Link to="/submit" className="inline-flex items-center gap-0.5 hover:underline">
-              <Plus className="w-3 h-3" />
-              Post
-            </Link>
-          </span>
+        <div className="px-3 pb-1.5">
+          <span className="text-[11px] text-muted-foreground">Be first to post</span>
         </div>
       )}
     </Link>
