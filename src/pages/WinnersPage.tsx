@@ -171,17 +171,17 @@ function ShowResultBlock({ block }: { block: ShowBlock }) {
   if (block.location) metaParts.push(block.location);
 
   return (
-    <div className="border-b border-border/60 pb-8 last:border-b-0 last:pb-0">
+    <div className="border-b border-border/50 pb-10 last:border-b-0 last:pb-0">
       {/* Show header */}
-      <h3 className="text-[21px] font-bold text-foreground leading-tight tracking-tight">
+      <h3 className="text-[26px] font-extrabold text-foreground leading-[1.15] tracking-tight">
         {block.showName}
       </h3>
-      <p className="text-[14px] text-muted-foreground mt-1.5 font-medium">
+      <p className="text-[15px] text-muted-foreground mt-2 font-medium">
         {metaParts.join(" • ")}
       </p>
 
       {/* Placement slots */}
-      <div className="mt-6 space-y-5">
+      <div className="mt-7 space-y-6">
         {block.slots.map((entry) => (
           <PlacementRow key={entry.slot} entry={entry} />
         ))}
@@ -230,39 +230,38 @@ function PlacementRow({ entry }: { entry: SlotEntry }) {
   const icon = SLOT_ICONS[entry.slot];
   const label = SLOT_LABELS[entry.slot];
 
+  const isGrand = entry.slot === "grand";
+  const isTopThree = entry.slot === "grand" || entry.slot === "reserve" || entry.slot === "third";
+
   return (
-    <div className="flex gap-3.5">
-      {/* Grand Champion photo */}
-      {entry.slot === "grand" && entry.image && (
+    <div>
+      {/* Grand: image above text */}
+      {isGrand && entry.image && (
         <img
           src={entry.image}
           alt={label}
-          className="w-[72px] h-[72px] rounded-xl object-cover shrink-0 bg-muted"
+          className="w-24 h-24 rounded-xl object-cover bg-muted mb-2.5"
           loading="lazy"
         />
       )}
 
-      <div className="min-w-0">
-        <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
-          {icon && <span className="mr-1.5">{icon}</span>}
-          {label}
-        </p>
+      <p className="text-[14px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
+        {icon && <span className="mr-1.5">{icon}</span>}
+        {label}
+      </p>
 
-        {entry.filled ? (
-          <>
-            <p className="text-[17px] text-foreground font-semibold leading-snug mt-1">
-              {entry.exhibitor}
-            </p>
-            {entry.breeder && (
-              <p className="text-[14px] text-muted-foreground mt-0.5 font-medium">
-                {entry.breeder}
-              </p>
-            )}
-          </>
-        ) : (
-          <p className="text-[14px] text-muted-foreground/60 italic mt-1">Not yet posted</p>
-        )}
-      </div>
+      {entry.filled ? (
+        <>
+          <p className={`text-foreground font-semibold leading-snug mt-1 ${isGrand ? "text-[20px]" : isTopThree ? "text-[17px]" : "text-[16px]"}`}>
+            {entry.exhibitor}
+          </p>
+          {entry.breeder && (
+            <p className="text-[15px] text-muted-foreground mt-0.5">{entry.breeder}</p>
+          )}
+        </>
+      ) : (
+        <p className="text-[15px] text-muted-foreground/50 italic mt-1">Not yet posted</p>
+      )}
     </div>
   );
 }
