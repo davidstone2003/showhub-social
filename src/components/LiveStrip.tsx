@@ -59,7 +59,7 @@ export function LiveStrip({ show }: LiveStripProps) {
 
   if (loading) return null;
 
-  const livePath = show ? `/winners?show=${show.id}` : "/winners";
+  const livePath = show ? `/live/${show.id}` : "/winners";
 
   return (
     <Link
