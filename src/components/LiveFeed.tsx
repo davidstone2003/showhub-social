@@ -26,7 +26,7 @@ interface LiveRingFeedProps {
   species?: string;
 }
 
-export function LiveRingFeed({ showId }: LiveRingFeedProps) {
+export function LiveRingFeed({ showId, species }: LiveRingFeedProps) {
   const [results, setResults] = useState<LiveResult[]>([]);
   const [loading, setLoading] = useState(true);
 
