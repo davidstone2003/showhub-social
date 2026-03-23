@@ -24,7 +24,7 @@ export function LiveStrip({ show }: LiveStripProps) {
         .select("id, win_placing, shown_by, created_at")
         .eq("status", "active")
         .order("created_at", { ascending: false })
-        .limit(3);
+        .limit(2);
 
       if (show) {
         query = query.eq("show_id", show.id);
