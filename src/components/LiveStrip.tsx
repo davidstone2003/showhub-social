@@ -47,7 +47,7 @@ export function LiveStrip() {
         <span className="text-xs font-bold text-foreground truncate">{event.name}</span>
         <span className="text-[10px] font-bold text-destructive shrink-0">LIVE</span>
       </div>
-      <span className="text-[11px] font-semibold text-primary shrink-0 ml-2">View</span>
+      <span className="text-[11px] font-semibold text-primary shrink-0 ml-2">View →</span>
     </Link>
   );
 }
