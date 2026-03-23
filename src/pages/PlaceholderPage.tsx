@@ -1,21 +1,37 @@
 import { Layout } from "@/components/Layout";
-import { Construction, ShoppingBag, Wrench, Package } from "lucide-react";
+import { Construction, ShoppingBag, Wrench, Package, Camera, Truck, Scissors, Pill, Wheat, SprayCan } from "lucide-react";
 
 const categories = [
   {
     title: "Animals",
     description: "Sheep, goats, cattle, pigs — breeding stock & show animals",
     icon: ShoppingBag,
+    items: null,
   },
   {
-    title: "Supplies",
-    description: "Show supplies, equipment, feed, supplements",
-    icon: Package,
+    title: "Nutrition",
+    description: "Feed, supplements, and nutritional products",
+    icon: Wheat,
+    items: [
+      { icon: Wheat, label: "Feed" },
+      { icon: Pill, label: "Supplements" },
+    ],
+  },
+  {
+    title: "Show Supplies",
+    description: "Equipment, grooming products, and show day essentials",
+    icon: SprayCan,
+    items: null,
   },
   {
     title: "Services",
-    description: "Photography, hauling, fitters, clipping",
+    description: "Professional livestock services",
     icon: Wrench,
+    items: [
+      { icon: Truck, label: "Hauling" },
+      { icon: Camera, label: "Photography" },
+      { icon: Scissors, label: "Fitting" },
+    ],
   },
 ];
 
