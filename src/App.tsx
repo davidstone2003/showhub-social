@@ -10,6 +10,7 @@ import SiresPage from "./pages/SiresPage";
 import AnimalPage from "./pages/AnimalPage";
 import SirePage from "./pages/SirePage";
 import WinnersPage from "./pages/WinnersPage";
+import LivePage from "./pages/LivePage";
 import { MarketPage, HaulersPage } from "./pages/PlaceholderPage";
 import SubmitWinnerPage from "./pages/SubmitWinnerPage";
 import AuthPage from "./pages/AuthPage";
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/animal/:id" element={<AnimalPage />} />
             <Route path="/sire/:id" element={<SirePage />} />
             <Route path="/winners" element={<WinnersPage />} />
+            <Route path="/live/:showId" element={<LivePage />} />
             <Route path="/market" element={<MarketPage />} />
             <Route path="/haulers" element={<HaulersPage />} />
             <Route path="/submit" element={<SubmitWinnerPage />} />
