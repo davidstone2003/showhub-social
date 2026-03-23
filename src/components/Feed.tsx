@@ -180,7 +180,7 @@ export function Feed() {
 
   return (
     <div className="flex-1 max-w-2xl mx-auto w-full">
-      <div style={{ padding: '12px 0 16px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div style={{ padding: '8px 0 12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {loading ? (
           <>
             <PostCardSkeleton />
