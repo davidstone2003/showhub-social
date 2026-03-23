@@ -1,20 +1,9 @@
-import { useParams, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
-import { cn } from "@/lib/utils";
-import { ArrowLeft, Plus, X } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { ArrowLeft } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
-
-const SPECIES_OPTIONS = ["All", "Sheep", "Goats", "Cattle", "Pigs"] as const;
-type Species = (typeof SPECIES_OPTIONS)[number];
 
 interface LiveItem {
   id: string;
@@ -26,18 +15,17 @@ interface LiveItem {
 
 const LivePage = () => {
   const { showId } = useParams<{ showId: string }>();
-  const { user } = useAuth();
+  const navigate = useNavigate();
   const [eventName, setEventName] = useState("");
+  const [eventLocation, setEventLocation] = useState<string | null>(null);
   const [eventId, setEventId] = useState<string | null>(null);
-  const [species, setSpecies] = useState<Species>("All");
-  const [filterOpen, setFilterOpen] = useState(false);
   const [items, setItems] = useState<LiveItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Resolve event by slug or fallback to first live event
+  // Resolve event
   useEffect(() => {
     async function resolveEvent() {
-      let query = supabase.from("events").select("id, name, slug");
+      let query = supabase.from("events").select("id, name, slug, location");
       if (showId) {
         query = query.eq("slug", showId);
       } else {
@@ -47,162 +35,116 @@ const LivePage = () => {
       if (data) {
         setEventId(data.id);
         setEventName(data.name);
+        setEventLocation(data.location);
       }
+      setLoading(false);
     }
     resolveEvent();
   }, [showId]);
 
-  // Load live_updates for the resolved event
+  // Load live updates
+  const loadUpdates = useCallback(async () => {
+    if (!eventId) return;
+    const { data } = await supabase
+      .from("live_updates")
+      .select("id, update_type, title, line_1, line_2, posted_at")
+      .eq("event_id", eventId)
+      .order("posted_at", { ascending: false })
+      .limit(100);
+
+    setItems(
+      (data || []).map((d) => ({
+        id: d.id,
+        type: d.update_type === "sale_update" ? "sale" : "result",
+        headline: d.title,
+        detail: [d.line_1, d.line_2].filter(Boolean).join(" • "),
+        postedAt: d.posted_at,
+      }))
+    );
+    setLoading(false);
+  }, [eventId]);
+
   useEffect(() => {
     if (!eventId) return;
-
-    async function load() {
-      setLoading(true);
-      const speciesValue = species === "All" ? undefined : species.toLowerCase();
-
-      let query = supabase
-        .from("live_updates")
-        .select("id, update_type, title, line_1, line_2, species, posted_at")
-        .eq("event_id", eventId!)
-        .order("posted_at", { ascending: false })
-        .limit(50);
-
-      if (speciesValue) query = query.ilike("species", speciesValue);
-
-      const { data } = await query;
-
-      setItems(
-        (data || []).map((d) => ({
-          id: d.id,
-          type: d.update_type === "sale_update" ? ("sale" as const) : ("result" as const),
-          headline: d.title,
-          detail: [d.line_1, d.line_2].filter(Boolean).join(" • "),
-          postedAt: d.posted_at,
-        }))
-      );
-      setLoading(false);
-    }
-    load();
+    loadUpdates();
 
     const channel = supabase
-      .channel("live-unified")
+      .channel(`live-feed-${eventId}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "live_updates" }, () => {
-        load();
+        loadUpdates();
       })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [eventId, species]);
-
-  const selectSpecies = (s: Species) => {
-    setSpecies(s);
-    setFilterOpen(false);
-  };
+  }, [eventId, loadUpdates]);
 
   return (
     <Layout showDiscovery={false}>
       {/* Header */}
       <div className="sticky top-[44px] lg:top-0 z-30 bg-card border-b border-border">
-        <div className="flex items-center justify-between px-3 py-2 max-w-2xl mx-auto">
-          <div className="flex items-center gap-2 min-w-0">
-            <Link to="/" className="p-1 -ml-1 rounded-lg hover:bg-muted transition-colors">
+        <div className="px-3 py-2.5 max-w-2xl mx-auto">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-1 -ml-1 rounded-lg hover:bg-muted transition-colors shrink-0"
+            >
               <ArrowLeft className="w-4 h-4 text-muted-foreground" />
-            </Link>
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span className="inline-block w-2 h-2 rounded-full bg-destructive animate-pulse shrink-0" />
-              <span className="text-sm font-bold text-foreground truncate">{eventName || "Live"}</span>
-              <span className="text-[10px] font-semibold text-destructive shrink-0">LIVE</span>
+            </button>
+            <div className="min-w-0">
+              <h1 className="text-sm font-bold text-foreground truncate">
+                {eventName || "Live"} <span className="text-destructive">LIVE</span>
+              </h1>
+              {eventLocation && (
+                <p className="text-[11px] text-muted-foreground truncate">{eventLocation}</p>
+              )}
             </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            {species !== "All" ? (
-              <button
-                onClick={() => setSpecies("All")}
-                className="inline-flex items-center gap-1 text-primary text-[11px] font-medium transition-colors"
-              >
-                <span className="w-1 h-1 rounded-full bg-primary shrink-0" />
-                {species}
-                <X className="w-3 h-3" />
-              </button>
-            ) : (
-              <button
-                onClick={() => setFilterOpen(true)}
-                className="inline-flex items-center gap-1 text-muted-foreground text-[11px] font-medium hover:text-foreground transition-colors"
-              >
-                <span className="w-1 h-1 rounded-full bg-muted-foreground shrink-0" />
-                Species
-              </button>
-            )}
-
-            {user && (
-              <Link
-                to={`/submit${eventId ? `?show=${eventId}` : ""}`}
-                className="inline-flex items-center gap-1 bg-primary text-primary-foreground font-semibold rounded-lg px-3 py-1.5 text-xs hover:bg-primary/90 transition-colors"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Post
-              </Link>
-            )}
           </div>
         </div>
       </div>
 
-      {/* Unified feed */}
+      {/* LIVE NOW status bar */}
+      <div className="bg-destructive/5 border-b border-destructive/10">
+        <div className="max-w-2xl mx-auto px-4 py-1.5 flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-destructive animate-pulse shrink-0" />
+          <span className="text-[11px] font-bold text-destructive tracking-wide">LIVE NOW</span>
+        </div>
+      </div>
+
+      {/* Feed */}
       <div className="max-w-2xl mx-auto w-full">
         {loading ? (
-          <div className="space-y-2 px-4 pt-3">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-14 bg-muted/50 rounded-xl animate-pulse" />
+          <div className="space-y-0 divide-y divide-border/40">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="px-4 py-3">
+                <div className="h-3.5 w-3/4 bg-muted/50 rounded animate-pulse" />
+                <div className="h-2.5 w-1/3 bg-muted/30 rounded animate-pulse mt-2" />
+              </div>
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="text-center py-12 px-4">
-            <p className="text-muted-foreground text-sm font-medium">No results yet — start the feed</p>
-            <p className="text-xs text-muted-foreground mt-1">Be the first to post</p>
+          <div className="text-center py-20 px-4">
+            <p className="text-sm font-medium text-muted-foreground">No live updates yet</p>
+            <p className="text-xs text-muted-foreground mt-1">Check back when classes begin</p>
           </div>
         ) : (
-          <div className="space-y-0.5 px-3 pt-2">
+          <div className="divide-y divide-border/30">
             {items.map((item) => (
-              <div key={item.id} className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/30 transition-colors">
-                <span className="mt-1 text-sm shrink-0">
-                  {item.type === "sale" ? "💰" : "🏆"}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground truncate">{item.headline}</p>
-                  <p className="text-xs text-muted-foreground truncate">{item.detail}</p>
-                </div>
-                <span className="text-[10px] text-muted-foreground shrink-0 mt-0.5">
-                  {formatDistanceToNow(new Date(item.postedAt), { addSuffix: false })}
-                </span>
+              <div key={item.id} className="px-4 py-2.5 hover:bg-muted/20 transition-colors">
+                <p className="text-[13px] font-semibold text-foreground leading-snug">
+                  {item.type === "sale" ? "💰 " : "🏆 "}
+                  {item.headline}
+                </p>
+                {item.detail && (
+                  <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{item.detail}</p>
+                )}
+                <p className="text-[10px] text-muted-foreground/60 mt-1">
+                  {formatDistanceToNow(new Date(item.postedAt), { addSuffix: true })}
+                </p>
               </div>
             ))}
           </div>
         )}
       </div>
-
-      {/* Species bottom sheet */}
-      <Drawer open={filterOpen} onOpenChange={setFilterOpen}>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>Species</DrawerTitle>
-          </DrawerHeader>
-          <div className="px-4 pb-6">
-            {SPECIES_OPTIONS.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => selectSpecies(opt)}
-                className={cn(
-                  "w-full text-left px-3 py-3 rounded-lg text-sm font-medium transition-colors",
-                  species === opt ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/50"
-                )}
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
-        </DrawerContent>
-      </Drawer>
     </Layout>
   );
 };
