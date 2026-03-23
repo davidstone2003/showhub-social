@@ -21,6 +21,7 @@ import OnboardingPage from "./pages/OnboardingPage";
 import AccountTypePage from "./pages/AccountTypePage";
 import EventsPage from "./pages/EventsPage";
 import EventDetailPage from "./pages/EventDetailPage";
+import RepoPage from "./pages/RepoPage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
             <Route path="/account-type" element={<AccountTypePage />} />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/events/:slug" element={<EventDetailPage />} />
+            <Route path="/repo" element={<RepoPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -1,4 +1,4 @@
-import { Home, Trophy, ShoppingBag, Plus, LogIn, LogOut, User, Shield, CalendarDays } from "lucide-react";
+import { Home, Trophy, ShoppingBag, Plus, LogIn, LogOut, User, Shield, CalendarDays, RefreshCw } from "lucide-react";
 import { NavLink, Link } from "react-router-dom";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,6 +8,7 @@ const navItems = [
   { icon: Home, label: "Home", to: "/" },
   { icon: Trophy, label: "Winners", to: "/winners" },
   { icon: CalendarDays, label: "Events", to: "/events" },
+  { icon: RefreshCw, label: "Repo", to: "/repo" },
   { icon: ShoppingBag, label: "Market", to: "/market" },
 ];
 
