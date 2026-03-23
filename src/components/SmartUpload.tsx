@@ -1,10 +1,12 @@
 import React, { useState, useRef } from "react";
-import { Camera, FileText, Link2, Sparkles, Loader2, ArrowLeft } from "lucide-react";
+import { Camera, FileText, Link2, Sparkles, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import type { ResultData } from "@/components/ResultBlock";
+import { createEmptyResult } from "@/components/ResultBlock";
 
 export interface ExtractedFields {
   showName: string;
@@ -18,14 +20,22 @@ export interface ExtractedFields {
   imagePreview?: string;
 }
 
+export interface MultiExtractResult {
+  results: ResultData[];
+  caption?: string;
+  imageFile?: File;
+  imagePreview?: string;
+}
+
 interface SmartUploadProps {
   onExtracted: (fields: ExtractedFields) => void;
+  onMultiExtracted?: (data: MultiExtractResult) => void;
   onSkip: () => void;
 }
 
 type InputMode = null | "photo" | "caption" | "link";
 
-export default function SmartUpload({ onExtracted, onSkip }: SmartUploadProps) {
+export default function SmartUpload({ onExtracted, onMultiExtracted, onSkip }: SmartUploadProps) {
   const [mode, setMode] = useState<InputMode>(null);
   const [processing, setProcessing] = useState(false);
   const [captionText, setCaptionText] = useState("");
@@ -47,10 +57,44 @@ export default function SmartUpload({ onExtracted, onSkip }: SmartUploadProps) {
     const { data, error } = await supabase.functions.invoke("extract-winner", { body });
     if (error) throw new Error(error.message || "Extraction failed");
     if (data?.error) throw new Error(data.error);
-    return data.extracted as Record<string, string>;
+    return data;
   };
 
-  const applyExtracted = (raw: Record<string, string>, extras?: Partial<ExtractedFields>) => {
+  const handleMultiResults = (data: any, extras?: { imageFile?: File; imagePreview?: string }) => {
+    const rawResults = data.results || [];
+    if (rawResults.length === 0 && data.extracted) {
+      rawResults.push(data.extracted);
+    }
+
+    if (onMultiExtracted && rawResults.length > 0) {
+      const results: ResultData[] = rawResults.map((r: any) => ({
+        id: crypto.randomUUID(),
+        showName: r.show_name || "",
+        showId: null,
+        winPlacing: r.win_placing || "",
+        shownBy: r.shown_by || "",
+        placedBy: r.placed_by || "",
+        sireName: r.sired_by || "",
+        sireId: null,
+        damName: r.dam || "",
+      }));
+
+      const caption = rawResults[0]?.caption || "";
+      
+      toast.success(`Found ${results.length} result${results.length > 1 ? "s" : ""}`, {
+        description: "Review and edit before posting.",
+      });
+
+      onMultiExtracted({
+        results,
+        caption,
+        ...extras,
+      });
+      return;
+    }
+
+    // Fallback to single extraction
+    const raw = data.extracted || rawResults[0] || {};
     const fields: ExtractedFields = {
       showName: raw.show_name || "",
       winPlacing: raw.win_placing || "",
@@ -80,11 +124,10 @@ export default function SmartUpload({ onExtracted, onSkip }: SmartUploadProps) {
     setProcessing(true);
     try {
       const base64 = await fileToBase64(file);
-      const raw = await callExtract({ imageBase64: base64, mimeType: file.type });
-      applyExtracted(raw, { imageFile: file, imagePreview: URL.createObjectURL(file) });
+      const data = await callExtract({ imageBase64: base64, mimeType: file.type });
+      handleMultiResults(data, { imageFile: file, imagePreview: URL.createObjectURL(file) });
     } catch (err: any) {
       toast.error("Extraction failed", { description: err.message });
-      // Still pass image through so user can fill manually
       onExtracted({
         showName: "", winPlacing: "", shownBy: "", placedBy: "",
         siredBy: "", dam: "", caption: "",
@@ -99,8 +142,8 @@ export default function SmartUpload({ onExtracted, onSkip }: SmartUploadProps) {
     if (!captionText.trim()) return;
     setProcessing(true);
     try {
-      const raw = await callExtract({ text: captionText });
-      applyExtracted(raw);
+      const data = await callExtract({ text: captionText });
+      handleMultiResults(data);
     } catch (err: any) {
       toast.error("Extraction failed", { description: err.message });
       onExtracted({
@@ -116,8 +159,8 @@ export default function SmartUpload({ onExtracted, onSkip }: SmartUploadProps) {
     if (!linkText.trim()) return;
     setProcessing(true);
     try {
-      const raw = await callExtract({ text: `Extract winner details from this post URL: ${linkText}` });
-      applyExtracted(raw);
+      const data = await callExtract({ text: `Extract winner details from this post URL: ${linkText}` });
+      handleMultiResults(data);
     } catch (err: any) {
       toast.error("Extraction failed", { description: err.message });
       onExtracted({
@@ -129,7 +172,6 @@ export default function SmartUpload({ onExtracted, onSkip }: SmartUploadProps) {
     }
   };
 
-  /* Loading overlay */
   if (processing) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4">
@@ -142,7 +184,6 @@ export default function SmartUpload({ onExtracted, onSkip }: SmartUploadProps) {
     );
   }
 
-  /* Sub-screens */
   if (mode === "caption") {
     return (
       <div className="space-y-3">
@@ -183,7 +224,6 @@ export default function SmartUpload({ onExtracted, onSkip }: SmartUploadProps) {
     );
   }
 
-  /* Main picker */
   return (
     <div className="space-y-4">
       <div className="text-center">

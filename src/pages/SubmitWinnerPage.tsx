@@ -9,16 +9,16 @@ import { VerifyEmailModal } from "@/components/VerifyEmailModal";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { AutocompleteInput } from "@/components/AutocompleteInput";
 import { PostTypeSelector, getDefaultToggles } from "@/components/PostTypeSelector";
 import type { PostType } from "@/components/PostTypeSelector";
-import { Camera, X, ImagePlus, Heart, MessageCircle, LogIn, Sparkles, ArrowLeft } from "lucide-react";
+import { ImagePlus, X, LogIn, Sparkles, ArrowLeft, Plus, Trophy } from "lucide-react";
 import { IdentitySelector } from "@/components/IdentitySelector";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import PostSuccessScreen from "@/components/PostSuccessScreen";
 import SmartUpload from "@/components/SmartUpload";
-import type { ExtractedFields } from "@/components/SmartUpload";
+import type { MultiExtractResult } from "@/components/SmartUpload";
+import { ResultBlock, createEmptyResult } from "@/components/ResultBlock";
+import type { ResultData } from "@/components/ResultBlock";
 
 type ImageFile = { file: File; preview: string };
 
@@ -52,15 +52,8 @@ export default function SubmitWinnerPage() {
   const isPremium = profile?.is_premium ?? false;
 
   const [images, setImages] = useState<ImageFile[]>([]);
-  const [showName, setShowName] = useState("");
-  const [showId, setShowId] = useState<string | null>(null);
-  const [winPlacing, setWinPlacing] = useState("");
-  const [shownBy, setShownBy] = useState("");
-  const [placedBy, setPlacedBy] = useState("");
-  const [sireName, setSireName] = useState("");
-  const [sireId, setSireId] = useState<string | null>(null);
-  const [damName, setDamName] = useState("");
   const [caption, setCaption] = useState("");
+  const [results, setResults] = useState<ResultData[]>([createEmptyResult()]);
   const [submitting, setSubmitting] = useState(false);
 
   /* Post type + toggles */
@@ -71,22 +64,38 @@ export default function SubmitWinnerPage() {
   const [successData, setSuccessData] = useState<{
     showName: string; winPlacing: string; shownBy: string;
     placedBy: string; sireName: string; damName: string;
-    caption: string; imageUrls: string[];
+    caption: string; imageUrls: string[]; resultCount?: number;
   } | null>(null);
 
-  /* Smart Upload step */
+  /* Smart Upload */
   const [showSmartUpload, setShowSmartUpload] = useState(false);
 
-  const handleSmartExtracted = (fields: ExtractedFields) => {
-    if (fields.showName) { setShowName(fields.showName); setShowId(null); }
-    if (fields.winPlacing) setWinPlacing(fields.winPlacing);
-    if (fields.shownBy) setShownBy(fields.shownBy);
-    if (fields.placedBy) setPlacedBy(fields.placedBy);
-    if (fields.siredBy) { setSireName(fields.siredBy); setSireId(null); }
-    if (fields.dam) setDamName(fields.dam);
-    if (fields.caption) setCaption(fields.caption);
+  const handleSmartExtractedLegacy = (fields: any) => {
     if (fields.imageFile && fields.imagePreview) {
       setImages([{ file: fields.imageFile, preview: fields.imagePreview }]);
+    }
+    if (fields.caption) setCaption(fields.caption);
+    // Update first result block
+    setResults(prev => {
+      const updated = { ...prev[0] };
+      if (fields.showName) { updated.showName = fields.showName; updated.showId = null; }
+      if (fields.winPlacing) updated.winPlacing = fields.winPlacing;
+      if (fields.shownBy) updated.shownBy = fields.shownBy;
+      if (fields.placedBy) updated.placedBy = fields.placedBy;
+      if (fields.siredBy) { updated.sireName = fields.siredBy; updated.sireId = null; }
+      if (fields.dam) updated.damName = fields.dam;
+      return [updated, ...prev.slice(1)];
+    });
+    setShowSmartUpload(false);
+  };
+
+  const handleMultiExtracted = (data: MultiExtractResult) => {
+    if (data.imageFile && data.imagePreview) {
+      setImages([{ file: data.imageFile, preview: data.imagePreview }]);
+    }
+    if (data.caption) setCaption(data.caption);
+    if (data.results.length > 0) {
+      setResults(data.results);
     }
     setShowSmartUpload(false);
   };
@@ -94,7 +103,8 @@ export default function SubmitWinnerPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
-  const isValid = showName.trim() && shownBy.trim();
+  // At least one result must have show + shown_by
+  const hasValidResult = results.some(r => r.showName.trim() && r.shownBy.trim());
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -113,12 +123,25 @@ export default function SubmitWinnerPage() {
     });
   };
 
+  const updateResult = (idx: number, updated: ResultData) => {
+    setResults(prev => prev.map((r, i) => i === idx ? updated : r));
+  };
+
+  const removeResult = (idx: number) => {
+    setResults(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const addResult = () => {
+    setResults(prev => [...prev, createEmptyResult()]);
+  };
+
   /* ── submit ── */
   const handleSubmit = async () => {
-    if (!isValid || submitting) return;
+    if (!hasValidResult || submitting) return;
     if (requireVerification()) return;
     setSubmitting(true);
     try {
+      // Upload images
       const imageUrls: string[] = [];
       for (const img of images) {
         const ext = img.file.name.split(".").pop();
@@ -131,48 +154,71 @@ export default function SubmitWinnerPage() {
         imageUrls.push(urlData.publicUrl);
       }
 
-      const resolvedShowId = await ensureLookupEntry("shows", showName, showId);
-      const resolvedSireId = sireName.trim()
-        ? await ensureLookupEntry("sires_lookup", sireName, sireId)
-        : null;
-
-      const title = winPlacing.trim()
-        ? `${winPlacing.trim()} — ${showName.trim()}`
-        : showName.trim();
-
-      const { error } = await (supabase.from("winners") as any).insert({
-        title,
-        show_name: showName.trim(),
-        shown_by: shownBy.trim(),
-        placed_by: placedBy.trim() || null,
-        sired_by: sireName.trim() || null,
-        sire_id: resolvedSireId,
-        dam: damName.trim() || null,
-        win_placing: winPlacing.trim() || null,
-        caption: caption.trim() || null,
-        tags: [],
-        image_urls: imageUrls,
-        show_id: resolvedShowId,
-        date: format(new Date(), "yyyy-MM-dd"),
+      // 1. Create the social post
+      const { data: post, error: postError } = await (supabase.from("posts") as any).insert({
         user_id: user?.id || null,
         posted_as_breeder_id: postedAsBreederId,
+        caption: caption.trim() || null,
+        image_urls: imageUrls,
+        tags: [],
         post_type: postType,
         show_on_feed: toggles.feed,
-        show_on_breeder_page: toggles.breederPage,
-        show_on_winners_archive: toggles.winnersArchive,
-        is_featured: toggles.featured,
-      });
+      }).select("id").single();
 
-      if (error) throw error;
+      if (postError) throw postError;
+      const sourcePostId = post.id;
+
+      // 2. Create winner cards for each valid result
+      const validResults = results.filter(r => r.showName.trim() && r.shownBy.trim());
+      
+      for (const result of validResults) {
+        const resolvedShowId = await ensureLookupEntry("shows", result.showName, result.showId);
+        const resolvedSireId = result.sireName.trim()
+          ? await ensureLookupEntry("sires_lookup", result.sireName, result.sireId)
+          : null;
+
+        const title = result.winPlacing.trim()
+          ? `${result.winPlacing.trim()} — ${result.showName.trim()}`
+          : result.showName.trim();
+
+        const { error: winError } = await (supabase.from("winners") as any).insert({
+          source_post_id: sourcePostId,
+          title,
+          show_name: result.showName.trim(),
+          shown_by: result.shownBy.trim(),
+          placed_by: result.placedBy.trim() || null,
+          sired_by: result.sireName.trim() || null,
+          sire_id: resolvedSireId,
+          dam: result.damName.trim() || null,
+          win_placing: result.winPlacing.trim() || null,
+          caption: caption.trim() || null,
+          tags: [],
+          image_urls: imageUrls,
+          show_id: resolvedShowId,
+          date: format(new Date(), "yyyy-MM-dd"),
+          user_id: user?.id || null,
+          posted_as_breeder_id: postedAsBreederId,
+          post_type: postType,
+          show_on_feed: toggles.feed,
+          show_on_breeder_page: toggles.breederPage,
+          show_on_winners_archive: toggles.winnersArchive,
+          is_featured: toggles.featured,
+        });
+
+        if (winError) throw winError;
+      }
+
+      const firstResult = validResults[0];
       setSuccessData({
-        showName: showName.trim(),
-        winPlacing: winPlacing.trim(),
-        shownBy: shownBy.trim(),
-        placedBy: placedBy.trim(),
-        sireName: sireName.trim(),
-        damName: damName.trim(),
+        showName: firstResult.showName.trim(),
+        winPlacing: firstResult.winPlacing.trim(),
+        shownBy: firstResult.shownBy.trim(),
+        placedBy: firstResult.placedBy.trim(),
+        sireName: firstResult.sireName.trim(),
+        damName: firstResult.damName.trim(),
         caption: caption.trim(),
         imageUrls,
+        resultCount: validResults.length,
       });
       
     } catch (err: any) {
@@ -229,7 +275,8 @@ export default function SubmitWinnerPage() {
             <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
               <div className="bg-card border border-border rounded-2xl p-5 w-full max-w-md shadow-lg">
                 <SmartUpload
-                  onExtracted={handleSmartExtracted}
+                  onExtracted={handleSmartExtractedLegacy}
+                  onMultiExtracted={handleMultiExtracted}
                   onSkip={() => setShowSmartUpload(false)}
                 />
               </div>
@@ -264,61 +311,52 @@ export default function SubmitWinnerPage() {
             onRemove={removeImage}
           />
 
-          {/* Required */}
-          <fieldset className="space-y-3">
-            <legend className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-1">
-              Required
-            </legend>
-            <AutocompleteInput
-              table="shows"
-              placeholder="Show (e.g., Mississippi Youth Expo) *"
-              value={showName}
-              onChange={(display, id) => { setShowName(display); setShowId(id); }}
-            />
-            <Input
-              placeholder="Placing (e.g., Grand Champion)"
-              value={winPlacing}
-              onChange={(e) => setWinPlacing(e.target.value)}
-              className="rounded-xl bg-card border-border h-12 text-sm"
-            />
-            <Input
-              placeholder="Shown by *"
-              value={shownBy}
-              onChange={(e) => setShownBy(e.target.value)}
-              className="rounded-xl bg-card border-border h-12 text-sm"
-            />
-          </fieldset>
-
-          {/* Optional */}
-          <fieldset className="space-y-3">
-            <legend className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-1">
-              Optional
-            </legend>
-            <Input
-              placeholder="Placed by"
-              value={placedBy}
-              onChange={(e) => setPlacedBy(e.target.value)}
-              className="rounded-xl bg-card border-border h-12 text-sm"
-            />
-            <AutocompleteInput
-              table="sires_lookup"
-              placeholder="Sire"
-              value={sireName}
-              onChange={(display, id) => { setSireName(display); setSireId(id); }}
-            />
-            <Input
-              placeholder="Dam"
-              value={damName}
-              onChange={(e) => setDamName(e.target.value)}
-              className="rounded-xl bg-card border-border h-12 text-sm"
-            />
+          {/* Caption / Story */}
+          <div>
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-1.5">
+              Your Story
+            </p>
             <Textarea
-              placeholder="Caption (optional)"
+              placeholder="Write your caption — share the story behind the win…"
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
               className="rounded-xl bg-card border-border text-sm min-h-[80px] resize-none"
             />
-          </fieldset>
+          </div>
+
+          {/* Result Blocks */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-primary" />
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">
+                  Results ({results.length})
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={addResult}
+                className="h-7 text-xs gap-1 text-primary hover:text-primary"
+              >
+                <Plus className="w-3.5 h-3.5" /> Add Result
+              </Button>
+            </div>
+            <div className="space-y-3">
+              {results.map((result, idx) => (
+                <ResultBlock
+                  key={result.id}
+                  result={result}
+                  index={idx}
+                  total={results.length}
+                  onChange={(updated) => updateResult(idx, updated)}
+                  onRemove={() => removeResult(idx)}
+                  defaultExpanded={results.length <= 2}
+                />
+              ))}
+            </div>
+          </div>
 
           {/* Smart Upload Button */}
           <Button
@@ -328,71 +366,17 @@ export default function SubmitWinnerPage() {
           >
             <Sparkles className="w-4 h-4" /> Smart Upload — Auto-fill with AI
           </Button>
-
-          {/* Preview */}
-          {isValid && (
-            <div className="bg-card border border-border rounded-xl overflow-hidden">
-              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide px-3.5 pt-3 pb-1">
-                Preview
-              </p>
-              {images[0] && (
-                <img src={images[0].preview} alt="Preview" className="w-full aspect-video object-cover" />
-              )}
-              <div className="px-3.5 pt-2 pb-1.5">
-                {winPlacing.trim() && (
-                  <p className="text-xl font-bold text-foreground leading-tight">{winPlacing}</p>
-                )}
-                <p className={cn(
-                  "leading-snug",
-                  winPlacing.trim()
-                    ? "text-base font-medium text-muted-foreground mt-0.5"
-                    : "text-xl font-bold text-foreground"
-                )}>
-                  {showName}
-                </p>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  Shown by: <span className="text-foreground font-medium">{shownBy}</span>
-                </p>
-                {placedBy.trim() && (
-                  <p className="text-sm text-muted-foreground mt-px">
-                    Placed by: <span className="text-foreground font-medium">{placedBy}</span>
-                  </p>
-                )}
-                {sireName.trim() && (
-                  <p className="text-xs text-muted-foreground mt-px">
-                    Sire: <span className="font-medium">{sireName}</span>
-                  </p>
-                )}
-                {damName.trim() && (
-                  <p className="text-xs text-muted-foreground mt-px">
-                    Dam: <span className="font-medium">{damName}</span>
-                  </p>
-                )}
-                {caption.trim() && (
-                  <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">{caption}</p>
-                )}
-                <div className="flex items-center justify-end gap-3 mt-2 pb-1">
-                  <span className="flex items-center gap-1 text-muted-foreground">
-                    <Heart className="w-4 h-4" /> <span className="text-xs font-medium">0</span>
-                  </span>
-                  <span className="flex items-center gap-1 text-muted-foreground">
-                    <MessageCircle className="w-4 h-4" /> <span className="text-xs font-medium">0</span>
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Submit */}
         <div className="fixed bottom-20 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent z-40 max-w-lg mx-auto">
           <Button
             onClick={handleSubmit}
-            disabled={!isValid || submitting}
+            disabled={!hasValidResult || submitting}
             className="w-full h-12 rounded-xl text-base font-bold"
             style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--foreground))" }}
           >
-            {submitting ? "Adding…" : "Add to Backdrop"}
+            {submitting ? "Adding…" : `Add to Backdrop${results.filter(r => r.showName.trim() && r.shownBy.trim()).length > 1 ? ` (${results.filter(r => r.showName.trim() && r.shownBy.trim()).length} results)` : ""}`}
           </Button>
         </div>
       </div>
@@ -461,9 +445,9 @@ function PhotoUpload({
             {images.length < 3 && (
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-20 h-20 rounded-md border-2 border-dashed border-border flex items-center justify-center hover:border-primary/50"
+                className="w-20 h-20 rounded-md border-2 border-dashed border-border flex items-center justify-center hover:border-primary/50 transition-colors"
               >
-                <Camera className="w-5 h-5 text-muted-foreground" />
+                <ImagePlus className="w-5 h-5 text-muted-foreground" />
               </button>
             )}
           </div>
