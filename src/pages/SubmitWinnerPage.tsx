@@ -82,6 +82,7 @@ export default function SubmitWinnerPage() {
     showName: string; winPlacing: string; shownBy: string;
     placedBy: string; sireName: string; damName: string;
     caption: string; imageUrls: string[]; resultCount?: number;
+    postedAsBreederId?: string | null;
   } | null>(null);
 
   /* Smart Upload */
