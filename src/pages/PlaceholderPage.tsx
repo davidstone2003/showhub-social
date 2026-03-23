@@ -1,7 +1,5 @@
 import { Layout } from "@/components/Layout";
-import { Construction, ShoppingBag, Truck, Camera, Wrench, Wheat, Pill } from "lucide-react";
-
-/* ── Market Page ── */
+import { Construction, ShoppingBag, Wrench, Package } from "lucide-react";
 
 const categories = [
   {
@@ -10,14 +8,14 @@ const categories = [
     icon: ShoppingBag,
   },
   {
-    title: "Services",
-    description: "Haulers, photographers, fitters, equipment",
-    icon: Truck,
+    title: "Supplies",
+    description: "Show supplies, equipment, feed, supplements",
+    icon: Package,
   },
   {
-    title: "Nutrition",
-    description: "Feed, supplements, and animal health",
-    icon: Wheat,
+    title: "Services",
+    description: "Photography, hauling, fitters, clipping",
+    icon: Wrench,
   },
 ];
 

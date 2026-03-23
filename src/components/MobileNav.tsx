@@ -1,11 +1,11 @@
-import { Home, Trophy, CalendarDays, ShoppingBag, RefreshCw } from "lucide-react";
+import { Home, Trophy, CalendarDays, Bookmark, ShoppingBag } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const navItems = [
   { icon: Home, label: "Home", to: "/" },
   { icon: Trophy, label: "Winners", to: "/winners" },
   { icon: CalendarDays, label: "Events", to: "/events" },
-  { icon: RefreshCw, label: "Repo", to: "/repo" },
+  { icon: Bookmark, label: "Saved", to: "/saved" },
   { icon: ShoppingBag, label: "Market", to: "/market" },
 ];
 
