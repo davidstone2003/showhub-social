@@ -49,6 +49,8 @@ const App = () => (
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/account-type" element={<AccountTypePage />} />
+            <Route path="/events" element={<EventsPage />} />
+            <Route path="/events/:slug" element={<EventDetailPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
