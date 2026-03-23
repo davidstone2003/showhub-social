@@ -21,6 +21,7 @@ import OnboardingPage from "./pages/OnboardingPage";
 import AccountTypePage from "./pages/AccountTypePage";
 import EventsPage from "./pages/EventsPage";
 import EventDetailPage from "./pages/EventDetailPage";
+import RepoPage from "./pages/RepoPage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
