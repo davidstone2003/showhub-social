@@ -65,6 +65,51 @@ export type Database = {
         }
         Relationships: []
       }
+      events: {
+        Row: {
+          created_at: string
+          description: string | null
+          end_date: string | null
+          event_type: string
+          id: string
+          is_featured: boolean
+          is_live: boolean
+          location: string | null
+          name: string
+          slug: string
+          start_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          event_type?: string
+          id?: string
+          is_featured?: boolean
+          is_live?: boolean
+          location?: string | null
+          name: string
+          slug: string
+          start_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          event_type?: string
+          id?: string
+          is_featured?: boolean
+          is_live?: boolean
+          location?: string | null
+          name?: string
+          slug?: string
+          start_date?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       exhibitor_animal_context: {
         Row: {
           breeder_id: string | null
@@ -145,6 +190,73 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      live_updates: {
+        Row: {
+          created_by: string | null
+          event_id: string
+          id: string
+          image_url: string | null
+          line_1: string
+          line_2: string | null
+          posted_at: string
+          sale_record_id: string | null
+          species: string | null
+          title: string
+          update_type: string
+          winner_record_id: string | null
+        }
+        Insert: {
+          created_by?: string | null
+          event_id: string
+          id?: string
+          image_url?: string | null
+          line_1: string
+          line_2?: string | null
+          posted_at?: string
+          sale_record_id?: string | null
+          species?: string | null
+          title: string
+          update_type?: string
+          winner_record_id?: string | null
+        }
+        Update: {
+          created_by?: string | null
+          event_id?: string
+          id?: string
+          image_url?: string | null
+          line_1?: string
+          line_2?: string | null
+          posted_at?: string
+          sale_record_id?: string | null
+          species?: string | null
+          title?: string
+          update_type?: string
+          winner_record_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_updates_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "live_updates_sale_record_id_fkey"
+            columns: ["sale_record_id"]
+            isOneToOne: false
+            referencedRelation: "sale_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "live_updates_winner_record_id_fkey"
+            columns: ["winner_record_id"]
+            isOneToOne: false
+            referencedRelation: "winner_records"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       moderation_actions: {
         Row: {
@@ -350,6 +462,62 @@ export type Database = {
         }
         Relationships: []
       }
+      sale_records: {
+        Row: {
+          breeder_name: string | null
+          buyer_name: string | null
+          created_at: string
+          event_id: string
+          id: string
+          image_url: string | null
+          lot_number: string | null
+          price: number | null
+          source: string | null
+          species: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          breeder_name?: string | null
+          buyer_name?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          image_url?: string | null
+          lot_number?: string | null
+          price?: number | null
+          source?: string | null
+          species?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          breeder_name?: string | null
+          buyer_name?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          image_url?: string | null
+          lot_number?: string | null
+          price?: number | null
+          source?: string | null
+          species?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sale_records_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shows: {
         Row: {
           created_at: string
@@ -450,6 +618,65 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      winner_records: {
+        Row: {
+          breeder_name: string | null
+          created_at: string
+          dam: string | null
+          event_id: string
+          exhibitor_name: string
+          id: string
+          image_url: string | null
+          placed_by: string | null
+          result_title: string
+          sire_name: string | null
+          source: string | null
+          species: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          breeder_name?: string | null
+          created_at?: string
+          dam?: string | null
+          event_id: string
+          exhibitor_name: string
+          id?: string
+          image_url?: string | null
+          placed_by?: string | null
+          result_title: string
+          sire_name?: string | null
+          source?: string | null
+          species?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          breeder_name?: string | null
+          created_at?: string
+          dam?: string | null
+          event_id?: string
+          exhibitor_name?: string
+          id?: string
+          image_url?: string | null
+          placed_by?: string | null
+          result_title?: string
+          sire_name?: string | null
+          source?: string | null
+          species?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "winner_records_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       winners: {
         Row: {
