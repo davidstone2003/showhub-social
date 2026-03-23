@@ -51,9 +51,26 @@ export default function SubmitWinnerPage() {
   const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
   const isPremium = profile?.is_premium ?? false;
 
+  const location = useLocation();
+  const carryForward = location.state as {
+    showName?: string; shownBy?: string; sireId?: string; sireName?: string;
+    damName?: string; postedAsBreederId?: string;
+  } | null;
+
   const [images, setImages] = useState<ImageFile[]>([]);
   const [caption, setCaption] = useState("");
-  const [results, setResults] = useState<ResultData[]>([createEmptyResult()]);
+  const [results, setResults] = useState<ResultData[]>(() => {
+    if (carryForward) {
+      const initial = createEmptyResult();
+      if (carryForward.showName) initial.showName = carryForward.showName;
+      if (carryForward.shownBy) initial.shownBy = carryForward.shownBy;
+      if (carryForward.sireName) initial.sireName = carryForward.sireName;
+      if (carryForward.sireId) initial.sireId = carryForward.sireId;
+      if (carryForward.damName) initial.damName = carryForward.damName;
+      return [initial];
+    }
+    return [createEmptyResult()];
+  });
   const [submitting, setSubmitting] = useState(false);
 
   /* Post type + toggles */
