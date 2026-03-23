@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -51,20 +51,38 @@ export default function SubmitWinnerPage() {
   const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
   const isPremium = profile?.is_premium ?? false;
 
+  const location = useLocation();
+  const carryForward = location.state as {
+    showName?: string; shownBy?: string; sireId?: string; sireName?: string;
+    damName?: string; postedAsBreederId?: string;
+  } | null;
+
   const [images, setImages] = useState<ImageFile[]>([]);
   const [caption, setCaption] = useState("");
-  const [results, setResults] = useState<ResultData[]>([createEmptyResult()]);
+  const [results, setResults] = useState<ResultData[]>(() => {
+    if (carryForward) {
+      const initial = createEmptyResult();
+      if (carryForward.showName) initial.showName = carryForward.showName;
+      if (carryForward.shownBy) initial.shownBy = carryForward.shownBy;
+      if (carryForward.sireName) initial.sireName = carryForward.sireName;
+      if (carryForward.sireId) initial.sireId = carryForward.sireId;
+      if (carryForward.damName) initial.damName = carryForward.damName;
+      return [initial];
+    }
+    return [createEmptyResult()];
+  });
   const [submitting, setSubmitting] = useState(false);
 
   /* Post type + toggles */
   const [postType, setPostType] = useState<PostType>("winner");
   const [toggles, setToggles] = useState(getDefaultToggles("winner"));
-  const [postedAsBreederId, setPostedAsBreederId] = useState<string | null>(null);
+  const [postedAsBreederId, setPostedAsBreederId] = useState<string | null>(carryForward?.postedAsBreederId || null);
 
   const [successData, setSuccessData] = useState<{
     showName: string; winPlacing: string; shownBy: string;
     placedBy: string; sireName: string; damName: string;
     caption: string; imageUrls: string[]; resultCount?: number;
+    postedAsBreederId?: string | null;
   } | null>(null);
 
   /* Smart Upload */
@@ -208,6 +226,68 @@ export default function SubmitWinnerPage() {
         if (winError) throw winError;
       }
 
+      // Save exhibitors for memory
+      if (user) {
+        const uniqueExhibitors = [...new Set(validResults.map(r => r.shownBy.trim()).filter(Boolean))];
+        for (const exName of uniqueExhibitors) {
+          // Upsert exhibitor
+          const { data: existingEx } = await supabase
+            .from("exhibitors")
+            .select("id")
+            .eq("created_by_user_id", user.id)
+            .ilike("name", exName)
+            .limit(1);
+
+          let exhibitorId: string;
+          if (existingEx && existingEx.length > 0) {
+            exhibitorId = existingEx[0].id;
+          } else {
+            const { data: newEx } = await supabase
+              .from("exhibitors")
+              .insert({ name: exName, created_by_user_id: user.id })
+              .select("id")
+              .single();
+            if (!newEx) continue;
+            exhibitorId = newEx.id;
+          }
+
+          // Upsert user_exhibitor
+          const firstMatch = validResults.find(r => r.shownBy.trim() === exName);
+          const { data: existingUe } = await supabase
+            .from("user_exhibitors")
+            .select("id, use_count")
+            .eq("user_id", user.id)
+            .eq("exhibitor_id", exhibitorId)
+            .limit(1);
+
+          if (existingUe && existingUe.length > 0) {
+            await supabase
+              .from("user_exhibitors")
+              .update({
+                use_count: existingUe[0].use_count + 1,
+                last_used_at: new Date().toISOString(),
+                last_show_name: firstMatch?.showName.trim() || null,
+                last_sire_name: firstMatch?.sireName.trim() || null,
+                last_dam_name: firstMatch?.damName.trim() || null,
+                last_breeder_id: postedAsBreederId,
+              })
+              .eq("id", existingUe[0].id);
+          } else {
+            await supabase.from("user_exhibitors").insert({
+              user_id: user.id,
+              exhibitor_id: exhibitorId,
+              label: exName === (profile?.display_name || profile?.first_name) ? "me" : "other",
+              use_count: 1,
+              last_used_at: new Date().toISOString(),
+              last_show_name: firstMatch?.showName.trim() || null,
+              last_sire_name: firstMatch?.sireName.trim() || null,
+              last_dam_name: firstMatch?.damName.trim() || null,
+              last_breeder_id: postedAsBreederId,
+            });
+          }
+        }
+      }
+
       const firstResult = validResults[0];
       setSuccessData({
         showName: firstResult.showName.trim(),
@@ -219,6 +299,7 @@ export default function SubmitWinnerPage() {
         caption: caption.trim(),
         imageUrls,
         resultCount: validResults.length,
+        postedAsBreederId,
       });
       
     } catch (err: any) {

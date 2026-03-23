@@ -2,6 +2,7 @@ import React from "react";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { AutocompleteInput } from "@/components/AutocompleteInput";
+import { ExhibitorPicker } from "@/components/ExhibitorPicker";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -74,11 +75,9 @@ export function ResultBlock({ result, index, total, onChange, onRemove, defaultE
             onChange={(e) => onChange({ ...result, winPlacing: e.target.value })}
             className="rounded-xl bg-card border-border h-11 text-sm"
           />
-          <Input
-            placeholder="Shown by *"
+          <ExhibitorPicker
             value={result.shownBy}
-            onChange={(e) => onChange({ ...result, shownBy: e.target.value })}
-            className="rounded-xl bg-card border-border h-11 text-sm"
+            onChange={(name) => onChange({ ...result, shownBy: name })}
           />
           <Input
             placeholder="Placed by"

@@ -65,6 +65,27 @@ export type Database = {
         }
         Relationships: []
       }
+      exhibitors: {
+        Row: {
+          created_at: string
+          created_by_user_id: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by_user_id: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          created_by_user_id?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       moderation_actions: {
         Row: {
           action: string
@@ -304,6 +325,53 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      user_exhibitors: {
+        Row: {
+          exhibitor_id: string
+          id: string
+          label: string
+          last_breeder_id: string | null
+          last_dam_name: string | null
+          last_show_name: string | null
+          last_sire_name: string | null
+          last_used_at: string
+          use_count: number
+          user_id: string
+        }
+        Insert: {
+          exhibitor_id: string
+          id?: string
+          label?: string
+          last_breeder_id?: string | null
+          last_dam_name?: string | null
+          last_show_name?: string | null
+          last_sire_name?: string | null
+          last_used_at?: string
+          use_count?: number
+          user_id: string
+        }
+        Update: {
+          exhibitor_id?: string
+          id?: string
+          label?: string
+          last_breeder_id?: string | null
+          last_dam_name?: string | null
+          last_show_name?: string | null
+          last_sire_name?: string | null
+          last_used_at?: string
+          use_count?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_exhibitors_exhibitor_id_fkey"
+            columns: ["exhibitor_id"]
+            isOneToOne: false
+            referencedRelation: "exhibitors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
