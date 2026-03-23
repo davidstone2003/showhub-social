@@ -476,6 +476,7 @@ export type Database = {
           sire_id: string | null
           sired_by: string | null
           source_post_id: string | null
+          species: string | null
           status: Database["public"]["Enums"]["post_status"]
           tags: string[] | null
           title: string
@@ -506,6 +507,7 @@ export type Database = {
           sire_id?: string | null
           sired_by?: string | null
           source_post_id?: string | null
+          species?: string | null
           status?: Database["public"]["Enums"]["post_status"]
           tags?: string[] | null
           title: string
@@ -536,6 +538,7 @@ export type Database = {
           sire_id?: string | null
           sired_by?: string | null
           source_post_id?: string | null
+          species?: string | null
           status?: Database["public"]["Enums"]["post_status"]
           tags?: string[] | null
           title?: string

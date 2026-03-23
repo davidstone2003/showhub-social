@@ -1,0 +1,1 @@
+ALTER TABLE public.winners ADD COLUMN species text NULL;
