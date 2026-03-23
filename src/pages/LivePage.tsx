@@ -2,69 +2,30 @@ import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
-import { formatDistanceToNow } from "date-fns";
-import { Plus, ArrowLeft } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { ArrowLeft, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { LiveRingFeed, LiveSalesFeed } from "@/components/LiveFeed";
 
-interface LiveResult {
-  id: string;
-  winPlacing: string | null;
-  shownBy: string;
-  bredBy: string | null;
-  createdAt: string;
-}
+type LiveTab = "shows" | "sales";
 
 const LivePage = () => {
   const { showId } = useParams<{ showId: string }>();
   const { user } = useAuth();
   const [showName, setShowName] = useState("");
-  const [results, setResults] = useState<LiveResult[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<LiveTab>("shows");
 
   useEffect(() => {
     if (!showId) return;
-
     async function load() {
-      // Fetch show name
       const { data: show } = await supabase
         .from("shows")
         .select("name")
         .eq("id", showId!)
         .single();
       if (show) setShowName(show.name);
-
-      // Fetch results
-      const { data } = await supabase
-        .from("winners")
-        .select("id, win_placing, shown_by, bred_by, created_at")
-        .eq("show_id", showId!)
-        .eq("status", "active")
-        .order("created_at", { ascending: false })
-        .limit(100);
-
-      setResults(
-        (data || []).map((d) => ({
-          id: d.id,
-          winPlacing: d.win_placing,
-          shownBy: d.shown_by,
-          bredBy: d.bred_by,
-          createdAt: d.created_at,
-        }))
-      );
-      setLoading(false);
     }
     load();
-
-    const channel = supabase
-      .channel(`live-${showId}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "winners" }, () => {
-        load();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, [showId]);
 
   return (
@@ -92,44 +53,35 @@ const LivePage = () => {
             </Link>
           )}
         </div>
+
+        {/* Shows / Sales pills */}
+        <div className="flex justify-center px-4 py-1 max-w-2xl mx-auto">
+          <div className="inline-flex rounded-md bg-muted/60 p-0.5">
+            {(["shows", "sales"] as LiveTab[]).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={cn(
+                  "rounded px-3.5 text-[11px] font-semibold capitalize transition-all",
+                  activeTab === tab
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+                style={{ height: 26, lineHeight: "26px" }}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Feed */}
+      {/* Content */}
       <div className="max-w-2xl mx-auto w-full">
-        {loading ? (
-          <div className="space-y-2 px-4 pt-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-14 bg-muted/50 rounded-lg animate-pulse" />
-            ))}
-          </div>
-        ) : results.length === 0 ? (
-          <div className="text-center py-16 px-4">
-            <p className="text-muted-foreground text-sm font-medium">Waiting for results…</p>
-            <p className="text-xs text-muted-foreground mt-1">Updates will appear here as they happen</p>
-          </div>
+        {activeTab === "shows" ? (
+          <LiveRingFeed showId={showId} />
         ) : (
-          <div className="px-3 pt-2 space-y-0.5">
-            {results.map((r) => (
-              <div
-                key={r.id}
-                className="flex items-start gap-2.5 px-2.5 py-2 rounded-lg hover:bg-muted/30 transition-colors"
-              >
-                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground truncate">
-                    {r.winPlacing || "Result"}
-                  </p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {r.shownBy}
-                    {r.bredBy ? ` • ${r.bredBy}` : ""}
-                  </p>
-                </div>
-                <span className="text-[10px] text-muted-foreground shrink-0 mt-0.5">
-                  {formatDistanceToNow(new Date(r.createdAt), { addSuffix: false })}
-                </span>
-              </div>
-            ))}
-          </div>
+          <LiveSalesFeed />
         )}
       </div>
     </Layout>
