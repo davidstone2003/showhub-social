@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, Plus, SlidersHorizontal, X } from "lucide-react";
+import { ArrowLeft, Plus, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { LiveRingFeed, LiveSalesFeed } from "@/components/LiveFeed";
 import {
@@ -11,12 +11,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-  DrawerFooter,
-  DrawerClose,
 } from "@/components/ui/drawer";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 
 type LiveTab = "shows" | "sales";
 
@@ -29,7 +24,6 @@ const LivePage = () => {
   const [showName, setShowName] = useState("");
   const [activeTab, setActiveTab] = useState<LiveTab>("shows");
   const [species, setSpecies] = useState<Species>("All");
-  const [pendingSpecies, setPendingSpecies] = useState<Species>("All");
   const [filterOpen, setFilterOpen] = useState(false);
 
   useEffect(() => {
@@ -45,18 +39,9 @@ const LivePage = () => {
     load();
   }, [showId]);
 
-  const openFilter = () => {
-    setPendingSpecies(species);
-    setFilterOpen(true);
-  };
-
-  const applyFilter = () => {
-    setSpecies(pendingSpecies);
+  const selectSpecies = (s: Species) => {
+    setSpecies(s);
     setFilterOpen(false);
-  };
-
-  const clearFilter = () => {
-    setSpecies("All");
   };
 
   const speciesValue = species === "All" ? undefined : species.toLowerCase();
@@ -77,23 +62,24 @@ const LivePage = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0">
-            {/* Species filter chip or button */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Species label / active chip */}
             {species !== "All" ? (
               <button
-                onClick={clearFilter}
-                className="inline-flex items-center gap-1 bg-primary/10 text-primary rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors hover:bg-primary/20"
+                onClick={() => setSpecies("All")}
+                className="inline-flex items-center gap-1 text-primary text-[11px] font-medium transition-colors"
               >
+                <span className="w-1 h-1 rounded-full bg-primary shrink-0" />
                 {species}
                 <X className="w-3 h-3" />
               </button>
             ) : (
               <button
-                onClick={openFilter}
-                className="p-1.5 rounded-lg hover:bg-muted transition-colors"
-                aria-label="Filter"
+                onClick={() => setFilterOpen(true)}
+                className="inline-flex items-center gap-1 text-muted-foreground text-[11px] font-medium hover:text-foreground transition-colors"
               >
-                <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
+                <span className="w-1 h-1 rounded-full bg-muted-foreground shrink-0" />
+                Species
               </button>
             )}
 
@@ -140,37 +126,28 @@ const LivePage = () => {
         )}
       </div>
 
-      {/* Species filter drawer */}
+      {/* Species bottom sheet */}
       <Drawer open={filterOpen} onOpenChange={setFilterOpen}>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>Filter by species</DrawerTitle>
+            <DrawerTitle>Species</DrawerTitle>
           </DrawerHeader>
-          <div className="px-4 pb-2">
-            <RadioGroup
-              value={pendingSpecies}
-              onValueChange={(v) => setPendingSpecies(v as Species)}
-              className="gap-0"
-            >
-              {SPECIES_OPTIONS.map((opt) => (
-                <label
-                  key={opt}
-                  className="flex items-center gap-3 px-2 py-3 rounded-lg hover:bg-muted/40 cursor-pointer transition-colors"
-                >
-                  <RadioGroupItem value={opt} id={`species-${opt}`} />
-                  <Label htmlFor={`species-${opt}`} className="text-sm font-medium cursor-pointer">
-                    {opt}
-                  </Label>
-                </label>
-              ))}
-            </RadioGroup>
+          <div className="px-4 pb-6">
+            {SPECIES_OPTIONS.map((opt) => (
+              <button
+                key={opt}
+                onClick={() => selectSpecies(opt)}
+                className={cn(
+                  "w-full text-left px-3 py-3 rounded-lg text-sm font-medium transition-colors",
+                  species === opt
+                    ? "bg-primary/10 text-primary"
+                    : "text-foreground hover:bg-muted/50"
+                )}
+              >
+                {opt}
+              </button>
+            ))}
           </div>
-          <DrawerFooter>
-            <Button onClick={applyFilter} className="w-full">Apply</Button>
-            <DrawerClose asChild>
-              <Button variant="outline" className="w-full">Cancel</Button>
-            </DrawerClose>
-          </DrawerFooter>
         </DrawerContent>
       </Drawer>
     </Layout>
