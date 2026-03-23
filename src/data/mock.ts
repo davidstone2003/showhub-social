@@ -47,6 +47,8 @@ export interface Post {
   dam?: string;
   placed_by?: string;
   win_placing?: string;
+  user_id?: string | null;
+  status?: string;
 }
 
 export interface Animal {
