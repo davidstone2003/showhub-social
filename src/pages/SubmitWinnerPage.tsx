@@ -190,26 +190,50 @@ export default function SubmitWinnerPage() {
 
       // 2. Create winner cards for each valid result
       const validResults = results.filter(r => r.showName.trim() && r.shownBy.trim());
+      const winnerRefs: WinnerRef[] = [];
       
       for (const result of validResults) {
         const resolvedShowId = await ensureLookupEntry("shows", result.showName, result.showId);
-        const resolvedSireId = result.sireName.trim()
-          ? await ensureLookupEntry("sires_lookup", result.sireName, result.sireId)
+
+        // Auto-fill sire from context if not provided
+        let autoSireName = result.sireName.trim();
+        let autoSireId = result.sireId;
+        let autoDamName = result.damName.trim();
+
+        if (!autoSireName && user) {
+          const { data: ctx } = await supabase
+            .from("exhibitor_animal_context")
+            .select("sire_name, sire_id, dam_name")
+            .eq("user_id", user.id)
+            .ilike("exhibitor_name", result.shownBy.trim())
+            .ilike("show_name", result.showName.trim())
+            .order("use_count", { ascending: false })
+            .limit(1);
+
+          if (ctx && ctx.length > 0 && ctx[0].sire_name) {
+            autoSireName = ctx[0].sire_name;
+            autoSireId = ctx[0].sire_id;
+            if (!autoDamName && ctx[0].dam_name) autoDamName = ctx[0].dam_name;
+          }
+        }
+
+        const resolvedSireId = autoSireName
+          ? await ensureLookupEntry("sires_lookup", autoSireName, autoSireId)
           : null;
 
         const title = result.winPlacing.trim()
           ? `${result.winPlacing.trim()} — ${result.showName.trim()}`
           : result.showName.trim();
 
-        const { error: winError } = await (supabase.from("winners") as any).insert({
+        const { data: winData, error: winError } = await (supabase.from("winners") as any).insert({
           source_post_id: sourcePostId,
           title,
           show_name: result.showName.trim(),
           shown_by: result.shownBy.trim(),
           placed_by: result.placedBy.trim() || null,
-          sired_by: result.sireName.trim() || null,
+          sired_by: autoSireName || null,
           sire_id: resolvedSireId,
-          dam: result.damName.trim() || null,
+          dam: autoDamName || null,
           win_placing: result.winPlacing.trim() || null,
           caption: caption.trim() || null,
           tags: [],
@@ -223,9 +247,19 @@ export default function SubmitWinnerPage() {
           show_on_breeder_page: toggles.breederPage,
           show_on_winners_archive: toggles.winnersArchive,
           is_featured: toggles.featured,
-        });
+        }).select("id").single();
 
         if (winError) throw winError;
+
+        // Only add to sire suggestion if sire wasn't auto-filled
+        if (!autoSireName) {
+          winnerRefs.push({
+            winnerId: winData.id,
+            showName: result.showName.trim(),
+            shownBy: result.shownBy.trim(),
+            showId: resolvedShowId,
+          });
+        }
       }
 
       // Save exhibitors for memory
