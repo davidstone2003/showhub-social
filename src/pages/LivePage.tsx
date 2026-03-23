@@ -21,76 +21,78 @@ interface LiveItem {
   type: "result" | "sale";
   headline: string;
   detail: string;
-  createdAt: string;
+  postedAt: string;
 }
 
 const LivePage = () => {
   const { showId } = useParams<{ showId: string }>();
   const { user } = useAuth();
-  const [showName, setShowName] = useState("");
+  const [eventName, setEventName] = useState("");
+  const [eventId, setEventId] = useState<string | null>(null);
   const [species, setSpecies] = useState<Species>("All");
   const [filterOpen, setFilterOpen] = useState(false);
   const [items, setItems] = useState<LiveItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Resolve event by slug or fallback to first live event
   useEffect(() => {
-    if (!showId) return;
-    supabase.from("shows").select("name").eq("id", showId).single().then(({ data }) => {
-      if (data) setShowName(data.name);
-    });
+    async function resolveEvent() {
+      let query = supabase.from("events").select("id, name, slug");
+      if (showId) {
+        query = query.eq("slug", showId);
+      } else {
+        query = query.eq("is_live", true).order("is_featured", { ascending: false });
+      }
+      const { data } = await query.limit(1).single();
+      if (data) {
+        setEventId(data.id);
+        setEventName(data.name);
+      }
+    }
+    resolveEvent();
   }, [showId]);
 
+  // Load live_updates for the resolved event
   useEffect(() => {
+    if (!eventId) return;
+
     async function load() {
       setLoading(true);
       const speciesValue = species === "All" ? undefined : species.toLowerCase();
 
       let query = supabase
-        .from("winners")
-        .select("id, win_placing, show_name, shown_by, bred_by, created_at, posted_as_breeder_id, species")
-        .eq("status", "active")
-        .order("created_at", { ascending: false })
+        .from("live_updates")
+        .select("id, update_type, title, line_1, line_2, species, posted_at")
+        .eq("event_id", eventId!)
+        .order("posted_at", { ascending: false })
         .limit(50);
 
-      if (showId) query = query.eq("show_id", showId);
-      else {
-        const today = new Date().toISOString().split("T")[0];
-        query = query.gte("date", today);
-      }
       if (speciesValue) query = query.ilike("species", speciesValue);
 
       const { data } = await query;
 
-      if (data) {
-        const breederIds = [...new Set(data.filter(d => d.posted_as_breeder_id).map(d => d.posted_as_breeder_id!))];
-        let breederMap: Record<string, string> = {};
-        if (breederIds.length > 0) {
-          const { data: bps } = await supabase.from("breeder_profiles").select("id, breeder_name").in("id", breederIds);
-          if (bps) breederMap = Object.fromEntries(bps.map(b => [b.id, b.breeder_name]));
-        }
-
-        setItems(data.map(d => {
-          const breederName = d.posted_as_breeder_id ? breederMap[d.posted_as_breeder_id] || d.bred_by : d.bred_by;
-          return {
-            id: d.id,
-            type: "result" as const,
-            headline: d.win_placing || "Result",
-            detail: [d.shown_by, breederName].filter(Boolean).join(" • "),
-            createdAt: d.created_at,
-          };
-        }));
-      }
+      setItems(
+        (data || []).map((d) => ({
+          id: d.id,
+          type: d.update_type === "sale_update" ? ("sale" as const) : ("result" as const),
+          headline: d.title,
+          detail: [d.line_1, d.line_2].filter(Boolean).join(" • "),
+          postedAt: d.posted_at,
+        }))
+      );
       setLoading(false);
     }
     load();
 
     const channel = supabase
       .channel("live-unified")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "winners" }, () => { load(); })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "live_updates" }, () => {
+        load();
+      })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [showId, species]);
+  }, [eventId, species]);
 
   const selectSpecies = (s: Species) => {
     setSpecies(s);
@@ -108,7 +110,7 @@ const LivePage = () => {
             </Link>
             <div className="flex items-center gap-1.5 min-w-0">
               <span className="inline-block w-2 h-2 rounded-full bg-destructive animate-pulse shrink-0" />
-              <span className="text-sm font-bold text-foreground truncate">{showName || "Live"}</span>
+              <span className="text-sm font-bold text-foreground truncate">{eventName || "Live"}</span>
               <span className="text-[10px] font-semibold text-destructive shrink-0">LIVE</span>
             </div>
           </div>
@@ -135,7 +137,7 @@ const LivePage = () => {
 
             {user && (
               <Link
-                to={`/submit${showId ? `?show=${showId}` : ""}`}
+                to={`/submit${eventId ? `?show=${eventId}` : ""}`}
                 className="inline-flex items-center gap-1 bg-primary text-primary-foreground font-semibold rounded-lg px-3 py-1.5 text-xs hover:bg-primary/90 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -171,7 +173,7 @@ const LivePage = () => {
                   <p className="text-xs text-muted-foreground truncate">{item.detail}</p>
                 </div>
                 <span className="text-[10px] text-muted-foreground shrink-0 mt-0.5">
-                  {formatDistanceToNow(new Date(item.createdAt), { addSuffix: false })}
+                  {formatDistanceToNow(new Date(item.postedAt), { addSuffix: false })}
                 </span>
               </div>
             ))}
