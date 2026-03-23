@@ -233,34 +233,48 @@ function PlacementRow({ entry }: { entry: SlotEntry }) {
   const isGrand = entry.slot === "grand";
   const isTopThree = entry.slot === "grand" || entry.slot === "reserve" || entry.slot === "third";
 
-  return (
-    <div>
-      {/* Grand: image above text */}
-      {isGrand && entry.image && (
+  if (isGrand && entry.image) {
+    return (
+      <div className="flex items-center gap-4">
         <img
           src={entry.image}
           alt={label}
-          className="w-24 h-24 rounded-xl object-cover bg-muted mb-2.5"
+          className="w-[88px] h-[88px] rounded-xl object-cover bg-muted flex-shrink-0"
           loading="lazy"
         />
-      )}
+        <div className="min-w-0">
+          <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
+            {icon && <span className="mr-1.5">{icon}</span>}
+            {label}
+          </p>
+          {entry.filled ? (
+            <>
+              <p className="text-[19px] text-foreground font-semibold leading-snug mt-1">{entry.exhibitor}</p>
+              {entry.breeder && <p className="text-[14px] text-muted-foreground mt-0.5">{entry.breeder}</p>}
+            </>
+          ) : (
+            <p className="text-[14px] text-muted-foreground/50 italic mt-1">Not yet posted</p>
+          )}
+        </div>
+      </div>
+    );
+  }
 
-      <p className="text-[14px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
+  return (
+    <div>
+      <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
         {icon && <span className="mr-1.5">{icon}</span>}
         {label}
       </p>
-
       {entry.filled ? (
         <>
-          <p className={`text-foreground font-semibold leading-snug mt-1 ${isGrand ? "text-[20px]" : isTopThree ? "text-[17px]" : "text-[16px]"}`}>
+          <p className={`text-foreground font-semibold leading-snug mt-1 ${isTopThree ? "text-[16px]" : "text-[15px]"}`}>
             {entry.exhibitor}
           </p>
-          {entry.breeder && (
-            <p className="text-[15px] text-muted-foreground mt-0.5">{entry.breeder}</p>
-          )}
+          {entry.breeder && <p className="text-[14px] text-muted-foreground mt-0.5">{entry.breeder}</p>}
         </>
       ) : (
-        <p className="text-[15px] text-muted-foreground/50 italic mt-1">Not yet posted</p>
+        <p className="text-[14px] text-muted-foreground/50 italic mt-1">Not yet posted</p>
       )}
     </div>
   );
