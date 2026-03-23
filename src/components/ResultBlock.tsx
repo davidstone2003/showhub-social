@@ -2,6 +2,7 @@ import React from "react";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { AutocompleteInput } from "@/components/AutocompleteInput";
+import { ExhibitorPicker } from "@/components/ExhibitorPicker";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
