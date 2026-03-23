@@ -65,6 +65,7 @@ export const MarketPage = () => (
                   ))}
                 </div>
               )}
+            </div>
           </div>
         ))}
       </div>
