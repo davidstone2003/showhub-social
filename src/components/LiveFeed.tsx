@@ -20,21 +20,31 @@ interface LiveSale {
   createdAt: string;
 }
 
-export function LiveRingFeed() {
+interface LiveRingFeedProps {
+  showId?: string;
+}
+
+export function LiveRingFeed({ showId }: LiveRingFeedProps) {
   const [results, setResults] = useState<LiveResult[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetch() {
-      // Get recent winners from today, ordered by recency
-      const today = new Date().toISOString().split("T")[0];
-      const { data } = await supabase
+      let query = supabase
         .from("winners")
         .select("id, win_placing, show_name, shown_by, bred_by, created_at, posted_as_breeder_id")
         .eq("status", "active")
-        .gte("date", today)
         .order("created_at", { ascending: false })
         .limit(50);
+
+      if (showId) {
+        query = query.eq("show_id", showId);
+      } else {
+        const today = new Date().toISOString().split("T")[0];
+        query = query.gte("date", today);
+      }
+
+      const { data } = await query;
 
       if (data) {
         // Resolve breeder names
@@ -70,7 +80,7 @@ export function LiveRingFeed() {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, []);
+  }, [showId]);
 
   if (loading) {
     return (
