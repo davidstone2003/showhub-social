@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
-import { Link } from "react-router-dom";
-import { Plus } from "lucide-react";
+
 
 interface LiveResult {
   id: string;
@@ -96,16 +95,9 @@ export function LiveRingFeed({ showId }: LiveRingFeedProps) {
 
   if (results.length === 0) {
     return (
-      <div className="text-center py-16 px-4">
+      <div className="text-center py-12 px-4">
         <p className="text-muted-foreground text-sm font-medium">Waiting for results…</p>
-        <p className="text-xs text-muted-foreground mt-1.5">Be the first to post</p>
-        <Link
-          to="/submit"
-          className="inline-flex items-center gap-1.5 mt-4 bg-primary text-primary-foreground font-semibold rounded-full px-5 py-2 text-sm hover:bg-primary/90 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Post Result
-        </Link>
+        <p className="text-xs text-muted-foreground mt-1">Be the first to post</p>
       </div>
     );
   }
