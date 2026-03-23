@@ -76,7 +76,7 @@ export default function SubmitWinnerPage() {
   /* Post type + toggles */
   const [postType, setPostType] = useState<PostType>("winner");
   const [toggles, setToggles] = useState(getDefaultToggles("winner"));
-  const [postedAsBreederId, setPostedAsBreederId] = useState<string | null>(null);
+  const [postedAsBreederId, setPostedAsBreederId] = useState<string | null>(carryForward?.postedAsBreederId || null);
 
   const [successData, setSuccessData] = useState<{
     showName: string; winPlacing: string; shownBy: string;
