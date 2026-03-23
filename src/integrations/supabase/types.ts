@@ -147,6 +147,59 @@ export type Database = {
           },
         ]
       }
+      posts: {
+        Row: {
+          caption: string | null
+          comments: number
+          created_at: string
+          id: string
+          image_urls: string[] | null
+          likes: number
+          post_type: string
+          posted_as_breeder_id: string | null
+          show_on_feed: boolean
+          status: string
+          tags: string[] | null
+          user_id: string | null
+        }
+        Insert: {
+          caption?: string | null
+          comments?: number
+          created_at?: string
+          id?: string
+          image_urls?: string[] | null
+          likes?: number
+          post_type?: string
+          posted_as_breeder_id?: string | null
+          show_on_feed?: boolean
+          status?: string
+          tags?: string[] | null
+          user_id?: string | null
+        }
+        Update: {
+          caption?: string | null
+          comments?: number
+          created_at?: string
+          id?: string
+          image_urls?: string[] | null
+          likes?: number
+          post_type?: string
+          posted_as_breeder_id?: string | null
+          show_on_feed?: boolean
+          status?: string
+          tags?: string[] | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_posted_as_breeder_id_fkey"
+            columns: ["posted_as_breeder_id"]
+            isOneToOne: false
+            referencedRelation: "breeder_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           account_type: string
@@ -294,6 +347,7 @@ export type Database = {
           shown_by: string
           sire_id: string | null
           sired_by: string | null
+          source_post_id: string | null
           status: Database["public"]["Enums"]["post_status"]
           tags: string[] | null
           title: string
@@ -323,6 +377,7 @@ export type Database = {
           shown_by: string
           sire_id?: string | null
           sired_by?: string | null
+          source_post_id?: string | null
           status?: Database["public"]["Enums"]["post_status"]
           tags?: string[] | null
           title: string
@@ -352,6 +407,7 @@ export type Database = {
           shown_by?: string
           sire_id?: string | null
           sired_by?: string | null
+          source_post_id?: string | null
           status?: Database["public"]["Enums"]["post_status"]
           tags?: string[] | null
           title?: string
@@ -385,6 +441,13 @@ export type Database = {
             columns: ["sire_id"]
             isOneToOne: false
             referencedRelation: "sires_lookup"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "winners_source_post_id_fkey"
+            columns: ["source_post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
             referencedColumns: ["id"]
           },
         ]
