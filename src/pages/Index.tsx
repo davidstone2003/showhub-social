@@ -1,15 +1,13 @@
 import { Layout } from "@/components/Layout";
-import { Feed } from "@/components/Feed";
 import { LiveStrip } from "@/components/LiveStrip";
+import { HomeLiveActivity } from "@/components/HomeLiveActivity";
 
 const Index = () => {
   return (
     <Layout showDiscovery={false}>
       <div className="max-w-2xl mx-auto w-full">
-        {/* Compact live strip */}
         <LiveStrip />
-        {/* Main social feed */}
-        <Feed />
+        <HomeLiveActivity />
       </div>
     </Layout>
   );
