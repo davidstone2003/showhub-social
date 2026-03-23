@@ -15,6 +15,7 @@ import { ImagePlus, X, LogIn, Sparkles, ArrowLeft, Plus, Trophy } from "lucide-r
 import { IdentitySelector } from "@/components/IdentitySelector";
 import { cn } from "@/lib/utils";
 import PostSuccessScreen from "@/components/PostSuccessScreen";
+import type { WinnerRef } from "@/components/PostSuccessScreen";
 import SmartUpload from "@/components/SmartUpload";
 import type { MultiExtractResult } from "@/components/SmartUpload";
 import { ResultBlock, createEmptyResult } from "@/components/ResultBlock";
