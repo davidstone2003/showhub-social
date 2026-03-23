@@ -24,7 +24,11 @@ export function MobileNav() {
               }`
             }
           >
-            <item.icon className="w-5 h-5" />
+            {"emoji" in item ? (
+              <span className="text-[20px] leading-5 h-5">{item.emoji}</span>
+            ) : (
+              <item.icon className="w-5 h-5" />
+            )}
             {item.label}
           </NavLink>
         ))}

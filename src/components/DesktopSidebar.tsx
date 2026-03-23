@@ -1,4 +1,4 @@
-import { Home, Trophy, DollarSign, Users, FolderHeart, ShoppingBag, Plus, LogIn, LogOut, User, Shield } from "lucide-react";
+import { Home, Trophy, Users, FolderHeart, ShoppingBag, Plus, LogIn, LogOut, User, Shield } from "lucide-react";
 import { NavLink, Link } from "react-router-dom";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,7 +7,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 const navItems = [
   { icon: Home, label: "Home", to: "/" },
   { icon: Trophy, label: "Winners", to: "/winners" },
-  { icon: DollarSign, label: "Sales", to: "/sales" },
+  { emoji: "💰", label: "Sales", to: "/sales" },
   { icon: Users, label: "Breeders", to: "/breeders" },
   { icon: FolderHeart, label: "Repo", to: "/repo" },
   { icon: ShoppingBag, label: "Market", to: "/market" },
