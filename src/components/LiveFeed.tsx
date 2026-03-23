@@ -34,7 +34,7 @@ export function LiveRingFeed({ showId, species }: LiveRingFeedProps) {
     async function fetch() {
       let query = supabase
         .from("winners")
-        .select("id, win_placing, show_name, shown_by, bred_by, created_at, posted_as_breeder_id")
+        .select("id, win_placing, show_name, shown_by, bred_by, created_at, posted_as_breeder_id, species")
         .eq("status", "active")
         .order("created_at", { ascending: false })
         .limit(50);
@@ -44,6 +44,10 @@ export function LiveRingFeed({ showId, species }: LiveRingFeedProps) {
       } else {
         const today = new Date().toISOString().split("T")[0];
         query = query.gte("date", today);
+      }
+
+      if (species) {
+        query = query.ilike("species", species);
       }
 
       const { data } = await query;
