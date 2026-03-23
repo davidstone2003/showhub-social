@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Layout } from "@/components/Layout";
 import { Link } from "react-router-dom";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, ChevronDown, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { normalizePlace, SLOT_ORDER, SLOT_LABELS, SLOT_ICONS, type PlacementSlot } from "@/lib/normalizePlace";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface WinnerRow {
   id: string;
   show_name: string;
+  show_id: string | null;
   win_placing: string | null;
   shown_by: string;
   bred_by: string | null;
@@ -24,35 +25,50 @@ interface WinnerRow {
 
 interface SlotEntry {
   slot: PlacementSlot;
-  exhibitor: string;
+  exhibitor: string | null;
   breeder: string | null;
   image: string | null;
-  rawPlacing: string | null;
+  filled: boolean;
 }
 
 interface ShowBlock {
   showName: string;
   latestDate: string;
+  location: string | null;
   species: string | null;
   slots: SlotEntry[];
-  classCount: number;
+  classResults: { placing: string; exhibitor: string; breeder: string | null }[];
 }
 
 /* ── Page ── */
 export default function WinnersPage() {
   const [rows, setRows] = useState<WinnerRow[]>([]);
+  const [eventMeta, setEventMeta] = useState<Map<string, { location: string | null }>>(new Map());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase
-        .from("winners")
-        .select("id, show_name, win_placing, shown_by, bred_by, placed_by, sired_by, dam, image_urls, date, created_at, species")
-        .eq("status", "active")
-        .eq("show_on_winners_archive", true)
-        .order("created_at", { ascending: false })
-        .limit(500);
-      setRows(data || []);
+      const [winnersRes, eventsRes] = await Promise.all([
+        supabase
+          .from("winners")
+          .select("id, show_name, show_id, win_placing, shown_by, bred_by, placed_by, sired_by, dam, image_urls, date, created_at, species")
+          .eq("status", "active")
+          .eq("show_on_winners_archive", true)
+          .order("created_at", { ascending: false })
+          .limit(500),
+        supabase
+          .from("events")
+          .select("id, location")
+          .limit(200),
+      ]);
+
+      setRows(winnersRes.data || []);
+
+      const meta = new Map<string, { location: string | null }>();
+      for (const e of eventsRes.data || []) {
+        meta.set(e.id, { location: e.location });
+      }
+      setEventMeta(meta);
       setLoading(false);
     }
     load();
@@ -70,16 +86,21 @@ export default function WinnersPage() {
     const blocks: ShowBlock[] = [];
     for (const [, posts] of grouped) {
       const filledSlots = new Map<PlacementSlot, SlotEntry>();
-      let classCount = 0;
+      const classResults: { placing: string; exhibitor: string; breeder: string | null }[] = [];
 
       for (const p of posts) {
         const slot = normalizePlace(p.win_placing);
         if (!slot) {
-          classCount++;
+          if (p.win_placing) {
+            classResults.push({
+              placing: p.win_placing,
+              exhibitor: p.shown_by,
+              breeder: p.bred_by,
+            });
+          }
           continue;
         }
         if (filledSlots.has(slot)) {
-          // Upgrade: replace if this post has an image and existing doesn't
           const existing = filledSlots.get(slot)!;
           const newImg = p.image_urls?.[0] || null;
           if (!existing.image && newImg) {
@@ -88,7 +109,7 @@ export default function WinnersPage() {
               exhibitor: p.shown_by,
               breeder: p.bred_by,
               image: newImg,
-              rawPlacing: p.win_placing,
+              filled: true,
             });
           }
           continue;
@@ -98,42 +119,33 @@ export default function WinnersPage() {
           exhibitor: p.shown_by,
           breeder: p.bred_by,
           image: p.image_urls?.[0] || null,
-          rawPlacing: p.win_placing,
+          filled: true,
         });
       }
 
-      const orderedSlots = SLOT_ORDER
-        .filter((s) => filledSlots.has(s))
-        .map((s) => filledSlots.get(s)!);
-
-      // Also add empty slots for grand/reserve if not filled
-      const displaySlots: SlotEntry[] = [];
-      for (const s of SLOT_ORDER.slice(0, 2)) {
-        if (filledSlots.has(s)) {
-          displaySlots.push(filledSlots.get(s)!);
-        } else {
-          displaySlots.push({ slot: s, exhibitor: "—", breeder: null, image: null, rawPlacing: null });
-        }
-      }
-      // Add 3rd-5th only if they exist
-      for (const s of SLOT_ORDER.slice(2)) {
-        if (filledSlots.has(s)) displaySlots.push(filledSlots.get(s)!);
-      }
+      // Build display: always show grand through 5th, unfilled = placeholder
+      const displaySlots: SlotEntry[] = SLOT_ORDER.map((s) =>
+        filledSlots.has(s)
+          ? filledSlots.get(s)!
+          : { slot: s, exhibitor: null, breeder: null, image: null, filled: false }
+      );
 
       const ref = posts[0];
+      const evMeta = ref.show_id ? eventMeta.get(ref.show_id) : undefined;
+
       blocks.push({
         showName: ref.show_name,
         latestDate: ref.date || ref.created_at,
+        location: evMeta?.location || null,
         species: ref.species,
         slots: displaySlots,
-        classCount,
+        classResults,
       });
     }
 
-    // Sort by most recent activity
     blocks.sort((a, b) => new Date(b.latestDate).getTime() - new Date(a.latestDate).getTime());
     return blocks;
-  }, [rows]);
+  }, [rows, eventMeta]);
 
   return (
     <Layout showDiscovery={false}>
@@ -159,7 +171,7 @@ export default function WinnersPage() {
                 <div key={i} className="space-y-2">
                   <Skeleton className="h-5 w-48" />
                   <Skeleton className="h-3 w-32" />
-                  <Skeleton className="h-16 w-full" />
+                  <Skeleton className="h-20 w-full" />
                 </div>
               ))}
             </div>
@@ -168,7 +180,7 @@ export default function WinnersPage() {
               <p className="text-muted-foreground text-sm">No results posted yet</p>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-8">
               {shows.map((block) => (
                 <ShowResultBlock key={block.showName} block={block} />
               ))}
@@ -182,56 +194,73 @@ export default function WinnersPage() {
 
 /* ── Show Result Block ── */
 function ShowResultBlock({ block }: { block: ShowBlock }) {
+  const [classOpen, setClassOpen] = useState(false);
   const year = new Date(block.latestDate).getFullYear();
+  const metaParts = [String(year)];
+  if (block.location) metaParts.push(block.location);
 
   return (
-    <div className="border-b border-border pb-5 last:border-b-0">
+    <div className="border-b border-border pb-6 last:border-b-0">
       {/* Show header */}
-      <div className="mb-3">
-        <h3 className="text-[15px] font-bold text-foreground leading-snug">
-          {block.showName}
-          {block.species && (
-            <span className="text-muted-foreground font-normal"> • {block.species}</span>
-          )}
-        </h3>
-        <p className="text-[12px] text-muted-foreground mt-0.5">{year}</p>
-      </div>
+      <h3 className="text-[16px] font-bold text-foreground leading-snug">{block.showName}</h3>
+      <p className="text-[12px] text-muted-foreground mt-0.5">
+        {metaParts.join(" • ")}
+      </p>
 
       {/* Placement slots */}
-      <div className="space-y-3">
-        {block.slots.map((entry, i) => (
-          <PlacementRow key={entry.slot} entry={entry} showImage={i === 0} />
+      <div className="mt-4 space-y-4">
+        {block.slots.map((entry) => (
+          <PlacementRow key={entry.slot} entry={entry} />
         ))}
       </div>
 
-      {/* Class results hint */}
-      {block.classCount > 0 && (
-        <p className="text-[12px] text-muted-foreground mt-3">
-          + {block.classCount} class result{block.classCount > 1 ? "s" : ""}
-        </p>
-      )}
-
-      {/* View All */}
+      {/* View Full Results */}
       <Link
         to={`/events/${encodeURIComponent(block.showName)}/results`}
-        className="inline-block mt-2 text-[12px] font-semibold text-primary"
+        className="inline-block mt-4 text-[13px] font-semibold text-primary"
       >
-        View All Results →
+        View Full Results →
       </Link>
+
+      {/* Class Results */}
+      {block.classResults.length > 0 && (
+        <div className="mt-3">
+          <button
+            onClick={() => setClassOpen(!classOpen)}
+            className="flex items-center gap-1 text-[12px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {classOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+            Class Results ({block.classResults.length})
+          </button>
+
+          {classOpen && (
+            <div className="mt-2 space-y-0.5 pl-1">
+              {block.classResults.map((c, i) => (
+                <div key={i} className="flex items-baseline gap-2 py-0.5">
+                  <span className="text-[12px] text-foreground">{c.placing}</span>
+                  <span className="text-[12px] text-muted-foreground">
+                    {c.exhibitor}
+                    {c.breeder && ` • ${c.breeder}`}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
 /* ── Placement Row ── */
-function PlacementRow({ entry, showImage }: { entry: SlotEntry; showImage: boolean }) {
+function PlacementRow({ entry }: { entry: SlotEntry }) {
   const icon = SLOT_ICONS[entry.slot];
   const label = SLOT_LABELS[entry.slot];
-  const isEmpty = entry.exhibitor === "—";
 
   return (
     <div className="flex gap-3">
-      {/* Image for Grand only */}
-      {showImage && entry.image && (
+      {/* Image for Grand only, if available */}
+      {entry.slot === "grand" && entry.image && (
         <img
           src={entry.image}
           alt={label}
@@ -241,17 +270,22 @@ function PlacementRow({ entry, showImage }: { entry: SlotEntry; showImage: boole
       )}
 
       <div className="min-w-0">
-        <p className="text-[12px] text-muted-foreground font-medium leading-tight">
+        <p className="text-[12px] text-muted-foreground font-semibold uppercase tracking-wide leading-tight">
           {icon && <span className="mr-1">{icon}</span>}
           {label}
         </p>
-        <p className={`text-[14px] leading-snug mt-0.5 ${isEmpty ? "text-muted-foreground/50" : "text-foreground font-semibold"}`}>
-          {entry.exhibitor}
-        </p>
-        {entry.breeder && !isEmpty && (
-          <p className="text-[12px] text-muted-foreground mt-0.5">
-            Bred by {entry.breeder}
-          </p>
+
+        {entry.filled ? (
+          <>
+            <p className="text-[14px] text-foreground font-semibold leading-snug mt-0.5">
+              {entry.exhibitor}
+            </p>
+            {entry.breeder && (
+              <p className="text-[12px] text-muted-foreground mt-0.5">{entry.breeder}</p>
+            )}
+          </>
+        ) : (
+          <p className="text-[13px] text-muted-foreground/50 italic mt-0.5">Not yet posted</p>
         )}
       </div>
     </div>
