@@ -44,6 +44,8 @@ export function LiveRingFeed({ showId }: LiveRingFeedProps) {
         query = query.gte("date", today);
       }
 
+      const { data } = await query;
+
       if (data) {
         // Resolve breeder names
         const breederIds = [...new Set(data.filter(d => d.posted_as_breeder_id).map(d => d.posted_as_breeder_id!))];
