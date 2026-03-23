@@ -56,25 +56,18 @@ export default function WinnersPage() {
           .eq("show_on_winners_archive", true)
           .order("created_at", { ascending: false })
           .limit(500),
-        supabase
-          .from("events")
-          .select("id, location")
-          .limit(200),
+        supabase.from("events").select("id, location").limit(200),
       ]);
 
       setRows(winnersRes.data || []);
-
       const meta = new Map<string, { location: string | null }>();
-      for (const e of eventsRes.data || []) {
-        meta.set(e.id, { location: e.location });
-      }
+      for (const e of eventsRes.data || []) meta.set(e.id, { location: e.location });
       setEventMeta(meta);
       setLoading(false);
     }
     load();
   }, []);
 
-  /* Compile into show blocks */
   const shows = useMemo(() => {
     const grouped = new Map<string, WinnerRow[]>();
     for (const r of rows) {
@@ -91,43 +84,22 @@ export default function WinnersPage() {
       for (const p of posts) {
         const slot = normalizePlace(p.win_placing);
         if (!slot) {
-          if (p.win_placing) {
-            classResults.push({
-              placing: p.win_placing,
-              exhibitor: p.shown_by,
-              breeder: p.bred_by,
-            });
-          }
+          if (p.win_placing) classResults.push({ placing: p.win_placing, exhibitor: p.shown_by, breeder: p.bred_by });
           continue;
         }
         if (filledSlots.has(slot)) {
           const existing = filledSlots.get(slot)!;
           const newImg = p.image_urls?.[0] || null;
           if (!existing.image && newImg) {
-            filledSlots.set(slot, {
-              slot,
-              exhibitor: p.shown_by,
-              breeder: p.bred_by,
-              image: newImg,
-              filled: true,
-            });
+            filledSlots.set(slot, { slot, exhibitor: p.shown_by, breeder: p.bred_by, image: newImg, filled: true });
           }
           continue;
         }
-        filledSlots.set(slot, {
-          slot,
-          exhibitor: p.shown_by,
-          breeder: p.bred_by,
-          image: p.image_urls?.[0] || null,
-          filled: true,
-        });
+        filledSlots.set(slot, { slot, exhibitor: p.shown_by, breeder: p.bred_by, image: p.image_urls?.[0] || null, filled: true });
       }
 
-      // Build display: always show grand through 5th, unfilled = placeholder
       const displaySlots: SlotEntry[] = SLOT_ORDER.map((s) =>
-        filledSlots.has(s)
-          ? filledSlots.get(s)!
-          : { slot: s, exhibitor: null, breeder: null, image: null, filled: false }
+        filledSlots.has(s) ? filledSlots.get(s)! : { slot: s, exhibitor: null, breeder: null, image: null, filled: false }
       );
 
       const ref = posts[0];
@@ -151,36 +123,35 @@ export default function WinnersPage() {
     <Layout showDiscovery={false}>
       <div className="mx-auto max-w-2xl pb-24">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-background border-b border-border px-4 py-3 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-foreground">Winners</h1>
+        <div className="sticky top-0 z-10 bg-background border-b border-border px-4 py-3.5 flex items-center justify-between">
+          <h1 className="text-xl font-bold text-foreground">Winners</h1>
           <div className="flex items-center gap-3">
             <button className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors">
-              <Search className="w-[18px] h-[18px] text-muted-foreground" />
+              <Search className="w-5 h-5 text-muted-foreground" />
             </button>
             <button className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors">
-              <SlidersHorizontal className="w-[18px] h-[18px] text-muted-foreground" />
+              <SlidersHorizontal className="w-5 h-5 text-muted-foreground" />
             </button>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="px-4 pt-4">
+        <div className="px-4 pt-5">
           {loading ? (
-            <div className="space-y-6">
+            <div className="space-y-8">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="space-y-2">
-                  <Skeleton className="h-5 w-48" />
-                  <Skeleton className="h-3 w-32" />
-                  <Skeleton className="h-20 w-full" />
+                <div key={i} className="space-y-3">
+                  <Skeleton className="h-6 w-56" />
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-24 w-full" />
                 </div>
               ))}
             </div>
           ) : shows.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-muted-foreground text-sm">No results posted yet</p>
+            <div className="text-center py-20">
+              <p className="text-muted-foreground text-base">No results posted yet</p>
             </div>
           ) : (
-            <div className="space-y-8">
+            <div className="space-y-10">
               {shows.map((block) => (
                 <ShowResultBlock key={block.showName} block={block} />
               ))}
@@ -200,15 +171,17 @@ function ShowResultBlock({ block }: { block: ShowBlock }) {
   if (block.location) metaParts.push(block.location);
 
   return (
-    <div className="border-b border-border pb-6 last:border-b-0">
+    <div className="border-b border-border/60 pb-8 last:border-b-0 last:pb-0">
       {/* Show header */}
-      <h3 className="text-[16px] font-bold text-foreground leading-snug">{block.showName}</h3>
-      <p className="text-[12px] text-muted-foreground mt-0.5">
+      <h3 className="text-[21px] font-bold text-foreground leading-tight tracking-tight">
+        {block.showName}
+      </h3>
+      <p className="text-[14px] text-muted-foreground mt-1.5 font-medium">
         {metaParts.join(" • ")}
       </p>
 
       {/* Placement slots */}
-      <div className="mt-4 space-y-4">
+      <div className="mt-6 space-y-5">
         {block.slots.map((entry) => (
           <PlacementRow key={entry.slot} entry={entry} />
         ))}
@@ -217,28 +190,28 @@ function ShowResultBlock({ block }: { block: ShowBlock }) {
       {/* View Full Results */}
       <Link
         to={`/events/${encodeURIComponent(block.showName)}/results`}
-        className="inline-block mt-4 text-[13px] font-semibold text-primary"
+        className="inline-block mt-6 text-[15px] font-semibold text-primary"
       >
         View Full Results →
       </Link>
 
       {/* Class Results */}
       {block.classResults.length > 0 && (
-        <div className="mt-3">
+        <div className="mt-5">
           <button
             onClick={() => setClassOpen(!classOpen)}
-            className="flex items-center gap-1 text-[12px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1.5 text-[14px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
           >
-            {classOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+            {classOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             Class Results ({block.classResults.length})
           </button>
 
           {classOpen && (
-            <div className="mt-2 space-y-0.5 pl-1">
+            <div className="mt-3 space-y-1 pl-1">
               {block.classResults.map((c, i) => (
-                <div key={i} className="flex items-baseline gap-2 py-0.5">
-                  <span className="text-[12px] text-foreground">{c.placing}</span>
-                  <span className="text-[12px] text-muted-foreground">
+                <div key={i} className="flex items-baseline gap-2 py-1">
+                  <span className="text-[14px] text-foreground font-medium">{c.placing}</span>
+                  <span className="text-[13px] text-muted-foreground">
                     {c.exhibitor}
                     {c.breeder && ` • ${c.breeder}`}
                   </span>
@@ -258,34 +231,36 @@ function PlacementRow({ entry }: { entry: SlotEntry }) {
   const label = SLOT_LABELS[entry.slot];
 
   return (
-    <div className="flex gap-3">
-      {/* Image for Grand only, if available */}
+    <div className="flex gap-3.5">
+      {/* Grand Champion photo */}
       {entry.slot === "grand" && entry.image && (
         <img
           src={entry.image}
           alt={label}
-          className="w-16 h-16 rounded-lg object-cover shrink-0 bg-muted"
+          className="w-[72px] h-[72px] rounded-xl object-cover shrink-0 bg-muted"
           loading="lazy"
         />
       )}
 
       <div className="min-w-0">
-        <p className="text-[12px] text-muted-foreground font-semibold uppercase tracking-wide leading-tight">
-          {icon && <span className="mr-1">{icon}</span>}
+        <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
+          {icon && <span className="mr-1.5">{icon}</span>}
           {label}
         </p>
 
         {entry.filled ? (
           <>
-            <p className="text-[14px] text-foreground font-semibold leading-snug mt-0.5">
+            <p className="text-[17px] text-foreground font-semibold leading-snug mt-1">
               {entry.exhibitor}
             </p>
             {entry.breeder && (
-              <p className="text-[12px] text-muted-foreground mt-0.5">{entry.breeder}</p>
+              <p className="text-[14px] text-muted-foreground mt-0.5 font-medium">
+                {entry.breeder}
+              </p>
             )}
           </>
         ) : (
-          <p className="text-[13px] text-muted-foreground/50 italic mt-0.5">Not yet posted</p>
+          <p className="text-[14px] text-muted-foreground/60 italic mt-1">Not yet posted</p>
         )}
       </div>
     </div>
