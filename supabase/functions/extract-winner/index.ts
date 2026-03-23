@@ -8,13 +8,16 @@ const corsHeaders = {
 
 const SYSTEM_PROMPT = `You are an expert at reading livestock show results. Given text (or an image of a show result post), extract structured data.
 
+A single post may describe MULTIPLE wins/results. Extract ALL of them as separate entries.
+
 RULES:
 - Only extract values you are confident about. Leave uncertain fields as empty strings.
 - Do NOT guess or hallucinate values.
 - For show_name, include the year if visible (e.g. "2025 San Angelo Livestock Show").
 - For win_placing, use the exact placement text (e.g. "Grand Champion Market Lamb", "3rd Overall").
 - For shown_by, placed_by, sired_by, dam — use the names as written.
-- caption should contain any remaining descriptive text not captured by other fields.`;
+- caption should contain any remaining descriptive text not captured by other fields.
+- If you detect multiple wins (e.g. "Grand Champion AND Reserve Champion" or multiple animals/exhibitors), return each as a separate entry in the results array.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -43,12 +46,12 @@ serve(async (req) => {
       });
       userContent.push({
         type: "text",
-        text: "Extract the livestock show winner details from this image. Return ONLY the JSON tool call.",
+        text: "Extract ALL livestock show winner details from this image. If there are multiple wins, return each as a separate entry. Return ONLY the JSON tool call.",
       });
     } else {
       userContent.push({
         type: "text",
-        text: `Extract the livestock show winner details from this text:\n\n${text}\n\nReturn ONLY the JSON tool call.`,
+        text: `Extract ALL livestock show winner details from this text. If there are multiple wins, return each as a separate entry:\n\n${text}\n\nReturn ONLY the JSON tool call.`,
       });
     }
 
@@ -68,26 +71,37 @@ serve(async (req) => {
           {
             type: "function",
             function: {
-              name: "extract_winner",
-              description: "Extract structured winner data from livestock show content",
+              name: "extract_winners",
+              description: "Extract structured winner data from livestock show content. Supports multiple results.",
               parameters: {
                 type: "object",
                 properties: {
-                  show_name: { type: "string", description: "Show name with year" },
-                  win_placing: { type: "string", description: "Placement or title won" },
-                  shown_by: { type: "string", description: "Exhibitor name" },
-                  placed_by: { type: "string", description: "Person who placed/fitted the animal" },
-                  sired_by: { type: "string", description: "Sire name" },
-                  dam: { type: "string", description: "Dam name" },
-                  caption: { type: "string", description: "Any remaining descriptive text" },
+                  results: {
+                    type: "array",
+                    description: "Array of winner results found in the content",
+                    items: {
+                      type: "object",
+                      properties: {
+                        show_name: { type: "string", description: "Show name with year" },
+                        win_placing: { type: "string", description: "Placement or title won" },
+                        shown_by: { type: "string", description: "Exhibitor name" },
+                        placed_by: { type: "string", description: "Person who placed/fitted the animal" },
+                        sired_by: { type: "string", description: "Sire name" },
+                        dam: { type: "string", description: "Dam name" },
+                        caption: { type: "string", description: "Any remaining descriptive text" },
+                      },
+                      required: ["show_name", "win_placing", "shown_by", "placed_by", "sired_by", "dam", "caption"],
+                      additionalProperties: false,
+                    },
+                  },
                 },
-                required: ["show_name", "win_placing", "shown_by", "placed_by", "sired_by", "dam", "caption"],
+                required: ["results"],
                 additionalProperties: false,
               },
             },
           },
         ],
-        tool_choice: { type: "function", function: { name: "extract_winner" } },
+        tool_choice: { type: "function", function: { name: "extract_winners" } },
       }),
     });
 
@@ -119,9 +133,14 @@ serve(async (req) => {
       });
     }
 
-    const extracted = JSON.parse(toolCall.function.arguments);
+    const parsed = JSON.parse(toolCall.function.arguments);
+    const results = parsed.results || [];
 
-    return new Response(JSON.stringify({ extracted }), {
+    // Backwards compatibility: also return single `extracted` if only one result
+    return new Response(JSON.stringify({ 
+      results,
+      extracted: results[0] || null,
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
