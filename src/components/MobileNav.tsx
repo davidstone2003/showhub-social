@@ -1,11 +1,12 @@
-import { Home, Trophy, CalendarDays, Bookmark, ShoppingBag } from "lucide-react";
+import { Home, Trophy, DollarSign, Users, FolderHeart, ShoppingBag } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const navItems = [
   { icon: Home, label: "Home", to: "/" },
   { icon: Trophy, label: "Winners", to: "/winners" },
-  { icon: CalendarDays, label: "Events", to: "/events" },
-  { icon: Bookmark, label: "Saved", to: "/saved" },
+  { icon: DollarSign, label: "Sales", to: "/sales" },
+  { icon: Users, label: "Breeders", to: "/breeders" },
+  { icon: FolderHeart, label: "Repo", to: "/repo" },
   { icon: ShoppingBag, label: "Market", to: "/market" },
 ];
 
@@ -18,7 +19,7 @@ export function MobileNav() {
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-colors ${
+              `flex flex-col items-center gap-0.5 px-1.5 py-1.5 rounded-lg text-[10px] font-medium transition-colors ${
                 isActive ? "text-primary" : "text-muted-foreground"
               }`
             }

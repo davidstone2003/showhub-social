@@ -12,6 +12,8 @@ import SirePage from "./pages/SirePage";
 import WinnersPage from "./pages/WinnersPage";
 import LivePage from "./pages/LivePage";
 import { MarketPage, HaulersPage } from "./pages/PlaceholderPage";
+import SalesPage from "./pages/SalesPage";
+import RepoPage from "./pages/RepoPage";
 import SubmitWinnerPage from "./pages/SubmitWinnerPage";
 import AuthPage from "./pages/AuthPage";
 import BreederProfilePage from "./pages/BreederProfilePage";
@@ -44,6 +46,9 @@ const App = () => (
             <Route path="/live/:showId" element={<LivePage />} />
             <Route path="/market" element={<MarketPage />} />
             <Route path="/haulers" element={<HaulersPage />} />
+            <Route path="/sales" element={<SalesPage />} />
+            <Route path="/repo" element={<RepoPage />} />
+            <Route path="/saved" element={<SavedPage />} />
             <Route path="/submit" element={<SubmitWinnerPage />} />
             <Route path="/breeder/:username" element={<BreederProfilePage />} />
             <Route path="/admin" element={<AdminPage />} />
@@ -52,7 +57,6 @@ const App = () => (
             <Route path="/account-type" element={<AccountTypePage />} />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/events/:slug" element={<EventDetailPage />} />
-            <Route path="/saved" element={<SavedPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
