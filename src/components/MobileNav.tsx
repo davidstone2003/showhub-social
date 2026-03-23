@@ -1,10 +1,10 @@
-import { Home, Trophy, Users, FolderHeart, ShoppingBag } from "lucide-react";
+import { Home, Trophy, Users, FolderHeart, ShoppingBag, Coins } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const navItems = [
   { icon: Home, label: "Home", to: "/" },
   { icon: Trophy, label: "Winners", to: "/winners" },
-  { emoji: "💰", label: "Sales", to: "/sales" },
+  { icon: Coins, label: "Sales", to: "/sales" },
   { icon: Users, label: "Breeders", to: "/breeders" },
   { icon: FolderHeart, label: "Repo", to: "/repo" },
   { icon: ShoppingBag, label: "Market", to: "/market" },
@@ -24,11 +24,7 @@ export function MobileNav() {
               }`
             }
           >
-            {"emoji" in item ? (
-              <span className="text-[20px] leading-5 h-5">{item.emoji}</span>
-            ) : (
-              <item.icon className="w-5 h-5" />
-            )}
+            <item.icon className="w-5 h-5" />
             {item.label}
           </NavLink>
         ))}
