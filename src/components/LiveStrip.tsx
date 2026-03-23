@@ -39,7 +39,7 @@ export function LiveStrip() {
 
   return (
     <Link
-      to={`/live/${event.slug}`}
+      to="/events?tab=live"
       className="mx-3 mt-1 mb-1 flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2 hover:bg-accent/30 transition-colors active:bg-accent/50"
     >
       <div className="flex items-center gap-1.5 min-w-0">
@@ -47,7 +47,7 @@ export function LiveStrip() {
         <span className="text-xs font-bold text-foreground truncate">{event.name}</span>
         <span className="text-[10px] font-bold text-destructive shrink-0">LIVE</span>
       </div>
-      <span className="text-[11px] font-semibold text-primary shrink-0 ml-2">View</span>
+      <span className="text-[11px] font-semibold text-primary shrink-0 ml-2">View →</span>
     </Link>
   );
 }
