@@ -336,6 +336,7 @@ export default function SubmitWinnerPage() {
         imageUrls,
         resultCount: validResults.length,
         postedAsBreederId,
+        winnerRefs,
       });
       
     } catch (err: any) {
