@@ -1,21 +1,37 @@
 import { Layout } from "@/components/Layout";
-import { Construction, ShoppingBag, Wrench, Package } from "lucide-react";
+import { Construction, ShoppingBag, Wrench, Package, Camera, Truck, Scissors, Pill, Wheat, SprayCan } from "lucide-react";
 
 const categories = [
   {
     title: "Animals",
     description: "Sheep, goats, cattle, pigs — breeding stock & show animals",
     icon: ShoppingBag,
+    items: null,
   },
   {
-    title: "Supplies",
-    description: "Show supplies, equipment, feed, supplements",
-    icon: Package,
+    title: "Nutrition",
+    description: "Feed, supplements, and nutritional products",
+    icon: Wheat,
+    items: [
+      { icon: Wheat, label: "Feed" },
+      { icon: Pill, label: "Supplements" },
+    ],
+  },
+  {
+    title: "Show Supplies",
+    description: "Equipment, grooming products, and show day essentials",
+    icon: SprayCan,
+    items: null,
   },
   {
     title: "Services",
-    description: "Photography, hauling, fitters, clipping",
+    description: "Professional livestock services",
     icon: Wrench,
+    items: [
+      { icon: Truck, label: "Hauling" },
+      { icon: Camera, label: "Photography" },
+      { icon: Scissors, label: "Fitting" },
+    ],
   },
 ];
 
@@ -39,8 +55,17 @@ export const MarketPage = () => (
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-foreground">{cat.title}</p>
               <p className="mt-0.5 text-[12px] text-muted-foreground">{cat.description}</p>
+              {cat.items && (
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {cat.items.map((item) => (
+                    <span key={item.label} className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                      <item.icon className="h-3 w-3" />
+                      {item.label}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
-            <span className="mt-1 shrink-0 text-[11px] font-medium text-primary">Coming soon</span>
           </div>
         ))}
       </div>
