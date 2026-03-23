@@ -7,7 +7,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 const navItems = [
   { icon: Home, label: "Home", to: "/" },
   { icon: Trophy, label: "Winners", to: "/winners" },
-  { emoji: "💰", label: "Sales", to: "/sales" },
+  { icon: Coins, label: "Sales", to: "/sales" },
   { icon: Users, label: "Breeders", to: "/breeders" },
   { icon: FolderHeart, label: "Repo", to: "/repo" },
   { icon: ShoppingBag, label: "Market", to: "/market" },
@@ -36,11 +36,7 @@ export function DesktopSidebar() {
               }`
             }
           >
-            {"emoji" in item ? (
-              <span className="text-[18px] leading-[18px]">{item.emoji}</span>
-            ) : (
-              <item.icon className="w-4.5 h-4.5" />
-            )}
+            <item.icon className="w-4.5 h-4.5" />
             {item.label}
           </NavLink>
         ))}
