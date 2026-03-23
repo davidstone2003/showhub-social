@@ -1,13 +1,11 @@
-import { Home, Trophy, Users, Dna, ShoppingBag, Truck } from "lucide-react";
+import { Home, Trophy, CalendarDays, ShoppingBag } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const navItems = [
-  { icon: Home, label: "Feed", to: "/" },
+  { icon: Home, label: "Home", to: "/" },
   { icon: Trophy, label: "Winners", to: "/winners" },
-  { icon: Users, label: "Breeders", to: "/breeders" },
-  { icon: Dna, label: "Sires", to: "/sires" },
+  { icon: CalendarDays, label: "Events", to: "/events" },
   { icon: ShoppingBag, label: "Market", to: "/market" },
-  { icon: Truck, label: "Haulers", to: "/haulers" },
 ];
 
 export function MobileNav() {
