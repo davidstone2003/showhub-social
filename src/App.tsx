@@ -52,6 +52,7 @@ const App = () => (
             <Route path="/account-type" element={<AccountTypePage />} />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/events/:slug" element={<EventDetailPage />} />
+            <Route path="/repo" element={<RepoPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
