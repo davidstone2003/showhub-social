@@ -23,6 +23,7 @@ interface LiveSale {
 
 interface LiveRingFeedProps {
   showId?: string;
+  species?: string;
 }
 
 export function LiveRingFeed({ showId }: LiveRingFeedProps) {
