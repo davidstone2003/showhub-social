@@ -2,8 +2,16 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check, Facebook, Download, Copy, FileJson, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { PostListingUpsell } from "@/components/upgrade/PostListingUpsell";
+import { SireSuggestion } from "@/components/SireSuggestion";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+
+export interface WinnerRef {
+  winnerId: string;
+  showName: string;
+  shownBy: string;
+  showId: string | null;
+}
 
 interface WinData {
   showName: string;
@@ -16,6 +24,7 @@ interface WinData {
   imageUrls: string[];
   resultCount?: number;
   postedAsBreederId?: string | null;
+  winnerRefs?: WinnerRef[];
 }
 
 function buildFacebookCaption(d: WinData): string {
@@ -48,7 +57,11 @@ function buildJsonExport(d: WinData): string {
 export default function PostSuccessScreen({ data }: { data: WinData }) {
   const navigate = useNavigate();
   const [exportOpen, setExportOpen] = useState(false);
+  const [sireStepDone, setSireStepDone] = useState(false);
   const fbCaption = buildFacebookCaption(data);
+
+  const winnersNeedingSire = (data.winnerRefs || []).filter(w => w.shownBy);
+  const showSireStep = winnersNeedingSire.length > 0 && !sireStepDone;
 
   const handleShareFacebook = async () => {
     try { await navigator.clipboard.writeText(fbCaption); } catch {}
@@ -106,7 +119,16 @@ export default function PostSuccessScreen({ data }: { data: WinData }) {
         {(data.resultCount ?? 1) > 1 ? ` (${data.resultCount} results)` : ""}
       </p>
 
-      <div className="w-full max-w-xs mt-8 space-y-3">
+      <div className="w-full max-w-xs mt-6 space-y-3">
+        {/* Sire suggestion step */}
+        {showSireStep && (
+          <SireSuggestion
+            winners={winnersNeedingSire}
+            postedAsBreederId={data.postedAsBreederId || null}
+            onComplete={() => setSireStepDone(true)}
+          />
+        )}
+
         {/* Post Another */}
         <Button
           onClick={handlePostAnother}

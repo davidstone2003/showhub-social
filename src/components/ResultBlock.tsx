@@ -3,7 +3,6 @@ import { X, ChevronDown, ChevronUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { AutocompleteInput } from "@/components/AutocompleteInput";
 import { ExhibitorPicker } from "@/components/ExhibitorPicker";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export interface ResultData {
@@ -60,7 +59,7 @@ export function ResultBlock({ result, index, total, onChange, onRemove, defaultE
         </div>
       </button>
 
-      {/* Fields */}
+      {/* Fields — sire/dam removed for speed, captured post-submission */}
       {expanded && (
         <div className="px-3.5 pb-3.5 space-y-2.5 border-t border-border pt-2.5">
           <AutocompleteInput
@@ -83,18 +82,6 @@ export function ResultBlock({ result, index, total, onChange, onRemove, defaultE
             placeholder="Placed by"
             value={result.placedBy}
             onChange={(e) => onChange({ ...result, placedBy: e.target.value })}
-            className="rounded-xl bg-card border-border h-11 text-sm"
-          />
-          <AutocompleteInput
-            table="sires_lookup"
-            placeholder="Sire"
-            value={result.sireName}
-            onChange={(display, id) => onChange({ ...result, sireName: display, sireId: id })}
-          />
-          <Input
-            placeholder="Dam"
-            value={result.damName}
-            onChange={(e) => onChange({ ...result, damName: e.target.value })}
             className="rounded-xl bg-card border-border h-11 text-sm"
           />
         </div>

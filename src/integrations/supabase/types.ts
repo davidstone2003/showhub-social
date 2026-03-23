@@ -65,6 +65,66 @@ export type Database = {
         }
         Relationships: []
       }
+      exhibitor_animal_context: {
+        Row: {
+          breeder_id: string | null
+          created_at: string
+          dam_name: string | null
+          exhibitor_name: string
+          id: string
+          last_used_at: string
+          show_id: string | null
+          show_name: string | null
+          sire_id: string | null
+          sire_name: string | null
+          use_count: number
+          user_id: string
+        }
+        Insert: {
+          breeder_id?: string | null
+          created_at?: string
+          dam_name?: string | null
+          exhibitor_name: string
+          id?: string
+          last_used_at?: string
+          show_id?: string | null
+          show_name?: string | null
+          sire_id?: string | null
+          sire_name?: string | null
+          use_count?: number
+          user_id: string
+        }
+        Update: {
+          breeder_id?: string | null
+          created_at?: string
+          dam_name?: string | null
+          exhibitor_name?: string
+          id?: string
+          last_used_at?: string
+          show_id?: string | null
+          show_name?: string | null
+          sire_id?: string | null
+          sire_name?: string | null
+          use_count?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exhibitor_animal_context_show_id_fkey"
+            columns: ["show_id"]
+            isOneToOne: false
+            referencedRelation: "shows"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exhibitor_animal_context_sire_id_fkey"
+            columns: ["sire_id"]
+            isOneToOne: false
+            referencedRelation: "sires_lookup"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exhibitors: {
         Row: {
           created_at: string
