@@ -26,7 +26,7 @@ export function ShowResultBlock({ block }: { block: ShowBlock }) {
       {grandSlot && <HeroResult entry={grandSlot} />}
 
       {/* Top Results — Reserve through 5th */}
-      <div className="space-y-6">
+      <div className="space-y-6 pt-2">
         {topSlots.map((entry) => (
           <TopResult key={entry.slot} entry={entry} />
         ))}
