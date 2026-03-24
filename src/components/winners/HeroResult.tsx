@@ -33,7 +33,7 @@ export function HeroResult({ entry }: { entry: SlotEntry }) {
               <img
                 src={entry.image}
                 alt={label}
-                className="w-[172px] h-[172px] rounded-2xl object-cover bg-muted shadow-sm"
+                className="w-full max-w-[280px] aspect-[4/5] rounded-2xl object-cover bg-muted shadow-sm"
                 loading="lazy"
               />
             </div>
