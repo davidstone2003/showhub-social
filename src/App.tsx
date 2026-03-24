@@ -16,6 +16,7 @@ import SalesPage from "./pages/SalesPage";
 import RepoPage from "./pages/RepoPage";
 import SubmitWinnerPage from "./pages/SubmitWinnerPage";
 import AuthPage from "./pages/AuthPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import BreederProfilePage from "./pages/BreederProfilePage";
 import AdminPage from "./pages/AdminPage";
 import PricingPage from "./pages/PricingPage";
@@ -37,6 +38,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/breeders" element={<BreedersPage />} />
             <Route path="/sires" element={<SiresPage />} />
             <Route path="/animal/:id" element={<AnimalPage />} />

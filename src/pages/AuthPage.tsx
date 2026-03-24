@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,15 +22,13 @@ function IntentScreen({ onBack }: { onBack?: () => void }) {
   const handleSelect = async (accountType: string) => {
     setSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
-        await supabase
-          .from("profiles")
-          .update({ account_type: accountType })
-          .eq("id", user.id);
+        await supabase.from("profiles").update({ account_type: accountType }).eq("id", user.id);
       }
 
-      // Clear saved form data on successful role selection
       sessionStorage.removeItem("signup_first");
       sessionStorage.removeItem("signup_last");
       sessionStorage.removeItem("signup_email");
@@ -67,12 +65,8 @@ function IntentScreen({ onBack }: { onBack?: () => void }) {
           <div className="flex justify-center mb-6">
             <BackdropLogo size="md" />
           </div>
-          <h1 className="text-xl font-bold text-foreground">
-            How do you use Backdrop?
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Pick what fits best. You can change this anytime.
-          </p>
+          <h1 className="text-xl font-bold text-foreground">How do you use Backdrop?</h1>
+          <p className="text-sm text-muted-foreground">Pick what fits best. You can change this anytime.</p>
         </div>
 
         <div className="space-y-3">
@@ -112,14 +106,30 @@ export default function AuthPage() {
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showIntent, setShowIntent] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const navigate = useNavigate();
 
-  const signupReady =
-    firstName.trim() &&
-    lastName.trim() &&
-    email.trim() &&
-    password.trim() &&
-    agreedTerms;
+  const signupReady = firstName.trim() && lastName.trim() && email.trim() && password.trim() && agreedTerms;
+
+  const handlePasswordReset = async () => {
+    if (!email.trim()) {
+      toast.error("Enter your email first");
+      return;
+    }
+
+    setResetLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success("Password reset email sent");
+    } catch (err: any) {
+      toast.error(err.message || "Unable to send reset email");
+    } finally {
+      setResetLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -162,7 +172,6 @@ export default function AuthPage() {
         });
         if (error) throw error;
         toast.success("Check your email to confirm your account.");
-        // Auto-confirmed: user is now logged in, show intent screen
         setShowIntent(true);
       }
     } catch (err: any) {
@@ -188,9 +197,7 @@ export default function AuthPage() {
             {isLogin ? "Welcome back" : "Join the Show Stock Network"}
           </h1>
           {!isLogin && (
-            <p className="text-xs text-muted-foreground/70 mt-1">
-              Create your profile. Start free. Upgrade anytime.
-            </p>
+            <p className="text-xs text-muted-foreground/70 mt-1">Create your profile. Start free. Upgrade anytime.</p>
           )}
         </div>
 
@@ -230,10 +237,24 @@ export default function AuthPage() {
               type="button"
               onClick={() => setShowPw(!showPw)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+              aria-label={showPw ? "Hide password" : "Show password"}
             >
               {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
+
+          {isLogin && (
+            <div className="flex justify-end -mt-1">
+              <button
+                type="button"
+                onClick={handlePasswordReset}
+                disabled={resetLoading}
+                className="text-sm font-medium text-primary underline underline-offset-2 disabled:opacity-60"
+              >
+                {resetLoading ? "Sending..." : "Forgot Password?"}
+              </button>
+            </div>
+          )}
 
           {!isLogin && (
             <div className="flex items-start gap-2 pt-1">
@@ -244,10 +265,7 @@ export default function AuthPage() {
                 className="mt-0.5"
               />
               <label htmlFor="terms" className="text-xs text-muted-foreground/70 leading-snug cursor-pointer select-none">
-                I agree to the{" "}
-                <a href="/terms" target="_blank" className="underline underline-offset-2 text-primary">Terms of Use</a>{" "}
-                and{" "}
-                <a href="/privacy" target="_blank" className="underline underline-offset-2 text-primary">Privacy Policy</a>
+                I agree to the <a href="/terms" target="_blank" className="underline underline-offset-2 text-primary">Terms of Use</a> and <a href="/privacy" target="_blank" className="underline underline-offset-2 text-primary">Privacy Policy</a>
               </label>
             </div>
           )}
@@ -260,22 +278,21 @@ export default function AuthPage() {
           >
             {loading ? "..." : isLogin ? "Sign In" : "Create Free Profile"}
           </Button>
-          {!isLogin && (
-            <p className="text-[11px] text-muted-foreground/60 text-center">
-              No credit card required
-            </p>
-          )}
+          {!isLogin && <p className="text-[11px] text-muted-foreground/60 text-center">No credit card required</p>}
         </form>
 
         <p className="text-center text-sm text-muted-foreground pt-1">
           {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="font-semibold text-primary underline underline-offset-2"
-          >
+          <button onClick={() => setIsLogin(!isLogin)} className="font-semibold text-primary underline underline-offset-2">
             {isLogin ? "Sign Up" : "Sign In"}
           </button>
         </p>
+
+        {isLogin && (
+          <p className="text-center text-xs text-muted-foreground">
+            Need a reset link instead? <Link to="/reset-password" className="text-primary underline underline-offset-2">Open reset page</Link>
+          </p>
+        )}
       </div>
     </div>
   );
