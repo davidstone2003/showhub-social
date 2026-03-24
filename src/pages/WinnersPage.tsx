@@ -173,7 +173,7 @@ function ShowResultBlock({ block }: { block: ShowBlock }) {
   return (
     <div className="border-b border-border/50 pb-10 last:border-b-0 last:pb-0">
       {/* Show header */}
-      <h3 className="text-[26px] font-extrabold text-foreground leading-[1.15] tracking-tight">
+      <h3 className="text-[22px] font-semibold text-foreground leading-tight tracking-tight">
         {block.showName}
       </h3>
       <p className="text-[15px] text-muted-foreground mt-2 font-medium">
@@ -181,7 +181,7 @@ function ShowResultBlock({ block }: { block: ShowBlock }) {
       </p>
 
       {/* Placement slots */}
-      <div className="mt-7 space-y-6">
+      <div className="mt-6 space-y-6">
         {block.slots.map((entry) => (
           <PlacementRow key={entry.slot} entry={entry} />
         ))}
@@ -231,29 +231,32 @@ function PlacementRow({ entry }: { entry: SlotEntry }) {
   const label = SLOT_LABELS[entry.slot];
 
   const isGrand = entry.slot === "grand";
-  const isTopThree = entry.slot === "grand" || entry.slot === "reserve" || entry.slot === "third";
 
-  if (isGrand && entry.image) {
+  const imgSize = isGrand ? "w-[100px] h-[100px]" : "w-[70px] h-[70px]";
+
+  if (entry.image) {
     return (
-      <div className="flex items-center gap-4">
+      <div className={`flex items-center gap-4 ${isGrand ? "py-2" : ""}`}>
         <img
           src={entry.image}
           alt={label}
-          className="w-[88px] h-[88px] rounded-xl object-cover bg-muted flex-shrink-0"
+          className={`${imgSize} rounded-xl object-cover bg-muted flex-shrink-0`}
           loading="lazy"
         />
         <div className="min-w-0">
-          <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
+          <p className="text-[12px] font-medium text-muted-foreground uppercase tracking-[0.06em] leading-tight">
             {icon && <span className="mr-1.5">{icon}</span>}
             {label}
           </p>
           {entry.filled ? (
             <>
-              <p className="text-[19px] text-foreground font-semibold leading-snug mt-1">{entry.exhibitor}</p>
-              {entry.breeder && <p className="text-[14px] text-muted-foreground mt-0.5">{entry.breeder}</p>}
+              <p className={`text-foreground leading-snug mt-1.5 ${isGrand ? "text-[26px] font-bold" : "text-[20px] font-semibold"}`}>
+                {entry.exhibitor}
+              </p>
+              {entry.breeder && <p className="text-[15px] text-muted-foreground mt-2">{entry.breeder}</p>}
             </>
           ) : (
-            <p className="text-[14px] text-muted-foreground/50 italic mt-1">Not yet posted</p>
+            <p className="text-[14px] text-muted-foreground/50 italic mt-1.5">Pending update</p>
           )}
         </div>
       </div>
@@ -261,20 +264,20 @@ function PlacementRow({ entry }: { entry: SlotEntry }) {
   }
 
   return (
-    <div>
-      <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
+    <div className={isGrand ? "py-2" : ""}>
+      <p className="text-[12px] font-medium text-muted-foreground uppercase tracking-[0.06em] leading-tight">
         {icon && <span className="mr-1.5">{icon}</span>}
         {label}
       </p>
       {entry.filled ? (
         <>
-          <p className={`text-foreground font-semibold leading-snug mt-1 ${isTopThree ? "text-[16px]" : "text-[15px]"}`}>
+          <p className={`text-foreground leading-snug mt-1.5 ${isGrand ? "text-[26px] font-bold" : "text-[20px] font-semibold"}`}>
             {entry.exhibitor}
           </p>
-          {entry.breeder && <p className="text-[14px] text-muted-foreground mt-0.5">{entry.breeder}</p>}
+          {entry.breeder && <p className="text-[15px] text-muted-foreground mt-2">{entry.breeder}</p>}
         </>
       ) : (
-        <p className="text-[14px] text-muted-foreground/50 italic mt-1">Not yet posted</p>
+        <p className="text-[14px] text-muted-foreground/50 italic mt-1.5">Pending update</p>
       )}
     </div>
   );
