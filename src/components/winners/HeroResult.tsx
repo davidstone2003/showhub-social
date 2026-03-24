@@ -44,7 +44,7 @@ export function HeroResult({ entry, onImageTap }: HeroResultProps) {
               <img
                 src={entry.image}
                 alt={label}
-                className="w-full aspect-[4/5] rounded-2xl object-cover bg-muted shadow-md"
+                className="w-full rounded-2xl object-cover bg-muted shadow-md"
                 loading="lazy"
               />
             </div>
