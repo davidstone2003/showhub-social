@@ -41,10 +41,10 @@ export function HeroResult({ entry, onImageTap }: HeroResultProps) {
               tabIndex={0}
               onKeyDown={(e) => e.key === "Enter" && onImageTap?.()}
             >
-              <img
+            <img
                 src={entry.image}
                 alt={label}
-                className="w-full aspect-[4/5] rounded-xl object-cover bg-muted shadow-sm"
+                className="w-[120px] h-[120px] rounded-xl object-cover bg-muted shadow-sm mx-auto"
                 loading="lazy"
               />
             </div>
