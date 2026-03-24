@@ -13,12 +13,12 @@ export function ShowResultBlock({ block }: { block: ShowBlock }) {
   const topSlots = block.slots.filter((s) => s.slot !== "grand");
 
   return (
-    <div className="border-b border-border/40 pb-8 last:border-b-0 last:pb-0">
-      {/* Show header */}
-      <h3 className="text-[22px] font-semibold text-foreground leading-tight tracking-tight">
+    <div className="pb-10 last:pb-0">
+      {/* Show header — anchors the entire block */}
+      <h3 className="text-[23px] font-semibold text-foreground leading-tight tracking-tight">
         {block.showName}
       </h3>
-      <p className="text-[14px] text-muted-foreground mt-1.5">
+      <p className="text-[15px] text-muted-foreground mt-2">
         {metaParts.join(" • ")}
       </p>
 
@@ -26,22 +26,25 @@ export function ShowResultBlock({ block }: { block: ShowBlock }) {
       {grandSlot && <HeroResult entry={grandSlot} />}
 
       {/* Top Results — Reserve through 5th */}
-      <div className="space-y-6 pt-2">
+      <div className="space-y-6">
         {topSlots.map((entry) => (
           <TopResult key={entry.slot} entry={entry} />
         ))}
       </div>
 
-      {/* View Full Results */}
+      {/* View Full Results — after all placements */}
       <Link
         to={`/events/${encodeURIComponent(block.showName)}/results`}
-        className="inline-block mt-6 text-[15px] font-semibold text-primary"
+        className="inline-block mt-6 text-[16px] font-semibold text-primary"
       >
         View Full Results →
       </Link>
 
       {/* Class Results — collapsible */}
       <ClassResults results={block.classResults} />
+
+      {/* Section divider */}
+      <div className="mt-8 border-b border-border/40" />
     </div>
   );
 }

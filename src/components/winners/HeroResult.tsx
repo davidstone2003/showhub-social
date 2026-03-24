@@ -6,7 +6,7 @@ export function HeroResult({ entry }: { entry: SlotEntry }) {
   const icon = SLOT_ICONS[entry.slot];
 
   return (
-    <div className="mt-8 mb-8 bg-muted/40 rounded-2xl px-5 py-6">
+    <div className="mt-5 mb-6 bg-muted/40 rounded-2xl px-5 py-6">
       {/* Label */}
       <p className="text-[12px] font-medium text-muted-foreground/80 uppercase tracking-[0.08em] text-center">
         {icon && <span className="mr-1.5 opacity-70">{icon}</span>}
