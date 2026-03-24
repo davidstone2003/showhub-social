@@ -40,10 +40,10 @@ export function ShowResultBlock({ block }: { block: ShowBlock }) {
   return (
     <div className="pb-10 last:pb-0">
       {/* Show header */}
-      <h3 className="text-[23px] font-semibold text-foreground leading-tight tracking-tight">
+      <h3 className="text-[24px] font-bold text-foreground leading-tight tracking-tight">
         {block.showName}
       </h3>
-      <p className="text-[15px] text-muted-foreground mt-2">
+      <p className="text-[15px] text-muted-foreground mt-2.5">
         {metaParts.join(" • ")}
       </p>
 
