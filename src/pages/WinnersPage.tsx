@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { Layout } from "@/components/Layout";
-import { Link } from "react-router-dom";
-import { Search, SlidersHorizontal, ChevronDown, ChevronRight } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { normalizePlace, SLOT_ORDER, SLOT_LABELS, SLOT_ICONS, type PlacementSlot } from "@/lib/normalizePlace";
+import { normalizePlace, SLOT_ORDER, type PlacementSlot } from "@/lib/normalizePlace";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ShowResultBlock } from "@/components/winners/ShowResultBlock";
+import type { SlotEntry, ShowBlock } from "@/components/winners/types";
 
 /* ── Types ── */
 interface WinnerRow {
@@ -21,23 +22,6 @@ interface WinnerRow {
   date: string;
   created_at: string;
   species: string | null;
-}
-
-interface SlotEntry {
-  slot: PlacementSlot;
-  exhibitor: string | null;
-  breeder: string | null;
-  image: string | null;
-  filled: boolean;
-}
-
-interface ShowBlock {
-  showName: string;
-  latestDate: string;
-  location: string | null;
-  species: string | null;
-  slots: SlotEntry[];
-  classResults: { placing: string; exhibitor: string; breeder: string | null }[];
 }
 
 /* ── Page ── */
@@ -142,7 +126,7 @@ export default function WinnersPage() {
                 <div key={i} className="space-y-3">
                   <Skeleton className="h-6 w-56" />
                   <Skeleton className="h-4 w-40" />
-                  <Skeleton className="h-24 w-full" />
+                  <Skeleton className="h-40 w-full rounded-xl" />
                 </div>
               ))}
             </div>
@@ -151,7 +135,7 @@ export default function WinnersPage() {
               <p className="text-muted-foreground text-base">No results posted yet</p>
             </div>
           ) : (
-            <div className="space-y-10">
+            <div className="space-y-12">
               {shows.map((block) => (
                 <ShowResultBlock key={block.showName} block={block} />
               ))}
@@ -160,125 +144,5 @@ export default function WinnersPage() {
         </div>
       </div>
     </Layout>
-  );
-}
-
-/* ── Show Result Block ── */
-function ShowResultBlock({ block }: { block: ShowBlock }) {
-  const [classOpen, setClassOpen] = useState(false);
-  const year = new Date(block.latestDate).getFullYear();
-  const metaParts = [String(year)];
-  if (block.location) metaParts.push(block.location);
-
-  return (
-    <div className="border-b border-border/50 pb-10 last:border-b-0 last:pb-0">
-      {/* Show header */}
-      <h3 className="text-[22px] font-semibold text-foreground leading-tight tracking-tight">
-        {block.showName}
-      </h3>
-      <p className="text-[15px] text-muted-foreground mt-2 font-medium">
-        {metaParts.join(" • ")}
-      </p>
-
-      {/* Placement slots */}
-      <div className="mt-6 space-y-6">
-        {block.slots.map((entry) => (
-          <PlacementRow key={entry.slot} entry={entry} />
-        ))}
-      </div>
-
-      {/* View Full Results */}
-      <Link
-        to={`/events/${encodeURIComponent(block.showName)}/results`}
-        className="inline-block mt-6 text-[15px] font-semibold text-primary"
-      >
-        View Full Results →
-      </Link>
-
-      {/* Class Results */}
-      {block.classResults.length > 0 && (
-        <div className="mt-5">
-          <button
-            onClick={() => setClassOpen(!classOpen)}
-            className="flex items-center gap-1.5 text-[14px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {classOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            Class Results ({block.classResults.length})
-          </button>
-
-          {classOpen && (
-            <div className="mt-3 space-y-1 pl-1">
-              {block.classResults.map((c, i) => (
-                <div key={i} className="flex items-baseline gap-2 py-1">
-                  <span className="text-[14px] text-foreground font-medium">{c.placing}</span>
-                  <span className="text-[13px] text-muted-foreground">
-                    {c.exhibitor}
-                    {c.breeder && ` • ${c.breeder}`}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ── Placement Row ── */
-function PlacementRow({ entry }: { entry: SlotEntry }) {
-  const icon = SLOT_ICONS[entry.slot];
-  const label = SLOT_LABELS[entry.slot];
-
-  const isGrand = entry.slot === "grand";
-
-  const imgSize = isGrand ? "w-[100px] h-[100px]" : "w-[70px] h-[70px]";
-
-  if (entry.image) {
-    return (
-      <div className={`flex items-center gap-4 ${isGrand ? "py-2" : ""}`}>
-        <img
-          src={entry.image}
-          alt={label}
-          className={`${imgSize} rounded-xl object-cover bg-muted flex-shrink-0`}
-          loading="lazy"
-        />
-        <div className="min-w-0">
-          <p className="text-[12px] font-medium text-muted-foreground uppercase tracking-[0.06em] leading-tight">
-            {icon && <span className="mr-1.5">{icon}</span>}
-            {label}
-          </p>
-          {entry.filled ? (
-            <>
-              <p className={`text-foreground leading-snug mt-1.5 ${isGrand ? "text-[26px] font-bold" : "text-[20px] font-semibold"}`}>
-                {entry.exhibitor}
-              </p>
-              {entry.breeder && <p className="text-[15px] text-muted-foreground mt-2">{entry.breeder}</p>}
-            </>
-          ) : (
-            <p className="text-[14px] text-muted-foreground/50 italic mt-1.5">Pending update</p>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className={isGrand ? "py-2" : ""}>
-      <p className="text-[12px] font-medium text-muted-foreground uppercase tracking-[0.06em] leading-tight">
-        {icon && <span className="mr-1.5">{icon}</span>}
-        {label}
-      </p>
-      {entry.filled ? (
-        <>
-          <p className={`text-foreground leading-snug mt-1.5 ${isGrand ? "text-[26px] font-bold" : "text-[20px] font-semibold"}`}>
-            {entry.exhibitor}
-          </p>
-          {entry.breeder && <p className="text-[15px] text-muted-foreground mt-2">{entry.breeder}</p>}
-        </>
-      ) : (
-        <p className="text-[14px] text-muted-foreground/50 italic mt-1.5">Pending update</p>
-      )}
-    </div>
   );
 }
