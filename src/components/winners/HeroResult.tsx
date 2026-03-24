@@ -11,7 +11,7 @@ export function HeroResult({ entry, onImageTap }: HeroResultProps) {
   const icon = SLOT_ICONS[entry.slot];
 
   return (
-    <div className="mt-5 mb-6 bg-muted/40 rounded-2xl px-4 py-6">
+    <div className="mt-5 mb-6">
       {/* Label */}
       <p className="text-[12px] font-medium text-muted-foreground/80 uppercase tracking-[0.08em] text-center">
         {icon && <span className="mr-1.5 opacity-70">{icon}</span>}
@@ -21,7 +21,7 @@ export function HeroResult({ entry, onImageTap }: HeroResultProps) {
       {entry.filled ? (
         <>
           {/* Winner name */}
-          <p className="text-[30px] font-bold text-foreground leading-[1.15] mt-2 text-center">
+          <p className="text-[30px] font-bold text-foreground leading-[1.15] mt-3 text-center">
             {entry.exhibitor}
           </p>
 
@@ -35,16 +35,16 @@ export function HeroResult({ entry, onImageTap }: HeroResultProps) {
           {/* Photo — full width, tappable */}
           {entry.image && (
             <div
-              className="mt-4 -mx-4 cursor-pointer active:opacity-90 transition-opacity"
+              className="mt-4 cursor-pointer active:opacity-90 transition-opacity"
               onClick={onImageTap}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => e.key === "Enter" && onImageTap?.()}
             >
-            <img
+              <img
                 src={entry.image}
                 alt={label}
-                className="w-[120px] h-[120px] rounded-xl object-cover bg-muted shadow-sm mx-auto"
+                className="w-full aspect-[4/5] rounded-2xl object-cover bg-muted shadow-md"
                 loading="lazy"
               />
             </div>
