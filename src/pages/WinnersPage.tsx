@@ -231,7 +231,6 @@ function PlacementRow({ entry }: { entry: SlotEntry }) {
   const label = SLOT_LABELS[entry.slot];
 
   const isGrand = entry.slot === "grand";
-  const isTopThree = entry.slot === "grand" || entry.slot === "reserve" || entry.slot === "third";
 
   const imgSize = isGrand ? "w-[100px] h-[100px]" : "w-[70px] h-[70px]";
 
