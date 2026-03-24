@@ -25,12 +25,14 @@ export function HeroResult({ entry, onImageTap }: HeroResultProps) {
             {entry.exhibitor}
           </p>
 
-          {/* Breeder */}
-          {entry.breeder && (
-            <p className="text-[14px] text-muted-foreground mt-2 text-center">
-              {entry.breeder}
-            </p>
-          )}
+          {/* Context lines */}
+          <div className="mt-1.5 space-y-0.5 text-center">
+            {entry.breeder && (
+              <p className="text-[14px] text-muted-foreground">
+                Bred by <span className="font-medium text-muted-foreground">{entry.breeder}</span>
+              </p>
+            )}
+          </div>
 
           {/* Photo — full width, tappable */}
           {entry.image && (
