@@ -6,19 +6,26 @@ export function HeroResult({ entry }: { entry: SlotEntry }) {
   const icon = SLOT_ICONS[entry.slot];
 
   return (
-    <div className="pt-4 pb-8">
+    <div className="mt-8 mb-8 bg-muted/40 rounded-2xl px-5 py-6">
       {/* Label */}
-      <p className="text-[12px] font-medium text-muted-foreground uppercase tracking-[0.08em] text-center">
-        {icon && <span className="mr-1.5">{icon}</span>}
+      <p className="text-[12px] font-medium text-muted-foreground/80 uppercase tracking-[0.08em] text-center">
+        {icon && <span className="mr-1.5 opacity-70">{icon}</span>}
         {label}
       </p>
 
       {entry.filled ? (
         <>
           {/* Winner name — dominant */}
-          <p className="text-[30px] font-bold text-foreground leading-tight mt-3 text-center">
+          <p className="text-[30px] font-bold text-foreground leading-[1.15] mt-2 text-center">
             {entry.exhibitor}
           </p>
+
+          {/* Context — breeder / sire */}
+          {entry.breeder && (
+            <p className="text-[14px] text-muted-foreground mt-2 text-center">
+              {entry.breeder}
+            </p>
+          )}
 
           {/* Photo */}
           {entry.image && (
@@ -26,21 +33,14 @@ export function HeroResult({ entry }: { entry: SlotEntry }) {
               <img
                 src={entry.image}
                 alt={label}
-                className="w-[148px] h-[148px] rounded-2xl object-cover bg-muted"
+                className="w-[172px] h-[172px] rounded-2xl object-cover bg-muted shadow-sm"
                 loading="lazy"
               />
             </div>
           )}
-
-          {/* Breeder */}
-          {entry.breeder && (
-            <p className="text-[14px] text-muted-foreground mt-3 text-center">
-              {entry.breeder}
-            </p>
-          )}
         </>
       ) : (
-        <p className="text-[14px] text-muted-foreground/70 italic mt-3 text-center">
+        <p className="text-[14px] text-muted-foreground/60 italic mt-3 text-center">
           Pending update
         </p>
       )}

@@ -7,8 +7,8 @@ export function TopResult({ entry }: { entry: SlotEntry }) {
 
   return (
     <div>
-      <p className="text-[12px] font-medium text-muted-foreground uppercase tracking-[0.06em]">
-        {icon && <span className="mr-1.5">{icon}</span>}
+      <p className="text-[12px] font-medium text-muted-foreground/70 uppercase tracking-[0.06em]">
+        {icon && <span className="mr-1.5 opacity-60">{icon}</span>}
         {label}
       </p>
       {entry.filled ? (
@@ -23,7 +23,7 @@ export function TopResult({ entry }: { entry: SlotEntry }) {
           )}
         </>
       ) : (
-        <p className="text-[14px] text-muted-foreground/70 italic mt-1.5">
+        <p className="text-[14px] text-muted-foreground/60 italic mt-1.5">
           Pending update
         </p>
       )}
