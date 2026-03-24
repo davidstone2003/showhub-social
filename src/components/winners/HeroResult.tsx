@@ -11,7 +11,7 @@ export function HeroResult({ entry, onImageTap }: HeroResultProps) {
   const icon = SLOT_ICONS[entry.slot];
 
   return (
-    <div className="mt-6 mb-8">
+    <div className="mt-3 mb-8">
       {/* Label */}
       <p className="text-[12px] font-medium text-muted-foreground/80 uppercase tracking-[0.08em] text-center">
         {icon && <span className="mr-1.5 opacity-70">{icon}</span>}
@@ -25,17 +25,19 @@ export function HeroResult({ entry, onImageTap }: HeroResultProps) {
             {entry.exhibitor}
           </p>
 
-          {/* Breeder */}
-          {entry.breeder && (
-            <p className="text-[14px] text-muted-foreground mt-2 text-center">
-              {entry.breeder}
-            </p>
-          )}
+          {/* Context lines */}
+          <div className="mt-1.5 space-y-0.5 text-center">
+            {entry.breeder && (
+              <p className="text-[14px] text-muted-foreground">
+                Bred by <span className="font-medium text-muted-foreground">{entry.breeder}</span>
+              </p>
+            )}
+          </div>
 
           {/* Photo — full width, tappable */}
           {entry.image && (
             <div
-              className="mt-5 -mx-1 cursor-pointer active:opacity-90 transition-opacity"
+              className="mt-5 -mx-2 cursor-pointer active:opacity-90 transition-opacity"
               onClick={onImageTap}
               role="button"
               tabIndex={0}
