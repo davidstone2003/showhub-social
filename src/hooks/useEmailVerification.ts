@@ -7,8 +7,7 @@ export function useEmailVerification() {
   const { user, profile } = useAuth();
   const [showVerifyModal, setShowVerifyModal] = useState(false);
 
-  // Temporarily bypass email verification for testing
-  const isVerified = true;
+  const isVerified = profile ? (profile.email_verified ?? true) : true;
 
   const requireVerification = useCallback((): boolean => {
     if (!user) return false;
