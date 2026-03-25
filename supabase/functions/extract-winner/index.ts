@@ -15,8 +15,9 @@ RULES:
 - Do NOT guess or hallucinate values.
 - For show_name, include the year if visible (e.g. "2025 San Angelo Livestock Show").
 - For win_placing, use the exact placement text (e.g. "Grand Champion Market Lamb", "3rd Overall").
-- For shown_by, placed_by, sired_by, dam — use the names as written.
+- For shown_by, placed_by, sired_by, dam — use the names as written, preserving original spelling and capitalization.
 - caption should contain any remaining descriptive text not captured by other fields.
+- CRITICAL: For the caption field, preserve the EXACT original order of all content. Do NOT rearrange, summarize, combine, or reword. Copy text verbatim in the same sequence it appeared in the source.
 - If you detect multiple wins (e.g. "Grand Champion AND Reserve Champion" or multiple animals/exhibitors), return each as a separate entry in the results array.`;
 
 serve(async (req) => {
