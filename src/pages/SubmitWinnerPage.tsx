@@ -231,6 +231,7 @@ export default function SubmitWinnerPage() {
           show_name: result.showName.trim(),
           shown_by: result.shownBy.trim(),
           placed_by: result.placedBy.trim() || null,
+          bred_by: result.bredBy.trim() || null,
           sired_by: autoSireName || null,
           sire_id: resolvedSireId,
           dam: autoDamName || null,

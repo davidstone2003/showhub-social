@@ -12,6 +12,7 @@ export interface ResultData {
   winPlacing: string;
   shownBy: string;
   placedBy: string;
+  bredBy: string;
   sireName: string;
   sireId: string | null;
   damName: string;
@@ -84,6 +85,12 @@ export function ResultBlock({ result, index, total, onChange, onRemove, defaultE
             onChange={(e) => onChange({ ...result, placedBy: e.target.value })}
             className="rounded-xl bg-card border-border h-11 text-sm"
           />
+          <Input
+            placeholder="Bred by"
+            value={result.bredBy}
+            onChange={(e) => onChange({ ...result, bredBy: e.target.value })}
+            className="rounded-xl bg-card border-border h-11 text-sm"
+          />
         </div>
       )}
     </div>
@@ -98,6 +105,7 @@ export function createEmptyResult(): ResultData {
     winPlacing: "",
     shownBy: "",
     placedBy: "",
+    bredBy: "",
     sireName: "",
     sireId: null,
     damName: "",
