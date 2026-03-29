@@ -11,6 +11,7 @@ import { AdminEditModal } from "@/components/AdminEditModal";
 import { AuthGate } from "@/components/AuthGate";
 import { useEmailVerification } from "@/hooks/useEmailVerification";
 import { VerifyEmailModal } from "@/components/VerifyEmailModal";
+import { WinnerImageViewer } from "@/components/winners/WinnerImageViewer";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
