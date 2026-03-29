@@ -12,6 +12,7 @@ export interface ResultData {
   winPlacing: string;
   shownBy: string;
   placedBy: string;
+  bredBy: string;
   sireName: string;
   sireId: string | null;
   damName: string;
