@@ -41,10 +41,14 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const [likeCount, setLikeCount] = useState(post.likes);
   const [imageFailed, setImageFailed] = useState(false);
   const [showFlagModal, setShowFlagModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAuthGate, setShowAuthGate] = useState(false);
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
   const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
+
+  const canManage = isAdmin || (user && (post as any).user_id === user.id);
 
   const handleLike = () => {
     if (!user) { setShowAuthGate(true); return; }
