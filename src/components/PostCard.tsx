@@ -57,6 +57,17 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
     setLikeCount((c) => (liked ? c - 1 : c + 1));
   };
 
+  const handleDelete = async () => {
+    const { error } = await supabase.from("winners").delete().eq("id", post.id);
+    if (error) {
+      toast.error("Failed to delete post");
+    } else {
+      toast.success("Post deleted");
+      onModerated?.();
+    }
+    setShowDeleteConfirm(false);
+  };
+
   const isUploadedWinnerImage = post.image.includes("/storage/v1/object/public/winner-images/");
   const imageSrc = imageFailed ? "/placeholder.svg" : post.image;
 
