@@ -20,6 +20,9 @@ interface WinnerCard {
 export function Feed() {
   const [loading, setLoading] = useState(true);
   const [dbPosts, setDbPosts] = useState<Post[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleModerated = () => setRefreshKey(k => k + 1);
 
   useEffect(() => {
     async function fetchFeed() {
