@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Heart, MessageCircle, Flag } from "lucide-react";
+import { Heart, MessageCircle, Flag, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import type { Post } from "@/data/mock";
@@ -7,9 +7,28 @@ import { cn } from "@/lib/utils";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/contexts/AuthContext";
 import { AdminFlagModal } from "@/components/AdminFlagModal";
+import { AdminEditModal } from "@/components/AdminEditModal";
 import { AuthGate } from "@/components/AuthGate";
 import { useEmailVerification } from "@/hooks/useEmailVerification";
 import { VerifyEmailModal } from "@/components/VerifyEmailModal";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface PostCardProps {
   post: Post & { status?: string; user_id?: string | null };
