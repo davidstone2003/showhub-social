@@ -11,6 +11,7 @@ import { AdminEditModal } from "@/components/AdminEditModal";
 import { AuthGate } from "@/components/AuthGate";
 import { useEmailVerification } from "@/hooks/useEmailVerification";
 import { VerifyEmailModal } from "@/components/VerifyEmailModal";
+import { WinnerImageViewer } from "@/components/winners/WinnerImageViewer";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -44,6 +45,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAuthGate, setShowAuthGate] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
   const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
@@ -140,10 +142,11 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </DropdownMenu>
         )}
 
-        {/* Full-width image — landscape ratio, no spacer */}
-        <Link
-          to={post.animal_id ? `/animal/${post.animal_id}` : "#"}
-          className="block w-full overflow-hidden"
+        {/* Full-width image — tap to open fullscreen */}
+        <button
+          onClick={() => setViewerOpen(true)}
+          className="block w-full overflow-hidden cursor-pointer"
+          type="button"
         >
           <img
             src={imageSrc}
@@ -154,7 +157,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
             decoding="async"
             onError={() => setImageFailed(true)}
           />
-        </Link>
+        </button>
 
         {/* Result information — tight, line-by-line */}
         <div style={{ padding: "8px 12px 10px" }}>
@@ -245,6 +248,17 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
       </AlertDialog>
       <AuthGate open={showAuthGate} onOpenChange={setShowAuthGate} />
       <VerifyEmailModal open={showVerifyModal} onOpenChange={setShowVerifyModal} onResend={resendVerification} />
+      <WinnerImageViewer
+        slides={[{
+          image: post.image,
+          name: post.shown_by || resultTitle,
+          placement: resultTitle,
+          breeder: post.breeder?.name || null,
+        }]}
+        initialIndex={0}
+        open={viewerOpen}
+        onClose={() => setViewerOpen(false)}
+      />
     </>
   );
 }
