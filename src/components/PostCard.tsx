@@ -45,6 +45,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAuthGate, setShowAuthGate] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
   const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
