@@ -193,7 +193,7 @@ export function Feed() {
           </>
         ) : allPosts.length > 0 ? (
           allPosts.map((post, i) => (
-            <PostCard key={post.id} post={post} index={i} />
+            <PostCard key={post.id} post={post} index={i} onModerated={handleModerated} />
           ))
         ) : (
           <div className="text-center" style={{ padding: '80px 0' }}>
