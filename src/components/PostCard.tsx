@@ -198,6 +198,34 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
       </motion.article>
 
       <AdminFlagModal open={showFlagModal} onOpenChange={setShowFlagModal} postId={post.id} postOwnerId={(post as any).user_id} onActionComplete={onModerated} />
+      <AdminEditModal
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+        post={{
+          id: post.id,
+          title: post.win_placing || post.show_name || "",
+          show_name: post.show_name || "",
+          shown_by: post.shown_by || "",
+          win_placing: post.win_placing,
+          caption: (post as any).caption,
+          bred_by: (post as any).bred_by,
+          sired_by: (post as any).sired_by,
+          dam: (post as any).dam,
+        }}
+        onSaved={onModerated}
+      />
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this post?</AlertDialogTitle>
+            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <AuthGate open={showAuthGate} onOpenChange={setShowAuthGate} />
       <VerifyEmailModal open={showVerifyModal} onOpenChange={setShowVerifyModal} onResend={resendVerification} />
     </>
