@@ -179,7 +179,7 @@ export function Feed() {
       setLoading(false);
     }
     fetchFeed();
-  }, []);
+  }, [refreshKey]);
 
   const allPosts = useMemo(() => [...dbPosts, ...mockPosts], [dbPosts]);
 
