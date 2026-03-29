@@ -140,7 +140,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </DropdownMenu>
         )}
 
-        {/* Full-width image — no spacer */}
+        {/* Full-width image — landscape ratio, no spacer */}
         <Link
           to={post.animal_id ? `/animal/${post.animal_id}` : "#"}
           className="block w-full overflow-hidden"
@@ -148,10 +148,8 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           <img
             src={imageSrc}
             alt={resultTitle}
-            className={cn(
-              "w-full",
-              isUploadedWinnerImage ? "aspect-[4/5] object-contain bg-muted" : "aspect-[4/5] object-cover"
-            )}
+            className="w-full object-cover"
+            style={{ aspectRatio: "4 / 3" }}
             loading="lazy"
             decoding="async"
             onError={() => setImageFailed(true)}
@@ -159,7 +157,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         </Link>
 
         {/* Result information — tight, line-by-line */}
-        <div style={{ padding: "10px 12px 10px" }}>
+        <div style={{ padding: "8px 12px 10px" }}>
           {/* Result title */}
           <p
             className="text-foreground font-semibold"
