@@ -76,19 +76,16 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const isRestricted = status === "restricted";
   const isRemoved = status === "removed";
 
-  // Build title: win_placing or show_name
+  // Full result title
+  const resultTitle = post.win_placing || post.show_name || "New Post";
+
+  // Year prefix for show name
   const currentYear = new Date().getFullYear();
   const postYear = post.created_at ? new Date(post.created_at).getFullYear() : currentYear;
   const yearPrefix = !isNaN(postYear) && postYear <= currentYear && postYear > 2000 ? `${postYear} ` : "";
-  
-  const title = post.win_placing || post.show_name || "New Post";
-  
-  // Build single context line
-  const contextParts: string[] = [];
-  if (post.shown_by) contextParts.push(post.shown_by);
-  if (post.show_name && post.win_placing) contextParts.push(`${yearPrefix}${post.show_name}`);
-  if (post.breeder?.name && !contextParts.includes(post.breeder.name)) contextParts.push(post.breeder.name);
-  const contextLine = contextParts.join(" • ");
+
+  // Show name with year
+  const showLine = post.show_name && post.win_placing ? `${yearPrefix}${post.show_name}` : null;
 
   return (
     <>
@@ -102,7 +99,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           isRestricted && "ring-2 ring-orange-400 opacity-75",
           isRemoved && "ring-2 ring-destructive opacity-50"
         )}
-        style={{ borderRadius: "10px", boxShadow: "0 1px 2px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)" }}
+        style={{ borderRadius: "10px", boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)" }}
       >
         {/* Status banner */}
         {status !== "active" && (
@@ -143,14 +140,14 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </DropdownMenu>
         )}
 
-        {/* Full-width image */}
+        {/* Full-width image — no spacer */}
         <Link
           to={post.animal_id ? `/animal/${post.animal_id}` : "#"}
-          className="block w-full overflow-hidden bg-muted"
+          className="block w-full overflow-hidden"
         >
           <img
             src={imageSrc}
-            alt={title}
+            alt={resultTitle}
             className={cn(
               "w-full",
               isUploadedWinnerImage ? "aspect-[4/5] object-contain bg-muted" : "aspect-[4/5] object-cover"
@@ -161,36 +158,58 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           />
         </Link>
 
-        {/* Title + context + engagement */}
-        <div style={{ padding: "8px 12px 12px" }}>
+        {/* Result information — tight, line-by-line */}
+        <div style={{ padding: "10px 12px 10px" }}>
+          {/* Result title */}
           <p
-            className="text-foreground font-semibold truncate"
-            style={{ fontSize: "16px", lineHeight: 1.3 }}
+            className="text-foreground font-semibold"
+            style={{ fontSize: "18px", lineHeight: 1.25 }}
           >
-            {title}
+            {resultTitle}
           </p>
 
-          {contextLine && (
+          {/* Exhibitor / Shown by */}
+          {post.shown_by && (
             <p
-              className="text-muted-foreground truncate"
-              style={{ fontSize: "13px", lineHeight: 1.3, marginTop: "3px" }}
+              className="text-muted-foreground"
+              style={{ fontSize: "14px", lineHeight: 1.3, marginTop: "8px" }}
             >
-              {contextLine}
+              {post.shown_by}
+            </p>
+          )}
+
+          {/* Show name with year */}
+          {showLine && (
+            <p
+              className="text-muted-foreground"
+              style={{ fontSize: "14px", lineHeight: 1.3, marginTop: "8px" }}
+            >
+              {showLine}
+            </p>
+          )}
+
+          {/* Bred by */}
+          {post.breeder?.name && (
+            <p
+              className="text-muted-foreground"
+              style={{ fontSize: "14px", lineHeight: 1.3, marginTop: "8px" }}
+            >
+              Bred by {post.breeder.name}
             </p>
           )}
 
           {/* Engagement row */}
-          <div className="flex items-center justify-end gap-3" style={{ marginTop: "8px" }}>
+          <div className="flex items-center gap-4" style={{ marginTop: "10px" }}>
             <button
               onClick={handleLike}
-              className="flex items-center gap-1 hover:text-destructive transition-colors"
+              className="flex items-center gap-1.5 hover:text-destructive transition-colors"
               style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))" }}
             >
-              <Heart className={cn("w-3.5 h-3.5", liked && "fill-destructive text-destructive")} />
+              <Heart className={cn("w-4 h-4", liked && "fill-destructive text-destructive")} />
               <span>{likeCount}</span>
             </button>
-            <span className="flex items-center gap-1" style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))" }}>
-              <MessageCircle className="w-3.5 h-3.5" />
+            <span className="flex items-center gap-1.5" style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))" }}>
+              <MessageCircle className="w-4 h-4" />
               <span>{post.comments}</span>
             </span>
           </div>
