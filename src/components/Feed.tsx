@@ -20,6 +20,9 @@ interface WinnerCard {
 export function Feed() {
   const [loading, setLoading] = useState(true);
   const [dbPosts, setDbPosts] = useState<Post[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleModerated = () => setRefreshKey(k => k + 1);
 
   useEffect(() => {
     async function fetchFeed() {
@@ -176,7 +179,7 @@ export function Feed() {
       setLoading(false);
     }
     fetchFeed();
-  }, []);
+  }, [refreshKey]);
 
   const allPosts = useMemo(() => [...dbPosts, ...mockPosts], [dbPosts]);
 
@@ -190,7 +193,7 @@ export function Feed() {
           </>
         ) : allPosts.length > 0 ? (
           allPosts.map((post, i) => (
-            <PostCard key={post.id} post={post} index={i} />
+            <PostCard key={post.id} post={post} index={i} onModerated={handleModerated} />
           ))
         ) : (
           <div className="text-center" style={{ padding: '80px 0' }}>

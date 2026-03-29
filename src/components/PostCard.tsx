@@ -62,8 +62,10 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   };
 
   const handleDelete = async () => {
-    const { error } = await supabase.from("winners").delete().eq("id", post.id);
-    if (error) {
+    // Try deleting from posts table first, then winners
+    const { error: postsError } = await supabase.from("posts").delete().eq("id", post.id);
+    const { error: winnersError } = await supabase.from("winners").delete().eq("id", post.id);
+    if (postsError && winnersError) {
       toast.error("Failed to delete post");
     } else {
       toast.success("Post deleted");
