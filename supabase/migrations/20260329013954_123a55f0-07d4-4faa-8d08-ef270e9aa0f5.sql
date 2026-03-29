@@ -1,0 +1,1 @@
+UPDATE profiles SET email_verified = true WHERE id = '93837aa3-2245-49a0-a364-63b186eb1270';
