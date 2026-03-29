@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Heart, MessageCircle, Flag } from "lucide-react";
+import { Heart, MessageCircle, Flag, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import type { Post } from "@/data/mock";
@@ -7,9 +7,28 @@ import { cn } from "@/lib/utils";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/contexts/AuthContext";
 import { AdminFlagModal } from "@/components/AdminFlagModal";
+import { AdminEditModal } from "@/components/AdminEditModal";
 import { AuthGate } from "@/components/AuthGate";
 import { useEmailVerification } from "@/hooks/useEmailVerification";
 import { VerifyEmailModal } from "@/components/VerifyEmailModal";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface PostCardProps {
   post: Post & { status?: string; user_id?: string | null };
@@ -22,16 +41,31 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const [likeCount, setLikeCount] = useState(post.likes);
   const [imageFailed, setImageFailed] = useState(false);
   const [showFlagModal, setShowFlagModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAuthGate, setShowAuthGate] = useState(false);
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
   const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
+
+  const canManage = isAdmin || (user && (post as any).user_id === user.id);
 
   const handleLike = () => {
     if (!user) { setShowAuthGate(true); return; }
     if (requireVerification()) return;
     setLiked(!liked);
     setLikeCount((c) => (liked ? c - 1 : c + 1));
+  };
+
+  const handleDelete = async () => {
+    const { error } = await supabase.from("winners").delete().eq("id", post.id);
+    if (error) {
+      toast.error("Failed to delete post");
+    } else {
+      toast.success("Post deleted");
+      onModerated?.();
+    }
+    setShowDeleteConfirm(false);
   };
 
   const isUploadedWinnerImage = post.image.includes("/storage/v1/object/public/winner-images/");
@@ -85,14 +119,28 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </div>
         )}
 
-        {/* Admin flag */}
-        {isAdmin && (
-          <button
-            onClick={() => setShowFlagModal(true)}
-            className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-card/80 backdrop-blur-sm border border-border hover:bg-destructive/10 transition-colors"
-          >
-            <Flag className="w-3.5 h-3.5 text-muted-foreground" />
-          </button>
+        {/* Admin/Owner controls */}
+        {canManage && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-card/80 backdrop-blur-sm border border-border hover:bg-muted transition-colors">
+                <MoreVertical className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-36">
+              <DropdownMenuItem onClick={() => setShowEditModal(true)}>
+                <Pencil className="w-3.5 h-3.5 mr-2" /> Edit
+              </DropdownMenuItem>
+              {isAdmin && (
+                <DropdownMenuItem onClick={() => setShowFlagModal(true)}>
+                  <Flag className="w-3.5 h-3.5 mr-2" /> Moderate
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={() => setShowDeleteConfirm(true)} className="text-destructive focus:text-destructive">
+                <Trash2 className="w-3.5 h-3.5 mr-2" /> Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
 
         {/* Full-width image */}
@@ -150,6 +198,34 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
       </motion.article>
 
       <AdminFlagModal open={showFlagModal} onOpenChange={setShowFlagModal} postId={post.id} postOwnerId={(post as any).user_id} onActionComplete={onModerated} />
+      <AdminEditModal
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+        post={{
+          id: post.id,
+          title: post.win_placing || post.show_name || "",
+          show_name: post.show_name || "",
+          shown_by: post.shown_by || "",
+          win_placing: post.win_placing,
+          caption: (post as any).caption,
+          bred_by: (post as any).bred_by,
+          sired_by: (post as any).sired_by,
+          dam: (post as any).dam,
+        }}
+        onSaved={onModerated}
+      />
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this post?</AlertDialogTitle>
+            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <AuthGate open={showAuthGate} onOpenChange={setShowAuthGate} />
       <VerifyEmailModal open={showVerifyModal} onOpenChange={setShowVerifyModal} onResend={resendVerification} />
     </>
