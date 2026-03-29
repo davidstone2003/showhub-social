@@ -299,7 +299,7 @@ export default function CreatePostPage() {
         </div>
       )}
 
-      <div className="min-h-screen bg-background pb-28">
+      <div className="min-h-screen bg-background pb-44">
         {/* Header */}
         <div className="sticky top-0 z-20 bg-card border-b border-border px-4 py-3">
           <div className="flex items-center gap-3">
@@ -386,8 +386,8 @@ export default function CreatePostPage() {
           )}
         </div>
 
-        {/* Sticky Post Button */}
-        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 backdrop-blur px-4 py-3 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+        {/* Sticky Post Button — sits above mobile nav (56px) */}
+        <div className="fixed inset-x-0 z-50 border-t border-border bg-background/95 backdrop-blur px-4 py-3" style={{ bottom: "calc(56px + env(safe-area-inset-bottom, 0px))" }}>
           <div className="max-w-lg mx-auto">
             <Button onClick={handleSubmit} disabled={submitting} className="w-full h-12 rounded-xl text-base font-bold">
               {submitting ? "Posting…" : "Post"}
