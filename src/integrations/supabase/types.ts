@@ -354,6 +354,7 @@ export type Database = {
           status: string
           tags: string[] | null
           user_id: string | null
+          video_url: string | null
         }
         Insert: {
           caption?: string | null
@@ -368,6 +369,7 @@ export type Database = {
           status?: string
           tags?: string[] | null
           user_id?: string | null
+          video_url?: string | null
         }
         Update: {
           caption?: string | null
@@ -382,6 +384,7 @@ export type Database = {
           status?: string
           tags?: string[] | null
           user_id?: string | null
+          video_url?: string | null
         }
         Relationships: [
           {
@@ -708,6 +711,7 @@ export type Database = {
           tags: string[] | null
           title: string
           user_id: string | null
+          video_url: string | null
           win_placing: string | null
         }
         Insert: {
@@ -739,6 +743,7 @@ export type Database = {
           tags?: string[] | null
           title: string
           user_id?: string | null
+          video_url?: string | null
           win_placing?: string | null
         }
         Update: {
@@ -770,6 +775,7 @@ export type Database = {
           tags?: string[] | null
           title?: string
           user_id?: string | null
+          video_url?: string | null
           win_placing?: string | null
         }
         Relationships: [
