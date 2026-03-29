@@ -15,6 +15,7 @@ import { MarketPage, HaulersPage } from "./pages/PlaceholderPage";
 import SalesPage from "./pages/SalesPage";
 import RepoPage from "./pages/RepoPage";
 import SubmitWinnerPage from "./pages/SubmitWinnerPage";
+import CreatePostPage from "./pages/CreatePostPage";
 import AuthPage from "./pages/AuthPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import BreederProfilePage from "./pages/BreederProfilePage";
@@ -52,7 +53,8 @@ const App = () => (
             <Route path="/sales" element={<SalesPage />} />
             <Route path="/repo" element={<RepoPage />} />
             <Route path="/saved" element={<SavedPage />} />
-            <Route path="/submit" element={<SubmitWinnerPage />} />
+            <Route path="/submit" element={<CreatePostPage />} />
+            <Route path="/submit/legacy" element={<SubmitWinnerPage />} />
             <Route path="/breeder/:username" element={<BreederProfilePage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/pricing" element={<PricingPage />} />

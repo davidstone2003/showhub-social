@@ -48,6 +48,7 @@ export interface Post {
   dam?: string;
   placed_by?: string;
   win_placing?: string;
+  video_url?: string | null;
   user_id?: string | null;
   status?: string;
 }

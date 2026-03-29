@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Heart, MessageCircle, Flag, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { FeedVideo, FullscreenVideo } from "@/components/post/VideoPlayer";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import type { Post } from "@/data/mock";
@@ -46,6 +47,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAuthGate, setShowAuthGate] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
+  const [videoFullscreen, setVideoFullscreen] = useState(false);
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
   const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
@@ -142,22 +144,29 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </DropdownMenu>
         )}
 
-        {/* Full-width image — tap to open fullscreen */}
-        <button
-          onClick={() => setViewerOpen(true)}
-          className="block w-full overflow-hidden cursor-pointer"
-          type="button"
-        >
-          <img
-            src={imageSrc}
-            alt={resultTitle}
-            className="w-full object-cover"
-            style={{ aspectRatio: "4 / 3" }}
-            loading="lazy"
-            decoding="async"
-            onError={() => setImageFailed(true)}
+        {/* Full-width media — photo or video */}
+        {(post as any).video_url ? (
+          <FeedVideo
+            src={(post as any).video_url}
+            aspectRatio="4 / 3"
           />
-        </button>
+        ) : (
+          <button
+            onClick={() => setViewerOpen(true)}
+            className="block w-full overflow-hidden cursor-pointer"
+            type="button"
+          >
+            <img
+              src={imageSrc}
+              alt={resultTitle}
+              className="w-full object-cover"
+              style={{ aspectRatio: "4 / 3" }}
+              loading="lazy"
+              decoding="async"
+              onError={() => setImageFailed(true)}
+            />
+          </button>
+        )}
 
         {/* Result information — tight, line-by-line */}
         <div style={{ padding: "8px 12px 10px" }}>
