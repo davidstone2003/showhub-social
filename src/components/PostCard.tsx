@@ -248,6 +248,17 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
       </AlertDialog>
       <AuthGate open={showAuthGate} onOpenChange={setShowAuthGate} />
       <VerifyEmailModal open={showVerifyModal} onOpenChange={setShowVerifyModal} onResend={resendVerification} />
+      <WinnerImageViewer
+        slides={[{
+          image: post.image,
+          name: post.shown_by || resultTitle,
+          placement: resultTitle,
+          breeder: post.breeder?.name || null,
+        }]}
+        initialIndex={0}
+        open={viewerOpen}
+        onClose={() => setViewerOpen(false)}
+      />
     </>
   );
 }
