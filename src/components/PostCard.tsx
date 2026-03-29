@@ -119,14 +119,28 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </div>
         )}
 
-        {/* Admin flag */}
-        {isAdmin && (
-          <button
-            onClick={() => setShowFlagModal(true)}
-            className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-card/80 backdrop-blur-sm border border-border hover:bg-destructive/10 transition-colors"
-          >
-            <Flag className="w-3.5 h-3.5 text-muted-foreground" />
-          </button>
+        {/* Admin/Owner controls */}
+        {canManage && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="absolute top-2 right-2 z-10 p-1.5 rounded-lg bg-card/80 backdrop-blur-sm border border-border hover:bg-muted transition-colors">
+                <MoreVertical className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-36">
+              <DropdownMenuItem onClick={() => setShowEditModal(true)}>
+                <Pencil className="w-3.5 h-3.5 mr-2" /> Edit
+              </DropdownMenuItem>
+              {isAdmin && (
+                <DropdownMenuItem onClick={() => setShowFlagModal(true)}>
+                  <Flag className="w-3.5 h-3.5 mr-2" /> Moderate
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={() => setShowDeleteConfirm(true)} className="text-destructive focus:text-destructive">
+                <Trash2 className="w-3.5 h-3.5 mr-2" /> Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
 
         {/* Full-width image */}
