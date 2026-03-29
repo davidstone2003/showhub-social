@@ -142,10 +142,11 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </DropdownMenu>
         )}
 
-        {/* Full-width image — landscape ratio, no spacer */}
-        <Link
-          to={post.animal_id ? `/animal/${post.animal_id}` : "#"}
-          className="block w-full overflow-hidden"
+        {/* Full-width image — tap to open fullscreen */}
+        <button
+          onClick={() => setViewerOpen(true)}
+          className="block w-full overflow-hidden cursor-pointer"
+          type="button"
         >
           <img
             src={imageSrc}
@@ -156,7 +157,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
             decoding="async"
             onError={() => setImageFailed(true)}
           />
-        </Link>
+        </button>
 
         {/* Result information — tight, line-by-line */}
         <div style={{ padding: "8px 12px 10px" }}>
