@@ -387,7 +387,7 @@ export default function CreatePostPage() {
         </div>
 
         {/* Sticky Post Button */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 pb-6 bg-gradient-to-t from-background via-background/95 to-transparent z-40">
+        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 backdrop-blur px-4 py-3 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
           <div className="max-w-lg mx-auto">
             <Button onClick={handleSubmit} disabled={submitting} className="w-full h-12 rounded-xl text-base font-bold">
               {submitting ? "Posting…" : "Post"}
