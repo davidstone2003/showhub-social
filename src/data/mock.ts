@@ -51,6 +51,7 @@ export interface Post {
   video_url?: string | null;
   user_id?: string | null;
   status?: string;
+  winner_id?: string | null;
 }
 
 export interface Animal {
