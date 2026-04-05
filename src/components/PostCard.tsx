@@ -193,7 +193,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           {/* Show name with year */}
           {showLine && (
             <p
-              className="text-muted-foreground"
+              className="text-foreground font-semibold"
               style={{ fontSize: "14px", lineHeight: 1.3, marginTop: "8px" }}
             >
               {showLine}
