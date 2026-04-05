@@ -242,6 +242,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           bred_by: (post as any).bred_by,
           sired_by: (post as any).sired_by,
           dam: (post as any).dam,
+          date: (post as any).date || post.created_at?.split("T")[0],
         }}
         onSaved={onModerated}
       />
