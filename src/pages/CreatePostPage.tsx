@@ -121,8 +121,10 @@ export default function CreatePostPage() {
 
       const { error: winError } = await (supabase.from("winners") as any).insert({
         source_post_id: post.id, title, show_name: showName.trim(),
-        shown_by: exhibitorName.trim(), bred_by: breederName.trim() || null,
+        shown_by: exhibitorName.trim(), placed_by: placedBy.trim() || null,
+        bred_by: breederName.trim() || null,
         sired_by: sireName.trim() || null, sire_id: resolvedSireId,
+        dam: damName.trim() || null,
         win_placing: resultTitle.trim() || null, caption: notes.trim() || null,
         image_urls: imageUrls, video_url: videoUrl, show_id: resolvedShowId,
         date: format(new Date(), "yyyy-MM-dd"), user_id: user?.id || null,
