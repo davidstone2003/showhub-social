@@ -19,6 +19,7 @@ interface AdminEditModalProps {
     bred_by?: string | null;
     sired_by?: string | null;
     dam?: string | null;
+    date?: string | null;
   };
   onSaved?: () => void;
 }
@@ -32,6 +33,7 @@ export function AdminEditModal({ open, onOpenChange, post, onSaved }: AdminEditM
   const [bredBy, setBredBy] = useState(post.bred_by || "");
   const [siredBy, setSiredBy] = useState(post.sired_by || "");
   const [dam, setDam] = useState(post.dam || "");
+  const [date, setDate] = useState(post.date || "");
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
@@ -47,6 +49,7 @@ export function AdminEditModal({ open, onOpenChange, post, onSaved }: AdminEditM
         bred_by: bredBy || null,
         sired_by: siredBy || null,
         dam: dam || null,
+        date: date || undefined,
       })
       .eq("id", post.id);
 
@@ -78,6 +81,10 @@ export function AdminEditModal({ open, onOpenChange, post, onSaved }: AdminEditM
           <div>
             <label className="text-xs font-medium text-muted-foreground">Show Name</label>
             <Input value={showName} onChange={(e) => setShowName(e.target.value)} />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">Date / Year</label>
+            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </div>
           <div>
             <label className="text-xs font-medium text-muted-foreground">Shown By</label>
