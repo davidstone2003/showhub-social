@@ -140,6 +140,7 @@ export function Feed() {
           saved: false,
           user_id: p.user_id,
           status: p.status,
+          winner_id: firstCard?.id || null,
         });
       }
 

@@ -233,7 +233,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         open={showEditModal}
         onOpenChange={setShowEditModal}
         post={{
-          id: post.id,
+          id: (post as any).winner_id || post.id,
           title: post.win_placing || post.show_name || "",
           show_name: post.show_name || "",
           shown_by: post.shown_by || "",
