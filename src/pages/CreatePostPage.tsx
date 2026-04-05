@@ -60,8 +60,10 @@ export default function CreatePostPage() {
   const [showId, setShowId] = useState<string | null>(null);
   const [exhibitorName, setExhibitorName] = useState("");
   const [breederName, setBreederName] = useState("");
+  const [placedBy, setPlacedBy] = useState("");
   const [sireName, setSireName] = useState("");
   const [sireId, setSireId] = useState<string | null>(null);
+  const [damName, setDamName] = useState("");
   const [notes, setNotes] = useState("");
 
   // Sale Lot fields
