@@ -352,8 +352,10 @@ export default function CreatePostPage() {
               <ResultPicker value={resultTitle} onChange={setResultTitle} />
               <AutocompleteInput table="shows" placeholder="Show Name *" value={showName} onChange={(n, id) => { setShowName(n); setShowId(id); }} />
               <ExhibitorPicker value={exhibitorName} onChange={setExhibitorName} />
+              <Input placeholder="Placed by" value={placedBy} onChange={e => setPlacedBy(e.target.value)} className="rounded-xl bg-card border-border h-12 text-sm" />
               <Input placeholder="Breeder" value={breederName} onChange={e => setBreederName(e.target.value)} className="rounded-xl bg-card border-border h-12 text-sm" />
               <AutocompleteInput table="sires_lookup" placeholder="Sire" value={sireName} onChange={(n, id) => { setSireName(n); setSireId(id); }} />
+              <Input placeholder="Dam" value={damName} onChange={e => setDamName(e.target.value)} className="rounded-xl bg-card border-border h-12 text-sm" />
               <Textarea placeholder="Notes" value={notes} onChange={e => setNotes(e.target.value)} className="rounded-xl bg-card border-border text-sm min-h-[60px] resize-none" />
             </div>
           )}
