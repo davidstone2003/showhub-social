@@ -91,7 +91,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const yearPrefix = !isNaN(postYear) && postYear <= currentYear && postYear > 2000 ? `${postYear} ` : "";
 
   // Show name with year
-  const showLine = post.show_name && post.win_placing ? `${yearPrefix}${post.show_name}` : null;
+  const showLine = post.show_name ? `${yearPrefix}${post.show_name}` : null;
 
   return (
     <>
