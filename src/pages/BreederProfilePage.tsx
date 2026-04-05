@@ -19,9 +19,12 @@ type WinnerRow = {
   shown_by: string;
   placed_by: string | null;
   sired_by: string | null;
+  sire_id: string | null;
   dam: string | null;
+  bred_by: string | null;
   caption: string | null;
   image_urls: string[] | null;
+  video_url: string | null;
   likes: number;
   comments: number;
   date: string;
@@ -30,13 +33,23 @@ type WinnerRow = {
   is_featured: boolean;
   tags: string[] | null;
   created_at: string;
+  user_id: string | null;
+  status: string;
 };
 
-function toPost(row: WinnerRow): Post {
+function toPost(row: WinnerRow, profile: any): Post {
+  const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ");
   return {
     id: row.id,
     image: row.image_urls?.[0] || "/placeholder.svg",
-    breeder: { id: "", name: "", location: "", logo: "", is_pro: false },
+    breeder: {
+      id: profile?.id || "",
+      name: fullName || profile?.display_name || profile?.username || "",
+      location: profile?.location || "",
+      logo: profile?.logo_url || "",
+      is_pro: profile?.subscription_tier === "breeder_page" || profile?.subscription_tier === "listing",
+      slug: profile?.username,
+    },
     caption: row.caption || "",
     tags: (row.tags || []).map((t) => ({ label: t, type: "tag" })),
     post_type: "champion",
@@ -48,8 +61,14 @@ function toPost(row: WinnerRow): Post {
     shown_by: row.shown_by,
     placed_by: row.placed_by || undefined,
     sired_by: row.sired_by || undefined,
+    sire_id: row.sire_id || undefined,
     dam: row.dam || undefined,
+    bred_by: row.bred_by || undefined,
     win_placing: row.win_placing || undefined,
+    video_url: row.video_url || null,
+    user_id: row.user_id,
+    status: row.status,
+    winner_id: row.id,
   };
 }
 
@@ -95,6 +114,9 @@ export default function BreederProfilePage() {
   const sales = posts.filter((p) => p.post_type === "sale");
   const recentPosts = posts.slice(0, isFeatured ? 10 : 3);
 
+  const renderCards = (items: WinnerRow[]) =>
+    items.map((post, i) => <PostCard key={post.id} post={toPost(post, profile)} index={i} />);
+
   if (profileLoading) {
     return (
       <Layout>
@@ -127,18 +149,13 @@ export default function BreederProfilePage() {
         />
 
         <div className="max-w-2xl mx-auto px-4 py-5 space-y-6">
-
-          {/* ===== FREE / CONTACTED TIER ===== */}
           {!isFeatured && (
             <>
               {recentPosts.length > 0 && (
                 <BreederSection icon={Activity} title="Recent Posts">
-                  {recentPosts.map((post, i) => (
-                    <PostCard key={post.id} post={toPost(post)} index={i} />
-                  ))}
+                  {renderCards(recentPosts)}
                 </BreederSection>
               )}
-
               <LockedSection icon={Trophy} title="Winners" count={winners.length || 3} isOwner={false} />
               <LockedSection icon={Dna} title="Sires" count={sires.length || 2} isOwner={false} />
               <LockedSection icon={Dna} title="Donors / Genetics" count={donors.length || 2} isOwner={false} />
@@ -146,54 +163,36 @@ export default function BreederProfilePage() {
             </>
           )}
 
-          {/* ===== FEATURED / BREEDER PAGE TIER ===== */}
           {isFeatured && (
             <>
               {featured.length > 0 && (
                 <BreederSection icon={Star} title="Featured">
-                  {featured.map((post, i) => (
-                    <PostCard key={post.id} post={toPost(post)} index={i} />
-                  ))}
+                  {renderCards(featured)}
                 </BreederSection>
               )}
-
               {winners.length > 0 && (
                 <BreederSection icon={Trophy} title="Recent Winners">
-                  {winners.map((post, i) => (
-                    <PostCard key={post.id} post={toPost(post)} index={i} />
-                  ))}
+                  {renderCards(winners)}
                 </BreederSection>
               )}
-
               {sires.length > 0 && (
                 <BreederSection icon={Dna} title="Sires">
-                  {sires.map((post, i) => (
-                    <PostCard key={post.id} post={toPost(post)} index={i} />
-                  ))}
+                  {renderCards(sires)}
                 </BreederSection>
               )}
-
               {donors.length > 0 && (
                 <BreederSection icon={Dna} title="Donors / Genetics">
-                  {donors.map((post, i) => (
-                    <PostCard key={post.id} post={toPost(post)} index={i} />
-                  ))}
+                  {renderCards(donors)}
                 </BreederSection>
               )}
-
               {sales.length > 0 && (
                 <BreederSection icon={ShoppingBag} title="Available / For Sale">
-                  {sales.map((post, i) => (
-                    <PostCard key={post.id} post={toPost(post)} index={i} />
-                  ))}
+                  {renderCards(sales)}
                 </BreederSection>
               )}
-
               {recentPosts.length > 0 && (
                 <BreederSection icon={Activity} title="Recent Activity">
-                  {recentPosts.slice(0, 5).map((post, i) => (
-                    <PostCard key={post.id} post={toPost(post)} index={i} />
-                  ))}
+                  {renderCards(recentPosts.slice(0, 5))}
                 </BreederSection>
               )}
             </>
