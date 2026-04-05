@@ -60,8 +60,10 @@ export default function CreatePostPage() {
   const [showId, setShowId] = useState<string | null>(null);
   const [exhibitorName, setExhibitorName] = useState("");
   const [breederName, setBreederName] = useState("");
+  const [placedBy, setPlacedBy] = useState("");
   const [sireName, setSireName] = useState("");
   const [sireId, setSireId] = useState<string | null>(null);
+  const [damName, setDamName] = useState("");
   const [notes, setNotes] = useState("");
 
   // Sale Lot fields
@@ -119,8 +121,10 @@ export default function CreatePostPage() {
 
       const { error: winError } = await (supabase.from("winners") as any).insert({
         source_post_id: post.id, title, show_name: showName.trim(),
-        shown_by: exhibitorName.trim(), bred_by: breederName.trim() || null,
+        shown_by: exhibitorName.trim(), placed_by: placedBy.trim() || null,
+        bred_by: breederName.trim() || null,
         sired_by: sireName.trim() || null, sire_id: resolvedSireId,
+        dam: damName.trim() || null,
         win_placing: resultTitle.trim() || null, caption: notes.trim() || null,
         image_urls: imageUrls, video_url: videoUrl, show_id: resolvedShowId,
         date: format(new Date(), "yyyy-MM-dd"), user_id: user?.id || null,
@@ -132,7 +136,7 @@ export default function CreatePostPage() {
       toast.success("Winner posted!");
       setSuccessData({
         showName: showName.trim(), winPlacing: resultTitle.trim(),
-        shownBy: exhibitorName.trim(), placedBy: "", sireName: sireName.trim(),
+        shownBy: exhibitorName.trim(), placedBy: placedBy.trim(), sireName: sireName.trim(),
         damName: "", caption: notes.trim(), imageUrls, postedAsBreederId, winnerRefs: [],
       });
     } catch (err: any) { toast.error("Failed to post", { description: err.message }); }
@@ -348,8 +352,10 @@ export default function CreatePostPage() {
               <ResultPicker value={resultTitle} onChange={setResultTitle} />
               <AutocompleteInput table="shows" placeholder="Show Name *" value={showName} onChange={(n, id) => { setShowName(n); setShowId(id); }} />
               <ExhibitorPicker value={exhibitorName} onChange={setExhibitorName} />
+              <Input placeholder="Placed by" value={placedBy} onChange={e => setPlacedBy(e.target.value)} className="rounded-xl bg-card border-border h-12 text-sm" />
               <Input placeholder="Breeder" value={breederName} onChange={e => setBreederName(e.target.value)} className="rounded-xl bg-card border-border h-12 text-sm" />
               <AutocompleteInput table="sires_lookup" placeholder="Sire" value={sireName} onChange={(n, id) => { setSireName(n); setSireId(id); }} />
+              <Input placeholder="Dam" value={damName} onChange={e => setDamName(e.target.value)} className="rounded-xl bg-card border-border h-12 text-sm" />
               <Textarea placeholder="Notes" value={notes} onChange={e => setNotes(e.target.value)} className="rounded-xl bg-card border-border text-sm min-h-[60px] resize-none" />
             </div>
           )}
