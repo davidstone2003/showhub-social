@@ -136,7 +136,7 @@ export default function CreatePostPage() {
       toast.success("Winner posted!");
       setSuccessData({
         showName: showName.trim(), winPlacing: resultTitle.trim(),
-        shownBy: exhibitorName.trim(), placedBy: "", sireName: sireName.trim(),
+        shownBy: exhibitorName.trim(), placedBy: placedBy.trim(), sireName: sireName.trim(),
         damName: "", caption: notes.trim(), imageUrls, postedAsBreederId, winnerRefs: [],
       });
     } catch (err: any) { toast.error("Failed to post", { description: err.message }); }
