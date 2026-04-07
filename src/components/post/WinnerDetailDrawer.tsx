@@ -53,7 +53,7 @@ export function WinnerDetailDrawer({ post, open, onClose }: WinnerDetailDrawerPr
   return (
     <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
       <DrawerContent className="border-t-0 rounded-t-2xl" style={{ backgroundColor: "#FAF7F2" }}>
-        <div className="px-5 pt-3 pb-6 max-h-[60vh] overflow-y-auto">
+        <div className="px-5 pt-3 pb-6 max-h-[45vh] overflow-y-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-bold" style={{ color: "#2C2418" }}>Details</h3>
