@@ -64,6 +64,12 @@ export function WinnerCard({ post, onTap }: WinnerCardProps) {
           </p>
         )}
 
+        {post.shown_by && (
+          <p className="text-muted-foreground" style={{ fontSize: 13, lineHeight: 1.3 }}>
+            Shown by {post.shown_by}
+          </p>
+        )}
+
         {breederName && (
           <div className="mt-1 flex items-center gap-2">
             <div
