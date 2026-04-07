@@ -164,8 +164,8 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </>
         )}
 
-        {/* Engagement row — always visible below card */}
-        <div className="flex items-center gap-4 px-3 pb-3" style={{ marginTop: isWinner ? 0 : undefined }}>
+        {/* Engagement row — below image for all cards */}
+        <div className={cn("flex items-center gap-4 px-3 pb-3 pt-2", isWinner && "bg-card")}>
           <button
             onClick={handleLike}
             className="flex items-center gap-1.5 hover:text-destructive transition-colors"
