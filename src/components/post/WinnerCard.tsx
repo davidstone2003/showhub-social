@@ -44,7 +44,7 @@ export function WinnerCard({ post, onTap }: WinnerCardProps) {
       className="block w-full text-left focus:outline-none active:scale-[0.99] transition-transform"
     >
       {/* Clean photo — no overlay */}
-      <div className="relative w-full overflow-hidden" style={{ aspectRatio: "3 / 2" }}>
+      <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4 / 3" }}>
         <img
           src={imageSrc}
           alt={placing || "Winner"}
