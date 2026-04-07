@@ -19,7 +19,8 @@ interface WinnerCardProps {
 export function WinnerCard({ post, onTap }: WinnerCardProps) {
   const placing = post.win_placing || post.win_title || "";
   const showName = post.show_name || "";
-  const year = post.created_at ? new Date(post.created_at).getFullYear() : new Date().getFullYear();
+  const dateStr = (post as any).date || post.created_at;
+  const year = dateStr ? new Date(dateStr).getFullYear() : new Date().getFullYear();
   const showLine = showName ? `${year} ${showName}` : "";
   const breederName = post.breeder?.name || "";
   const breederLogo = post.breeder?.logo || "";
