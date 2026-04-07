@@ -80,7 +80,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         transition={{ duration: 0.2, delay: index * 0.02 }}
         className={cn(
           "overflow-hidden relative",
-          isWinner ? "" : "bg-card",
+          isWinner ? "-mx-3" : "bg-card",
           isFlagged && "ring-2 ring-amber-400",
           isRestricted && "ring-2 ring-orange-400 opacity-75",
           isRemoved && "ring-2 ring-destructive opacity-50"
