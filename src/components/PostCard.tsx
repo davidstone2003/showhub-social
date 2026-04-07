@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Heart, MessageCircle, Flag, MoreVertical, Pencil, Trash2 } from "lucide-react";
-import { FeedVideo, FullscreenVideo } from "@/components/post/VideoPlayer";
+import { FeedVideo } from "@/components/post/VideoPlayer";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import type { Post } from "@/data/mock";
 import { cn } from "@/lib/utils";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -13,23 +12,16 @@ import { AuthGate } from "@/components/AuthGate";
 import { useEmailVerification } from "@/hooks/useEmailVerification";
 import { VerifyEmailModal } from "@/components/VerifyEmailModal";
 import { WinnerImageViewer } from "@/components/winners/WinnerImageViewer";
+import { WinnerCard } from "@/components/post/WinnerCard";
+import { WinnerDetailDrawer } from "@/components/post/WinnerDetailDrawer";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
 interface PostCardProps {
@@ -47,12 +39,13 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAuthGate, setShowAuthGate] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
-  const [videoFullscreen, setVideoFullscreen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
   const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
 
   const canManage = isAdmin || (user && (post as any).user_id === user.id);
+  const isWinner = post.post_type === "champion" && (post.win_placing || post.win_title);
 
   const handleLike = () => {
     if (!user) { setShowAuthGate(true); return; }
@@ -62,7 +55,6 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   };
 
   const handleDelete = async () => {
-    // Try deleting from posts table first, then winners
     const { error: postsError } = await supabase.from("posts").delete().eq("id", post.id);
     const { error: winnersError } = await supabase.from("winners").delete().eq("id", post.id);
     if (postsError && winnersError) {
@@ -74,24 +66,11 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
     setShowDeleteConfirm(false);
   };
 
-  const isUploadedWinnerImage = post.image.includes("/storage/v1/object/public/winner-images/");
-  const imageSrc = imageFailed ? "/placeholder.svg" : post.image;
-
+  const resultTitle = post.win_placing || post.show_name || "New Post";
   const status = (post as any).status || "active";
   const isFlagged = status === "flagged";
   const isRestricted = status === "restricted";
   const isRemoved = status === "removed";
-
-  // Full result title
-  const resultTitle = post.win_placing || post.show_name || "New Post";
-
-  // Year prefix for show name
-  const currentYear = new Date().getFullYear();
-  const postYear = post.created_at ? new Date(post.created_at).getFullYear() : currentYear;
-  const yearPrefix = !isNaN(postYear) && postYear <= currentYear && postYear > 2000 ? `${postYear} ` : "";
-
-  // Show name with year
-  const showLine = post.show_name ? `${yearPrefix}${post.show_name}` : null;
 
   return (
     <>
@@ -105,7 +84,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           isRestricted && "ring-2 ring-orange-400 opacity-75",
           isRemoved && "ring-2 ring-destructive opacity-50"
         )}
-        style={{ borderRadius: "10px", boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)" }}
+        style={{ borderRadius: 12, boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)" }}
       >
         {/* Status banner */}
         {status !== "active" && (
@@ -146,92 +125,67 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </DropdownMenu>
         )}
 
-        {/* Full-width media — photo or video */}
-        {(post as any).video_url ? (
-          <FeedVideo
-            src={(post as any).video_url}
-            aspectRatio="4 / 3"
-          />
+        {/* WINNER CARD (new 4:5 portrait design) */}
+        {isWinner ? (
+          <WinnerCard post={post} onTap={() => setDrawerOpen(true)} />
         ) : (
-          <button
-            onClick={() => setViewerOpen(true)}
-            className="block w-full overflow-hidden cursor-pointer"
-            type="button"
-          >
-            <img
-              src={imageSrc}
-              alt={resultTitle}
-              className="w-full object-cover"
-              style={{ aspectRatio: "4 / 3" }}
-              loading="lazy"
-              decoding="async"
-              onError={() => setImageFailed(true)}
-            />
-          </button>
+          /* Standard card for non-winner posts */
+          <>
+            {(post as any).video_url ? (
+              <FeedVideo src={(post as any).video_url} aspectRatio="4 / 3" />
+            ) : (
+              <button
+                onClick={() => setViewerOpen(true)}
+                className="block w-full overflow-hidden cursor-pointer"
+                type="button"
+              >
+                <img
+                  src={imageFailed ? "/placeholder.svg" : post.image}
+                  alt={resultTitle}
+                  className="w-full object-cover"
+                  style={{ aspectRatio: "4 / 3" }}
+                  loading="lazy"
+                  decoding="async"
+                  onError={() => setImageFailed(true)}
+                />
+              </button>
+            )}
+            <div style={{ padding: "8px 12px 10px" }}>
+              <p className="text-foreground font-semibold" style={{ fontSize: 18, lineHeight: 1.25 }}>{resultTitle}</p>
+              {post.shown_by && <p className="text-muted-foreground" style={{ fontSize: 14, lineHeight: 1.3, marginTop: 8 }}>{post.shown_by}</p>}
+              {post.show_name && (
+                <p className="text-foreground font-semibold" style={{ fontSize: 14, lineHeight: 1.3, marginTop: 8 }}>
+                  {post.created_at ? `${new Date(post.created_at).getFullYear()} ` : ""}{post.show_name}
+                </p>
+              )}
+              {post.breeder?.name && <p className="text-muted-foreground" style={{ fontSize: 14, lineHeight: 1.3, marginTop: 8 }}>Bred by {post.breeder.name}</p>}
+            </div>
+          </>
         )}
 
-        {/* Result information — tight, line-by-line */}
-        <div style={{ padding: "8px 12px 10px" }}>
-          {/* Result title */}
-          <p
-            className="text-foreground font-semibold"
-            style={{ fontSize: "18px", lineHeight: 1.25 }}
+        {/* Engagement row — always visible below card */}
+        <div className="flex items-center gap-4 px-3 pb-3" style={{ marginTop: isWinner ? 0 : undefined }}>
+          <button
+            onClick={handleLike}
+            className="flex items-center gap-1.5 hover:text-destructive transition-colors"
+            style={{ fontSize: 13, color: "hsl(var(--muted-foreground))" }}
           >
-            {resultTitle}
-          </p>
-
-          {/* Exhibitor / Shown by */}
-          {post.shown_by && (
-            <p
-              className="text-muted-foreground"
-              style={{ fontSize: "14px", lineHeight: 1.3, marginTop: "8px" }}
-            >
-              {post.shown_by}
-            </p>
-          )}
-
-          {/* Show name with year */}
-          {showLine && (
-            <p
-              className="text-foreground font-semibold"
-              style={{ fontSize: "14px", lineHeight: 1.3, marginTop: "8px" }}
-            >
-              {showLine}
-            </p>
-          )}
-
-          {/* Bred by */}
-          {post.breeder?.name && (
-            <p
-              className="text-muted-foreground"
-              style={{ fontSize: "14px", lineHeight: 1.3, marginTop: "8px" }}
-            >
-              Bred by {post.breeder.name}
-            </p>
-          )}
-
-          {/* Engagement row */}
-          <div className="flex items-center gap-4" style={{ marginTop: "10px" }}>
-            <button
-              onClick={handleLike}
-              className="flex items-center gap-1.5 hover:text-destructive transition-colors"
-              style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))" }}
-            >
-              <Heart className={cn("w-4 h-4", liked && "fill-destructive text-destructive")} />
-              <span>{likeCount}</span>
-            </button>
-            <span className="flex items-center gap-1.5" style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))" }}>
-              <MessageCircle className="w-4 h-4" />
-              <span>{post.comments}</span>
-            </span>
-          </div>
+            <Heart className={cn("w-4 h-4", liked && "fill-destructive text-destructive")} />
+            <span>{likeCount}</span>
+          </button>
+          <span className="flex items-center gap-1.5" style={{ fontSize: 13, color: "hsl(var(--muted-foreground))" }}>
+            <MessageCircle className="w-4 h-4" />
+            <span>{post.comments}</span>
+          </span>
         </div>
       </motion.article>
 
+      {/* Winner detail drawer */}
+      <WinnerDetailDrawer post={post} open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+
       <AdminFlagModal open={showFlagModal} onOpenChange={setShowFlagModal} postId={post.id} postOwnerId={(post as any).user_id} onActionComplete={onModerated} />
       <AdminEditModal
-        open={showEditModal}
-        onOpenChange={setShowEditModal}
+        open={showEditModal} onOpenChange={setShowEditModal}
         post={{
           id: (post as any).winner_id || post.id,
           title: post.win_placing || post.show_name || "",
@@ -261,15 +215,8 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
       <AuthGate open={showAuthGate} onOpenChange={setShowAuthGate} />
       <VerifyEmailModal open={showVerifyModal} onOpenChange={setShowVerifyModal} onResend={resendVerification} />
       <WinnerImageViewer
-        slides={[{
-          image: post.image,
-          name: post.shown_by || resultTitle,
-          placement: resultTitle,
-          breeder: post.breeder?.name || null,
-        }]}
-        initialIndex={0}
-        open={viewerOpen}
-        onClose={() => setViewerOpen(false)}
+        slides={[{ image: post.image, name: post.shown_by || resultTitle, placement: resultTitle, breeder: post.breeder?.name || null }]}
+        initialIndex={0} open={viewerOpen} onClose={() => setViewerOpen(false)}
       />
     </>
   );
