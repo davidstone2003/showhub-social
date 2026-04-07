@@ -32,7 +32,7 @@ export function WinnerCard({ post, onTap }: WinnerCardProps) {
       type="button"
       onClick={onTap}
       className="relative block w-full overflow-hidden bg-card text-left focus:outline-none active:scale-[0.99] transition-transform"
-      style={{ aspectRatio: "4 / 5", borderRadius: 12 }}
+      style={{ aspectRatio: "3 / 2", borderRadius: 12 }}
     >
       {/* Hero image */}
       <img
