@@ -1,4 +1,5 @@
 import compassSire from "@/assets/posts/compass-sire.jpeg";
+import sampleGrandChampion from "@/assets/sample-grand-champion-lamb.jpg";
 import brandSaleDay from "@/assets/posts/brand-sale-day.jpeg";
 import beattyThankyou from "@/assets/posts/beatty-thankyou.jpeg";
 import whitcombFlush from "@/assets/posts/whitcomb-flush.jpeg";
