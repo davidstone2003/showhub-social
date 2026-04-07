@@ -31,10 +31,9 @@ export function WinnerCard({ post, onTap }: WinnerCardProps) {
     <button
       type="button"
       onClick={onTap}
-      className="relative block w-full overflow-hidden bg-card text-left focus:outline-none active:scale-[0.99] transition-transform"
-      style={{ aspectRatio: "3 / 2", borderRadius: 12 }}
+      className="relative block w-full overflow-hidden text-left focus:outline-none active:scale-[0.99] transition-transform"
+      style={{ aspectRatio: "3 / 2" }}
     >
-      {/* Hero image */}
       <img
         src={imageSrc}
         alt={placing || "Winner"}
@@ -49,41 +48,36 @@ export function WinnerCard({ post, onTap }: WinnerCardProps) {
         style={{ width: 4, backgroundColor: accent, zIndex: 2 }}
       />
 
-      {/* Bottom gradient overlay */}
+      {/* Bottom gradient — 20% height */}
       <div
         className="absolute inset-x-0 bottom-0"
         style={{
-          height: "40%",
-          background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 60%, transparent 100%)",
+          height: "20%",
+          background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)",
           zIndex: 1,
         }}
       />
 
-      {/* Text over gradient */}
-      <div className="absolute inset-x-0 bottom-0 z-[2] px-4 pb-4 flex flex-col gap-1">
-        {/* Placing */}
+      {/* Text pinned to bottom edge */}
+      <div className="absolute inset-x-0 bottom-0 z-[2] px-4 pb-3 flex flex-col gap-0.5">
         {placing && (
           <p
             className="font-bold uppercase tracking-wide"
-            style={{ fontSize: 20, lineHeight: 1.2, color: "#fff", textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}
+            style={{ fontSize: 18, lineHeight: 1.2, color: "#fff", textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}
           >
             {placing}
           </p>
         )}
-        {/* Show + year */}
         {showLine && (
-          <p
-            style={{ fontSize: 14, lineHeight: 1.3, color: "rgba(255,255,255,0.85)", textShadow: "0 1px 3px rgba(0,0,0,0.4)" }}
-          >
+          <p style={{ fontSize: 13, lineHeight: 1.3, color: "rgba(255,255,255,0.85)", textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>
             {showLine}
           </p>
         )}
-        {/* Breeder avatar + name */}
         {breederName && (
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center gap-2 mt-0.5">
             <div
               className="flex items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-xs"
-              style={{ width: 24, height: 24 }}
+              style={{ width: 22, height: 22 }}
             >
               {breederLogo ? (
                 typeof breederLogo === "string" && breederLogo.startsWith("http") ? (
@@ -95,7 +89,7 @@ export function WinnerCard({ post, onTap }: WinnerCardProps) {
                 <span style={{ color: "#fff" }}>🐑</span>
               )}
             </div>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.8)" }}>{breederName}</span>
+            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>{breederName}</span>
           </div>
         )}
       </div>
