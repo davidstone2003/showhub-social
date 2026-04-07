@@ -1,7 +1,6 @@
 import React from "react";
 import type { Post } from "@/data/mock";
 
-/** Color accent bar based on placing */
 function accentColor(placing?: string | null): string {
   if (!placing) return "#C4A882";
   const p = placing.toLowerCase();
@@ -9,6 +8,17 @@ function accentColor(placing?: string | null): string {
   if (/reserve/i.test(p)) return "#A8A9AD";
   if (/class\s*winner/i.test(p)) return "#4A7C59";
   return "#C4A882";
+}
+
+/** Small ribbon SVG icon */
+function RibbonIcon({ color, size = 28 }: { color: string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2L14.9 7.9L21.5 8.9L16.75 13.5L17.8 20.1L12 17L6.2 20.1L7.25 13.5L2.5 8.9L9.1 7.9L12 2Z" fill={color} />
+      <path d="M8 18L6 23L9.5 20.5" fill={color} opacity="0.7" />
+      <path d="M16 18L18 23L14.5 20.5" fill={color} opacity="0.7" />
+    </svg>
+  );
 }
 
 interface WinnerCardProps {
@@ -33,6 +43,7 @@ export function WinnerCard({ post, onTap }: WinnerCardProps) {
       onClick={onTap}
       className="block w-full text-left focus:outline-none active:scale-[0.99] transition-transform"
     >
+      {/* Clean photo — no overlay */}
       <div className="relative w-full overflow-hidden" style={{ aspectRatio: "3 / 2" }}>
         <img
           src={imageSrc}
@@ -41,54 +52,67 @@ export function WinnerCard({ post, onTap }: WinnerCardProps) {
           loading="lazy"
           decoding="async"
         />
-
-        <div
-          className="absolute left-0 top-0 bottom-0"
-          style={{ width: 4, backgroundColor: accent, zIndex: 2 }}
-        />
-      </div>
-
-      <div className="bg-card px-4 py-3 flex flex-col gap-0.5">
-        {placing && (
-          <p
-            className="text-foreground font-bold uppercase tracking-wide"
-            style={{ fontSize: 18, lineHeight: 1.2 }}
+        {/* Breeder avatar bottom-right */}
+        {(breederLogo || breederName) && (
+          <div
+            className="absolute flex items-center justify-center rounded-full overflow-hidden"
+            style={{
+              width: 32,
+              height: 32,
+              bottom: 8,
+              right: 8,
+              zIndex: 2,
+              border: "2px solid rgba(255,255,255,0.85)",
+              backgroundColor: "#1A1A1A",
+            }}
           >
-            {placing}
-          </p>
-        )}
-
-        {showLine && (
-          <p className="text-muted-foreground" style={{ fontSize: 13, lineHeight: 1.3 }}>
-            {showLine}
-          </p>
-        )}
-
-        {post.shown_by && (
-          <p className="text-muted-foreground" style={{ fontSize: 13, lineHeight: 1.3 }}>
-            Shown by {post.shown_by}
-          </p>
-        )}
-
-        {breederName && (
-          <div className="mt-1 flex items-center gap-2">
-            <div
-              className="flex items-center justify-center rounded-full bg-muted text-xs"
-              style={{ width: 22, height: 22 }}
-            >
-              {breederLogo ? (
-                typeof breederLogo === "string" && breederLogo.startsWith("http") ? (
-                  <img src={breederLogo} alt="" className="h-full w-full rounded-full object-cover" />
-                ) : (
-                  <span>{breederLogo}</span>
-                )
-              ) : (
-                <span>🐑</span>
-              )}
-            </div>
-            <span className="text-muted-foreground" style={{ fontSize: 11 }}>{breederName}</span>
+            {breederLogo && typeof breederLogo === "string" && breederLogo.startsWith("http") ? (
+              <img src={breederLogo} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span style={{ fontSize: 14, color: "#fff" }}>
+                {breederLogo || breederName.charAt(0).toUpperCase()}
+              </span>
+            )}
           </div>
         )}
+      </div>
+
+      {/* Champion footer */}
+      <div className="relative overflow-hidden" style={{ backgroundColor: "#1A1A1A" }}>
+        {/* Top accent line */}
+        <div className="absolute top-0 left-0 right-0" style={{ height: 3, backgroundColor: accent }} />
+        {/* Left accent bar */}
+        <div className="absolute left-0 top-0 bottom-0" style={{ width: 6, backgroundColor: accent }} />
+
+        <div style={{ padding: "14px 16px 14px 22px" }} className="flex flex-col gap-1">
+          {/* Row 1: Ribbon + Placing */}
+          <div className="flex items-center gap-2">
+            <RibbonIcon color={accent} size={28} />
+            <p
+              className="font-bold uppercase tracking-wide"
+              style={{ fontSize: 18, lineHeight: 1.2, color: "#FFFFFF" }}
+            >
+              {placing || "Winner"}
+            </p>
+          </div>
+
+          {/* Row 2: Show + Breeder */}
+          <div className="flex items-center gap-2 flex-wrap" style={{ paddingLeft: 36 }}>
+            {showLine && (
+              <span style={{ fontSize: 13, lineHeight: 1.3, color: "#C4A882" }}>
+                {showLine}
+              </span>
+            )}
+            {showLine && breederName && (
+              <span style={{ fontSize: 13, color: "#555" }}>·</span>
+            )}
+            {breederName && (
+              <span style={{ fontSize: 13, lineHeight: 1.3, color: "rgba(255,255,255,0.75)" }}>
+                {breederName}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
     </button>
   );
