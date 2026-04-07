@@ -31,65 +31,56 @@ export function WinnerCard({ post, onTap }: WinnerCardProps) {
     <button
       type="button"
       onClick={onTap}
-      className="relative block w-full overflow-hidden text-left focus:outline-none active:scale-[0.99] transition-transform"
-      style={{ aspectRatio: "3 / 2" }}
+      className="block w-full text-left focus:outline-none active:scale-[0.99] transition-transform"
     >
-      <img
-        src={imageSrc}
-        alt={placing || "Winner"}
-        className="absolute inset-0 w-full h-full object-cover"
-        loading="lazy"
-        decoding="async"
-      />
+      <div className="relative w-full overflow-hidden" style={{ aspectRatio: "3 / 2" }}>
+        <img
+          src={imageSrc}
+          alt={placing || "Winner"}
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
 
-      {/* Left accent bar */}
-      <div
-        className="absolute left-0 top-0 bottom-0"
-        style={{ width: 4, backgroundColor: accent, zIndex: 2 }}
-      />
+        <div
+          className="absolute left-0 top-0 bottom-0"
+          style={{ width: 4, backgroundColor: accent, zIndex: 2 }}
+        />
+      </div>
 
-      {/* Bottom gradient — 20% height */}
-      <div
-        className="absolute inset-x-0 bottom-0"
-        style={{
-          height: "20%",
-          background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)",
-          zIndex: 1,
-        }}
-      />
-
-      {/* Text pinned to bottom edge */}
-      <div className="absolute inset-x-0 bottom-0 z-[2] px-4 pb-3 flex flex-col gap-0.5">
+      <div className="bg-card px-4 py-3 flex flex-col gap-0.5">
         {placing && (
           <p
-            className="font-bold uppercase tracking-wide"
-            style={{ fontSize: 18, lineHeight: 1.2, color: "#fff", textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}
+            className="text-foreground font-bold uppercase tracking-wide"
+            style={{ fontSize: 18, lineHeight: 1.2 }}
           >
             {placing}
           </p>
         )}
+
         {showLine && (
-          <p style={{ fontSize: 13, lineHeight: 1.3, color: "rgba(255,255,255,0.85)", textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>
+          <p className="text-muted-foreground" style={{ fontSize: 13, lineHeight: 1.3 }}>
             {showLine}
           </p>
         )}
+
         {breederName && (
-          <div className="flex items-center gap-2 mt-0.5">
+          <div className="mt-1 flex items-center gap-2">
             <div
-              className="flex items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-xs"
+              className="flex items-center justify-center rounded-full bg-muted text-xs"
               style={{ width: 22, height: 22 }}
             >
               {breederLogo ? (
                 typeof breederLogo === "string" && breederLogo.startsWith("http") ? (
-                  <img src={breederLogo} alt="" className="w-full h-full rounded-full object-cover" />
+                  <img src={breederLogo} alt="" className="h-full w-full rounded-full object-cover" />
                 ) : (
                   <span>{breederLogo}</span>
                 )
               ) : (
-                <span style={{ color: "#fff" }}>🐑</span>
+                <span>🐑</span>
               )}
             </div>
-            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>{breederName}</span>
+            <span className="text-muted-foreground" style={{ fontSize: 11 }}>{breederName}</span>
           </div>
         )}
       </div>
