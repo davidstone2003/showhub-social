@@ -79,12 +79,13 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2, delay: index * 0.02 }}
         className={cn(
-          "bg-card overflow-hidden relative",
+          "overflow-hidden relative",
+          isWinner ? "" : "bg-card",
           isFlagged && "ring-2 ring-amber-400",
           isRestricted && "ring-2 ring-orange-400 opacity-75",
           isRemoved && "ring-2 ring-destructive opacity-50"
         )}
-        style={{ borderRadius: 12, boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)" }}
+        style={isWinner ? {} : { borderRadius: 12, boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)" }}
       >
         {/* Status banner */}
         {status !== "active" && (
