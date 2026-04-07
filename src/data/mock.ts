@@ -101,6 +101,21 @@ export const animals: Animal[] = [
 
 export const posts: Post[] = [
   {
+    id: "sample-gc", image: sampleGrandChampion,
+    breeder: { id: "b6", name: "Stone Show Stock", location: "Georgia", logo: "🪨", is_pro: true },
+    post_type: "champion",
+    win_placing: "Grand Champion",
+    win_title: "Grand Champion",
+    show_name: "Ohio State Fair",
+    shown_by: "Caleb Stone",
+    sired_by: "Blindside",
+    bred_by: "Stone Show Stock",
+    caption: "",
+    tags: [{ label: "Market Lamb", type: "breed" }],
+    created_at: "2024-08-05T12:00:00Z",
+    likes: 312, comments: 47, saved: false,
+  },
+  {
     id: "p1", image: compassSire, breeder: breeders[0], post_type: "sire",
     caption: "COMPASS 🧭\n2.0 x Beast x Gas Monkey\n\nHeaded in the right direction. Owned with Silvers Livestock. Raised by Allen Newcomb Show Lambs & Treadmills.\n\n📞 Sam 830.234.7021 | Ty 580.225.2679 | Cooper 580.821.2361",
     tags: [{ label: "Compass", type: "sire" }, { label: "Club Lamb 🐑", type: "breed" }, { label: "For Sale 💰", type: "sale" }],
