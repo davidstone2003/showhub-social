@@ -14,16 +14,37 @@ import { AutocompleteInput } from "@/components/AutocompleteInput";
 import { ExhibitorPicker } from "@/components/ExhibitorPicker";
 import { IdentitySelector } from "@/components/IdentitySelector";
 import { MediaUpload, type MediaFile, type SoundOption } from "@/components/post/MediaUpload";
-import { ResultPicker } from "@/components/post/ResultPicker";
 import SmartUpload from "@/components/SmartUpload";
 import PostSuccessScreen from "@/components/PostSuccessScreen";
+import { WinnerCard } from "@/components/post/WinnerCard";
 import {
   Trophy, ShoppingCart, CalendarDays, FileText,
-  ArrowLeft, LogIn, Sparkles, ChevronLeft, Camera, ClipboardPaste,
+  ArrowLeft, LogIn, Sparkles, ChevronLeft, Camera, ClipboardPaste, Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 type PostCategory = null | "winner" | "sale_lot" | "sale_event" | "general";
+
+const WINNER_RESULTS = [
+  "Grand Champion",
+  "Reserve Grand Champion",
+  "Class Winner",
+  "Division Champion",
+  "Reserve Division",
+  "5th Overall",
+  "Other",
+];
+
+const SPECIES_OPTIONS = [
+  "Market Lamb",
+  "Breeding Ewe",
+  "Wether Dam",
+  "Market Goat",
+  "Market Steer",
+  "Heifer",
+  "Other",
+];
 
 const ensureLookupEntry = async (
   table: "shows" | "sires_lookup" | "breeders_lookup",
@@ -54,8 +75,12 @@ export default function CreatePostPage() {
   const [pasteText, setPasteText] = useState("");
   const [successData, setSuccessData] = useState<any>(null);
 
+  // Winner step management (1=media, 2=result, 3=details, 4=preview)
+  const [winnerStep, setWinnerStep] = useState(1);
+
   // Winner fields
   const [resultTitle, setResultTitle] = useState("");
+  const [customResult, setCustomResult] = useState("");
   const [showName, setShowName] = useState("");
   const [showId, setShowId] = useState<string | null>(null);
   const [exhibitorName, setExhibitorName] = useState("");
@@ -65,6 +90,7 @@ export default function CreatePostPage() {
   const [sireId, setSireId] = useState<string | null>(null);
   const [damName, setDamName] = useState("");
   const [notes, setNotes] = useState("");
+  const [species, setSpecies] = useState("");
 
   // Sale Lot fields
   const [lotNumber, setLotNumber] = useState("");
@@ -102,6 +128,8 @@ export default function CreatePostPage() {
     return { imageUrls, videoUrl };
   };
 
+  const effectiveResult = resultTitle === "Other" ? customResult : resultTitle;
+
   const handleSubmitWinner = async () => {
     if (!showName.trim() || !exhibitorName.trim()) { toast.error("Show name and exhibitor are required"); return; }
     if (requireVerification()) return;
@@ -110,12 +138,12 @@ export default function CreatePostPage() {
       const { imageUrls, videoUrl } = await uploadMedia();
       const resolvedShowId = await ensureLookupEntry("shows", showName, showId);
       const resolvedSireId = sireName.trim() ? await ensureLookupEntry("sires_lookup", sireName, sireId) : null;
-      const title = resultTitle.trim() ? `${resultTitle.trim()} — ${showName.trim()}` : showName.trim();
+      const title = effectiveResult.trim() ? `${effectiveResult.trim()} — ${showName.trim()}` : showName.trim();
 
       const { data: post, error: postError } = await (supabase.from("posts") as any).insert({
         user_id: user?.id || null, posted_as_breeder_id: postedAsBreederId,
         caption: notes.trim() || null, image_urls: imageUrls, video_url: videoUrl,
-        tags: [], post_type: "winner", show_on_feed: true,
+        tags: species ? [species] : [], post_type: "winner", show_on_feed: true,
       }).select("id").single();
       if (postError) throw postError;
 
@@ -125,17 +153,18 @@ export default function CreatePostPage() {
         bred_by: breederName.trim() || null,
         sired_by: sireName.trim() || null, sire_id: resolvedSireId,
         dam: damName.trim() || null,
-        win_placing: resultTitle.trim() || null, caption: notes.trim() || null,
+        win_placing: effectiveResult.trim() || null, caption: notes.trim() || null,
         image_urls: imageUrls, video_url: videoUrl, show_id: resolvedShowId,
         date: format(new Date(), "yyyy-MM-dd"), user_id: user?.id || null,
         posted_as_breeder_id: postedAsBreederId, post_type: "winner",
         show_on_feed: true, show_on_breeder_page: true, show_on_winners_archive: true,
+        species: species || null,
       }).select("id").single();
       if (winError) throw winError;
 
       toast.success("Winner posted!");
       setSuccessData({
-        showName: showName.trim(), winPlacing: resultTitle.trim(),
+        showName: showName.trim(), winPlacing: effectiveResult.trim(),
         shownBy: exhibitorName.trim(), placedBy: placedBy.trim(), sireName: sireName.trim(),
         damName: "", caption: notes.trim(), imageUrls, postedAsBreederId, winnerRefs: [],
       });
@@ -242,7 +271,7 @@ export default function CreatePostPage() {
   if (!category) {
     return (
       <Layout showDiscovery={false}>
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen" style={{ backgroundColor: "#FAF7F2" }}>
           <div className="sticky top-0 z-20 bg-card border-b border-border px-4 py-3">
             <div className="flex items-center gap-3">
               <button onClick={() => navigate(-1)} className="text-muted-foreground hover:text-foreground">
@@ -252,17 +281,235 @@ export default function CreatePostPage() {
             </div>
           </div>
           <div className="max-w-md mx-auto px-4 py-6 space-y-3">
-            <p className="text-center text-muted-foreground text-sm mb-4">What are you posting?</p>
-            <TypeButton icon={Trophy} label="Winner Post" desc="Share a show result" color="hsl(var(--primary))" onClick={() => setCategory("winner")} />
-            <TypeButton icon={ShoppingCart} label="Sale Lot" desc="Consignment or sale animal" color="hsl(45 93% 47%)" onClick={() => setCategory("sale_lot")} />
-            <TypeButton icon={CalendarDays} label="Sale / Event" desc="Promote an upcoming sale or event" color="hsl(280 70% 55%)" onClick={() => setCategory("sale_event")} />
-            <TypeButton icon={FileText} label="General Post" desc="Update, video, or casual post" color="hsl(var(--muted-foreground))" onClick={() => setCategory("general")} />
+            <p className="text-center text-sm mb-4" style={{ color: "#8B7332" }}>What are you posting?</p>
+            <TypeButton icon={Trophy} label="Winner Post" desc="Share a show result" color="#C9A84C" onClick={() => setCategory("winner")} />
+            <TypeButton icon={ShoppingCart} label="Sale Lot" desc="Consignment or sale animal" color="#4A7C59" onClick={() => setCategory("sale_lot")} />
+            <TypeButton icon={CalendarDays} label="Sale / Event" desc="Promote an upcoming sale or event" color="#8B7332" onClick={() => setCategory("sale_event")} />
+            <TypeButton icon={FileText} label="General Post" desc="Update, video, or casual post" color="#5C4E3C" onClick={() => setCategory("general")} />
           </div>
         </div>
       </Layout>
     );
   }
 
+  // ─── WINNER 4-STEP FLOW ───
+  if (category === "winner") {
+    const previewPost = {
+      id: "preview",
+      image: media[0]?.preview || "/placeholder.svg",
+      breeder: { id: "", name: breederName || profile?.display_name || "", location: "", logo: "", is_pro: false },
+      win_placing: effectiveResult,
+      win_title: effectiveResult,
+      show_name: showName,
+      shown_by: exhibitorName,
+      sired_by: sireName,
+      bred_by: breederName,
+      caption: notes,
+      tags: [],
+      post_type: "champion" as const,
+      created_at: new Date().toISOString(),
+      likes: 0,
+      comments: 0,
+      saved: false,
+    };
+
+    const canAdvanceStep2 = !!effectiveResult;
+    const canAdvanceStep3 = !!showName.trim() && !!exhibitorName.trim();
+
+    return (
+      <Layout showDiscovery={false}>
+        <VerifyEmailModal open={showVerifyModal} onOpenChange={setShowVerifyModal} onResend={resendVerification} />
+
+        {showSmartUpload && (
+          <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-card border border-border rounded-2xl p-5 w-full max-w-md shadow-lg">
+              <SmartUpload onExtracted={handleSmartExtracted} onSkip={() => setShowSmartUpload(false)} />
+            </div>
+          </div>
+        )}
+
+        {showPasteCaption && (
+          <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-card border border-border rounded-2xl p-5 w-full max-w-md shadow-lg space-y-3">
+              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+                <ClipboardPaste className="w-4 h-4" style={{ color: "#C9A84C" }} /> Paste Text
+              </h3>
+              <Textarea placeholder="Paste your Facebook or Instagram caption here…" value={pasteText} onChange={(e) => setPasteText(e.target.value)} className="rounded-xl bg-card border-border text-sm min-h-[120px] resize-none" autoFocus />
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => { setShowPasteCaption(false); setPasteText(""); }} className="flex-1 h-11 rounded-xl">Cancel</Button>
+                <Button onClick={handlePasteCaption} disabled={!pasteText.trim() || submitting} className="flex-1 h-11 rounded-xl font-semibold gap-2" style={{ backgroundColor: "#C9A84C", color: "#fff" }}>
+                  <Sparkles className="w-4 h-4" /> {submitting ? "Parsing…" : "Auto Fill"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="min-h-screen pb-44" style={{ backgroundColor: "#FAF7F2" }}>
+          {/* Header */}
+          <div className="sticky top-0 z-20 bg-card border-b border-border px-4 py-3">
+            <div className="flex items-center gap-3">
+              <button onClick={() => winnerStep > 1 ? setWinnerStep(winnerStep - 1) : setCategory(null)} className="text-muted-foreground hover:text-foreground">
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <h1 className="text-lg font-bold text-foreground flex-1">Winner Post</h1>
+              <span className="text-xs font-semibold" style={{ color: "#8B7332" }}>Step {winnerStep}/4</span>
+            </div>
+            {/* Progress bar */}
+            <div className="mt-2 h-1 rounded-full" style={{ backgroundColor: "#E8E0D0" }}>
+              <div className="h-full rounded-full transition-all duration-300" style={{ width: `${(winnerStep / 4) * 100}%`, backgroundColor: "#C9A84C" }} />
+            </div>
+          </div>
+
+          {!user && (
+            <div className="max-w-lg mx-auto px-4 pt-3">
+              <Link to="/auth" className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium hover:opacity-90 transition-colors" style={{ backgroundColor: "#C9A84C15", border: "1px solid #C9A84C30", color: "#8B7332" }}>
+                <LogIn className="w-4 h-4" /> Sign in to save posts to your breeder page
+              </Link>
+            </div>
+          )}
+
+          <AnimatePresence mode="wait">
+            {/* STEP 1: Media */}
+            {winnerStep === 1 && (
+              <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="max-w-lg mx-auto px-4 py-4 space-y-4">
+                <div className="text-center mb-2">
+                  <h2 className="text-base font-bold" style={{ color: "#2C2418" }}>Add Your Photo</h2>
+                  <p className="text-xs mt-1" style={{ color: "#8B7332" }}>1 hero image required, up to 2 more optional</p>
+                </div>
+                <MediaUpload media={media} onMediaChange={setMedia} soundOption={soundOption} onSoundOptionChange={setSoundOption} />
+                {media.length > 0 && (
+                  <div className="flex gap-2">
+                    <button onClick={() => setShowSmartUpload(true)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-colors" style={{ backgroundColor: "#C9A84C15", border: "1px solid #C9A84C30", color: "#8B7332" }}>
+                      <Camera className="w-3.5 h-3.5" /> Auto Fill From Photo
+                    </button>
+                    <button onClick={() => setShowPasteCaption(true)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-colors" style={{ backgroundColor: "#C9A84C15", border: "1px solid #C9A84C30", color: "#8B7332" }}>
+                      <ClipboardPaste className="w-3.5 h-3.5" /> Auto Fill From Text
+                    </button>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* STEP 2: Result */}
+            {winnerStep === 2 && (
+              <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="max-w-lg mx-auto px-4 py-4 space-y-3">
+                <div className="text-center mb-2">
+                  <h2 className="text-base font-bold" style={{ color: "#2C2418" }}>What did you win?</h2>
+                </div>
+                <div className="space-y-2">
+                  {WINNER_RESULTS.map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      onClick={() => setResultTitle(r)}
+                      className={cn(
+                        "w-full text-left px-4 py-3.5 rounded-xl text-sm font-medium transition-all border",
+                        resultTitle === r
+                          ? "border-[#C9A84C] bg-[#C9A84C]/10 text-[#2C2418] font-bold"
+                          : "border-[#E8E0D0] bg-white text-[#5C4E3C] hover:border-[#C9A84C]/50"
+                      )}
+                    >
+                      {r}
+                    </button>
+                  ))}
+                  {resultTitle === "Other" && (
+                    <Input
+                      placeholder="Type your result…"
+                      value={customResult}
+                      onChange={(e) => setCustomResult(e.target.value)}
+                      className="rounded-xl h-12 text-sm mt-2"
+                      style={{ borderColor: "#E8E0D0" }}
+                      autoFocus
+                    />
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {/* STEP 3: Details */}
+            {winnerStep === 3 && (
+              <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="max-w-lg mx-auto px-4 py-4 space-y-3">
+                <div className="text-center mb-2">
+                  <h2 className="text-base font-bold" style={{ color: "#2C2418" }}>Details</h2>
+                  <p className="text-xs mt-1" style={{ color: "#8B7332" }}>Just the essentials</p>
+                </div>
+                <AutocompleteInput table="shows" placeholder="Show Name *" value={showName} onChange={(n, id) => { setShowName(n); setShowId(id); }} />
+                <ExhibitorPicker value={exhibitorName} onChange={setExhibitorName} />
+                <AutocompleteInput table="sires_lookup" placeholder="Sired by" value={sireName} onChange={(n, id) => { setSireName(n); setSireId(id); }} />
+                {/* Species */}
+                <div className="space-y-1.5">
+                  <p className="text-xs font-semibold" style={{ color: "#8B7332" }}>Species</p>
+                  <div className="flex flex-wrap gap-2">
+                    {SPECIES_OPTIONS.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setSpecies(species === s ? "" : s)}
+                        className={cn(
+                          "px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                          species === s
+                            ? "border-[#C9A84C] bg-[#C9A84C]/10 text-[#2C2418]"
+                            : "border-[#E8E0D0] bg-white text-[#5C4E3C]"
+                        )}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {user && <IdentitySelector value={postedAsBreederId} onChange={setPostedAsBreederId} postType="winner" />}
+              </motion.div>
+            )}
+
+            {/* STEP 4: Preview */}
+            {winnerStep === 4 && (
+              <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="max-w-lg mx-auto px-4 py-4 space-y-4">
+                <div className="text-center mb-2">
+                  <h2 className="text-base font-bold" style={{ color: "#2C2418" }}>Preview</h2>
+                  <p className="text-xs mt-1" style={{ color: "#8B7332" }}>This is exactly how it'll look in the feed</p>
+                </div>
+                <div className="rounded-xl overflow-hidden shadow-lg">
+                  <WinnerCard post={previewPost} />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Sticky bottom button */}
+          <div className="fixed inset-x-0 z-50 border-t bg-white/95 backdrop-blur px-4 py-3" style={{ bottom: "calc(56px + env(safe-area-inset-bottom, 0px))", borderColor: "#E8E0D0" }}>
+            <div className="max-w-lg mx-auto">
+              {winnerStep < 4 ? (
+                <Button
+                  onClick={() => setWinnerStep(winnerStep + 1)}
+                  disabled={
+                    (winnerStep === 1 && media.length === 0) ||
+                    (winnerStep === 2 && !canAdvanceStep2) ||
+                    (winnerStep === 3 && !canAdvanceStep3)
+                  }
+                  className="w-full h-12 rounded-xl text-base font-bold"
+                  style={{ backgroundColor: "#C9A84C", color: "#fff" }}
+                >
+                  Next
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSubmitWinner}
+                  disabled={submitting}
+                  className="w-full h-12 rounded-xl text-base font-bold gap-2"
+                  style={{ backgroundColor: "#C9A84C", color: "#fff" }}
+                >
+                  {submitting ? "Posting…" : "POST IT"}
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // ─── OTHER POST TYPES (unchanged) ───
   const formTitle = { winner: "Winner Post", sale_lot: "Sale Lot", sale_event: "Sale / Event", general: "General Post" }[category];
   const handleSubmit = { winner: handleSubmitWinner, sale_lot: handleSubmitSaleLot, sale_event: handleSubmitSaleEvent, general: handleSubmitGeneral }[category];
 
@@ -270,7 +517,6 @@ export default function CreatePostPage() {
     <Layout showDiscovery={false}>
       <VerifyEmailModal open={showVerifyModal} onOpenChange={setShowVerifyModal} onResend={resendVerification} />
 
-      {/* Smart Upload overlay */}
       {showSmartUpload && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-card border border-border rounded-2xl p-5 w-full max-w-md shadow-lg">
@@ -279,20 +525,13 @@ export default function CreatePostPage() {
         </div>
       )}
 
-      {/* Paste Caption overlay */}
       {showPasteCaption && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-card border border-border rounded-2xl p-5 w-full max-w-md shadow-lg space-y-3">
             <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-              <ClipboardPaste className="w-4 h-4 text-primary" /> Paste Facebook Text
+              <ClipboardPaste className="w-4 h-4 text-primary" /> Paste Text
             </h3>
-            <Textarea
-              placeholder="Paste your Facebook or Instagram caption here…"
-              value={pasteText}
-              onChange={(e) => setPasteText(e.target.value)}
-              className="rounded-xl bg-card border-border text-sm min-h-[120px] resize-none"
-              autoFocus
-            />
+            <Textarea placeholder="Paste your Facebook or Instagram caption here…" value={pasteText} onChange={(e) => setPasteText(e.target.value)} className="rounded-xl bg-card border-border text-sm min-h-[120px] resize-none" autoFocus />
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => { setShowPasteCaption(false); setPasteText(""); }} className="flex-1 h-11 rounded-xl">Cancel</Button>
               <Button onClick={handlePasteCaption} disabled={!pasteText.trim() || submitting} className="flex-1 h-11 rounded-xl font-semibold gap-2">
@@ -304,7 +543,6 @@ export default function CreatePostPage() {
       )}
 
       <div className="min-h-screen bg-background pb-44">
-        {/* Header */}
         <div className="sticky top-0 z-20 bg-card border-b border-border px-4 py-3">
           <div className="flex items-center gap-3">
             <button onClick={() => setCategory(null)} className="text-muted-foreground hover:text-foreground">
@@ -328,37 +566,9 @@ export default function CreatePostPage() {
         )}
 
         <div className="max-w-lg mx-auto px-4 py-3 space-y-3">
-          {/* Step 1: Media Upload (always first) */}
           <MediaUpload media={media} onMediaChange={setMedia} soundOption={soundOption} onSoundOptionChange={setSoundOption} />
 
-          {/* AI helper shortcuts (after media) */}
-          {category === "winner" && media.length > 0 && (
-            <div className="flex gap-2">
-              <button onClick={() => setShowSmartUpload(true)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-primary/20 bg-primary/5 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors">
-                <Camera className="w-3.5 h-3.5" /> Auto Fill From Photo
-              </button>
-              <button onClick={() => setShowPasteCaption(true)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-primary/20 bg-primary/5 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors">
-                <ClipboardPaste className="w-3.5 h-3.5" /> Auto Fill From Caption
-              </button>
-            </div>
-          )}
-
-          {/* Identity */}
           {user && <IdentitySelector value={postedAsBreederId} onChange={setPostedAsBreederId} postType="winner" />}
-
-          {/* Step 2: Type-specific fields */}
-          {category === "winner" && (
-            <div className="space-y-3">
-              <ResultPicker value={resultTitle} onChange={setResultTitle} />
-              <AutocompleteInput table="shows" placeholder="Show Name *" value={showName} onChange={(n, id) => { setShowName(n); setShowId(id); }} />
-              <ExhibitorPicker value={exhibitorName} onChange={setExhibitorName} />
-              <Input placeholder="Placed by" value={placedBy} onChange={e => setPlacedBy(e.target.value)} className="rounded-xl bg-card border-border h-12 text-sm" />
-              <Input placeholder="Breeder" value={breederName} onChange={e => setBreederName(e.target.value)} className="rounded-xl bg-card border-border h-12 text-sm" />
-              <AutocompleteInput table="sires_lookup" placeholder="Sire" value={sireName} onChange={(n, id) => { setSireName(n); setSireId(id); }} />
-              <Input placeholder="Dam" value={damName} onChange={e => setDamName(e.target.value)} className="rounded-xl bg-card border-border h-12 text-sm" />
-              <Textarea placeholder="Notes" value={notes} onChange={e => setNotes(e.target.value)} className="rounded-xl bg-card border-border text-sm min-h-[60px] resize-none" />
-            </div>
-          )}
 
           {category === "sale_lot" && (
             <div className="space-y-3">
@@ -383,16 +593,10 @@ export default function CreatePostPage() {
           )}
 
           {category === "general" && (
-            <Textarea
-              placeholder="Description"
-              value={generalCaption}
-              onChange={(e) => setGeneralCaption(e.target.value)}
-              className="rounded-xl bg-card border-border text-sm min-h-[100px] resize-none"
-            />
+            <Textarea placeholder="Description" value={generalCaption} onChange={(e) => setGeneralCaption(e.target.value)} className="rounded-xl bg-card border-border text-sm min-h-[100px] resize-none" />
           )}
         </div>
 
-        {/* Sticky Post Button — sits above mobile nav (56px) */}
         <div className="fixed inset-x-0 z-50 border-t border-border bg-background/95 backdrop-blur px-4 py-3" style={{ bottom: "calc(56px + env(safe-area-inset-bottom, 0px))" }}>
           <div className="max-w-lg mx-auto">
             <Button onClick={handleSubmit} disabled={submitting} className="w-full h-12 rounded-xl text-base font-bold">
@@ -411,14 +615,15 @@ function TypeButton({ icon: Icon, label, desc, color, onClick }: {
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-4 p-4 rounded-2xl border border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition-all text-left active:scale-[0.98]"
+      className="w-full flex items-center gap-4 p-4 rounded-2xl border bg-white hover:shadow-md transition-all text-left active:scale-[0.98]"
+      style={{ borderColor: "#E8E0D0" }}
     >
       <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: `${color}15` }}>
         <Icon className="w-6 h-6" style={{ color }} />
       </div>
       <div>
-        <p className="text-base font-bold text-foreground">{label}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+        <p className="text-base font-bold" style={{ color: "#2C2418" }}>{label}</p>
+        <p className="text-xs mt-0.5" style={{ color: "#8B7332" }}>{desc}</p>
       </div>
     </button>
   );
