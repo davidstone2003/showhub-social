@@ -27,8 +27,10 @@ import {
 interface PostCardProps {
   post: Post & { status?: string; user_id?: string | null };
   index: number;
-  onModerated?: () => void;
+  onModerated?: (postId?: string) => void;
 }
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export function PostCard({ post, index, onModerated }: PostCardProps) {
   const [liked, setLiked] = useState(false);
@@ -46,6 +48,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
 
   const canManage = isAdmin || (user && (post as any).user_id === user.id);
   const isWinner = post.post_type === "champion" && (post.win_placing || post.win_title);
+  const isPersistedRecord = UUID_PATTERN.test(post.id);
 
   const handleLike = () => {
     if (!user) { setShowAuthGate(true); return; }
@@ -55,25 +58,52 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   };
 
   const handleDelete = async () => {
+    if (!isPersistedRecord) {
+      toast.success("Sample post removed");
+      onModerated?.(post.id);
+      setShowDeleteConfirm(false);
+      return;
+    }
+
     try {
-      // First, delete any linked winner cards (FK constraint: winners.source_post_id -> posts.id)
-      await supabase.from("winners").delete().eq("source_post_id", post.id);
+      const { error: linkedWinnersError } = await supabase
+        .from("winners")
+        .delete()
+        .eq("source_post_id", post.id);
 
-      // Try deleting from posts table
-      const { error: postsError } = await supabase.from("posts").delete().eq("id", post.id);
+      if (linkedWinnersError) {
+        throw linkedWinnersError;
+      }
 
-      // Also try deleting from winners table (if this is a standalone winner)
-      const { error: winnersError } = await supabase.from("winners").delete().eq("id", post.id);
+      const { error: postsError, count: postsDeleted } = await supabase
+        .from("posts")
+        .delete({ count: "exact" })
+        .eq("id", post.id);
 
-      if (postsError && winnersError) {
-        toast.error("Failed to delete post");
+      if (postsError) {
+        throw postsError;
+      }
+
+      const { error: winnersError, count: winnersDeleted } = await supabase
+        .from("winners")
+        .delete({ count: "exact" })
+        .eq("id", post.id);
+
+      if (winnersError) {
+        throw winnersError;
+      }
+
+      if ((postsDeleted ?? 0) === 0 && (winnersDeleted ?? 0) === 0) {
+        toast.error("Post was not found");
       } else {
         toast.success("Post deleted");
-        onModerated?.();
+        onModerated?.(post.id);
       }
-    } catch (e) {
-      toast.error("Failed to delete post");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to delete post";
+      toast.error(message);
     }
+
     setShowDeleteConfirm(false);
   };
 
