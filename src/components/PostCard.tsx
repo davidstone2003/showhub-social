@@ -55,13 +55,24 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   };
 
   const handleDelete = async () => {
-    const { error: postsError } = await supabase.from("posts").delete().eq("id", post.id);
-    const { error: winnersError } = await supabase.from("winners").delete().eq("id", post.id);
-    if (postsError && winnersError) {
+    try {
+      // First, delete any linked winner cards (FK constraint: winners.source_post_id -> posts.id)
+      await supabase.from("winners").delete().eq("source_post_id", post.id);
+
+      // Try deleting from posts table
+      const { error: postsError } = await supabase.from("posts").delete().eq("id", post.id);
+
+      // Also try deleting from winners table (if this is a standalone winner)
+      const { error: winnersError } = await supabase.from("winners").delete().eq("id", post.id);
+
+      if (postsError && winnersError) {
+        toast.error("Failed to delete post");
+      } else {
+        toast.success("Post deleted");
+        onModerated?.();
+      }
+    } catch (e) {
       toast.error("Failed to delete post");
-    } else {
-      toast.success("Post deleted");
-      onModerated?.();
     }
     setShowDeleteConfirm(false);
   };
