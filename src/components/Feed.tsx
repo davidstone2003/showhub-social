@@ -20,9 +20,15 @@ interface WinnerCard {
 export function Feed() {
   const [loading, setLoading] = useState(true);
   const [dbPosts, setDbPosts] = useState<Post[]>([]);
+  const [hiddenPostIds, setHiddenPostIds] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const handleModerated = () => setRefreshKey(k => k + 1);
+  const handleModerated = (postId?: string) => {
+    if (postId) {
+      setHiddenPostIds((current) => (current.includes(postId) ? current : [...current, postId]));
+    }
+    setRefreshKey((k) => k + 1);
+  };
 
   useEffect(() => {
     async function fetchFeed() {
@@ -69,7 +75,7 @@ export function Feed() {
           .select("id, display_name, first_name, last_name, username, logo_url, location, subscription_tier")
           .in("id", userIds);
         if (profiles) {
-          profilesMap = Object.fromEntries(profiles.map(p => [p.id, p]));
+          profilesMap = Object.fromEntries(profiles.map((p) => [p.id, p]));
         }
       }
 
@@ -81,7 +87,7 @@ export function Feed() {
           .select("id, breeder_name, breeder_slug, logo_url, location")
           .in("id", breederIds);
         if (bps) {
-          breederProfilesMap = Object.fromEntries(bps.map(bp => [bp.id, bp]));
+          breederProfilesMap = Object.fromEntries(bps.map((bp) => [bp.id, bp]));
         }
       }
 
@@ -113,7 +119,7 @@ export function Feed() {
       const mapped: Post[] = [];
 
       // Map social posts (with linked winner cards)
-      for (const p of (postsData || [])) {
+      for (const p of postsData || []) {
         const breeder = resolveIdentity(p);
         const cards = winnerCardsMap[p.id] || [];
         const firstCard = cards[0];
@@ -133,7 +139,7 @@ export function Feed() {
           video_url: p.video_url || null,
           caption: p.caption || "",
           tags: (p.tags || []).map((t: string) => ({ label: t, type: "breed" })),
-          post_type: cards.length > 0 ? "champion" as const : (p.post_type || "champion") as any,
+          post_type: cards.length > 0 ? ("champion" as const) : ((p.post_type || "champion") as any),
           created_at: p.created_at,
           likes: p.likes || 0,
           comments: p.comments || 0,
@@ -145,7 +151,7 @@ export function Feed() {
       }
 
       // Map standalone winners (legacy)
-      for (const w of (standaloneWinners || [])) {
+      for (const w of standaloneWinners || []) {
         const breeder = resolveIdentity(w);
         mapped.push({
           id: w.id,
@@ -173,7 +179,6 @@ export function Feed() {
         });
       }
 
-      // Sort by created_at desc
       mapped.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
       setDbPosts(mapped);
@@ -182,11 +187,14 @@ export function Feed() {
     fetchFeed();
   }, [refreshKey]);
 
-  const allPosts = useMemo(() => [...dbPosts, ...mockPosts], [dbPosts]);
+  const allPosts = useMemo(() => {
+    const sourcePosts = dbPosts.length > 0 ? dbPosts : mockPosts;
+    return sourcePosts.filter((post) => !hiddenPostIds.includes(post.id));
+  }, [dbPosts, hiddenPostIds]);
 
   return (
     <div className="flex-1 max-w-2xl mx-auto w-full">
-      <div style={{ padding: '8px 0 12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <div style={{ padding: "8px 0 12px", display: "flex", flexDirection: "column", gap: "10px" }}>
         {loading ? (
           <>
             <PostCardSkeleton />
@@ -197,14 +205,14 @@ export function Feed() {
             <PostCard key={post.id} post={post} index={i} onModerated={handleModerated} />
           ))
         ) : (
-          <div className="text-center" style={{ padding: '80px 0' }}>
-            <p className="text-muted-foreground" style={{ fontSize: '16px', lineHeight: '24px' }}>
+          <div className="text-center" style={{ padding: "80px 0" }}>
+            <p className="text-muted-foreground" style={{ fontSize: "16px", lineHeight: "24px" }}>
               No posts yet. Be the first!
             </p>
             <Link
               to="/submit"
               className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-colors"
-              style={{ marginTop: '12px', padding: '0 16px', height: '40px', borderRadius: '10px', fontSize: '14px' }}
+              style={{ marginTop: "12px", padding: "0 16px", height: "40px", borderRadius: "10px", fontSize: "14px" }}
             >
               <Plus className="w-4 h-4" />
               Add to Backdrop
