@@ -1,4 +1,4 @@
-import { Home, Trophy, Coins, Users, FolderHeart, ShoppingBag, Plus, LogIn, LogOut, User, Shield } from "lucide-react";
+import { Home, Trophy, Coins, Users, Dna, ShoppingBag, Plus, LogIn, LogOut, User, Shield } from "lucide-react";
 import { NavLink, Link } from "react-router-dom";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,7 +9,7 @@ const navItems = [
   { icon: Trophy, label: "Winners", to: "/winners" },
   { icon: Coins, label: "Sales", to: "/sales" },
   { icon: Users, label: "Breeders", to: "/breeders" },
-  { icon: FolderHeart, label: "Repo", to: "/repo" },
+  { icon: Dna, label: "Sires", to: "/repo" },
   { icon: ShoppingBag, label: "Market", to: "/market" },
 ];
 
