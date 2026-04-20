@@ -65,6 +65,95 @@ export type Database = {
         }
         Relationships: []
       }
+      catalog_breeders: {
+        Row: {
+          accent_color: string
+          created_at: string
+          id: string
+          name: string
+          website: string | null
+        }
+        Insert: {
+          accent_color?: string
+          created_at?: string
+          id?: string
+          name: string
+          website?: string | null
+        }
+        Update: {
+          accent_color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      catalog_sires: {
+        Row: {
+          breeder_id: string
+          created_at: string
+          dwarf: string | null
+          genotype: string | null
+          id: string
+          notes: string | null
+          ownership: string | null
+          pedigree: string | null
+          photo_url: string | null
+          price: number | null
+          scrapie: string | null
+          semen_available: boolean
+          sire_name: string
+          species: string
+          spider: string | null
+          updated_at: string
+        }
+        Insert: {
+          breeder_id: string
+          created_at?: string
+          dwarf?: string | null
+          genotype?: string | null
+          id?: string
+          notes?: string | null
+          ownership?: string | null
+          pedigree?: string | null
+          photo_url?: string | null
+          price?: number | null
+          scrapie?: string | null
+          semen_available?: boolean
+          sire_name: string
+          species?: string
+          spider?: string | null
+          updated_at?: string
+        }
+        Update: {
+          breeder_id?: string
+          created_at?: string
+          dwarf?: string | null
+          genotype?: string | null
+          id?: string
+          notes?: string | null
+          ownership?: string | null
+          pedigree?: string | null
+          photo_url?: string | null
+          price?: number | null
+          scrapie?: string | null
+          semen_available?: boolean
+          sire_name?: string
+          species?: string
+          spider?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalog_sires_breeder_id_fkey"
+            columns: ["breeder_id"]
+            isOneToOne: false
+            referencedRelation: "catalog_breeders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           created_at: string

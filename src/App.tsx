@@ -13,7 +13,7 @@ import WinnersPage from "./pages/WinnersPage";
 import LivePage from "./pages/LivePage";
 import { MarketPage, HaulersPage } from "./pages/PlaceholderPage";
 import SalesPage from "./pages/SalesPage";
-import RepoPage from "./pages/RepoPage";
+import SireCatalogPage from "./pages/SireCatalogPage";
 import SubmitWinnerPage from "./pages/SubmitWinnerPage";
 import CreatePostPage from "./pages/CreatePostPage";
 import AuthPage from "./pages/AuthPage";
@@ -51,7 +51,7 @@ const App = () => (
             <Route path="/market" element={<MarketPage />} />
             <Route path="/haulers" element={<HaulersPage />} />
             <Route path="/sales" element={<SalesPage />} />
-            <Route path="/repo" element={<RepoPage />} />
+            <Route path="/repo" element={<SireCatalogPage />} />
             <Route path="/saved" element={<SavedPage />} />
             <Route path="/submit" element={<CreatePostPage />} />
             <Route path="/submit/legacy" element={<SubmitWinnerPage />} />
