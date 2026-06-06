@@ -116,8 +116,17 @@ export default function BreederProfilePage() {
   const sales = posts.filter((p) => p.post_type === "sale");
   const recentPosts = posts.slice(0, isFeatured ? 10 : 3);
 
+  const breederName = profile?.display_name || profile?.username || "";
+  const lambs = useMemo(
+    () => allDemoLambs().filter((l) => l.breederName.toLowerCase() === breederName.toLowerCase()),
+    [breederName]
+  );
+
+  const [tab, setTab] = useState<"posts" | "lambs" | "results">("posts");
+
   const renderCards = (items: WinnerRow[]) =>
     items.map((post, i) => <PostCard key={post.id} post={toPost(post, profile)} index={i} />);
+
 
   if (profileLoading) {
     return (
