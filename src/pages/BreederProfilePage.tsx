@@ -1,5 +1,5 @@
-import React from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useMemo } from "react";
+import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,7 +10,9 @@ import { Trophy, Dna, ShoppingBag, Star, Activity } from "lucide-react";
 import { BreederHero } from "@/components/breeder/BreederHero";
 import { BreederSection } from "@/components/breeder/BreederSection";
 import { LockedSection } from "@/components/breeder/LockedSection";
+import { allDemoLambs } from "@/data/demoLambs";
 import type { Post } from "@/data/mock";
+
 
 type WinnerRow = {
   id: string;
