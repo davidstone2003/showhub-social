@@ -1,84 +1,58 @@
+## Scope
+Build the missing features only. Existing Home/Winners/Sales/Breeders/Sires/Market pages stay as-is. All new pages use hardcoded demo data (no new DB tables). New pages use the spec's blue (#1A4FB5) and green (#1A7A3A); existing pages keep their earth-tone tokens.
 
+## Demo data file
+Create `src/data/demoLambs.ts` with:
+- 14 breeders (id, name, slug, location, color, wins, lambs_count, followers_count)
+- 8 demo lambs (tag, breeder, sire ref, dam, sex, breed, color, dob, weight, for_sale, price, results[])
+- 6+ show results
+Sire references reuse existing `catalog_sires` rows by name (lookup helper).
 
-# Exhibitor Memory + Smart Reuse System
+## New routes
+1. `/lamb/:tag` — **Public QR lamb profile** (no auth)
+   - Top bar, photo placeholder, info chips, show results, sire card (with genotype badges), dam card, grandsire card, contact button, "Powered by Backdrop" footer.
 
-## Overview
+2. `/breeder/:username` — **Add tabs** (Sires | Lambs | Results)
+   - Edit existing `BreederProfilePage.tsx`: add a tab strip below the hero. Sires = filter `catalog_sires` by breeder name match. Lambs = grid from demo data. Results = existing winners list.
 
-Build a system that remembers exhibitors a user posts for, tracks relationships (me, kid, family), and pre-fills fields on subsequent posts to reduce typing to near-zero over time.
+3. `/sire/:id` — **Add Semen Booking section**
+   - Edit existing `SirePage.tsx`: if catalog row has `semen_available`, append a section with a date picker (shadcn Calendar), "$X per unit", "Order Semen" (green) + "Contact Breeder" (outlined) buttons. Submit shows a toast only (no backend).
 
-## Database Changes
+4. `/dashboard` — **Breeder dashboard** (requires auth)
+   - Welcome header, 4 quick stats, 4 quick-action buttons, recent activity list. Stats and activity are derived from existing `winners`/`posts` tables filtered by `user_id`.
 
-**New table: `exhibitors`**
-- `id` (uuid, PK)
-- `name` (text, not null)
-- `created_by_user_id` (uuid, references auth.users)
-- `created_at` (timestamp)
-- RLS: users can read/insert/update their own; public read for display
+5. `/dashboard/lambs/new` — **Lamb registration 3-step flow**
+   - Step 1: tag, DOB, sex pills, breed pills, color pills, notes.
+   - Step 2: sire picker (searches `catalog_sires`), dam text input, grandsire read-only.
+   - Step 3: review + Save.
+   - Success screen with "Register Next Lamb" and "View All Lambs" buttons.
+   - State stored in component; on Save, append to localStorage `backdrop_demo_lambs` so newly registered lambs are visible at `/lamb/:tag` during the demo.
 
-**New table: `user_exhibitors`**
-- `id` (uuid, PK)
-- `user_id` (uuid, references auth.users)
-- `exhibitor_id` (uuid, references exhibitors)
-- `label` (text: 'me', 'kid', 'family', 'other')
-- `use_count` (integer, default 1)
-- `last_used_at` (timestamp)
-- `last_breeder_id` (uuid, nullable) — last breeder used with this exhibitor
-- `last_show_name` (text, nullable) — last show context
-- `last_sire_name` (text, nullable)
-- `last_dam_name` (text, nullable)
-- unique constraint on (user_id, exhibitor_id)
-- RLS: users can CRUD their own rows
+## Routing changes (`src/App.tsx`)
+Add 4 routes: `/lamb/:tag`, `/dashboard`, `/dashboard/lambs/new`, `/dashboard/lambs`.
 
-## Submission Flow Changes
+## Minor polish
+- Sire catalog: confirm genotype badges render as 3 separate chips (already do — no change).
+- Breeders directory: add a Follow/Following toggle (local state only, no DB).
 
-**ResultBlock "Shown by" field** — Replace the plain text input with a new `ExhibitorPicker` component:
+## Files to create
+- `src/data/demoLambs.ts`
+- `src/pages/LambPublicPage.tsx`
+- `src/pages/DashboardPage.tsx`
+- `src/pages/LambRegisterPage.tsx`
+- `src/components/breeder/BreederTabs.tsx`
+- `src/components/sire/SemenBookingSection.tsx`
 
-1. Shows a quick-select row: **Me** | **My Kids** (chips for saved exhibitors) | **Someone Else**
-2. Selecting "Me" fills `shownBy` with user's display name
-3. Selecting a saved kid/family member fills `shownBy` with their name
-4. "Someone Else" shows the standard text input
-5. Autocomplete against user's saved exhibitors as they type
+## Files to edit
+- `src/App.tsx` (routes)
+- `src/pages/BreederProfilePage.tsx` (tabs)
+- `src/pages/SirePage.tsx` (booking section)
+- `src/pages/BreedersPage.tsx` (Follow toggle)
 
-**After successful post submission:**
-- Upsert the exhibitor into `exhibitors` table
-- Upsert `user_exhibitors` with incremented `use_count`, updated `last_used_at`, and context (breeder, show, sire, dam)
-
-## Post Another Flow
-
-**PostSuccessScreen** — Add a "Post Another" button that navigates back to `/submit` with query params or state carrying:
-- Last show name (pre-filled)
-- Last exhibitor (pre-selected)
-- Last breeder identity (pre-selected)
-
-The SubmitWinnerPage reads this carry-forward state on mount and pre-fills the first result block accordingly.
-
-## Component: ExhibitorPicker
-
-```text
-┌─────────────────────────────────────┐
-│  Who showed?                        │
-│  [Me] [Kid1] [Kid2] [+ Add]        │
-│  ─── or type a name ───            │
-│  [________________________]         │
-└─────────────────────────────────────┘
-```
-
-- Fetches `user_exhibitors` joined with `exhibitors` on mount
-- Sorted by `use_count` desc (most-used first)
-- Chips colored by label (me=primary, kid=amber, family=purple)
-
-## Files to Create/Modify
-
-1. **Migration SQL** — Create `exhibitors` and `user_exhibitors` tables with RLS
-2. **`src/components/ExhibitorPicker.tsx`** — New component for exhibitor selection
-3. **`src/components/ResultBlock.tsx`** — Replace "Shown by" input with ExhibitorPicker
-4. **`src/pages/SubmitWinnerPage.tsx`** — Save exhibitor data after submit; read carry-forward state on mount
-5. **`src/components/PostSuccessScreen.tsx`** — Add "Post Another" button with carry-forward data
-
-## Technical Details
-
-- Exhibitor upsert uses `ON CONFLICT (user_id, exhibitor_id)` to increment count
-- ExhibitorPicker loads data once via `useEffect`, caches in component state
-- Carry-forward state passed via `navigate('/submit', { state: {...} })` and read with `useLocation`
-- All new tables require authenticated RLS policies scoped to `auth.uid() = user_id`
-
+## Out of scope
+- New DB tables (lambs, show_results, follows)
+- QR code image generation (placeholder only)
+- Photo uploads in lamb registration
+- Print-all-tags PDF
+- Switching app-wide design tokens
+- Email/order processing for semen booking
