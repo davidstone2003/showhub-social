@@ -1,6 +1,8 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { SemenBookingSection } from "@/components/sire/SemenBookingSection";
 import { SirePhoto } from "./SirePhoto";
+
 import { GenotypeBadges } from "./GenotypeBadges";
 import { parseGenotype } from "@/lib/genotype";
 import { ExternalLink } from "lucide-react";
@@ -87,17 +89,20 @@ export function SireDetailModal({ sire, open, onClose }: Props) {
             ))}
           </div>
 
+          {sire.semen_available && (
+            <SemenBookingSection
+              sireName={sire.sire_name}
+              price={sire.price}
+              breederName={sire.breeder.name}
+            />
+          )}
+
           <div className="flex gap-2 pt-2">
-            <Button
-              disabled={!sire.semen_available}
-              className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white disabled:bg-muted disabled:text-muted-foreground"
-            >
-              Order Semen
-            </Button>
             <Button variant="outline" className="flex-1" onClick={onClose}>
               Close
             </Button>
           </div>
+
         </div>
       </DialogContent>
     </Dialog>

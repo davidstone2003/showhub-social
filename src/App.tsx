@@ -26,6 +26,11 @@ import AccountTypePage from "./pages/AccountTypePage";
 import EventsPage from "./pages/EventsPage";
 import EventDetailPage from "./pages/EventDetailPage";
 import SavedPage from "./pages/SavedPage";
+import LambPublicPage from "./pages/LambPublicPage";
+import DashboardPage from "./pages/DashboardPage";
+import LambRegisterPage from "./pages/LambRegisterPage";
+import MyLambsPage from "./pages/MyLambsPage";
+
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -62,6 +67,11 @@ const App = () => (
             <Route path="/account-type" element={<AccountTypePage />} />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/events/:slug" element={<EventDetailPage />} />
+            <Route path="/lamb/:tag" element={<LambPublicPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard/lambs" element={<MyLambsPage />} />
+            <Route path="/dashboard/lambs/new" element={<LambRegisterPage />} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
