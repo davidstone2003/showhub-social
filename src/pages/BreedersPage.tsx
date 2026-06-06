@@ -35,10 +35,28 @@ const stateOptions = [
   { label: "Iowa", value: "Iowa" },
 ];
 
+const FOLLOW_KEY = "backdrop_followed_breeders";
+function loadFollowed(): string[] {
+  if (typeof window === "undefined") return [];
+  try { return JSON.parse(window.localStorage.getItem(FOLLOW_KEY) || "[]"); } catch { return []; }
+}
+
 export default function BreedersPage() {
   const [search, setSearch] = useState("");
   const [species, setSpecies] = useState<Species>("All");
   const [stateFilter, setStateFilter] = useState("all");
+  const [followed, setFollowed] = useState<string[]>(() => loadFollowed());
+
+  const toggleFollow = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setFollowed((prev) => {
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+      window.localStorage.setItem(FOLLOW_KEY, JSON.stringify(next));
+      return next;
+    });
+  };
+
 
   const { data: breeders = [], isLoading } = useQuery({
     queryKey: ["breeders-directory-full"],
