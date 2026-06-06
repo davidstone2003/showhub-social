@@ -1,6 +1,8 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { SemenBookingSection } from "@/components/sire/SemenBookingSection";
 import { SirePhoto } from "./SirePhoto";
+
 import { GenotypeBadges } from "./GenotypeBadges";
 import { parseGenotype } from "@/lib/genotype";
 import { ExternalLink } from "lucide-react";
