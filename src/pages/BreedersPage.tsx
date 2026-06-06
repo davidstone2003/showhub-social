@@ -189,12 +189,23 @@ export default function BreedersPage() {
                     <Trophy className="w-3 h-3" />{b.winnerCount} winner{b.winnerCount !== 1 ? "s" : ""}
                   </span>
                   <span className="flex items-center gap-1">🐏 {b.sireCount} sire{b.sireCount !== 1 ? "s" : ""}</span>
+                  <button
+                    onClick={(e) => toggleFollow(e, b.id)}
+                    className={`ml-auto text-[11px] font-semibold px-2.5 py-1 rounded-full border transition-colors ${
+                      followed.includes(b.id)
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card text-foreground border-border hover:bg-muted"
+                    }`}
+                  >
+                    {followed.includes(b.id) ? "Following" : "Follow"}
+                  </button>
                 </div>
               </Link>
             );
           })}
         </div>
       )}
+
     </DirectoryLayout>
   );
 }
