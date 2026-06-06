@@ -35,10 +35,28 @@ const stateOptions = [
   { label: "Iowa", value: "Iowa" },
 ];
 
+const FOLLOW_KEY = "backdrop_followed_breeders";
+function loadFollowed(): string[] {
+  if (typeof window === "undefined") return [];
+  try { return JSON.parse(window.localStorage.getItem(FOLLOW_KEY) || "[]"); } catch { return []; }
+}
+
 export default function BreedersPage() {
   const [search, setSearch] = useState("");
   const [species, setSpecies] = useState<Species>("All");
   const [stateFilter, setStateFilter] = useState("all");
+  const [followed, setFollowed] = useState<string[]>(() => loadFollowed());
+
+  const toggleFollow = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setFollowed((prev) => {
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+      window.localStorage.setItem(FOLLOW_KEY, JSON.stringify(next));
+      return next;
+    });
+  };
+
 
   const { data: breeders = [], isLoading } = useQuery({
     queryKey: ["breeders-directory-full"],
@@ -171,12 +189,23 @@ export default function BreedersPage() {
                     <Trophy className="w-3 h-3" />{b.winnerCount} winner{b.winnerCount !== 1 ? "s" : ""}
                   </span>
                   <span className="flex items-center gap-1">🐏 {b.sireCount} sire{b.sireCount !== 1 ? "s" : ""}</span>
+                  <button
+                    onClick={(e) => toggleFollow(e, b.id)}
+                    className={`ml-auto text-[11px] font-semibold px-2.5 py-1 rounded-full border transition-colors ${
+                      followed.includes(b.id)
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card text-foreground border-border hover:bg-muted"
+                    }`}
+                  >
+                    {followed.includes(b.id) ? "Following" : "Follow"}
+                  </button>
                 </div>
               </Link>
             );
           })}
         </div>
       )}
+
     </DirectoryLayout>
   );
 }
