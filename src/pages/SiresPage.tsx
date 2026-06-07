@@ -1,35 +1,45 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Dna } from "lucide-react";
+import { ChevronRight, Search, LayoutGrid, List as ListIcon, Flame } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { DirectoryLayout, type Species, type FilterDropdown } from "@/components/DirectoryLayout";
+import { Layout } from "@/components/Layout";
 import gooseImage from "@/assets/sires/goose.jpeg";
 
 interface Sire {
   id: string;
   name: string;
   breederName: string | null;
-  species: Species;
-  semenType: string;
+  breed: string;
+  semenAvailable: boolean;
+  winCount: number;
+  image?: string;
 }
 
-const semenOptions = [
-  { label: "All Semen Types", value: "all" },
-  { label: "Frozen", value: "frozen" },
-  { label: "Fresh Chilled", value: "fresh_chilled" },
-  { label: "Fresh", value: "fresh" },
-];
+function initials(name: string) {
+  return name.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("");
+}
+
+function Monogram({ name, size = 44 }: { name: string; size?: number }) {
+  return (
+    <div
+      className="flex items-center justify-center rounded-xl shrink-0 font-bold text-white tracking-wide"
+      style={{
+        width: size,
+        height: size,
+        background: "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-dark)) 100%)",
+        fontSize: size > 60 ? 20 : 14,
+      }}
+    >
+      {initials(name) || "?"}
+    </div>
+  );
+}
 
 const SiresPage = () => {
   const [sires, setSires] = useState<Sire[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [species, setSpecies] = useState<Species>("All");
-  const [breederFilter, setBreederFilter] = useState("all");
-  const [semenFilter, setSemenFilter] = useState("all");
-  const [breederOptions, setBreederOptions] = useState<{ label: string; value: string }[]>([
-    { label: "All Breeders", value: "all" },
-  ]);
+  const [view, setView] = useState<"list" | "grid">("list");
 
   useEffect(() => {
     async function fetchSires() {
@@ -39,36 +49,26 @@ const SiresPage = () => {
       ]);
 
       if (sireData) {
-        const sireIdsWithPosts = new Set((winnerData ?? []).map((w) => w.sire_id).filter(Boolean));
-        const breeders = new Set<string>();
-        (winnerData ?? []).forEach((w) => { if (w.bred_by) breeders.add(w.bred_by); });
-        setBreederOptions([
-          { label: "All Breeders", value: "all" },
-          ...Array.from(breeders).sort().map((b) => ({ label: b, value: b })),
-        ]);
-
-        const sortedSires = [...sireData].sort((a, b) => {
-          const aHas = sireIdsWithPosts.has(a.id);
-          const bHas = sireIdsWithPosts.has(b.id);
-          if (aHas !== bHas) return aHas ? -1 : 1;
-          return a.name.localeCompare(b.name);
+        const winsBySire = new Map<string, number>();
+        const breederBySire = new Map<string, string>();
+        (winnerData ?? []).forEach((w) => {
+          if (!w.sire_id) return;
+          winsBySire.set(w.sire_id, (winsBySire.get(w.sire_id) ?? 0) + 1);
+          if (w.bred_by && !breederBySire.has(w.sire_id)) breederBySire.set(w.sire_id, w.bred_by);
         });
 
-        const breederBySireId = new Map<string, string>();
-        (winnerData ?? []).forEach((winner) => {
-          if (winner.sire_id && winner.bred_by && !breederBySireId.has(winner.sire_id)) {
-            breederBySireId.set(winner.sire_id, winner.bred_by);
-          }
-        });
+        const mapped: Sire[] = sireData.map((s) => ({
+          id: s.id,
+          name: s.name,
+          breederName: breederBySire.get(s.id) ?? null,
+          breed: "Sheep",
+          semenAvailable: winsBySire.has(s.id),
+          winCount: winsBySire.get(s.id) ?? 0,
+          image: s.name === "Goose" ? gooseImage : undefined,
+        }));
 
-        setSires(
-          sortedSires.map((sire) => ({
-            ...sire,
-            breederName: breederBySireId.get(sire.id) ?? null,
-            species: "Sheep",
-            semenType: "all",
-          }))
-        );
+        mapped.sort((a, b) => b.winCount - a.winCount || a.name.localeCompare(b.name));
+        setSires(mapped);
       }
       setLoading(false);
     }
@@ -76,74 +76,158 @@ const SiresPage = () => {
   }, []);
 
   const filtered = useMemo(() => {
-    let list = [...sires];
+    if (!search.trim()) return sires;
+    const q = search.toLowerCase();
+    return sires.filter((s) =>
+      s.name.toLowerCase().includes(q) || (s.breederName ?? "").toLowerCase().includes(q)
+    );
+  }, [sires, search]);
 
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter((s) => s.name.toLowerCase().includes(q));
-    }
-
-    if (species !== "All") {
-      list = list.filter((s) => s.species === species);
-    }
-
-    if (breederFilter !== "all") {
-      list = list.filter((s) => s.breederName === breederFilter);
-    }
-
-    if (semenFilter !== "all") {
-      list = list.filter((s) => s.semenType === semenFilter);
-    }
-
-    return list;
-  }, [sires, search, species, breederFilter, semenFilter]);
-
-  const filters: FilterDropdown[] = [
-    { label: "Breeder", value: breederFilter, onChange: setBreederFilter, options: breederOptions },
-    { label: "Semen Type", value: semenFilter, onChange: setSemenFilter, options: semenOptions },
-  ];
+  const trending = useMemo(() => sires.filter((s) => s.winCount > 0).slice(0, 8), [sires]);
 
   return (
-    <DirectoryLayout
-      title="Sire Directory"
-      description="Browse sires by breeder, breed, and availability"
-      searchPlaceholder="Search sire name"
-      search={search}
-      onSearchChange={setSearch}
-      species={species}
-      onSpeciesChange={setSpecies}
-      filters={filters}
-      resultCount={filtered.length}
-      resultLabel="Sire"
-    >
-      {loading ? (
-        <p className="text-sm text-muted-foreground text-center py-8">Loading…</p>
-      ) : filtered.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-8">No sires found.</p>
-      ) : (
-        <div className="grid gap-2.5 grid-cols-2 lg:grid-cols-3">
-          {filtered.map((s) => (
-            <Link
-              key={s.id}
-              to={`/sire/${s.id}`}
-              className="block bg-card rounded-xl border border-border overflow-hidden hover:shadow-sm transition-shadow"
+    <Layout showDiscovery={false}>
+      <div className="mx-auto max-w-2xl pb-24">
+        {/* Header */}
+        <div className="sticky top-0 z-10 bg-background border-b border-border px-4 py-3.5 flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Sires</h1>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{sires.length} active across the network</p>
+          </div>
+          <div className="flex rounded-lg border border-border bg-card overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setView("list")}
+              aria-label="List view"
+              className={`p-2 transition-colors ${view === "list" ? "bg-muted text-foreground" : "text-muted-foreground"}`}
             >
-              <div className="w-full aspect-square bg-muted">
-                {s.name === "Goose" ? (
-                  <img src={gooseImage} alt={s.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-3xl">🐏</div>
-                )}
-              </div>
-              <div className="flex items-center gap-1.5 p-2.5">
-                <Dna className="w-3.5 h-3.5 text-primary shrink-0" />
-                <p className="font-semibold text-sm text-foreground truncate">{s.name}</p>
-              </div>
-            </Link>
-          ))}
+              <ListIcon className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("grid")}
+              aria-label="Grid view"
+              className={`p-2 transition-colors ${view === "grid" ? "bg-muted text-foreground" : "text-muted-foreground"}`}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-      )}
-    </DirectoryLayout>
+
+        <div className="px-4 pt-3">
+          {/* Search */}
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search sires or breeders…"
+              className="h-10 w-full rounded-xl border border-border bg-card pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/40"
+            />
+          </div>
+
+          {/* Trending */}
+          {!search && trending.length > 0 && (
+            <section className="mb-5">
+              <div className="flex items-center gap-1.5 mb-2.5">
+                <Flame className="w-4 h-4 text-[hsl(var(--gold))]" />
+                <h2 className="text-[13px] font-bold uppercase tracking-wider text-foreground">Trending Sires</h2>
+              </div>
+              <div className="flex gap-2.5 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1">
+                {trending.map((s) => (
+                  <Link
+                    key={s.id}
+                    to={`/sire/${s.id}`}
+                    className="shrink-0 w-[140px] rounded-xl border border-border bg-card p-3 shadow-[var(--shadow-card)] hover:-translate-y-0.5 transition-transform"
+                  >
+                    {s.image ? (
+                      <img src={s.image} alt={s.name} className="w-full aspect-square rounded-lg object-cover mb-2" />
+                    ) : (
+                      <div className="w-full aspect-square rounded-lg mb-2 overflow-hidden">
+                        <Monogram name={s.name} size={120} />
+                      </div>
+                    )}
+                    <p className="text-sm font-semibold text-foreground truncate">{s.name}</p>
+                    <p className="text-[11px] text-[hsl(var(--gold))] font-semibold mt-0.5">
+                      {s.winCount} win{s.winCount !== 1 ? "s" : ""}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Catalog header */}
+          <h2 className="text-[13px] font-bold uppercase tracking-wider text-foreground mb-2">
+            {search ? "Results" : "All Sires"}
+            <span className="ml-2 text-muted-foreground font-medium normal-case tracking-normal">
+              {filtered.length}
+            </span>
+          </h2>
+
+          {loading ? (
+            <p className="text-sm text-muted-foreground text-center py-12">Loading…</p>
+          ) : filtered.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-12">No sires found.</p>
+          ) : view === "list" ? (
+            <div className="rounded-xl border border-border bg-card overflow-hidden shadow-[var(--shadow-card)]">
+              {filtered.map((s, i) => (
+                <Link
+                  key={s.id}
+                  to={`/sire/${s.id}`}
+                  className={`flex items-center gap-3 px-3 py-2.5 active:bg-muted/50 transition-colors ${
+                    i !== filtered.length - 1 ? "border-b border-[hsl(var(--divider-soft))]" : ""
+                  }`}
+                >
+                  {s.image ? (
+                    <img src={s.image} alt={s.name} className="w-11 h-11 rounded-xl object-cover shrink-0" />
+                  ) : (
+                    <Monogram name={s.name} />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{s.name}</p>
+                    <p className="text-[12px] text-muted-foreground truncate">
+                      {s.breed}
+                      {s.breederName ? ` · ${s.breederName}` : ""}
+                    </p>
+                  </div>
+                  {s.semenAvailable && (
+                    <span className="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      SEMEN
+                    </span>
+                  )}
+                  <ChevronRight className="w-4 h-4 text-muted-foreground/60 shrink-0" />
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {filtered.map((s) => (
+                <Link
+                  key={s.id}
+                  to={`/sire/${s.id}`}
+                  className="rounded-xl border border-border bg-card overflow-hidden shadow-[var(--shadow-card)] hover:-translate-y-0.5 transition-transform"
+                >
+                  <div className="w-full aspect-square overflow-hidden">
+                    {s.image ? (
+                      <img src={s.image} alt={s.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <Monogram name={s.name} size={180} />
+                    )}
+                  </div>
+                  <div className="p-2.5">
+                    <p className="text-sm font-semibold text-foreground truncate">{s.name}</p>
+                    <p className="text-[11px] text-[hsl(var(--gold))] font-semibold mt-0.5">
+                      {s.winCount > 0 ? `${s.winCount} win${s.winCount !== 1 ? "s" : ""}` : s.breed}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </Layout>
   );
 };
 
