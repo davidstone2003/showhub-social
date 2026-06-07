@@ -127,19 +127,42 @@ RAW.forEach((r) => {
   }
 });
 
-export const CHAMPION_DRIVE_SIRES: CatalogSire[] = RAW.map((r) => {
-  const primary = r.bred.split(",")[0].trim();
-  const breeder = breederMap.get(primary)!;
-  return {
-    id: slug(r.name),
-    sire_name: r.name,
-    pedigree: r.pedigree,
-    notes: null,
-    genotype: null,
-    semen_available: r.semen,
-    price: null,
-    ownership: `Owned by ${r.owned}`,
-    photo_url: r.photo,
-    breeder,
-  };
-});
+const SPECTACLE: CatalogSire = {
+  id: "spectacle",
+  sire_name: "Spectacle",
+  pedigree: "Crossbones x Mythical x Crinkle x Shoot Yeah",
+  notes:
+    "SPECTACLE is the record selling WFX buck lamb. Assembled unlike any other ram we have owned; SPECTACLE's build and organization is simply unmatched within his breed. $300 per unit · 5 unit minimum. $80,000 half interest purchase @ Bluegrass Babes, Louisville, KY.",
+  genotype: "RRNNFD",
+  semen_available: true,
+  price: 300,
+  ownership: "Owned by Randy Hill",
+  photo_url: null,
+  breeder: {
+    id: "stoner-show-lambs",
+    name: "Stoner Show Lambs",
+    accent_color: "#1A2A44",
+    website: "reprospecialty.com",
+  },
+};
+
+export const CHAMPION_DRIVE_SIRES: CatalogSire[] = [
+  SPECTACLE,
+  ...RAW.map((r) => {
+    const primary = r.bred.split(",")[0].trim();
+    const breeder = breederMap.get(primary)!;
+    return {
+      id: slug(r.name),
+      sire_name: r.name,
+      pedigree: r.pedigree,
+      notes: null,
+      genotype: null,
+      semen_available: r.semen,
+      price: null,
+      ownership: `Owned by ${r.owned}`,
+      photo_url: r.photo,
+      breeder,
+    };
+  }),
+];
+
