@@ -130,10 +130,15 @@ RAW.forEach((r) => {
 const SPECTACLE: CatalogSire = {
   id: "spectacle",
   sire_name: "Spectacle",
+  breed: "Crossbred-Sheep (Non-Registered)",
   pedigree: "Crossbones x Mythical x Crinkle x Shoot Yeah",
-  notes:
-    "SPECTACLE is the record selling WFX buck lamb. Assembled unlike any other ram we have owned; SPECTACLE's build and organization is simply unmatched within his breed. $300 per unit · 5 unit minimum. $80,000 half interest purchase @ Bluegrass Babes, Louisville, KY.",
   genotype: "RRNNFD",
+  registered: "No",
+  sku: "RSGSPEC01",
+  stock: 5,
+  description:
+    "SPECTACLE is the record selling WFX buck lamb. Assembled unlike any other ram we have owned; SPECTACLE's build and organization is simply unmatched within his breed. $80,000 half interest purchase @ Bluegrass Babes, Louisville, KY. 5 unit minimum.",
+  notes: null,
   semen_available: true,
   price: 300,
   ownership: "Owned by Randy Hill",

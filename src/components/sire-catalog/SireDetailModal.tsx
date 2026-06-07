@@ -2,9 +2,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { SemenBookingSection } from "@/components/sire/SemenBookingSection";
 import { SirePhoto } from "./SirePhoto";
-
 import { GenotypeBadges } from "./GenotypeBadges";
-import { parseGenotype } from "@/lib/genotype";
 import { ExternalLink } from "lucide-react";
 import type { CatalogSire } from "@/pages/SireCatalogPage";
 
@@ -14,95 +12,114 @@ interface Props {
   onClose: () => void;
 }
 
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <p className="text-sm text-foreground leading-relaxed">
+      <span className="font-semibold">{label}:</span>{" "}
+      <span className="text-foreground/85">{children}</span>
+    </p>
+  );
+}
+
 export function SireDetailModal({ sire, open, onClose }: Props) {
   if (!sire) return null;
   const accent = sire.breeder.accent_color;
-  const parsed = parseGenotype(sire.genotype);
-
-  const fields: { label: string; value: string }[] = [
-    { label: "DNA (RSG)", value: parsed.rsg || "—" },
-    { label: "Scrapie", value: parsed.scrapie ?? "—" },
-    { label: "Spider", value: parsed.spider ?? "—" },
-    { label: "Dwarf", value: parsed.dwarf ?? "—" },
-    { label: "Semen Status", value: sire.semen_available ? "Available" : "Not currently available" },
-    { label: "Ownership", value: sire.ownership || "Sole" },
-    { label: "Notes", value: sire.notes || "—" },
-  ];
+  const priceStr = sire.price ? `$${sire.price.toFixed(0)}` : null;
+  const stockLabel =
+    typeof sire.stock === "number"
+      ? `${sire.stock} in stock`
+      : sire.semen_available
+      ? "In stock"
+      : "Out of stock";
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-2xl p-0 overflow-hidden gap-0">
-        <div className="relative aspect-[16/10] bg-muted">
-          <SirePhoto photoUrl={sire.photo_url} sireName={sire.sire_name} accentColor={accent} />
-          {sire.semen_available && (
-            <span className="absolute top-3 right-3 inline-flex items-center rounded-full bg-emerald-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-lg">
-              Semen Available
-            </span>
-          )}
-          <div
-            className="absolute inset-x-0 bottom-0 px-4 py-2 flex items-center justify-between text-white text-sm"
-            style={{ background: accent }}
-          >
-            <span className="font-semibold">{sire.breeder.name}</span>
-            {sire.breeder.website && (
-              <a
-                href={sire.breeder.website.startsWith("http") ? sire.breeder.website : `https://${sire.breeder.website}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs underline-offset-2 hover:underline"
-              >
-                {sire.breeder.website} <ExternalLink className="w-3 h-3" />
-              </a>
-            )}
-          </div>
-        </div>
-
-        <div className="p-5 space-y-4 max-h-[55vh] overflow-y-auto">
-          <div className="flex items-baseline justify-between gap-3">
-            <h2 className="font-serif text-2xl font-bold text-foreground">{sire.sire_name}</h2>
-            {sire.price ? (
-              <p className="text-lg font-bold text-emerald-700">${sire.price.toFixed(2)}</p>
-            ) : (
-              <p className="text-sm text-muted-foreground">Contact for pricing</p>
+      <DialogContent className="max-w-3xl p-0 overflow-hidden gap-0">
+        <div className="grid md:grid-cols-2">
+          {/* Photo column */}
+          <div className="relative bg-muted aspect-square md:aspect-auto md:min-h-[420px]">
+            <SirePhoto photoUrl={sire.photo_url} sireName={sire.sire_name} accentColor={accent} />
+            {sire.semen_available && (
+              <span className="absolute top-3 left-3 inline-flex items-center rounded-full bg-emerald-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-lg">
+                Semen Available
+              </span>
             )}
           </div>
 
-          {sire.pedigree && (
+          {/* Info column */}
+          <div className="p-6 max-h-[80vh] overflow-y-auto space-y-4">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1">
-                Pedigree Information
+              <h2 className="font-serif text-3xl font-bold text-foreground leading-tight">
+                {sire.sire_name}
+              </h2>
+              {priceStr && (
+                <p className="mt-2 text-2xl font-bold text-foreground">{priceStr}</p>
+              )}
+              <p className="mt-1 text-xs font-medium uppercase tracking-wide text-emerald-700">
+                {stockLabel}
               </p>
-              <p className="text-sm text-foreground">{sire.pedigree}</p>
             </div>
-          )}
 
-          <div>
+            {sire.pedigree && (
+              <Row label="Pedigree Information">{sire.pedigree}</Row>
+            )}
+
             <GenotypeBadges raw={sire.genotype} size="md" />
+
+            {sire.sku && (
+              <p className="text-[11px] text-muted-foreground">
+                <span className="font-semibold uppercase">SKU:</span> {sire.sku}
+                <span className="mx-1.5">·</span>
+                <span className="font-semibold uppercase">Category:</span> Sire Catalog
+              </p>
+            )}
+
+            <div className="border-t border-border pt-4 space-y-2">
+              <h3 className="font-serif text-lg font-bold text-foreground">Description</h3>
+              <Row label="Sire Name">{sire.sire_name}</Row>
+              {sire.breed && <Row label="Breed">{sire.breed}</Row>}
+              <Row label="Breeder">
+                {sire.breeder.website ? (
+                  <a
+                    href={sire.breeder.website.startsWith("http") ? sire.breeder.website : `https://${sire.breeder.website}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 underline-offset-2 hover:underline"
+                    style={{ color: accent }}
+                  >
+                    {sire.breeder.name} <ExternalLink className="w-3 h-3" />
+                  </a>
+                ) : (
+                  sire.breeder.name
+                )}
+              </Row>
+              {sire.pedigree && <Row label="Pedigree Information">{sire.pedigree}</Row>}
+              {sire.genotype && <Row label="DNA">{sire.genotype}</Row>}
+              {sire.registered && <Row label="Registered">{sire.registered}</Row>}
+              {priceStr && <Row label="Price">{priceStr}</Row>}
+              {sire.ownership && <Row label="Ownership">{sire.ownership}</Row>}
+
+              {(sire.description || sire.notes) && (
+                <p className="pt-2 text-sm text-foreground/85 leading-relaxed">
+                  {sire.description || sire.notes}
+                </p>
+              )}
+            </div>
+
+            {sire.semen_available && (
+              <SemenBookingSection
+                sireName={sire.sire_name}
+                price={sire.price}
+                breederName={sire.breeder.name}
+              />
+            )}
+
+            <div className="flex gap-2 pt-2">
+              <Button variant="outline" className="flex-1" onClick={onClose}>
+                Close
+              </Button>
+            </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            {fields.map((f) => (
-              <div key={f.label} className="rounded-md bg-muted/40 px-3 py-2">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{f.label}</p>
-                <p className="text-sm text-foreground mt-0.5 break-words">{f.value}</p>
-              </div>
-            ))}
-          </div>
-
-          {sire.semen_available && (
-            <SemenBookingSection
-              sireName={sire.sire_name}
-              price={sire.price}
-              breederName={sire.breeder.name}
-            />
-          )}
-
-          <div className="flex gap-2 pt-2">
-            <Button variant="outline" className="flex-1" onClick={onClose}>
-              Close
-            </Button>
-          </div>
-
         </div>
       </DialogContent>
     </Dialog>

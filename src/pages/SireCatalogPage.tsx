@@ -35,6 +35,11 @@ export interface CatalogSire {
   price: number | null;
   ownership: string | null;
   photo_url: string | null;
+  breed?: string | null;
+  registered?: string | null;
+  sku?: string | null;
+  stock?: number | null;
+  description?: string | null;
   breeder: { id: string; name: string; accent_color: string; website: string | null };
 }
 
