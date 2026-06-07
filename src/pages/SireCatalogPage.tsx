@@ -56,15 +56,10 @@ export default function SireCatalogPage() {
   });
 
   useEffect(() => {
-    (async () => {
-      const { data, error } = await supabase
-        .from("catalog_sires")
-        .select("id, sire_name, pedigree, notes, genotype, semen_available, price, ownership, photo_url, breeder:catalog_breeders(id, name, accent_color, website)")
-        .order("sire_name");
-      if (!error && data) setSires(data as unknown as CatalogSire[]);
-      setLoading(false);
-    })();
+    setSires(CHAMPION_DRIVE_SIRES);
+    setLoading(false);
   }, []);
+
 
   const breederCounts = useMemo(() => {
     const map = new Map<string, { id: string; name: string; accent_color: string; count: number }>();
