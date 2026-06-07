@@ -6,6 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import BreedersPage from "./pages/BreedersPage";
+import SpeciesHubPage from "./pages/SpeciesHubPage";
+import BreederCategoryPage from "./pages/BreederCategoryPage";
 import SiresPage from "./pages/SiresPage";
 import AnimalPage from "./pages/AnimalPage";
 import SirePage from "./pages/SirePage";
@@ -47,6 +49,8 @@ const App = () => (
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/breeders" element={<BreedersPage />} />
+            <Route path="/breeders/:species" element={<SpeciesHubPage />} />
+            <Route path="/breeders/:species/:category" element={<BreederCategoryPage />} />
             <Route path="/sires" element={<SiresPage />} />
             <Route path="/animal/:id" element={<AnimalPage />} />
             <Route path="/sire/:id" element={<SirePage />} />
