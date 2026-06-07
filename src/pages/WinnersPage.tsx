@@ -174,7 +174,23 @@ export default function WinnersPage() {
           </div>
         </div>
 
-        <div className="px-4 pt-5">
+        {/* Filter pills */}
+        <div className="px-4 pt-3 flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
+          {["All", "Grand Champions", "Reserve", "Class Winners", "By Breed"].map((label, i) => (
+            <button
+              key={label}
+              className={`shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-colors ${
+                i === 0
+                  ? "bg-foreground text-background"
+                  : "bg-card border border-border text-muted-foreground hover:bg-muted/50"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="px-4 pt-4">
           {loading ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (

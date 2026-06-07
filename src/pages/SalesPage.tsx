@@ -1,19 +1,22 @@
 import { useState } from "react";
 import { Layout } from "@/components/Layout";
-import { Search, SlidersHorizontal, Bookmark, ChevronDown } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+  SheetDescription,
+} from "@/components/ui/sheet";
 
 /* ── mock live sale updates ── */
 const liveSaleUpdates = [
-  { id: "1", text: "Lot 14 sold for $12,500", time: "1m ago" },
-  { id: "2", text: "High seller so far", time: "4m ago" },
-  { id: "3", text: "Average updated to $4,850", time: "7m ago" },
-  { id: "4", text: "Bidding open on Lot 27", time: "10m ago" },
+  { id: "1", lot: "Lot 14", price: "$12,500", time: "1m ago", note: "Sold" },
+  { id: "2", lot: "Lot 27", price: "—", time: "4m ago", note: "Bidding open" },
+  { id: "3", lot: "Avg", price: "$4,850", time: "7m ago", note: "Running avg updated" },
+  { id: "4", lot: "Lot 9", price: "$8,200", time: "12m ago", note: "Sold" },
 ];
 
-/* ── mock saved views ── */
-const savedViews = ["All Sales", "My Views", "High Sellers", "Spring Sales", "Goose Progeny"];
-
-/* ── mock sale results ── */
 interface LotEntry {
   lot: string;
   seller: string;
@@ -57,20 +60,25 @@ const mockSaleResults: SaleResultBlock[] = [
 
 function SaleBlock({ block }: { block: SaleResultBlock }) {
   return (
-    <div className="border-b border-border pb-4 last:border-b-0 last:pb-0">
+    <div className="rounded-xl bg-card border border-border shadow-[var(--shadow-card)] p-4">
       <h3 className="text-[15px] font-bold text-foreground leading-snug">{block.saleName}</h3>
       <p className="text-[12px] text-muted-foreground mt-0.5">
-        {block.date} • {block.location}
+        {block.date} · {block.location}
       </p>
 
-      <div className="mt-3 space-y-0">
+      <div className="mt-3">
         {block.lots.map((l, i) => (
-          <div key={i} className="flex items-center justify-between py-1.5 border-b border-border/40 last:border-b-0">
-            <div className="flex items-baseline gap-2 min-w-0">
-              <span className="text-[12px] font-semibold text-muted-foreground shrink-0">{l.lot}</span>
+          <div
+            key={i}
+            className={`flex items-center justify-between py-2 ${
+              i !== block.lots.length - 1 ? "border-b border-[hsl(var(--divider-soft))]" : ""
+            }`}
+          >
+            <div className="flex items-baseline gap-2.5 min-w-0">
+              <span className="text-[11px] font-bold tracking-wider text-muted-foreground shrink-0 w-12">{l.lot}</span>
               <span className="text-[13px] text-foreground truncate">{l.seller}</span>
             </div>
-            <span className="text-[13px] font-bold text-foreground shrink-0 ml-3">{l.price}</span>
+            <span className="text-[13px] font-bold text-[hsl(var(--gold))] shrink-0 ml-3 tabular-nums">{l.price}</span>
           </div>
         ))}
       </div>
@@ -79,91 +87,88 @@ function SaleBlock({ block }: { block: SaleResultBlock }) {
 }
 
 export default function SalesPage() {
-  const [activeView, setActiveView] = useState("All Sales");
+  const [filterOpen, setFilterOpen] = useState(false);
 
   return (
     <Layout showDiscovery={false}>
       <div className="mx-auto max-w-2xl pb-24">
-        {/* ─── Header ─── */}
-        <div className="sticky top-0 z-10 bg-background border-b border-border px-4 py-3 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-foreground">Sales</h1>
-          <div className="flex items-center gap-3">
+        {/* Header */}
+        <div className="sticky top-0 z-10 bg-background border-b border-border px-4 py-3.5 flex items-center justify-between">
+          <h1 className="text-xl font-bold text-foreground">Sales</h1>
+          <div className="flex items-center gap-2">
             <button className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors">
-              <Search className="w-[18px] h-[18px] text-muted-foreground" />
-            </button>
-            <button className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors">
-              <SlidersHorizontal className="w-[18px] h-[18px] text-muted-foreground" />
+              <Search className="w-5 h-5 text-muted-foreground" />
             </button>
           </div>
         </div>
 
         {/* ─── Section 1: LIVE ─── */}
-        <div className="px-4 pt-3">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="flex items-center gap-1.5 rounded-full bg-destructive/10 px-2.5 py-1 text-[11px] font-bold text-destructive">
-              <span className="h-1.5 w-1.5 rounded-full bg-destructive animate-pulse" />
+        <div className="px-4 pt-4">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="flex items-center gap-1.5 rounded-full bg-destructive/10 border border-destructive/20 px-2.5 py-1 text-[11px] font-bold text-destructive">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75 animate-ping" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-destructive" />
+              </span>
               LIVE
             </span>
-            <span className="text-[12px] text-muted-foreground">American Royal</span>
+            <span className="text-[12px] font-semibold text-foreground">American Royal</span>
           </div>
 
-          <div className="space-y-0">
-            {liveSaleUpdates.map((u) => (
+          <div className="rounded-xl bg-card border border-border shadow-[var(--shadow-card)] overflow-hidden">
+            {liveSaleUpdates.map((u, i) => (
               <div
                 key={u.id}
-                className="flex items-start justify-between py-2 border-b border-border/50 last:border-b-0"
+                className={`flex items-center gap-3 px-3.5 py-3 ${
+                  i !== liveSaleUpdates.length - 1 ? "border-b border-[hsl(var(--divider-soft))]" : ""
+                }`}
               >
-                <div className="flex items-start gap-2 min-w-0">
-                  <span className="text-[13px] mt-px">💰</span>
-                  <p className="text-[13px] text-foreground leading-snug">{u.text}</p>
+                <div className="h-8 w-8 rounded-lg bg-[hsl(var(--gold))]/15 flex items-center justify-center shrink-0">
+                  <span className="text-[15px]">💰</span>
                 </div>
-                <span className="text-[11px] text-muted-foreground shrink-0 ml-3">{u.time}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-[13px] font-bold text-foreground">{u.lot}</span>
+                    {u.price !== "—" && (
+                      <span className="text-[13px] font-bold text-[hsl(var(--gold))] tabular-nums">{u.price}</span>
+                    )}
+                  </div>
+                  <p className="text-[12px] text-muted-foreground truncate">{u.note}</p>
+                </div>
+                <span className="text-[11px] text-muted-foreground shrink-0">{u.time}</span>
               </div>
             ))}
           </div>
 
-          <button className="mt-2 mb-1 text-[12px] font-semibold text-primary">
+          <button className="mt-3 text-[12px] font-semibold text-primary">
             View All Live Sale Updates →
           </button>
         </div>
 
-        {/* ─── Divider ─── */}
-        <div className="h-2 bg-muted/30 mt-3" />
-
         {/* ─── Section 2: Sale Results ─── */}
-        <div className="px-4 pt-4">
-          <h2 className="text-[15px] font-bold text-foreground mb-3">Sale Results</h2>
-
-          {/* Filters row */}
-          <div className="flex items-center gap-2 mb-3 overflow-x-auto pb-1 scrollbar-none">
-            <FilterChip label="Sale" />
-            <FilterChip label="Year" />
-            <FilterChip label="Price" />
-            <button className="flex items-center gap-1 shrink-0 rounded-lg border border-primary/30 bg-primary/5 px-2.5 py-1.5 text-[12px] font-semibold text-primary">
-              <Bookmark className="w-3 h-3" />
-              Save View
-            </button>
+        <div className="px-4 pt-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-[15px] font-bold text-foreground">Sale Results</h2>
+            <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
+              <SheetTrigger asChild>
+                <button className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-[12px] font-semibold text-foreground hover:bg-muted/50 transition-colors">
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  Filter & Sort
+                </button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="rounded-t-2xl">
+                <SheetTitle>Filter & Sort</SheetTitle>
+                <SheetDescription>Refine sale results by sale, year, or price.</SheetDescription>
+                <div className="mt-4 space-y-4">
+                  <FilterSection label="Sale" options={["All Sales", "The Exposure", "The Brand Sale"]} />
+                  <FilterSection label="Year" options={["2026", "2025", "2024"]} />
+                  <FilterSection label="Sort by" options={["Most Recent", "Highest Price", "Lot Number"]} />
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
 
-          {/* Saved view pills */}
-          <div className="flex items-center gap-1.5 mb-4 overflow-x-auto pb-1 scrollbar-none">
-            {savedViews.map((v) => (
-              <button
-                key={v}
-                onClick={() => setActiveView(v)}
-                className={`shrink-0 rounded-full px-3 py-1 text-[12px] font-medium transition-colors ${
-                  activeView === v
-                    ? "bg-foreground text-background"
-                    : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                }`}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
-
-          {/* Sale result blocks grouped by sale */}
-          <div className="space-y-5">
+          <div className="space-y-3">
             {mockSaleResults.map((block) => (
               <SaleBlock key={block.id} block={block} />
             ))}
@@ -174,11 +179,24 @@ export default function SalesPage() {
   );
 }
 
-function FilterChip({ label }: { label: string }) {
+function FilterSection({ label, options }: { label: string; options: string[] }) {
   return (
-    <button className="flex items-center gap-1 shrink-0 rounded-lg border border-border bg-card px-2.5 py-1.5 text-[12px] font-medium text-muted-foreground hover:bg-muted/50 transition-colors">
-      {label}
-      <ChevronDown className="w-3 h-3" />
-    </button>
+    <div>
+      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">{label}</p>
+      <div className="flex flex-wrap gap-2">
+        {options.map((o, i) => (
+          <button
+            key={o}
+            className={`rounded-full px-3 py-1.5 text-[12px] font-semibold transition-colors ${
+              i === 0
+                ? "bg-foreground text-background"
+                : "bg-card border border-border text-muted-foreground hover:bg-muted/50"
+            }`}
+          >
+            {o}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
