@@ -107,9 +107,9 @@ export default function BreedersPage() {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="min-h-screen bg-[#0A1628] text-white">
-        {/* HERO */}
-        <section className="relative overflow-hidden border-b border-white/5">
+      <div className="min-h-screen bg-background text-foreground">
+        {/* HERO — stays dark */}
+        <section className="relative overflow-hidden bg-[#0A1628] text-white">
           <div
             className="absolute inset-0 opacity-30"
             style={{
@@ -117,7 +117,7 @@ export default function BreedersPage() {
                 "radial-gradient(circle at 20% 20%, rgba(201,168,76,0.25), transparent 50%), radial-gradient(circle at 80% 60%, rgba(57,217,138,0.08), transparent 60%)",
             }}
           />
-          <div className="relative mx-auto max-w-6xl px-4 pt-10 pb-6 md:pt-14 md:pb-10">
+          <div className="relative mx-auto max-w-6xl px-4 pt-10 pb-8 md:pt-14 md:pb-10">
             <p className="text-[11px] uppercase tracking-[0.22em] text-[#C9A84C]">The Backdrop Directory</p>
             <h1 className="mt-2 text-3xl md:text-5xl font-bold tracking-tight leading-[1.05]">
               Find Your Next<br /><span className="text-[#C9A84C]">Champion</span>
@@ -165,12 +165,12 @@ export default function BreedersPage() {
           </div>
         </section>
 
-        {/* SPECIES TILES */}
+        {/* SPECIES TILES — light */}
         <section className="mx-auto max-w-6xl px-4 py-8">
-          <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.18em] text-white/90">Browse by Species</h2>
+          <h2 className="mb-4 text-[13px] font-bold uppercase tracking-[0.18em] text-foreground">Browse by Species</h2>
           {isLoading ? (
             <div className="grid grid-cols-2 gap-3">
-              {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-36 rounded-2xl bg-white/5" />)}
+              {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3 md:gap-4">
@@ -178,29 +178,29 @@ export default function BreedersPage() {
                 <Link
                   key={s.key}
                   to={`/breeders/${s.key}`}
-                  className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#141E2E] to-[#0A1628] p-4 md:p-5 transition-all hover:border-[#C9A84C]/40 hover:-translate-y-0.5"
+                  className="group relative overflow-hidden rounded-2xl border border-border bg-card p-4 md:p-5 shadow-[var(--shadow-card)] transition-all hover:border-[hsl(var(--gold))]/40 hover:-translate-y-0.5"
                 >
                   <span className="absolute right-3 top-3 text-3xl md:text-4xl opacity-20 group-hover:opacity-40 transition-opacity">{s.silhouette}</span>
-                  <h3 className="text-lg md:text-2xl font-bold tracking-tight text-white">{s.name}</h3>
-                  <p className="mt-0.5 text-[11px] text-white/50">{s.blurb}</p>
-                  <p className="mt-3 text-[11px] font-semibold text-[#C9A84C]">{s.count} operation{s.count !== 1 ? "s" : ""}</p>
+                  <h3 className="text-lg md:text-2xl font-bold tracking-tight text-foreground">{s.name}</h3>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">{s.blurb}</p>
+                  <p className="mt-3 text-[12px] font-bold text-[hsl(var(--gold))]">{s.count} operation{s.count !== 1 ? "s" : ""}</p>
                   {s.topState && (
-                    <p className="mt-1 text-[10px] uppercase tracking-wider text-white/40">Most active: {s.topState}</p>
+                    <p className="mt-1 text-[10px] uppercase tracking-wider text-muted-foreground">Most active: {s.topState}</p>
                   )}
-                  <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-white/30 transition-transform group-hover:translate-x-0.5 group-hover:text-[#C9A84C]" />
+                  <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5 group-hover:text-[hsl(var(--gold))]" />
                 </Link>
               ))}
             </div>
           )}
         </section>
 
-        {/* SPOTLIGHT */}
+        {/* SPOTLIGHT — dark cards on light bg */}
         {spotlights.length > 0 && (
-          <section className="border-t border-white/5 py-6 pb-24">
+          <section className="border-t border-border py-6 pb-24">
             <div className="mx-auto max-w-6xl px-4">
               <div className="mb-3 flex items-baseline justify-between">
-                <h2 className="text-sm font-bold uppercase tracking-[0.18em] text-white/90">Spotlight</h2>
-                <span className="text-[10px] uppercase tracking-wider text-white/40">Featured Breeders</span>
+                <h2 className="text-[13px] font-bold uppercase tracking-[0.18em] text-foreground">Spotlight</h2>
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Featured Breeders</span>
               </div>
               <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1">
                 {spotlights.map((b) => <SpotlightCard key={b.id} b={b} />)}

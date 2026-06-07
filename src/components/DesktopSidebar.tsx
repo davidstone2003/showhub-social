@@ -9,7 +9,7 @@ const navItems = [
   { icon: Trophy, label: "Winners", to: "/winners" },
   { icon: Coins, label: "Sales", to: "/sales" },
   { icon: Users, label: "Breeders", to: "/breeders" },
-  { icon: Dna, label: "Sires", to: "/repo" },
+  { icon: Dna, label: "Sires", to: "/sires" },
   { icon: ShoppingBag, label: "Market", to: "/market" },
 ];
 

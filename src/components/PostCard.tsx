@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Heart, MessageCircle, Flag, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { Heart, MessageCircle, Share2, Flag, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { FeedVideo } from "@/components/post/VideoPlayer";
 import { motion } from "framer-motion";
 import type { Post } from "@/data/mock";
@@ -219,6 +219,14 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
             <MessageCircle className="w-4 h-4" />
             <span>{post.comments}</span>
           </span>
+          <button
+            onClick={(e) => { e.preventDefault(); }}
+            className="flex items-center gap-1.5 ml-auto hover:text-primary transition-colors"
+            style={{ fontSize: 13, color: "hsl(var(--muted-foreground))" }}
+            aria-label="Share"
+          >
+            <Share2 className="w-4 h-4" />
+          </button>
         </div>
       </motion.article>
 

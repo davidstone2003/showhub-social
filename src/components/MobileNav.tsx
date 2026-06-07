@@ -6,7 +6,7 @@ const navItems = [
   { icon: Trophy, label: "Winners", to: "/winners" },
   { icon: Coins, label: "Sales", to: "/sales" },
   { icon: Users, label: "Breeders", to: "/breeders" },
-  { icon: Dna, label: "Sires", to: "/repo" },
+  { icon: Dna, label: "Sires", to: "/sires" },
   { icon: ShoppingBag, label: "Market", to: "/market" },
 ];
 
@@ -19,8 +19,8 @@ export function MobileNav() {
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 px-1.5 py-1.5 rounded-lg text-[10px] font-medium transition-colors ${
-                isActive ? "text-primary" : "text-muted-foreground"
+              `flex flex-col items-center gap-0.5 px-1.5 py-1.5 rounded-lg text-[10px] font-medium transition-all active:scale-90 ${
+                isActive ? "text-[hsl(var(--gold))]" : "text-[#9CA3AF]"
               }`
             }
           >
