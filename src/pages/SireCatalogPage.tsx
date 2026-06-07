@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { Layout } from "@/components/Layout";
-import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, LayoutGrid, List, ChevronRight, Filter } from "lucide-react";
@@ -9,6 +8,8 @@ import { SireCardCatalog } from "@/components/sire-catalog/SireCard";
 import { SireListRow } from "@/components/sire-catalog/SireListRow";
 import { SireDetailModal } from "@/components/sire-catalog/SireDetailModal";
 import { parseGenotype } from "@/lib/genotype";
+import { CHAMPION_DRIVE_SIRES } from "@/data/championDriveSires";
+
 import {
   Select,
   SelectContent,
