@@ -40,12 +40,15 @@ export function LiveStrip() {
   return (
     <Link
       to={`/events/${event.slug}`}
-      className="mx-0 mt-2 mb-1 flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2 hover:bg-accent/30 transition-colors active:bg-accent/50"
+      className="mx-0 mt-2 mb-1 flex items-center justify-between rounded-full border border-[hsl(var(--gold))]/60 bg-card px-3.5 py-2 shadow-[var(--shadow-card)] hover:bg-accent/30 transition-colors active:bg-accent/50"
     >
-      <div className="flex items-center gap-1.5 min-w-0">
-        <span className="inline-block w-2 h-2 rounded-full bg-destructive animate-pulse shrink-0" />
+      <div className="flex items-center gap-2 min-w-0">
+        <span className="relative flex h-2 w-2 shrink-0">
+          <span className="absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75 animate-ping" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-destructive" />
+        </span>
+        <span className="text-[10px] font-black tracking-wider text-destructive shrink-0">LIVE</span>
         <span className="text-xs font-bold text-foreground truncate">{event.name}</span>
-        <span className="text-[10px] font-bold text-destructive shrink-0">LIVE</span>
       </div>
       <span className="text-[11px] font-semibold text-primary shrink-0 ml-2">View →</span>
     </Link>
