@@ -734,6 +734,11 @@ export default function CreatePostPage() {
               )}
             </div>
 
+            <FieldLabel>Placed By</FieldLabel>
+            <Input value={placedBy} onChange={(e) => setPlacedBy(e.target.value)} placeholder="Judge name" className="h-11 rounded-lg" />
+
+
+
             <FieldLabel>Sired By</FieldLabel>
             <AutocompleteInput
               table="sires_lookup" value={sireName}
