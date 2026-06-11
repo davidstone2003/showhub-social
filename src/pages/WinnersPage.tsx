@@ -185,7 +185,7 @@ export default function WinnersPage() {
 
         {/* Species pills */}
         <div className="px-4 pt-3 pb-3">
-          <SpeciesPills value={species} onChange={setSpecies} />
+          <SpeciesPills value={species} onChange={setSpecies} appMode />
         </div>
 
         <div className="px-4 pt-4">
