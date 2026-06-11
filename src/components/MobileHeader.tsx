@@ -8,7 +8,7 @@ export function MobileHeader() {
   const { user } = useAuth();
 
   return (
-    <header className="lg:hidden sticky top-0 z-40 bg-card border-b border-border" style={{ padding: '8px 12px' }}>
+    <header className="lg:hidden sticky top-0 z-40 bg-white border-b border-border" style={{ padding: '8px 12px' }}>
       <div className="flex items-center justify-between">
         <BackdropLogo size="sm" showTagline={false} onDark={false} />
 
