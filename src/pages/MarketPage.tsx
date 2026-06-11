@@ -6,11 +6,11 @@ import { Layout } from "@/components/Layout";
 const NAVY = "#0A1628";
 const GOLD = "#C9A84C";
 
-type Category = "All" | "Animals" | "Nutrition" | "Show Supplies" | "Services";
-const CATEGORIES: Category[] = ["All", "Animals", "Nutrition", "Show Supplies", "Services"];
+type Category = "All" | "Stock" | "Nutrition" | "Show Supplies" | "Services";
+const CATEGORIES: Category[] = ["All", "Stock", "Nutrition", "Show Supplies", "Services"];
 
 const categoryMeta: Record<Exclude<Category, "All">, { icon: any; color: string; bg: string; description: string }> = {
-  "Animals":       { icon: ShoppingBag, color: GOLD,      bg: "rgba(201,168,76,0.15)", description: "Sheep, goats, cattle, pigs — breeding stock & show animals" },
+  "Stock":       { icon: ShoppingBag, color: GOLD,      bg: "rgba(201,168,76,0.15)", description: "Sheep, goats, cattle, pigs — breeding stock & show animals" },
   "Nutrition":     { icon: Wheat,       color: "#3F9D5F", bg: "rgba(63,157,95,0.12)",  description: "Feed, supplements, and nutritional products" },
   "Show Supplies": { icon: SprayCan,    color: "#3B82F6", bg: "rgba(59,130,246,0.12)", description: "Equipment, grooming products, and show day essentials" },
   "Services":      { icon: Wrench,      color: "#8B5CF6", bg: "rgba(139,92,246,0.12)", description: "Hauling, photography, fitting, and professional services" },
@@ -26,10 +26,10 @@ type Listing = {
 };
 
 const LISTINGS: Listing[] = [
-  { id: "1", title: "Hampshire Ram Lamb",   price: "$1,800", meta: "IA · Posted 2d ago", category: "Animals" },
+  { id: "1", title: "Hampshire Ram Lamb",   price: "$1,800", meta: "IA · Posted 2d ago", category: "Stock" },
   { id: "2", title: "Show Feed — 50lb",     price: "$42",    meta: "OH · Posted 3d ago", category: "Nutrition" },
   { id: "3", title: "Hauling — Midwest",    price: "Quote",  meta: "KS · Service",       category: "Services" },
-  { id: "4", title: "Boer Doe Kid",         price: "$950",   meta: "TX · Posted 5d ago", category: "Animals" },
+  { id: "4", title: "Boer Doe Kid",         price: "$950",   meta: "TX · Posted 5d ago", category: "Stock" },
   { id: "5", title: "Grooming Spray Kit",   price: "$78",    meta: "IN · Posted 1d ago", category: "Show Supplies" },
   { id: "6", title: "Show Day Photography", price: "Quote",  meta: "WI · Service",       category: "Services" },
 ];
