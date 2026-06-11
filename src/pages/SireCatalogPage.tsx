@@ -61,7 +61,7 @@ export default function SireCatalogPage() {
   });
 
   useEffect(() => {
-    setSires(CHAMPION_DRIVE_SIRES);
+    setSires(REPRO_SHEEP_SIRES);
     setLoading(false);
   }, []);
 
