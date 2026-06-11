@@ -952,16 +952,24 @@ export default function CreatePostPage() {
   );
 }
 
-function ToolbarIcon({ icon: Icon, onClick, active }: { icon: any; onClick: () => void; active?: boolean }) {
+function ToolbarIcon({ icon: Icon, onClick, active, gold, badge }: {
+  icon: any; onClick: () => void; active?: boolean; gold?: boolean; badge?: boolean;
+}) {
   return (
     <button
       onClick={onClick}
-      className="w-11 h-11 rounded-full flex items-center justify-center transition-colors"
+      className="relative w-11 h-11 rounded-full flex items-center justify-center transition-colors"
       style={{
-        backgroundColor: active ? "#C9A84C" : "transparent",
+        backgroundColor: gold ? "#C9A84C" : active ? "#C9A84C" : "transparent",
       }}
     >
-      <Icon className="w-[22px] h-[22px]" style={{ color: active ? "#0A1628" : "#0A1628" }} />
+      <Icon className="w-[22px] h-[22px]" style={{ color: "#0A1628" }} />
+      {badge && (
+        <span
+          className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full"
+          style={{ backgroundColor: "#C9A84C", border: "2px solid white" }}
+        />
+      )}
     </button>
   );
 }
