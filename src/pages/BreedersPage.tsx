@@ -10,26 +10,6 @@ import { useBreederDirectory, stateAbbr, type DirectoryBreeder } from "@/hooks/u
 const NAVY = "#0A1628";
 const GOLD = "#C9A84C";
 
-function CountUp({ end, label }: { end: number; label: string }) {
-  const [val, setVal] = useState(0);
-  useEffect(() => {
-    const dur = 1100, start = performance.now();
-    let raf = 0;
-    const tick = (now: number) => {
-      const p = Math.min(1, (now - start) / dur);
-      setVal(Math.floor(end * (1 - Math.pow(1 - p, 3))));
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [end]);
-  return (
-    <div className="flex flex-col items-center md:items-start">
-      <span className="text-2xl md:text-3xl font-bold tracking-tight tabular-nums" style={{ color: "#C9A84C" }}>{val.toLocaleString()}</span>
-      <span className="text-[12px] uppercase tracking-[0.12em] mt-1" style={{ color: "#4B5563", fontWeight: 500 }}>{label}</span>
-    </div>
-  );
-}
 
 function speciesStats(breeders: DirectoryBreeder[], keywords: string[]) {
   const matched = breeders.filter((b) =>
