@@ -233,7 +233,7 @@ export default function WinnersPage() {
                       paddingLeft: 12,
                     }}
                   >
-                    <h3 className="font-bold leading-tight" style={{ fontSize: 16, color: "#FFFFFF" }}>
+                    <h3 className="font-bold leading-tight" style={{ fontSize: 16, color: "#0A1628" }}>
                       {group.year} {group.showName}
                     </h3>
                   </div>
