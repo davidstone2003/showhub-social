@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronRight, Search, LayoutGrid, List as ListIcon, Flame } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
+import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
 import gooseImage from "@/assets/sires/goose.jpeg";
 
 interface Sire {
