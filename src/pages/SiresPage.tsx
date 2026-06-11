@@ -1,10 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ChevronRight, Search, LayoutGrid, List as ListIcon, Flame } from "lucide-react";
+import { ChevronRight, Search, LayoutGrid, List as ListIcon, Flame, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
 import gooseImage from "@/assets/sires/goose.jpeg";
+
+const NAVY = "#0A1628";
+const GOLD = "#C9A84C";
 
 interface Sire {
   id: string;
@@ -14,7 +17,17 @@ interface Sire {
   semenAvailable: boolean;
   winCount: number;
   image?: string;
+  seeded?: boolean;
 }
+
+const SEED_SIRES: Sire[] = [
+  { id: "seed-good-life", name: "Good Life", breederName: null, breed: "Sheep", semenAvailable: true, winCount: 0, seeded: true },
+  { id: "seed-chick-magnet", name: "Chick Magnet", breederName: null, breed: "Sheep", semenAvailable: true, winCount: 0, seeded: true },
+  { id: "seed-pipas", name: "Pipas", breederName: null, breed: "Sheep", semenAvailable: true, winCount: 0, seeded: true },
+  { id: "seed-common-ground", name: "Common Ground", breederName: null, breed: "Sheep", semenAvailable: true, winCount: 0, seeded: true },
+  { id: "seed-on-the-rocks", name: "On The Rocks", breederName: null, breed: "Sheep", semenAvailable: true, winCount: 0, seeded: true },
+  { id: "seed-smoke-bomb", name: "Smoke Bomb", breederName: null, breed: "Sheep", semenAvailable: true, winCount: 0, seeded: true },
+];
 
 function initials(name: string) {
   return name.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("");
@@ -27,12 +40,20 @@ function Monogram({ name, size = 44 }: { name: string; size?: number }) {
       style={{
         width: size,
         height: size,
-        background: "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-dark)) 100%)",
+        background: `linear-gradient(135deg, ${NAVY} 0%, #1B3A6B 100%)`,
         fontSize: size > 60 ? 20 : 14,
       }}
     >
       {initials(name) || "?"}
     </div>
+  );
+}
+
+function SemenBadge() {
+  return (
+    <span className="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+      SEMEN
+    </span>
   );
 }
 
@@ -50,28 +71,30 @@ const SiresPage = () => {
         supabase.from("winners").select("sire_id, bred_by").eq("status", "active").not("sire_id", "is", null),
       ]);
 
-      if (sireData) {
-        const winsBySire = new Map<string, number>();
-        const breederBySire = new Map<string, string>();
-        (winnerData ?? []).forEach((w) => {
-          if (!w.sire_id) return;
-          winsBySire.set(w.sire_id, (winsBySire.get(w.sire_id) ?? 0) + 1);
-          if (w.bred_by && !breederBySire.has(w.sire_id)) breederBySire.set(w.sire_id, w.bred_by);
-        });
+      const winsBySire = new Map<string, number>();
+      const breederBySire = new Map<string, string>();
+      (winnerData ?? []).forEach((w) => {
+        if (!w.sire_id) return;
+        winsBySire.set(w.sire_id, (winsBySire.get(w.sire_id) ?? 0) + 1);
+        if (w.bred_by && !breederBySire.has(w.sire_id)) breederBySire.set(w.sire_id, w.bred_by);
+      });
 
-        const mapped: Sire[] = sireData.map((s) => ({
-          id: s.id,
-          name: s.name,
-          breederName: breederBySire.get(s.id) ?? null,
-          breed: "Sheep",
-          semenAvailable: winsBySire.has(s.id),
-          winCount: winsBySire.get(s.id) ?? 0,
-          image: s.name === "Goose" ? gooseImage : undefined,
-        }));
+      const mapped: Sire[] = (sireData ?? []).map((s) => ({
+        id: s.id,
+        name: s.name,
+        breederName: breederBySire.get(s.id) ?? null,
+        breed: "Sheep",
+        semenAvailable: winsBySire.has(s.id),
+        winCount: winsBySire.get(s.id) ?? 0,
+        image: s.name === "Goose" ? gooseImage : undefined,
+      }));
 
-        mapped.sort((a, b) => b.winCount - a.winCount || a.name.localeCompare(b.name));
-        setSires(mapped);
-      }
+      mapped.sort((a, b) => b.winCount - a.winCount || a.name.localeCompare(b.name));
+
+      // Merge seeded sires (avoid duplicates by name) so the page never looks empty.
+      const existingNames = new Set(mapped.map((m) => m.name.toLowerCase()));
+      const seedsToAdd = SEED_SIRES.filter((s) => !existingNames.has(s.name.toLowerCase()));
+      setSires([...mapped, ...seedsToAdd]);
       setLoading(false);
     }
     fetchSires();
@@ -90,19 +113,20 @@ const SiresPage = () => {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="mx-auto max-w-2xl pb-24">
-        {/* Header */}
-        <div className="sticky top-0 z-10 bg-background border-b border-border px-4 py-3.5 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">Sires</h1>
-            <p className="text-[11px] text-muted-foreground mt-0.5">{sires.length} active across the network</p>
-          </div>
-          <div className="flex rounded-lg border border-border bg-card overflow-hidden">
+      <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
+        {/* Header — white bg, navy title */}
+        <div
+          className="sticky top-0 z-10 bg-white border-b border-border px-4 flex items-center justify-between"
+          style={{ height: 60 }}
+        >
+          <h1 className="text-[22px] font-bold leading-none" style={{ color: NAVY }}>Sires</h1>
+          <div className="flex rounded-lg border border-border bg-white overflow-hidden">
             <button
               type="button"
               onClick={() => setView("list")}
               aria-label="List view"
-              className={`p-2 transition-colors ${view === "list" ? "bg-muted text-foreground" : "text-muted-foreground"}`}
+              className={`p-2 transition-colors ${view === "list" ? "bg-muted" : ""}`}
+              style={{ color: view === "list" ? NAVY : "#9CA3AF" }}
             >
               <ListIcon className="w-4 h-4" />
             </button>
@@ -110,7 +134,8 @@ const SiresPage = () => {
               type="button"
               onClick={() => setView("grid")}
               aria-label="Grid view"
-              className={`p-2 transition-colors ${view === "grid" ? "bg-muted text-foreground" : "text-muted-foreground"}`}
+              className={`p-2 transition-colors ${view === "grid" ? "bg-muted" : ""}`}
+              style={{ color: view === "grid" ? NAVY : "#9CA3AF" }}
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
@@ -130,7 +155,8 @@ const SiresPage = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search sires or breeders…"
-              className="h-10 w-full rounded-xl border border-border bg-card pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/40"
+              className="h-10 w-full rounded-xl border border-border bg-white pl-10 pr-4 text-sm placeholder:text-muted-foreground focus:outline-none"
+              style={{ color: NAVY }}
             />
           </div>
 
@@ -138,15 +164,15 @@ const SiresPage = () => {
           {!search && trending.length > 0 && (
             <section className="mb-5">
               <div className="flex items-center gap-1.5 mb-2.5">
-                <Flame className="w-4 h-4 text-[hsl(var(--gold))]" />
-                <h2 className="text-[13px] font-bold uppercase tracking-wider text-foreground">Trending Sires</h2>
+                <Flame className="w-4 h-4" style={{ color: GOLD }} />
+                <h2 className="text-[13px] font-bold uppercase tracking-wider" style={{ color: NAVY }}>Trending Sires</h2>
               </div>
               <div className="flex gap-2.5 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1">
                 {trending.map((s) => (
                   <Link
                     key={s.id}
                     to={`/sire/${s.id}`}
-                    className="shrink-0 w-[140px] rounded-xl border border-border bg-card p-3 shadow-[var(--shadow-card)] hover:-translate-y-0.5 transition-transform"
+                    className="shrink-0 w-[140px] rounded-xl border border-border bg-white p-3 shadow-[var(--shadow-card)] hover:-translate-y-0.5 transition-transform"
                   >
                     {s.image ? (
                       <img src={s.image} alt={s.name} className="w-full aspect-square rounded-lg object-cover mb-2" />
@@ -155,8 +181,8 @@ const SiresPage = () => {
                         <Monogram name={s.name} size={120} />
                       </div>
                     )}
-                    <p className="text-sm font-semibold text-foreground truncate">{s.name}</p>
-                    <p className="text-[11px] text-[hsl(var(--gold))] font-semibold mt-0.5">
+                    <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{s.name}</p>
+                    <p className="text-[11px] font-semibold mt-0.5" style={{ color: GOLD }}>
                       {s.winCount} win{s.winCount !== 1 ? "s" : ""}
                     </p>
                   </Link>
@@ -166,71 +192,90 @@ const SiresPage = () => {
           )}
 
           {/* Catalog header */}
-          <h2 className="text-[13px] font-bold uppercase tracking-wider text-foreground mb-2">
-            {search ? "Results" : "All Sires"}
-            <span className="ml-2 text-muted-foreground font-medium normal-case tracking-normal">
-              {filtered.length}
-            </span>
-          </h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-[13px] font-bold uppercase tracking-wider" style={{ color: NAVY }}>
+              {search ? "Results" : "All Sires"}
+              <span className="ml-2 text-muted-foreground font-medium normal-case tracking-normal">
+                {filtered.length}
+              </span>
+            </h2>
+            <Link
+              to="/submit-sire"
+              className="inline-flex items-center gap-1 rounded-full px-3 h-7 text-[11px] font-bold"
+              style={{ backgroundColor: GOLD, color: NAVY }}
+            >
+              <Plus className="w-3 h-3" strokeWidth={3} />
+              Submit
+            </Link>
+          </div>
 
           {loading ? (
             <p className="text-sm text-muted-foreground text-center py-12">Loading…</p>
           ) : filtered.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-12">No sires found.</p>
+            <EmptyState />
           ) : view === "list" ? (
-            <div className="rounded-xl border border-border bg-card overflow-hidden shadow-[var(--shadow-card)]">
-              {filtered.map((s, i) => (
-                <Link
-                  key={s.id}
-                  to={`/sire/${s.id}`}
-                  className={`flex items-center gap-3 px-3 py-2.5 active:bg-muted/50 transition-colors ${
-                    i !== filtered.length - 1 ? "border-b border-[hsl(var(--divider-soft))]" : ""
-                  }`}
-                >
-                  {s.image ? (
-                    <img src={s.image} alt={s.name} className="w-11 h-11 rounded-xl object-cover shrink-0" />
-                  ) : (
-                    <Monogram name={s.name} />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate">{s.name}</p>
-                    <p className="text-[12px] text-muted-foreground truncate">
-                      {s.breed}
-                      {s.breederName ? ` · ${s.breederName}` : ""}
-                    </p>
-                  </div>
-                  {s.semenAvailable && (
-                    <span className="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      SEMEN
-                    </span>
-                  )}
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/60 shrink-0" />
-                </Link>
-              ))}
+            <div className="rounded-xl border border-border bg-white overflow-hidden shadow-[var(--shadow-card)]">
+              {filtered.map((s, i) => {
+                const inner = (
+                  <>
+                    {s.image ? (
+                      <img src={s.image} alt={s.name} className="w-11 h-11 rounded-xl object-cover shrink-0" />
+                    ) : (
+                      <Monogram name={s.name} />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{s.name}</p>
+                      <p className="text-[12px] text-muted-foreground truncate">
+                        {s.breed}
+                        {s.breederName ? ` · ${s.breederName}` : ""}
+                      </p>
+                    </div>
+                    {s.semenAvailable && <SemenBadge />}
+                    {!s.seeded && <ChevronRight className="w-4 h-4 text-muted-foreground/60 shrink-0" />}
+                  </>
+                );
+                const cls = `flex items-center gap-3 px-3 py-2.5 ${
+                  i !== filtered.length - 1 ? "border-b border-[hsl(var(--divider-soft))]" : ""
+                } ${s.seeded ? "opacity-95" : "active:bg-muted/50 transition-colors"}`;
+                return s.seeded ? (
+                  <div key={s.id} className={cls}>{inner}</div>
+                ) : (
+                  <Link key={s.id} to={`/sire/${s.id}`} className={cls}>{inner}</Link>
+                );
+              })}
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
-              {filtered.map((s) => (
-                <Link
-                  key={s.id}
-                  to={`/sire/${s.id}`}
-                  className="rounded-xl border border-border bg-card overflow-hidden shadow-[var(--shadow-card)] hover:-translate-y-0.5 transition-transform"
-                >
-                  <div className="w-full aspect-square overflow-hidden">
-                    {s.image ? (
-                      <img src={s.image} alt={s.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <Monogram name={s.name} size={180} />
-                    )}
-                  </div>
-                  <div className="p-2.5">
-                    <p className="text-sm font-semibold text-foreground truncate">{s.name}</p>
-                    <p className="text-[11px] text-[hsl(var(--gold))] font-semibold mt-0.5">
-                      {s.winCount > 0 ? `${s.winCount} win${s.winCount !== 1 ? "s" : ""}` : s.breed}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+              {filtered.map((s) => {
+                const inner = (
+                  <>
+                    <div className="w-full aspect-square overflow-hidden">
+                      {s.image ? (
+                        <img src={s.image} alt={s.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <Monogram name={s.name} size={180} />
+                      )}
+                    </div>
+                    <div className="p-2.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{s.name}</p>
+                        {s.semenAvailable && <SemenBadge />}
+                      </div>
+                      <p className="text-[11px] font-semibold mt-0.5" style={{ color: GOLD }}>
+                        {s.winCount > 0 ? `${s.winCount} win${s.winCount !== 1 ? "s" : ""}` : s.breed}
+                      </p>
+                    </div>
+                  </>
+                );
+                const cls = "rounded-xl border border-border bg-white overflow-hidden shadow-[var(--shadow-card)]";
+                return s.seeded ? (
+                  <div key={s.id} className={cls}>{inner}</div>
+                ) : (
+                  <Link key={s.id} to={`/sire/${s.id}`} className={`${cls} hover:-translate-y-0.5 transition-transform`}>
+                    {inner}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
@@ -238,5 +283,23 @@ const SiresPage = () => {
     </Layout>
   );
 };
+
+function EmptyState() {
+  return (
+    <div className="rounded-2xl border border-border bg-white p-8 text-center">
+      <h3 className="text-xl font-bold" style={{ color: NAVY }}>Sires Coming Soon</h3>
+      <p className="mt-2 text-sm text-muted-foreground">
+        We're building the most complete sire database in the industry. Check back daily as we add records.
+      </p>
+      <Link
+        to="/submit-sire"
+        className="inline-flex items-center gap-1.5 mt-5 rounded-full px-5 h-11 text-sm font-bold"
+        style={{ backgroundColor: GOLD, color: NAVY }}
+      >
+        <Plus className="w-4 h-4" strokeWidth={3} /> Submit a Sire
+      </Link>
+    </div>
+  );
+}
 
 export default SiresPage;

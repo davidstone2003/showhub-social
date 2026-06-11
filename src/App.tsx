@@ -9,6 +9,7 @@ import BreedersPage from "./pages/BreedersPage";
 import SpeciesHubPage from "./pages/SpeciesHubPage";
 import BreederCategoryPage from "./pages/BreederCategoryPage";
 import SiresPage from "./pages/SiresPage";
+import SubmitSirePage from "./pages/SubmitSirePage";
 import AnimalPage from "./pages/AnimalPage";
 import SirePage from "./pages/SirePage";
 import WinnersPage from "./pages/WinnersPage";
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="/breeders/:species" element={<SpeciesHubPage />} />
             <Route path="/breeders/:species/:category" element={<BreederCategoryPage />} />
             <Route path="/sires" element={<SiresPage />} />
+            <Route path="/submit-sire" element={<SubmitSirePage />} />
             <Route path="/animal/:id" element={<AnimalPage />} />
             <Route path="/sire/:id" element={<SirePage />} />
             <Route path="/winners" element={<WinnersPage />} />

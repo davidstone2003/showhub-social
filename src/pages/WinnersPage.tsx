@@ -165,16 +165,16 @@ export default function WinnersPage() {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="mx-auto max-w-2xl pb-24">
-        {/* Header */}
-        <div className="sticky top-0 z-10 bg-background border-b border-border px-4 py-3.5 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-foreground">Winners</h1>
+      <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
+        {/* Header — white bg, navy title */}
+        <div className="sticky top-0 z-10 bg-white border-b border-border px-4 flex items-center justify-between" style={{ height: 60 }}>
+          <h1 className="text-[22px] font-bold leading-none" style={{ color: "#0A1628" }}>Winners</h1>
           <div className="flex items-center gap-3">
             <button className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors">
-              <Search className="w-5 h-5 text-muted-foreground" />
+              <Search className="w-5 h-5" style={{ color: "#0A1628" }} />
             </button>
             <button className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors">
-              <SlidersHorizontal className="w-5 h-5 text-muted-foreground" />
+              <SlidersHorizontal className="w-5 h-5" style={{ color: "#0A1628" }} />
             </button>
           </div>
         </div>

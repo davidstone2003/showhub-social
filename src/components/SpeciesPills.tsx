@@ -8,8 +8,12 @@ interface SpeciesPillsProps {
 }
 
 /**
- * Standard species filter row used across directory/feed pages.
- * Pills: All · Sheep · Goats · Cattle · Pigs
+ * Standard species filter row used across every directory/feed page.
+ * Order is locked: All · Sheep · Goats · Cattle · Pigs.
+ *
+ * Visual contract (do NOT diverge per-page):
+ * - Active   → solid navy #1B3A6B fill, white text, no border
+ * - Inactive → white fill, navy text, 1px navy border
  */
 export function SpeciesPills({ value, onChange, className = "" }: SpeciesPillsProps) {
   return (
@@ -26,11 +30,12 @@ export function SpeciesPills({ value, onChange, className = "" }: SpeciesPillsPr
             role="tab"
             aria-selected={active}
             onClick={() => onChange(option)}
-            className={`h-7 shrink-0 rounded-full px-3 text-[11px] font-semibold leading-[14px] transition-colors ${
+            className="h-8 shrink-0 rounded-full px-3.5 text-[12px] font-semibold leading-none transition-colors"
+            style={
               active
-                ? "bg-primary text-primary-foreground"
-                : "border border-border bg-transparent text-muted-foreground hover:border-foreground/40"
-            }`}
+                ? { backgroundColor: "#1B3A6B", color: "#FFFFFF", border: "1px solid #1B3A6B" }
+                : { backgroundColor: "#FFFFFF", color: "#1B3A6B", border: "1px solid #1B3A6B" }
+            }
           >
             {option}
           </button>

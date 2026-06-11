@@ -159,22 +159,22 @@ function parseDate(s: string | null | undefined): number {
 }
 
 function freshnessLabel(status: SourceStatus | undefined): string {
-  if (!status?.last_success_at) return "Source not yet updated";
+  if (!status?.last_success_at) return "Results update daily at 6:00 AM CT";
   const last = new Date(status.last_success_at);
   const now = new Date();
   const sameDay =
     last.getFullYear() === now.getFullYear() &&
     last.getMonth() === now.getMonth() &&
     last.getDate() === now.getDate();
-  if (sameDay) return "Updated today at 6:00 AM CT";
+  if (sameDay) return `Updated today at ${last.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} CT`;
   const yesterday = new Date(now);
   yesterday.setDate(now.getDate() - 1);
   const isYesterday =
     last.getFullYear() === yesterday.getFullYear() &&
     last.getMonth() === yesterday.getMonth() &&
     last.getDate() === yesterday.getDate();
-  if (isYesterday) return "Source last updated yesterday";
-  return `Source last updated ${last.toLocaleDateString()}`;
+  if (isYesterday) return "Last updated yesterday · Daily refresh at 6:00 AM CT";
+  return `Last updated ${last.toLocaleDateString()} · Daily refresh at 6:00 AM CT`;
 }
 
 export default function SalesPage() {
@@ -270,10 +270,10 @@ export default function SalesPage() {
   const upcomingList: UpcomingSale[] = scrapedUpcoming.length > 0 ? scrapedUpcoming : fallbackUpcomingSales;
   const upcomingFreshness =
     !scoStatus?.last_success_at && !wlStatus?.last_success_at
-      ? "Source not yet updated"
+      ? "Results update daily at 6:00 AM CT"
       : [
-          scoStatus?.last_success_at ? freshnessLabel(scoStatus).replace("Source ", "SCO ").replace("Updated", "SCO updated") : "SCO not yet updated",
-          wlStatus?.last_success_at ? freshnessLabel(wlStatus).replace("Source ", "wlivestock ").replace("Updated", "wlivestock updated") : "wlivestock not yet updated",
+          scoStatus?.last_success_at ? freshnessLabel(scoStatus).replace("Updated", "SCO updated").replace("Last updated", "SCO last updated") : "SCO refreshes daily 6:00 AM CT",
+          wlStatus?.last_success_at ? freshnessLabel(wlStatus).replace("Updated", "wlivestock updated").replace("Last updated", "wlivestock last updated") : "wlivestock refreshes daily 6:00 AM CT",
         ].join(" · ");
 
   const cdStatus = sourceStatus["champion-drive"];
@@ -282,12 +282,12 @@ export default function SalesPage() {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="mx-auto max-w-2xl pb-24">
-        {/* Header */}
-        <div className="sticky top-0 z-10 bg-background border-b border-border px-4 py-3.5 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-foreground">Sales</h1>
+      <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
+        {/* Header — white bg, navy title */}
+        <div className="sticky top-0 z-10 bg-white border-b border-border px-4 flex items-center justify-between" style={{ height: 60 }}>
+          <h1 className="text-[22px] font-bold leading-none" style={{ color: "#0A1628" }}>Sales</h1>
           <button className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors">
-            <Search className="w-5 h-5 text-muted-foreground" />
+            <Search className="w-5 h-5" style={{ color: "#0A1628" }} />
           </button>
         </div>
 
@@ -311,7 +311,14 @@ export default function SalesPage() {
                       <span className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{s.location}</span>
                     </div>
                   </div>
-                  <button className="shrink-0 rounded-full bg-foreground text-background px-3 py-1.5 text-[12px] font-semibold">
+                  <button
+                    className="shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold"
+                    style={
+                      s.link
+                        ? { backgroundColor: "#0A1628", color: "#FFFFFF" }
+                        : { backgroundColor: "#C9A84C", color: "#0A1628" }
+                    }
+                  >
                     {s.link ? "View" : "Remind"}
                   </button>
                 </div>
