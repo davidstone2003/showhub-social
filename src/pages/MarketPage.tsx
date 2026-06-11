@@ -93,19 +93,21 @@ export default function MarketPage() {
 
         {/* Category pills */}
         <div className="px-4 pt-3">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-1 px-1">
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-hide" role="tablist" aria-label="Filter by category">
             {CATEGORIES.map((c) => {
               const active = category === c;
               return (
                 <button
                   key={c}
+                  role="tab"
+                  aria-selected={active}
                   onClick={() => setCategory(c)}
-                  className="shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-semibold whitespace-nowrap transition-colors"
-                  style={{
-                    background: active ? NAVY : "white",
-                    color: active ? "white" : NAVY,
-                    border: `1px solid ${active ? NAVY : "#E5E7EB"}`,
-                  }}
+                  className="h-8 shrink-0 rounded-full px-3.5 text-[12px] font-semibold leading-none whitespace-nowrap transition-colors"
+                  style={
+                    active
+                      ? { backgroundColor: "#1B3A6B", color: "#FFFFFF", border: "1px solid #1B3A6B" }
+                      : { backgroundColor: "#FFFFFF", color: "#1B3A6B", border: "1px solid #1B3A6B" }
+                  }
                 >
                   {c}
                 </button>
