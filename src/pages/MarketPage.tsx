@@ -56,7 +56,7 @@ export default function MarketPage() {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="app-mode mx-auto max-w-2xl pb-24 relative" style={{ backgroundColor: "#0A1628", minHeight: "100vh" }}>
+      <div className="mx-auto max-w-2xl pb-24 relative" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
         {/* Header */}
         <div
           className="sticky top-0 z-10 px-4 flex items-center justify-between"
@@ -94,55 +94,55 @@ export default function MarketPage() {
           </div>
         </div>
 
-        {/* Category pills */}
-        <div className="px-4 pt-3">
-          <div className="flex gap-1.5 overflow-x-auto scrollbar-hide" role="tablist" aria-label="Filter by category">
-            {CATEGORIES.map((c) => {
-              const active = category === c;
-              return (
-                <button
-                  key={c}
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => setCategory(c)}
-                  className="h-8 shrink-0 rounded-full px-3.5 text-[12px] font-semibold leading-none whitespace-nowrap transition-colors"
-                  style={
-                    active
-                      ? { backgroundColor: "#C9A84C", color: "#0A1628", border: "1px solid #C9A84C" }
-                      : { backgroundColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", border: "1px solid transparent" }
-                  }
-                >
-                  {c}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Inline search */}
-        {searchOpen && (
+        {/* Dark chrome band: pills + optional search + stats */}
+        <div style={{ backgroundColor: "#0A1628" }} className="pb-4">
           <div className="px-4 pt-3">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "rgba(255,255,255,0.4)" }} />
-              <input
-                autoFocus
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search listings, sellers, categories…"
-                className="h-11 w-full rounded-full pl-11 pr-4 text-sm focus:outline-none"
-                style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "#FFFFFF" }}
-              />
+            <div className="flex gap-1.5 overflow-x-auto scrollbar-hide" role="tablist" aria-label="Filter by category">
+              {CATEGORIES.map((c) => {
+                const active = category === c;
+                return (
+                  <button
+                    key={c}
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => setCategory(c)}
+                    className="h-8 shrink-0 rounded-full px-3.5 text-[12px] font-semibold leading-none whitespace-nowrap transition-colors"
+                    style={
+                      active
+                        ? { backgroundColor: "#C9A84C", color: "#0A1628", border: "1px solid #C9A84C" }
+                        : { backgroundColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", border: "1px solid transparent" }
+                    }
+                  >
+                    {c}
+                  </button>
+                );
+              })}
             </div>
           </div>
-        )}
 
-        {/* Compact stat strip */}
-        <div className="px-4 pt-4">
-          <div className="grid grid-cols-4 gap-2 rounded-2xl p-3" style={{ backgroundColor: "#141E2E", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 2px 8px rgba(0,0,0,0.3)" }}>
-            <Stat value={stats.listings} label="Listings" />
-            <Stat value={stats.sellers} label="Sellers" />
-            <Stat value={stats.states} label="States" />
-            <Stat value={stats.categories} label="Categories" />
+          {searchOpen && (
+            <div className="px-4 pt-3">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "rgba(255,255,255,0.4)" }} />
+                <input
+                  autoFocus
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search listings, sellers, categories…"
+                  className="h-11 w-full rounded-full pl-11 pr-4 text-sm focus:outline-none"
+                  style={{ backgroundColor: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", color: "#FFFFFF" }}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="px-4 pt-4">
+            <div className="grid grid-cols-4 gap-2 rounded-2xl p-3" style={{ backgroundColor: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <Stat value={stats.listings} label="Listings" />
+              <Stat value={stats.sellers} label="Sellers" />
+              <Stat value={stats.states} label="States" />
+              <Stat value={stats.categories} label="Categories" />
+            </div>
           </div>
         </div>
 
@@ -152,7 +152,7 @@ export default function MarketPage() {
         {/* Listings */}
         <section className="px-4 pt-5">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "#FFFFFF" }}>
+            <h2 className="text-[13px] font-bold uppercase tracking-wider" style={{ color: NAVY }}>
               {search ? "Results" : category === "All" ? "Recently Listed" : category}
               <span className="ml-2 text-muted-foreground font-medium normal-case tracking-normal">{filtered.length}</span>
             </h2>
@@ -160,7 +160,7 @@ export default function MarketPage() {
 
           {filtered.length === 0 ? (
             <div className="rounded-2xl border border-border bg-card p-8 text-center">
-              <h3 className="text-lg font-bold" style={{ color: "#FFFFFF" }}>No listings found</h3>
+              <h3 className="text-lg font-bold" style={{ color: NAVY }}>No listings found</h3>
               <p className="mt-2 text-sm text-muted-foreground">Try a different category or search term.</p>
             </div>
           ) : view === "list" ? (
@@ -179,7 +179,7 @@ export default function MarketPage() {
                       <Icon className="w-5 h-5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate" style={{ color: "#FFFFFF" }}>{l.title}</p>
+                      <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{l.title}</p>
                       <p className="text-[12px] text-muted-foreground truncate">{l.meta}</p>
                     </div>
                     <p className="text-[13px] font-bold shrink-0" style={{ color: GOLD }}>{l.price}</p>
@@ -199,7 +199,7 @@ export default function MarketPage() {
                       <Icon className="w-10 h-10" />
                     </div>
                     <div className="p-2.5">
-                      <p className="text-sm font-semibold truncate" style={{ color: "#FFFFFF" }}>{l.title}</p>
+                      <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{l.title}</p>
                       <p className="text-[13px] font-bold mt-0.5" style={{ color: GOLD }}>{l.price}</p>
                       <p className="text-[11px] text-muted-foreground truncate mt-0.5">{l.meta}</p>
                     </div>
@@ -215,7 +215,7 @@ export default function MarketPage() {
           to="/submit"
           aria-label="Post a Listing"
           className="fixed bottom-20 right-4 z-40 flex items-center gap-2 rounded-full px-4 py-3 shadow-lg font-bold text-[13px] active:scale-95 transition-transform"
-          style={{ background: GOLD, color: "#FFFFFF", boxShadow: "0 8px 24px rgba(201,168,76,0.4)" }}
+          style={{ background: GOLD, color: NAVY, boxShadow: "0 8px 24px rgba(201,168,76,0.4)" }}
         >
           <Plus className="w-4 h-4 stroke-[3]" />
           Post a Listing
@@ -241,7 +241,7 @@ function Stat({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center">
       <span className="text-xl font-bold tabular-nums leading-none" style={{ color: GOLD }}>{v.toLocaleString()}</span>
-      <span className="mt-1 text-[11px] uppercase tracking-[0.1em]" style={{ color: "#4B5563", fontWeight: 500 }}>{label}</span>
+      <span className="mt-1 text-[11px] uppercase tracking-[0.1em]" style={{ color: "rgba(255,255,255,0.6)", fontWeight: 500 }}>{label}</span>
     </div>
   );
 }

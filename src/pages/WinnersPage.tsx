@@ -166,7 +166,7 @@ export default function WinnersPage() {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="app-mode mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#0A1628", minHeight: "100vh" }}>
+      <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
         {/* Header — dark, white title */}
         <div
           className="sticky top-0 z-10 px-4 flex items-center justify-between"
@@ -183,8 +183,8 @@ export default function WinnersPage() {
           </div>
         </div>
 
-        {/* Species pills */}
-        <div className="px-4 pt-3 pb-3">
+        {/* Species pills — dark chrome band */}
+        <div className="px-4 pt-3 pb-3" style={{ backgroundColor: "#0A1628" }}>
           <SpeciesPills value={species} onChange={setSpecies} appMode />
         </div>
 
@@ -198,7 +198,7 @@ export default function WinnersPage() {
           ) : showGroups.length === 0 ? (
             <div className="flex flex-col items-center text-center" style={{ paddingTop: 80, paddingBottom: 40 }}>
               <Trophy size={48} style={{ color: "#C9A84C" }} />
-              <h2 className="font-bold mt-4" style={{ fontSize: 22, lineHeight: 1.2, color: "#FFFFFF" }}>
+              <h2 className="font-bold mt-4" style={{ fontSize: 22, lineHeight: 1.2, color: "#0A1628" }}>
                 No winners yet
               </h2>
               <p className="text-muted-foreground mt-2 max-w-xs" style={{ fontSize: 14, lineHeight: 1.4 }}>
@@ -233,7 +233,7 @@ export default function WinnersPage() {
                       paddingLeft: 12,
                     }}
                   >
-                    <h3 className="font-bold leading-tight" style={{ fontSize: 16, color: "#FFFFFF" }}>
+                    <h3 className="font-bold leading-tight" style={{ fontSize: 16, color: "#0A1628" }}>
                       {group.year} {group.showName}
                     </h3>
                   </div>
