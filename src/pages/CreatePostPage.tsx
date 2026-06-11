@@ -403,7 +403,14 @@ export default function CreatePostPage() {
             className="w-full resize-none border-0 outline-none bg-transparent placeholder:text-[#9CA3AF]"
             style={{ fontSize: "17px", lineHeight: 1.5, color: "#0A1628", minHeight: "120px" }}
           />
+          {generalCaption.trim() && /(\*\*|_|^#\s|^•\s|\n#\s|\n•\s)/m.test(generalCaption) && (
+            <div className="mt-3 pt-3 border-t border-dashed border-[#E5E7EB]">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#9CA3AF] mb-2">Post Preview</div>
+              <CaptionPreview text={generalCaption} />
+            </div>
+          )}
         </div>
+
 
         {/* Media preview strip */}
         {media.length > 0 && (
@@ -726,6 +733,45 @@ function ToolbarIcon({ icon: Icon, onClick, active }: { icon: any; onClick: () =
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return <label className="text-[12px] font-bold uppercase tracking-wide text-[#5C6470] block">{children}</label>;
 }
+
+function renderInline(text: string): React.ReactNode[] {
+  const nodes: React.ReactNode[] = [];
+  const regex = /(\*\*([^*]+)\*\*)|(_([^_]+)_)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let key = 0;
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) nodes.push(text.slice(lastIndex, match.index));
+    if (match[2]) nodes.push(<strong key={key++} className="font-bold">{match[2]}</strong>);
+    else if (match[4]) nodes.push(<em key={key++} className="italic">{match[4]}</em>);
+    lastIndex = regex.lastIndex;
+  }
+  if (lastIndex < text.length) nodes.push(text.slice(lastIndex));
+  return nodes;
+}
+
+function CaptionPreview({ text }: { text: string }) {
+  const lines = text.split("\n");
+  return (
+    <div className="space-y-1" style={{ color: "#0A1628" }}>
+      {lines.map((line, i) => {
+        if (line.startsWith("# ")) {
+          return <div key={i} className="text-[22px] font-bold leading-tight">{renderInline(line.slice(2))}</div>;
+        }
+        if (line.startsWith("• ")) {
+          return (
+            <div key={i} className="flex gap-2 text-[17px] leading-snug">
+              <span>•</span><span>{renderInline(line.slice(2))}</span>
+            </div>
+          );
+        }
+        if (!line.trim()) return <div key={i} className="h-2" />;
+        return <div key={i} className="text-[17px] leading-snug">{renderInline(line)}</div>;
+      })}
+    </div>
+  );
+}
+
 
 function BottomSheet({ children, onClose, title, tall }: { children: React.ReactNode; onClose: () => void; title?: string; tall?: boolean }) {
   return (
