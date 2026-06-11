@@ -133,10 +133,15 @@ export default function CreatePostPage() {
         .maybeSingle();
       const farmName = (data as any)?.breeder_name as string | undefined;
       if (farmName) {
-        setSavedDefaults((prev) => ({ ...prev, farmName, bredBy: prev.bredBy || farmName }));
+        setSavedDefaults((prev) => {
+          const next = { ...prev, farmName, bredBy: prev.bredBy || farmName };
+          try { localStorage.setItem("backdrop_post_defaults", JSON.stringify(next)); } catch {}
+          return next;
+        });
         setBreederName((prev) => prev || farmName);
       }
     })();
+
   }, [user]);
 
   const handleOpenWinnerPanel = () => {
@@ -764,7 +769,7 @@ export default function CreatePostPage() {
             </div>
 
             <FieldLabel>Placed By</FieldLabel>
-            <Input value={placedBy} onChange={(e) => setPlacedBy(e.target.value)} placeholder="Judge name" className="h-11 rounded-lg" />
+            <Input value={placedBy} onChange={(e) => setPlacedBy(e.target.value)} placeholder="Placed by" className="h-11 rounded-lg" />
 
 
 
