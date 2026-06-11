@@ -619,18 +619,18 @@ export default function CreatePostPage() {
           <div className="space-y-4 pb-2">
             <div>
               <label className="text-[12px] font-bold uppercase tracking-wide text-[#5C6470] mb-2 block">Placement</label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
                 {WINNER_RESULTS.map(r => {
                   const sel = resultTitle === r;
                   return (
                     <button
                       key={r}
                       onClick={() => setResultTitle(sel ? "" : r)}
-                      className="px-4 h-10 rounded-full text-[13px] font-semibold transition-all"
+                      className="shrink-0 rounded-full px-3 py-2 text-[13px] font-semibold transition-all border"
                       style={{
-                        backgroundColor: sel ? "#C9A84C" : "#F3F4F6",
-                        color: sel ? "#0A1628" : "#0A1628",
-                        border: sel ? "1px solid #C9A84C" : "1px solid #E5E7EB",
+                        backgroundColor: sel ? "#C9A84C" : "white",
+                        color: "#0A1628",
+                        borderColor: sel ? "#C9A84C" : "#E5E7EB",
                       }}
                     >
                       {r}
