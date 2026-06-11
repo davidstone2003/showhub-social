@@ -108,13 +108,17 @@ export default function BreederProfilePage() {
 
   const tier: string = profile?.subscription_tier || "free";
   const isFeatured = tier === "featured" || tier === "breeder_page";
+  const isContacted = tier === "listing" || tier === "contacted" || isFeatured;
+  const isPaid = isFeatured || isContacted;
+  const isOwnProfile = user?.id === profile?.id;
 
   const featured = posts.filter((p) => p.is_featured);
   const winners = posts.filter((p) => p.post_type === "winner");
   const sires = posts.filter((p) => p.post_type === "sire");
   const donors = posts.filter((p) => p.post_type === "donor");
   const sales = posts.filter((p) => p.post_type === "sale");
-  const recentPosts = posts.slice(0, isFeatured ? 10 : 3);
+  const recentPosts = posts.slice(0, isPaid ? 10 : 3);
+
 
   const breederName = profile?.display_name || profile?.username || "";
   const lambs = useMemo(
