@@ -578,6 +578,7 @@ function SaleResultCard({ sale, onSellerClick }: { sale: SaleResult; onSellerCli
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }
