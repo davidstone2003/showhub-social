@@ -141,34 +141,8 @@ export default function MarketPage() {
           </div>
         </div>
 
-        {/* Browse categories */}
-        {category === "All" && (
-          <section className="px-4 pt-5">
-            <h2 className="text-[13px] font-bold uppercase tracking-[0.16em] mb-2.5" style={{ color: NAVY }}>Browse Categories</h2>
-            <div className="space-y-2">
-              {(Object.keys(categoryMeta) as Array<keyof typeof categoryMeta>).map((title) => {
-                const cat = categoryMeta[title];
-                return (
-                  <button
-                    key={title}
-                    onClick={() => setCategory(title)}
-                    className="w-full flex items-start gap-3 rounded-xl border border-border bg-white p-4 text-left active:bg-muted/40 transition-colors"
-                    style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}
-                  >
-                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: cat.bg, color: cat.color }}>
-                      <cat.icon className="h-5 w-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[15px] font-semibold" style={{ color: NAVY }}>{title}</p>
-                      <p className="mt-0.5 text-[12px] text-muted-foreground">{cat.description}</p>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/60 mt-1 shrink-0" />
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-        )}
+
+
 
         {/* Listings */}
         <section className="px-4 pt-5">
