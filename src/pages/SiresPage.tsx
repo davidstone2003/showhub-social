@@ -5,6 +5,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
 import gooseImage from "@/assets/sires/goose.jpeg";
+import { REPRO_SHEEP_SIRES } from "@/data/reproSheepSires";
+
+const RSG_PHOTO_BY_NAME = new Map<string, string>(
+  REPRO_SHEEP_SIRES
+    .filter((s) => s.photo_url)
+    .map((s) => [s.sire_name.toLowerCase().trim(), s.photo_url as string])
+);
+function rsgPhoto(name: string): string | undefined {
+  return RSG_PHOTO_BY_NAME.get(name.toLowerCase().trim());
+}
 
 const NAVY = "#0A1628";
 const GOLD = "#C9A84C";
