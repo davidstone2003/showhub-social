@@ -107,6 +107,55 @@ export default function CreatePostPage() {
   // General fields
   const [generalCaption, setGeneralCaption] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [generatingCaption, setGeneratingCaption] = useState(false);
+  const [savedDefaults, setSavedDefaults] = useState<{ farmName: string; bredBy: string }>({ farmName: "", bredBy: "" });
+
+  useEffect(() => {
+    const saved = localStorage.getItem("backdrop_post_defaults");
+    if (saved) {
+      try {
+        const defaults = JSON.parse(saved);
+        setSavedDefaults(defaults);
+        setBreederName((prev) => (!prev && defaults.bredBy ? defaults.bredBy : prev));
+      } catch {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleOpenWinnerPanel = () => {
+    if (!breederName && savedDefaults.bredBy) setBreederName(savedDefaults.bredBy);
+    setShowWinnerPanel(true);
+  };
+
+  const handleGenerateCaption = async () => {
+    if (!effectiveResult) return;
+    setGeneratingCaption(true);
+    try {
+      const fields = {
+        Placement: effectiveResult,
+        Show: showName,
+        "Shown by": exhibitorName,
+        "Bred by": breederName,
+        "Sired by": sireName,
+        "Placed by": placedBy,
+        Species: species,
+      };
+      const { data, error } = await supabase.functions.invoke("generate-caption", { body: { fields } });
+      if (error) throw error;
+      const caption = (data as any)?.caption || "";
+      if (caption) {
+        setNotes(caption);
+        setGeneralCaption(caption);
+        toast.success("Caption generated!");
+      } else {
+        toast.error("Couldn't generate caption");
+      }
+    } catch (err: any) {
+      toast.error("Couldn't generate caption", { description: err?.message });
+    } finally {
+      setGeneratingCaption(false);
+    }
+  };
 
   const captionRef = useRef<HTMLTextAreaElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
