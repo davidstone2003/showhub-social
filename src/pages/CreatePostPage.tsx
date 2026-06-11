@@ -307,6 +307,7 @@ export default function CreatePostPage() {
         tags: species ? [species] : [], post_type: "general", show_on_feed: true,
         tagged_user_ids: taggedPeople.map(p => p.id),
       });
+      setTaggedPeople([]);
       toast.success("Post shared!"); navigate("/");
     } catch (err: any) { toast.error("Failed to post", { description: err.message }); }
     finally { setSubmitting(false); }
