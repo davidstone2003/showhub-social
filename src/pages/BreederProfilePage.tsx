@@ -245,14 +245,70 @@ export default function BreederProfilePage() {
               )}
 
               {tab === "results" && (
-                <BreederSection icon={Trophy} title="Show Results">
-                  {winners.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No results yet.</p>
-                  ) : (
-                    renderCards(winners)
-                  )}
-                </BreederSection>
+                winners.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Trophy className="w-10 h-10 mx-auto mb-3" style={{ color: "#C9A84C" }} />
+                    <p className="font-semibold text-[15px]" style={{ color: "#0A1628" }}>No winners yet</p>
+                    <p className="text-[13px] text-[#6B7280] mt-1">Post your results to build your record</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6 px-4 py-3">
+                    {(() => {
+                      const grouped = new Map<string, WinnerRow[]>();
+                      winners.forEach((w) => {
+                        const key = w.show_name || "Other";
+                        if (!grouped.has(key)) grouped.set(key, []);
+                        grouped.get(key)!.push(w);
+                      });
+                      return [...grouped.entries()].map(([showName, showWinners]) => (
+                        <div key={showName}>
+                          <div className="mb-3" style={{ borderLeft: "3px solid #C9A84C", paddingLeft: 10 }}>
+                            <h3 className="font-bold text-[14px]" style={{ color: "#0A1628" }}>
+                              {showWinners[0]?.created_at
+                                ? `${new Date(showWinners[0].created_at).getFullYear()} `
+                                : ""}{showName}
+                            </h3>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            {showWinners.map((w) => {
+                              const img = w.image_urls?.[0];
+                              return (
+                                <div key={w.id} className="rounded-xl overflow-hidden border border-[#E5E7EB] bg-white shadow-sm">
+                                  {img ? (
+                                    <img src={img} alt={w.win_placing || ""} className="w-full aspect-square object-cover" />
+                                  ) : (
+                                    <div className="w-full aspect-square flex items-center justify-center"
+                                      style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
+                                      <span className="text-3xl font-black text-white/20">
+                                        {(showName || "W").charAt(0)}
+                                      </span>
+                                    </div>
+                                  )}
+                                  <div className="p-2">
+                                    <p className="text-[10px] font-black uppercase tracking-wider truncate"
+                                      style={{ color: "#C9A84C" }}>
+                                      {w.win_placing || "Winner"}
+                                    </p>
+                                    <p className="text-[12px] font-semibold text-[#0A1628] truncate mt-0.5">
+                                      {w.shown_by}
+                                    </p>
+                                    {w.sired_by && (
+                                      <p className="text-[11px] text-[#6B7280] truncate">
+                                        {w.sired_by}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                )
               )}
+
             </>
           )}
 
