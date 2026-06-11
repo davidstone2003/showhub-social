@@ -1,10 +1,14 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search, BadgeCheck, MapPin, Play, ChevronRight } from "lucide-react";
+import { Search, BadgeCheck, MapPin, Play, ChevronRight, SlidersHorizontal } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
 import { SPECIES } from "@/data/breederTaxonomy";
 import { useBreederDirectory, stateAbbr, type DirectoryBreeder } from "@/hooks/useBreederDirectory";
+
+const NAVY = "#0A1628";
+const GOLD = "#C9A84C";
 
 function CountUp({ end, label }: { end: number; label: string }) {
   const [val, setVal] = useState(0);
@@ -76,6 +80,8 @@ function SpotlightCard({ b }: { b: DirectoryBreeder }) {
 
 export default function BreedersPage() {
   const [search, setSearch] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [species, setSpecies] = useState<SpeciesPill>("All");
   const { data: breeders = [], isLoading } = useBreederDirectory();
 
   const stats = useMemo(() => {
@@ -95,8 +101,10 @@ export default function BreedersPage() {
   );
 
   const speciesCounts = useMemo(
-    () => SPECIES.map((s) => ({ ...s, ...speciesStats(breeders, s.keywords) })),
-    [breeders]
+    () => SPECIES
+      .map((s) => ({ ...s, ...speciesStats(breeders, s.keywords) }))
+      .filter((s) => matchesSpecies(species, s.name, ...s.keywords)),
+    [breeders, species]
   );
 
   const searchResults = useMemo(() => {
@@ -107,26 +115,41 @@ export default function BreedersPage() {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="min-h-screen" style={{ backgroundColor: "#F8F7F4", color: "#0A1628" }}>
-        {/* HERO — light */}
-        <section className="relative overflow-hidden" style={{ backgroundColor: "#F8F7F4" }}>
-          <div className="relative mx-auto max-w-6xl px-4 pt-8 pb-6 md:pt-12 md:pb-10">
-            <p className="text-[11px] uppercase tracking-[0.22em]" style={{ color: "#C9A84C" }}>The Backdrop Directory</p>
-            <h1 className="mt-2 text-3xl md:text-5xl font-bold tracking-tight leading-[1.05]" style={{ color: "#0A1628" }}>
-              Find Your Next<br /><span style={{ color: "#C9A84C" }}>Champion</span>
-            </h1>
-            <p className="mt-3 max-w-md text-sm md:text-base" style={{ color: "#4B5563" }}>
-              The serious breeders. The bloodlines that matter. The wins that count.
-            </p>
+      <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
+        {/* Header — white bg, navy title (matches Winners/Sales/Sires) */}
+        <div className="sticky top-0 z-10 bg-white border-b border-border px-4 flex items-center justify-between" style={{ height: 60 }}>
+          <h1 className="text-[22px] font-bold leading-none" style={{ color: NAVY }}>Breeders</h1>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSearchOpen((v) => !v)}
+              className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors"
+              aria-label="Search"
+            >
+              <Search className="w-5 h-5" style={{ color: NAVY }} />
+            </button>
+            <button className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors" aria-label="Filter">
+              <SlidersHorizontal className="w-5 h-5" style={{ color: NAVY }} />
+            </button>
+          </div>
+        </div>
 
-            <div className="relative mt-3 md:mt-4 max-w-2xl">
+        {/* Species pills */}
+        <div className="px-4 pt-3">
+          <SpeciesPills value={species} onChange={setSpecies} />
+        </div>
+
+        {/* Inline search (toggled) */}
+        {searchOpen && (
+          <div className="px-4 pt-3">
+            <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "#9CA3AF" }} />
               <input
+                autoFocus
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search breeders, sires, states, breeds…"
-                className="h-12 w-full rounded-full bg-white pl-11 pr-4 text-sm focus:outline-none transition-colors"
-                style={{ border: "1px solid #E5E7EB", color: "#0A1628" }}
+                className="h-11 w-full rounded-full bg-white pl-11 pr-4 text-sm focus:outline-none"
+                style={{ border: "1px solid #E5E7EB", color: NAVY }}
               />
               {searchResults.length > 0 && (
                 <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-20 overflow-hidden rounded-2xl border border-border bg-white shadow-2xl">
@@ -135,13 +158,13 @@ export default function BreedersPage() {
                       key={b.id}
                       to={`/breeder/${b.username}`}
                       className="flex items-center gap-3 border-b border-border px-4 py-3 last:border-b-0 hover:bg-muted/50"
-                      onClick={() => setSearch("")}
+                      onClick={() => { setSearch(""); setSearchOpen(false); }}
                     >
-                      <div className="h-9 w-9 rounded-lg flex items-center justify-center text-[11px] font-black" style={{ backgroundColor: "#0A1628", color: "#C9A84C" }}>
+                      <div className="h-9 w-9 rounded-lg flex items-center justify-center text-[11px] font-black" style={{ backgroundColor: NAVY, color: GOLD }}>
                         {(b.display_name || b.username).slice(0, 2).toUpperCase()}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold" style={{ color: "#0A1628" }}>{b.display_name || b.username}</p>
+                        <p className="truncate text-sm font-semibold" style={{ color: NAVY }}>{b.display_name || b.username}</p>
                         {b.location && <p className="truncate text-[11px]" style={{ color: "#6B7280" }}>{b.location}</p>}
                       </div>
                     </Link>
@@ -149,61 +172,85 @@ export default function BreedersPage() {
                 </div>
               )}
             </div>
-
-            <div className="mt-8 grid grid-cols-4 gap-3 md:gap-8 rounded-2xl bg-white p-4 md:p-5" style={{ border: "1px solid #E5E7EB" }}>
-              <CountUp end={stats.total} label="Breeders" />
-              <CountUp end={stats.active} label="Active This Week" />
-              <CountUp end={stats.states} label="States" />
-              <CountUp end={stats.breeds} label="Breeds Covered" />
-            </div>
           </div>
-        </section>
+        )}
 
-        {/* SPECIES TILES — light */}
-        <section className="mx-auto max-w-6xl px-4 py-8">
-          <h2 className="mb-4 text-[13px] font-bold uppercase tracking-[0.18em] text-foreground">Browse by Species</h2>
+        {/* Compact stat strip */}
+        <div className="px-4 pt-4">
+          <div className="grid grid-cols-4 gap-2 rounded-2xl bg-white p-3" style={{ border: "1px solid #E5E7EB", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
+            <Stat value={stats.total} label="Breeders" />
+            <Stat value={stats.active} label="Active" />
+            <Stat value={stats.states} label="States" />
+            <Stat value={stats.breeds} label="Breeds" />
+          </div>
+        </div>
+
+        {/* Species tiles */}
+        <section className="px-4 pt-5">
+          <h2 className="mb-2.5 text-[13px] font-bold uppercase tracking-[0.16em]" style={{ color: NAVY }}>Browse by Species</h2>
           {isLoading ? (
             <div className="grid grid-cols-2 gap-3">
-              {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}
+              {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-2xl" />)}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 gap-3">
               {speciesCounts.map((s) => (
                 <Link
                   key={s.key}
                   to={`/breeders/${s.key}`}
-                  className="group relative overflow-hidden rounded-2xl border border-border bg-white p-4 md:p-5 transition-all hover:border-[hsl(var(--gold))]/40 hover:-translate-y-0.5"
+                  className="group relative overflow-hidden rounded-2xl border border-border bg-white p-4 transition-all hover:-translate-y-0.5"
                   style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}
                 >
-                  <span className="absolute right-3 top-3 text-3xl md:text-4xl opacity-20 group-hover:opacity-40 transition-opacity">{s.silhouette}</span>
-                  <h3 className="text-lg md:text-2xl font-bold tracking-tight text-foreground">{s.name}</h3>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">{s.blurb}</p>
-                  <p className="mt-3 text-[12px] font-bold text-[hsl(var(--gold))]">{s.count} operation{s.count !== 1 ? "s" : ""}</p>
+                  <span className="absolute right-3 top-3 text-3xl opacity-20 group-hover:opacity-40 transition-opacity">{s.silhouette}</span>
+                  <h3 className="text-lg font-bold tracking-tight" style={{ color: NAVY }}>{s.name}</h3>
+                  <p className="mt-0.5 text-[11px]" style={{ color: "#6B7280" }}>{s.blurb}</p>
+                  <p className="mt-3 text-[12px] font-bold" style={{ color: GOLD }}>{s.count} operation{s.count !== 1 ? "s" : ""}</p>
                   {s.topState && (
-                    <p className="mt-1 text-[10px] uppercase tracking-wider text-muted-foreground">Most active: {s.topState}</p>
+                    <p className="mt-1 text-[10px] uppercase tracking-wider" style={{ color: "#6B7280" }}>Most active: {s.topState}</p>
                   )}
-                  <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5 group-hover:text-[hsl(var(--gold))]" />
+                  <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 transition-transform group-hover:translate-x-0.5" style={{ color: "#9CA3AF" }} />
                 </Link>
               ))}
             </div>
           )}
         </section>
 
-        {/* SPOTLIGHT — dark cards on light bg */}
+        {/* Spotlight */}
         {spotlights.length > 0 && (
-          <section className="border-t border-border py-6 pb-24">
-            <div className="mx-auto max-w-6xl px-4">
-              <div className="mb-3 flex items-baseline justify-between">
-                <h2 className="text-[13px] font-bold uppercase tracking-[0.18em] text-foreground">Spotlight</h2>
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Featured Breeders</span>
+          <section className="pt-6">
+            <div className="px-4">
+              <div className="mb-2.5 flex items-baseline justify-between">
+                <h2 className="text-[13px] font-bold uppercase tracking-[0.16em]" style={{ color: NAVY }}>Spotlight</h2>
+                <span className="text-[10px] uppercase tracking-wider" style={{ color: "#6B7280" }}>Featured Breeders</span>
               </div>
-              <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1">
-                {spotlights.map((b) => <SpotlightCard key={b.id} b={b} />)}
-              </div>
+            </div>
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide px-4 pb-1">
+              {spotlights.map((b) => <SpotlightCard key={b.id} b={b} />)}
             </div>
           </section>
         )}
       </div>
     </Layout>
+  );
+}
+
+function Stat({ value, label }: { value: number; label: string }) {
+  const [v, setV] = useState(0);
+  useEffect(() => {
+    const dur = 900, start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / dur);
+      setV(Math.floor(value * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return (
+    <div className="flex flex-col items-center">
+      <span className="text-xl font-bold tabular-nums leading-none" style={{ color: GOLD }}>{v.toLocaleString()}</span>
+      <span className="mt-1 text-[11px] uppercase tracking-[0.1em]" style={{ color: "#4B5563", fontWeight: 500 }}>{label}</span>
+    </div>
   );
 }
