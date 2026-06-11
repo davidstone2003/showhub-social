@@ -86,7 +86,7 @@ export default function CreatePostPage() {
   const [sireId, setSireId] = useState<string | null>(null);
   const [damName, setDamName] = useState("");
   const [notes, setNotes] = useState("");
-  const [species, setSpecies] = useState("sheep");
+  const [species, setSpecies] = useState("Sheep");
 
   // Sale Lot fields
   const [lotNumber, setLotNumber] = useState("");
@@ -122,7 +122,7 @@ export default function CreatePostPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Pull the user's breeder profile name and use as Bred By default
+  // Pull the user's breeder/profile name and use as Bred By default
   useEffect(() => {
     if (!user) return;
     (async () => {
@@ -131,7 +131,9 @@ export default function CreatePostPage() {
         .select("id, breeder_name")
         .eq("owner_user_id", user.id)
         .maybeSingle();
-      const farmName = (data as any)?.breeder_name as string | undefined;
+      const farmName = ((data as any)?.breeder_name ||
+        (profile?.account_type === "breeder" ? profile?.display_name : null) ||
+        user.user_metadata?.display_name) as string | undefined;
       if (farmName) {
         setSavedDefaults((prev) => {
           const next = { ...prev, farmName, bredBy: prev.bredBy || farmName };
@@ -142,7 +144,7 @@ export default function CreatePostPage() {
       }
     })();
 
-  }, [user]);
+  }, [user, profile]);
 
   const handleOpenWinnerPanel = () => {
     if (!breederName && (savedDefaults.bredBy || savedDefaults.farmName)) {
@@ -425,7 +427,7 @@ export default function CreatePostPage() {
   const displayName = profile?.display_name || profile?.first_name || "You";
   const initials = (displayName || "U").slice(0, 2).toUpperCase();
   const avatarUrl = (profile as any)?.logo_url || (profile as any)?.avatar_url;
-  const winnerHasData = !!(resultTitle || showName || exhibitorName || sireName);
+  const winnerHasData = !!(resultTitle || showName || exhibitorName || breederName || placedBy || sireName || damName || notes);
 
   return (
     <Layout showDiscovery={false}>
