@@ -332,8 +332,10 @@ export default function SalesPage() {
         </div>
 
         {/* Species pills */}
-        <div className="px-4 pt-3">
-          <SpeciesPills value={species} onChange={setSpecies} appMode />
+        <div style={{ backgroundColor: "#0A1628" }} className="pb-3">
+          <div className="px-4 pt-3">
+            <SpeciesPills value={species} onChange={setSpecies} appMode />
+          </div>
         </div>
 
         {/* ─── 1. UPCOMING SALES ─── */}
