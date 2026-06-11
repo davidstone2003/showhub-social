@@ -351,6 +351,36 @@ export default function CreatePostPage() {
     return handleSubmitGeneral();
   };
 
+  // Auto-extract winner details from a photo using AI
+  const autoExtractFromPhoto = async (file: File) => {
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve((r.result as string).split(",")[1]);
+        r.onerror = reject;
+        r.readAsDataURL(file);
+      });
+      const toastId = toast.loading("Reading photo with AI…");
+      const { data, error } = await supabase.functions.invoke("extract-winner", {
+        body: { imageBase64: base64, mimeType: file.type },
+      });
+      toast.dismiss(toastId);
+      if (error) throw error;
+      const raw = (data as any)?.extracted || (data as any)?.results?.[0] || {};
+      let filled = 0;
+      if (raw.show_name) { setShowName(raw.show_name); filled++; }
+      if (raw.win_placing) { setResultTitle(raw.win_placing); filled++; }
+      if (raw.shown_by) { setExhibitorName(raw.shown_by); filled++; }
+      if (raw.placed_by) { setBreederName((prev) => prev || raw.placed_by); filled++; }
+      if (raw.sired_by) { setSireName(raw.sired_by); filled++; }
+      if (raw.dam) { setDamName(raw.dam); filled++; }
+      if (raw.caption) { setNotes(raw.caption); filled++; }
+      if (filled > 0) toast.success(`Auto-filled ${filled} field${filled > 1 ? "s" : ""} from photo`);
+    } catch (err: any) {
+      toast.error("Couldn't auto-read photo", { description: err?.message });
+    }
+  };
+
   // Media handlers
   const onPickPhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -359,6 +389,10 @@ export default function CreatePostPage() {
     }));
     setMedia(prev => [...prev, ...next].slice(0, 10));
     if (photoInputRef.current) photoInputRef.current.value = "";
+    // Auto-extract from the first new photo if no show name yet
+    if (next.length > 0 && !showName) {
+      void autoExtractFromPhoto(next[0].file);
+    }
   };
   const onPickVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
