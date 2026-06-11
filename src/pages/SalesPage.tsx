@@ -282,7 +282,7 @@ export default function SalesPage() {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="mx-auto max-w-2xl pb-24">
+      <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
         {/* Header — white bg, navy title */}
         <div className="sticky top-0 z-10 bg-white border-b border-border px-4 flex items-center justify-between" style={{ height: 60 }}>
           <h1 className="text-[22px] font-bold leading-none" style={{ color: "#0A1628" }}>Sales</h1>
