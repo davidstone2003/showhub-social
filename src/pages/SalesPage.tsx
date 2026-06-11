@@ -26,11 +26,25 @@ interface UpcomingSale {
   location: string;
   host: string;
   link?: string;
+  species?: Exclude<SpeciesPill, "All">;
 }
 const fallbackUpcomingSales: UpcomingSale[] = [
-  { id: "u1", name: "SC Online Summer Classic", date: "June 18, 2026", location: "Online", host: "SC Online Sales" },
-  { id: "u2", name: "Midwest Elite Sale", date: "July 9, 2026", location: "Des Moines, IA", host: "Midwest Showstock" },
-  { id: "u3", name: "Southern Showcase", date: "August 2, 2026", location: "Athens, GA", host: "Southern Cattle Co." },
+  // Sheep
+  { id: "u-s1", name: "The Exposure Summer Lamb Sale", date: "June 14, 2026", location: "Harrisonburg, VA", host: "The Exposure", species: "Sheep" },
+  { id: "u-s2", name: "Midwest Elite Lamb Sale", date: "July 9, 2026", location: "Des Moines, IA", host: "Midwest Showstock", species: "Sheep" },
+  { id: "u-s3", name: "Stone Show Stock Online Ewe Sale", date: "August 12, 2026", location: "Online", host: "Stone Show Stock", species: "Sheep" },
+  // Goats
+  { id: "u-g1", name: "SC Online Summer Goat Classic", date: "June 18, 2026", location: "Online", host: "SC Online Sales", species: "Goats" },
+  { id: "u-g2", name: "Texas Elite Doe Sale", date: "July 22, 2026", location: "Fort Worth, TX", host: "Lone Star Goats", species: "Goats" },
+  { id: "u-g3", name: "Boer Showcase Online", date: "August 5, 2026", location: "Online", host: "Premier Boer", species: "Goats" },
+  // Cattle
+  { id: "u-c1", name: "Southern Cattle Showcase", date: "August 2, 2026", location: "Athens, GA", host: "Southern Cattle Co.", species: "Cattle" },
+  { id: "u-c2", name: "Heifer Heaven Online Sale", date: "September 10, 2026", location: "Online", host: "Hill Country Cattle", species: "Cattle" },
+  { id: "u-c3", name: "Steer Power Fall Classic", date: "October 4, 2026", location: "Oklahoma City, OK", host: "Power Genetics", species: "Cattle" },
+  // Pigs
+  { id: "u-p1", name: "Midwest Barrow & Gilt Sale", date: "June 28, 2026", location: "Springfield, IL", host: "Midwest Swine", species: "Pigs" },
+  { id: "u-p2", name: "Showpig Showcase Online", date: "July 30, 2026", location: "Online", host: "Showpig.com", species: "Pigs" },
+  { id: "u-p3", name: "Elite Hog Classic", date: "August 19, 2026", location: "Indianapolis, IN", host: "Elite Swine Genetics", species: "Pigs" },
 ];
 
 /* ── Sale results ── */
@@ -262,7 +276,11 @@ export default function SalesPage() {
     ),
   );
   const upcomingFiltered = (list: UpcomingSale[]) =>
-    list.filter((s) => matchesSpecies(species, s.name, s.location, s.host));
+    list.filter((s) =>
+      s.species
+        ? species === "All" || s.species === species
+        : matchesSpecies(species, s.name, s.location, s.host),
+    );
 
   // Upcoming list: prefer live-scraped, fall back to mock if a scrape never ran
   const scoStatus = sourceStatus["sc-online"];
