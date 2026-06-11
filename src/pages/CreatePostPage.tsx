@@ -345,10 +345,14 @@ export default function CreatePostPage() {
   };
 
   // Determine which submit handler to use
+  const winnerDraftHasEntry = !!(
+    resultTitle || customResult || showName.trim() || exhibitorName.trim() ||
+    placedBy.trim() || sireName.trim() || damName.trim() || notes.trim()
+  );
   const winnerReady = !!showName.trim() && !!exhibitorName.trim();
   const saleLotReady = !!saleName.trim();
   const saleEventReady = !!eventName.trim();
-  const canPost = winnerReady || saleLotReady || saleEventReady || generalCaption.trim().length > 0 || notes.trim().length > 0 || media.length > 0;
+  const canPost = winnerDraftHasEntry || saleLotReady || saleEventReady || generalCaption.trim().length > 0 || media.length > 0;
 
   const handlePost = async () => {
     setShowEmojiPicker(false);
@@ -362,7 +366,7 @@ export default function CreatePostPage() {
         return;
       }
     }
-    if (winnerReady) return handleSubmitWinner();
+    if (winnerDraftHasEntry) return handleSubmitWinner();
     if (saleLotReady) return handleSubmitSaleLot();
     if (saleEventReady) return handleSubmitSaleEvent();
     return handleSubmitGeneral();
@@ -427,7 +431,7 @@ export default function CreatePostPage() {
   const displayName = profile?.display_name || profile?.first_name || "You";
   const initials = (displayName || "U").slice(0, 2).toUpperCase();
   const avatarUrl = (profile as any)?.logo_url || (profile as any)?.avatar_url;
-  const winnerHasData = !!(resultTitle || showName || exhibitorName || breederName || placedBy || sireName || damName || notes);
+  const winnerHasData = winnerDraftHasEntry;
 
   return (
     <Layout showDiscovery={false}>
