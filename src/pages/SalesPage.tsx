@@ -9,20 +9,6 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 
-/* ── Live ticker ── */
-type LiveStatus = "sold" | "bidding" | "avg";
-const liveSaleUpdates: { id: string; lot: string; price: string; time: string; note: string; status: LiveStatus }[] = [
-  { id: "1", lot: "Lot 14", price: "$12,500", time: "1m ago", note: "Sold", status: "sold" },
-  { id: "2", lot: "Lot 27", price: "—", time: "4m ago", note: "Bidding open", status: "bidding" },
-  { id: "3", lot: "Avg", price: "$4,850", time: "7m ago", note: "Running avg updated", status: "avg" },
-  { id: "4", lot: "Lot 9", price: "$8,200", time: "12m ago", note: "Sold", status: "sold" },
-];
-
-const statusDot: Record<LiveStatus, string> = {
-  sold: "bg-[hsl(var(--gold))]",
-  bidding: "bg-blue-500",
-  avg: "bg-muted-foreground",
-};
 
 /* ── Upcoming sales ── */
 interface UpcomingSale {
@@ -111,43 +97,6 @@ export default function SalesPage() {
           <button className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors">
             <Search className="w-5 h-5 text-muted-foreground" />
           </button>
-        </div>
-
-        {/* ─── 1. LIVE ─── */}
-        <div className="px-4 pt-4">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="flex items-center gap-1.5 rounded-full bg-destructive/10 border border-destructive/20 px-2.5 py-1 text-[11px] font-bold text-destructive">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75 animate-ping" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-destructive" />
-              </span>
-              LIVE
-            </span>
-            <span className="text-[12px] font-semibold text-foreground">American Royal</span>
-          </div>
-
-          <div className="rounded-xl bg-card border border-border shadow-[var(--shadow-card)] overflow-hidden">
-            {liveSaleUpdates.map((u, i) => (
-              <div
-                key={u.id}
-                className={`flex items-center gap-3 px-3.5 py-3 ${
-                  i !== liveSaleUpdates.length - 1 ? "border-b border-[hsl(var(--divider-soft))]" : ""
-                }`}
-              >
-                <span className={`h-2 w-2 rounded-full shrink-0 ${statusDot[u.status]}`} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-[13px] font-bold text-foreground">{u.lot}</span>
-                    {u.price !== "—" && (
-                      <span className="text-[13px] font-bold text-[hsl(var(--gold))] tabular-nums">{u.price}</span>
-                    )}
-                  </div>
-                  <p className="text-[12px] text-muted-foreground truncate">{u.note}</p>
-                </div>
-                <span className="text-[11px] text-muted-foreground shrink-0">{u.time}</span>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* ─── 2. UPCOMING SALES ─── */}
