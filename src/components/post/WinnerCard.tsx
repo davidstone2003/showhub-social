@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import type { Post } from "@/data/mock";
 
 function accentColor(placing?: string | null): string {
@@ -27,12 +28,14 @@ interface WinnerCardProps {
 }
 
 export function WinnerCard({ post, onTap }: WinnerCardProps) {
+  const navigate = useNavigate();
   const placing = post.win_placing || post.win_title || "";
   const showName = post.show_name || "";
   const dateStr = (post as any).date || post.created_at;
   const year = dateStr ? new Date(dateStr).getFullYear() : new Date().getFullYear();
   const showLine = showName ? `${year} ${showName}` : "";
   const breederName = post.breeder?.name || "";
+  const breederSlug = post.breeder?.slug || "";
   const breederLogo = post.breeder?.logo || "";
   const accent = accentColor(placing);
   const imageSrc = post.image || "/placeholder.svg";
@@ -107,9 +110,22 @@ export function WinnerCard({ post, onTap }: WinnerCardProps) {
               <span style={{ fontSize: 13, color: "#555" }}>·</span>
             )}
             {breederName && (
-              <span style={{ fontSize: 13, lineHeight: 1.3, color: "rgba(255,255,255,0.75)" }}>
-                {breederName}
-              </span>
+              breederSlug ? (
+                <span
+                  role="link"
+                  tabIndex={0}
+                  onClick={(e) => { e.stopPropagation(); navigate(`/breeder/${breederSlug}`); }}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); navigate(`/breeder/${breederSlug}`); } }}
+                  className="hover:underline cursor-pointer"
+                  style={{ fontSize: 13, lineHeight: 1.3, color: "rgba(255,255,255,0.85)" }}
+                >
+                  {breederName}
+                </span>
+              ) : (
+                <span style={{ fontSize: 13, lineHeight: 1.3, color: "rgba(255,255,255,0.75)" }}>
+                  {breederName}
+                </span>
+              )
             )}
           </div>
         </div>
