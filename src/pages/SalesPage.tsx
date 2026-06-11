@@ -268,15 +268,29 @@ export default function SalesPage() {
     return () => { cancelled = true; };
   }, []);
 
-  const allResultsRaw = [...scrapedResults, ...saleResults];
+  const scoAsResults: SaleResult[] = SCO_RECENT_SALES.map((s) => ({
+    id: s.id,
+    saleName: s.name,
+    date: s.date,
+    location: s.location,
+    totalHead: 0,
+    averagePrice: "—",
+    topSellers: [],
+    sireBreakdown: [],
+    species: s.species,
+    link: s.link,
+  }));
+  const allResultsRaw = [...scrapedResults, ...scoAsResults, ...saleResults];
   const allResults = allResultsRaw.filter((r) =>
-    matchesSpecies(
-      species,
-      r.saleName,
-      r.location,
-      ...r.topSellers.flatMap((t) => [t.lot, t.breeder, t.sire ?? null]),
-      ...r.sireBreakdown.map((s) => s.sire),
-    ),
+    r.species
+      ? species === "All" || r.species === species
+      : matchesSpecies(
+          species,
+          r.saleName,
+          r.location,
+          ...r.topSellers.flatMap((t) => [t.lot, t.breeder, t.sire ?? null]),
+          ...r.sireBreakdown.map((s) => s.sire),
+        ),
   );
   const upcomingFiltered = (list: UpcomingSale[]) =>
     list.filter((s) =>
