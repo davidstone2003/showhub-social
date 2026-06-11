@@ -522,6 +522,32 @@ export default function CreatePostPage() {
           </div>
         )}
 
+        {/* Tagged people chip */}
+        {taggedPeople.length > 0 && (
+          <div className="mx-4 mb-2 flex items-center gap-2 flex-wrap">
+            <span className="text-[12px] font-semibold text-[#5C6470]">With:</span>
+            {taggedPeople.map(person => (
+              <div
+                key={person.id}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium"
+                style={{ backgroundColor: "#C9A84C15", color: "#8B6914", border: "1px solid #C9A84C40" }}
+              >
+                {person.name}
+                <button onClick={() => setTaggedPeople(prev => prev.filter(p => p.id !== person.id))}>
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+            <button
+              onClick={() => setShowTagSheet(true)}
+              className="text-[12px] font-semibold"
+              style={{ color: "#C9A84C" }}
+            >
+              + Add more
+            </button>
+          </div>
+        )}
+
         {/* Caption area */}
         <div className="px-4 pt-2">
           <textarea
