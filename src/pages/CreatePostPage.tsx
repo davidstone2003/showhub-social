@@ -18,8 +18,9 @@ import SmartUpload from "@/components/SmartUpload";
 import PostSuccessScreen from "@/components/PostSuccessScreen";
 import {
   Trophy, ChevronDown, X, Camera, Video as VideoIcon, Smile,
-  Tag, Leaf, MoreHorizontal, Play, Plus, Sparkles, ClipboardPaste,
+  Tag, Leaf, MoreHorizontal, Play, Plus, Sparkles, ClipboardPaste, Type,
 } from "lucide-react";
+import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { cn } from "@/lib/utils";
 
 type PostCategory = null | "winner" | "sale_lot" | "sale_event" | "general";
