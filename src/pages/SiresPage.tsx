@@ -154,21 +154,23 @@ const SiresPage = () => {
           </div>
         </div>
 
-        {/* Species pills */}
-        <div className="px-4 pt-3">
-          <SpeciesPills value={species} onChange={setSpecies} appMode />
+        {/* Dark chrome band: pills */}
+        <div style={{ backgroundColor: "#0A1628" }} className="pb-3">
+          <div className="px-4 pt-3">
+            <SpeciesPills value={species} onChange={setSpecies} appMode />
+          </div>
         </div>
 
         <div className="px-4 pt-3">
           {/* Search */}
           <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "rgba(255,255,255,0.4)" }} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search sires or breeders…"
-              className="h-10 w-full rounded-xl pl-10 pr-4 text-sm focus:outline-none"
-              style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "#FFFFFF" }}
+              className="h-10 w-full rounded-xl border border-border bg-white pl-10 pr-4 text-sm placeholder:text-muted-foreground focus:outline-none"
+              style={{ color: NAVY }}
             />
           </div>
 
