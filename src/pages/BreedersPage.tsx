@@ -98,25 +98,28 @@ export default function BreedersPage() {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
+      <div className="app-mode mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#0A1628", minHeight: "100vh" }}>
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-white border-b border-border px-4 flex items-center justify-between" style={{ height: 60 }}>
-          <h1 className="text-[22px] font-bold leading-none" style={{ color: NAVY }}>Breeders</h1>
+        <div
+          className="sticky top-0 z-10 px-4 flex items-center justify-between"
+          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Breeders</h1>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSearchOpen((v) => !v)}
-              className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors"
+              className="p-1.5 rounded-lg transition-colors"
               aria-label="Search"
             >
-              <Search className="w-5 h-5" style={{ color: NAVY }} />
+              <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
             </button>
-            <div className="flex rounded-lg border border-border bg-white overflow-hidden">
+            <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.12)", backgroundColor: "rgba(255,255,255,0.06)" }}>
               <button
                 type="button"
                 onClick={() => setView("list")}
                 aria-label="List view"
-                className={`p-2 transition-colors ${view === "list" ? "bg-muted" : ""}`}
-                style={{ color: view === "list" ? NAVY : "#9CA3AF" }}
+                className="p-2 transition-colors"
+                style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "list" ? "rgba(255,255,255,0.08)" : "transparent" }}
               >
                 <ListIcon className="w-4 h-4" />
               </button>
@@ -124,8 +127,8 @@ export default function BreedersPage() {
                 type="button"
                 onClick={() => setView("grid")}
                 aria-label="Grid view"
-                className={`p-2 transition-colors ${view === "grid" ? "bg-muted" : ""}`}
-                style={{ color: view === "grid" ? NAVY : "#9CA3AF" }}
+                className="p-2 transition-colors"
+                style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "grid" ? "rgba(255,255,255,0.08)" : "transparent" }}
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
@@ -135,21 +138,21 @@ export default function BreedersPage() {
 
         {/* Species pills */}
         <div className="px-4 pt-3">
-          <SpeciesPills value={species} onChange={setSpecies} />
+          <SpeciesPills value={species} onChange={setSpecies} appMode />
         </div>
 
         {/* Inline search (toggled) */}
         {searchOpen && (
           <div className="px-4 pt-3">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "#9CA3AF" }} />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "rgba(255,255,255,0.4)" }} />
               <input
                 autoFocus
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search breeders, sires, states, breeds…"
-                className="h-11 w-full rounded-full bg-white pl-11 pr-4 text-sm focus:outline-none"
-                style={{ border: "1px solid #E5E7EB", color: NAVY }}
+                className="h-11 w-full rounded-full pl-11 pr-4 text-sm focus:outline-none"
+                style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "#FFFFFF" }}
               />
             </div>
           </div>
@@ -157,7 +160,7 @@ export default function BreedersPage() {
 
         {/* Compact stat strip */}
         <div className="px-4 pt-4">
-          <div className="grid grid-cols-4 gap-2 rounded-2xl bg-white p-3" style={{ border: "1px solid #E5E7EB", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
+          <div className="grid grid-cols-4 gap-2 rounded-2xl p-3" style={{ backgroundColor: "#141E2E", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 2px 8px rgba(0,0,0,0.3)" }}>
             <Stat value={stats.total} label="Breeders" />
             <Stat value={stats.active} label="Active" />
             <Stat value={stats.states} label="States" />
