@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
+import { SCO_RECENT_SALES } from "@/data/scoRecentSales";
 
 /* ── Upcoming sales ── */
 interface UpcomingSale {
