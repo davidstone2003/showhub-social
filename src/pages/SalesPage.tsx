@@ -183,6 +183,7 @@ export default function SalesPage() {
   const [scrapedResults, setScrapedResults] = useState<SaleResult[]>([]);
   const [scrapedUpcoming, setScrapedUpcoming] = useState<UpcomingSale[]>([]);
   const [sourceStatus, setSourceStatus] = useState<Record<string, SourceStatus>>({});
+  const [species, setSpecies] = useState<SpeciesPill>("All");
 
   useEffect(() => {
     let cancelled = false;
