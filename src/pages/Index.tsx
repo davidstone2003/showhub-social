@@ -7,11 +7,13 @@ import { Feed } from "@/components/Feed";
 const Index = () => {
   return (
     <Layout showDiscovery={false}>
-      <div className="max-w-2xl mx-auto w-full px-3 pb-24">
-        <div className="-mt-2">
-          <LiveStrip />
+      <div style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
+        <div className="max-w-2xl mx-auto w-full px-3 pb-24">
+          <div className="-mt-2">
+            <LiveStrip />
+          </div>
+          <Feed />
         </div>
-        <Feed />
       </div>
 
       {/* Floating action button */}
