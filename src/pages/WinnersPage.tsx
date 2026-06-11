@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, Trophy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Skeleton } from "@/components/ui/skeleton";
 import { PostCard } from "@/components/PostCard";
+import { PostCardSkeleton } from "@/components/PostCardSkeleton";
 import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
 import type { Post } from "@/data/mock";
 
@@ -186,25 +187,50 @@ export default function WinnersPage() {
 
         <div className="px-4 pt-4">
           {loading ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="space-y-3">
-                  <Skeleton className="h-6 w-56" />
-                  <Skeleton className="h-48 w-full rounded-xl" />
-                </div>
-              ))}
+            <div className="flex flex-col gap-3">
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
             </div>
           ) : showGroups.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-muted-foreground text-base">No results posted yet</p>
+            <div className="flex flex-col items-center text-center" style={{ paddingTop: 80, paddingBottom: 40 }}>
+              <Trophy size={48} style={{ color: "#C9A84C" }} />
+              <h2 className="font-bold mt-4" style={{ fontSize: 22, lineHeight: 1.2, color: "#0A1628" }}>
+                No winners yet
+              </h2>
+              <p className="text-muted-foreground mt-2 max-w-xs" style={{ fontSize: 14, lineHeight: 1.4 }}>
+                Post your champions and show results here
+              </p>
+              <Link
+                to="/submit"
+                className="inline-flex items-center justify-center font-bold active:scale-95 transition-transform"
+                style={{
+                  marginTop: 20,
+                  padding: "0 22px",
+                  height: 48,
+                  borderRadius: 24,
+                  fontSize: 15,
+                  backgroundColor: "#C9A84C",
+                  color: "#0A1628",
+                  boxShadow: "0 4px 12px rgba(201,168,76,0.35)",
+                }}
+              >
+                Post a Win
+              </Link>
             </div>
           ) : (
-            <div className="space-y-10">
-              {showGroups.map((group) => (
-                <div key={group.showName}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {showGroups.map((group, gi) => (
+                <div key={group.showName} style={{ marginTop: gi === 0 ? 0 : 20 }}>
                   {/* Show header */}
-                  <div className="mb-4">
-                    <h3 className="text-lg font-bold text-foreground leading-tight">
+                  <div
+                    className="mb-3"
+                    style={{
+                      borderLeft: "3px solid #C9A84C",
+                      paddingLeft: 12,
+                    }}
+                  >
+                    <h3 className="font-bold leading-tight" style={{ fontSize: 16, color: "#0A1628" }}>
                       {group.year} {group.showName}
                     </h3>
                   </div>
