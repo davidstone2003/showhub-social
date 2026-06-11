@@ -660,6 +660,26 @@ export default function CreatePostPage() {
 
             <FieldLabel>Bred By</FieldLabel>
             <Input value={breederName} onChange={(e) => setBreederName(e.target.value)} placeholder="Breeder name" className="h-11 rounded-lg" />
+            <div className="flex items-center justify-between -mt-2">
+              <span className="text-[11px] text-[#9CA3AF]">
+                {savedDefaults.bredBy === breederName && breederName ? "✓ This is your default" : ""}
+              </span>
+              {breederName && savedDefaults.bredBy !== breederName && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newDefaults = { ...savedDefaults, bredBy: breederName };
+                    setSavedDefaults(newDefaults);
+                    localStorage.setItem("backdrop_post_defaults", JSON.stringify(newDefaults));
+                    toast.success("Saved as default breeder name");
+                  }}
+                  className="text-[11px] font-semibold"
+                  style={{ color: "#C9A84C" }}
+                >
+                  Save as my default
+                </button>
+              )}
+            </div>
 
             <FieldLabel>Sired By</FieldLabel>
             <AutocompleteInput
