@@ -61,7 +61,7 @@ function Monogram({ name, size = 44 }: { name: string; size?: number }) {
 
 function SemenBadge() {
   return (
-    <span className="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+    <span className="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full" style={{ backgroundColor: "#166534", color: "#FFFFFF" }}>
       SEMEN
     </span>
   );
