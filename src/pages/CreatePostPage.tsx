@@ -18,7 +18,7 @@ import SmartUpload from "@/components/SmartUpload";
 import PostSuccessScreen from "@/components/PostSuccessScreen";
 import {
   Trophy, ChevronDown, X, Camera, Video as VideoIcon, Smile,
-  Tag, Leaf, MoreHorizontal, Play, Plus, Sparkles, ClipboardPaste, Type,
+  Tag, Leaf, MoreHorizontal, Play, Plus, Sparkles, ClipboardPaste,
 } from "lucide-react";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { cn } from "@/lib/utils";
@@ -107,7 +107,6 @@ export default function CreatePostPage() {
   // General fields
   const [generalCaption, setGeneralCaption] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [showFormatting, setShowFormatting] = useState(false);
 
   const captionRef = useRef<HTMLTextAreaElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -278,7 +277,6 @@ export default function CreatePostPage() {
 
   const handlePost = () => {
     setShowEmojiPicker(false);
-    setShowFormatting(false);
     if (winnerReady) return handleSubmitWinner();
     if (saleLotReady) return handleSubmitSaleLot();
     if (saleEventReady) return handleSubmitSaleEvent();
@@ -401,15 +399,10 @@ export default function CreatePostPage() {
             onChange={(e) => setGeneralCaption(e.target.value)}
             placeholder="What's happening in your program? Share a win, sale, update, or anything on your mind…"
             className="w-full resize-none border-0 outline-none bg-transparent placeholder:text-[#9CA3AF]"
-            style={{ fontSize: "17px", lineHeight: 1.5, color: "#0A1628", minHeight: "120px" }}
+            style={{ fontSize: "17px", lineHeight: 1.5, color: "#0A1628", minHeight: "120px", whiteSpace: "pre-wrap" }}
           />
-          {generalCaption.trim() && /(\*\*|_|^#\s|^•\s|\n#\s|\n•\s)/m.test(generalCaption) && (
-            <div className="mt-3 pt-3 border-t border-dashed border-[#E5E7EB]">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-[#9CA3AF] mb-2">Post Preview</div>
-              <CaptionPreview text={generalCaption} />
-            </div>
-          )}
         </div>
+
 
 
         {/* Media preview strip */}
@@ -473,34 +466,9 @@ export default function CreatePostPage() {
         </div>
       )}
 
-      {/* Text formatting mini-toolbar */}
-      {showFormatting && (
-        <div className="fixed left-0 right-0 bottom-[120px] z-40 flex items-center gap-1 px-4 py-2 bg-white border-t border-[#E5E7EB] overflow-x-auto">
-          {[
-            { label: "B", style: "**", title: "Bold" },
-            { label: "I", style: "_", title: "Italic" },
-            { label: "H1", style: "# ", title: "Heading" },
-            { label: "•", style: "\n• ", title: "Bullet" },
-          ].map(({ label, style, title }) => (
-            <button
-              key={label}
-              title={title}
-              onClick={() => {
-                const ta = captionRef.current;
-                const start = ta?.selectionStart ?? generalCaption.length;
-                const end = ta?.selectionEnd ?? start;
-                const selected = generalCaption.slice(start, end);
-                const wrapped = selected ? `${style}${selected}${style}` : style;
-                const newCaption = generalCaption.slice(0, start) + wrapped + generalCaption.slice(end);
-                setGeneralCaption(newCaption);
-                setTimeout(() => ta?.focus(), 0);
-              }}
-              className="flex items-center justify-center w-9 h-9 rounded-lg border border-[#E5E7EB] text-[13px] font-bold text-[#0A1628] hover:bg-[#F8F7F4] shrink-0"
-            >
-              {label}
-            </button>
-          ))}
-          <div className="w-px h-6 bg-[#E5E7EB] mx-1 shrink-0" />
+      {/* Quick-tap livestock emoji row */}
+      {showEmojiPicker && (
+        <div className="fixed left-0 right-0 bottom-[478px] z-40 flex items-center gap-1 px-4 py-2 bg-white border-t border-[#E5E7EB] overflow-x-auto">
           {["🏆", "🐑", "🐄", "🐖", "🐐", "⭐", "🔥", "👏", "💪", "❤️"].map(emoji => (
             <button
               key={emoji}
@@ -512,7 +480,7 @@ export default function CreatePostPage() {
                 setGeneralCaption(newCaption);
                 setTimeout(() => ta?.focus(), 0);
               }}
-              className="text-[20px] w-9 h-9 flex items-center justify-center shrink-0"
+              className="text-[22px] w-10 h-10 flex items-center justify-center shrink-0 hover:bg-[#F8F7F4] rounded-lg"
             >
               {emoji}
             </button>
@@ -524,8 +492,7 @@ export default function CreatePostPage() {
       <div className="fixed left-0 right-0 bottom-16 z-30 bg-white border-t border-[#E5E7EB] h-[52px] flex items-center justify-around px-2">
         <ToolbarIcon icon={Camera} onClick={() => photoInputRef.current?.click()} />
         <ToolbarIcon icon={VideoIcon} onClick={() => videoInputRef.current?.click()} />
-        <ToolbarIcon icon={Smile} active={showEmojiPicker} onClick={() => { setShowFormatting(false); setShowEmojiPicker(v => !v); }} />
-        <ToolbarIcon icon={Type} active={showFormatting} onClick={() => { setShowEmojiPicker(false); setShowFormatting(v => !v); }} />
+        <ToolbarIcon icon={Smile} active={showEmojiPicker} onClick={() => setShowEmojiPicker(v => !v)} />
         <ToolbarIcon icon={Trophy} active={winnerHasData} onClick={() => setShowWinnerPanel(true)} />
         <ToolbarIcon icon={Tag} onClick={() => toast("Tagging coming soon")} />
         <ToolbarIcon icon={Leaf} active={!!species} onClick={() => setShowSpeciesSheet(true)} />
@@ -734,43 +701,6 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
   return <label className="text-[12px] font-bold uppercase tracking-wide text-[#5C6470] block">{children}</label>;
 }
 
-function renderInline(text: string): React.ReactNode[] {
-  const nodes: React.ReactNode[] = [];
-  const regex = /(\*\*([^*]+)\*\*)|(_([^_]+)_)/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-  let key = 0;
-  while ((match = regex.exec(text)) !== null) {
-    if (match.index > lastIndex) nodes.push(text.slice(lastIndex, match.index));
-    if (match[2]) nodes.push(<strong key={key++} className="font-bold">{match[2]}</strong>);
-    else if (match[4]) nodes.push(<em key={key++} className="italic">{match[4]}</em>);
-    lastIndex = regex.lastIndex;
-  }
-  if (lastIndex < text.length) nodes.push(text.slice(lastIndex));
-  return nodes;
-}
-
-function CaptionPreview({ text }: { text: string }) {
-  const lines = text.split("\n");
-  return (
-    <div className="space-y-1" style={{ color: "#0A1628" }}>
-      {lines.map((line, i) => {
-        if (line.startsWith("# ")) {
-          return <div key={i} className="text-[22px] font-bold leading-tight">{renderInline(line.slice(2))}</div>;
-        }
-        if (line.startsWith("• ")) {
-          return (
-            <div key={i} className="flex gap-2 text-[17px] leading-snug">
-              <span>•</span><span>{renderInline(line.slice(2))}</span>
-            </div>
-          );
-        }
-        if (!line.trim()) return <div key={i} className="h-2" />;
-        return <div key={i} className="text-[17px] leading-snug">{renderInline(line)}</div>;
-      })}
-    </div>
-  );
-}
 
 
 function BottomSheet({ children, onClose, title, tall }: { children: React.ReactNode; onClose: () => void; title?: string; tall?: boolean }) {
