@@ -13,7 +13,6 @@ import { AuthGate } from "@/components/AuthGate";
 import { useEmailVerification } from "@/hooks/useEmailVerification";
 import { VerifyEmailModal } from "@/components/VerifyEmailModal";
 import { WinnerImageViewer } from "@/components/winners/WinnerImageViewer";
-import { WinnerCard } from "@/components/post/WinnerCard";
 import { WinnerDetailDrawer } from "@/components/post/WinnerDetailDrawer";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -33,15 +32,128 @@ interface PostCardProps {
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+function accentForPlacing(placing?: string | null): string {
+  if (!placing) return "#C9A84C";
+  if (/grand\s*champ/i.test(placing) && !/reserve/i.test(placing)) return "#C9A84C";
+  if (/reserve/i.test(placing)) return "#A8A9AD";
+  if (/class\s*winner/i.test(placing)) return "#4A7C59";
+  return "#C9A84C";
+}
+
+function PhotoGrid({ images, onTap }: { images: string[]; onTap: (index: number) => void }) {
+  if (images.length === 0) return null;
+
+  if (images.length === 1) {
+    return (
+      <button
+        type="button"
+        onClick={() => onTap(0)}
+        className="block w-full overflow-hidden"
+      >
+        <img
+          src={images[0]}
+          alt=""
+          className="w-full object-cover"
+          style={{ aspectRatio: "4 / 3" }}
+          loading="lazy"
+          decoding="async"
+        />
+      </button>
+    );
+  }
+
+  if (images.length === 2) {
+    return (
+      <div className="flex w-full" style={{ gap: 2, aspectRatio: "2 / 1" }}>
+        {images.map((src, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => onTap(i)}
+            className="flex-1 overflow-hidden"
+          >
+            <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
+          </button>
+        ))}
+      </div>
+    );
+  }
+
+  if (images.length === 3) {
+    return (
+      <div className="w-full flex flex-col" style={{ gap: 2 }}>
+        <button
+          type="button"
+          onClick={() => onTap(0)}
+          className="block w-full overflow-hidden"
+        >
+          <img
+            src={images[0]}
+            alt=""
+            className="w-full object-cover"
+            style={{ aspectRatio: "16 / 9" }}
+            loading="lazy"
+            decoding="async"
+          />
+        </button>
+        <div className="flex w-full" style={{ gap: 2, aspectRatio: "2 / 1" }}>
+          {[images[1], images[2]].map((src, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => onTap(i + 1)}
+              className="flex-1 overflow-hidden"
+            >
+              <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const visible = images.slice(0, 4);
+  const remaining = images.length - 4;
+  return (
+    <div className="w-full grid grid-cols-2" style={{ gap: 2 }}>
+      {visible.map((src, i) => (
+        <button
+          key={i}
+          type="button"
+          onClick={() => onTap(i)}
+          className="relative overflow-hidden"
+        >
+          <img
+            src={src}
+            alt=""
+            className="w-full h-full object-cover"
+            style={{ aspectRatio: "1 / 1" }}
+            loading="lazy"
+            decoding="async"
+          />
+          {i === 3 && remaining > 0 && (
+            <div
+              className="absolute inset-0 flex items-center justify-center text-white font-bold"
+              style={{ backgroundColor: "rgba(0,0,0,0.55)", fontSize: 24 }}
+            >
+              +{remaining}
+            </div>
+          )}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function PostCard({ post, index, onModerated }: PostCardProps) {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes);
-  const [imageFailed, setImageFailed] = useState(false);
   const [showFlagModal, setShowFlagModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAuthGate, setShowAuthGate] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
@@ -71,28 +183,19 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         .from("winners")
         .delete()
         .eq("source_post_id", post.id);
-
-      if (linkedWinnersError) {
-        throw linkedWinnersError;
-      }
+      if (linkedWinnersError) throw linkedWinnersError;
 
       const { error: postsError, count: postsDeleted } = await supabase
         .from("posts")
         .delete({ count: "exact" })
         .eq("id", post.id);
-
-      if (postsError) {
-        throw postsError;
-      }
+      if (postsError) throw postsError;
 
       const { error: winnersError, count: winnersDeleted } = await supabase
         .from("winners")
         .delete({ count: "exact" })
         .eq("id", post.id);
-
-      if (winnersError) {
-        throw winnersError;
-      }
+      if (winnersError) throw winnersError;
 
       if ((postsDeleted ?? 0) === 0 && (winnersDeleted ?? 0) === 0) {
         toast.error("Post was not found");
@@ -114,6 +217,20 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const isRestricted = status === "restricted";
   const isRemoved = status === "removed";
 
+  const allImages: string[] = (post as any).image_urls?.length > 0
+    ? (post as any).image_urls
+    : (post.image && post.image !== "/placeholder.svg" ? [post.image] : []);
+
+  const accent = accentForPlacing(post.win_placing);
+  const breederLogo = post.breeder?.logo;
+  const breederName = post.breeder?.name || "Unknown";
+  const breederSlug = post.breeder?.slug;
+
+  const openViewer = (i: number) => {
+    setViewerIndex(i);
+    setViewerOpen(true);
+  };
+
   return (
     <>
       <motion.article
@@ -121,15 +238,13 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2, delay: index * 0.02 }}
         className={cn(
-          "overflow-hidden relative",
-          isWinner ? "-mx-3" : "-mx-3 bg-white",
+          "overflow-hidden relative -mx-3 bg-white",
           isFlagged && "ring-2 ring-amber-400",
           isRestricted && "ring-2 ring-orange-400 opacity-75",
           isRemoved && "ring-2 ring-destructive opacity-50"
         )}
-        style={isWinner ? {} : { borderRadius: 0, borderBottom: "1px solid #E5E7EB" }}
+        style={{ borderRadius: 0, borderBottom: "1px solid #E5E7EB" }}
       >
-        {/* Status banner */}
         {status !== "active" && (
           <div className={cn(
             "px-3 py-1 text-xs font-semibold flex items-center gap-1.5",
@@ -144,7 +259,6 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </div>
         )}
 
-        {/* Admin/Owner controls */}
         {canManage && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -168,70 +282,85 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </DropdownMenu>
         )}
 
-        {/* WINNER CARD (new 4:5 portrait design) */}
-        {isWinner ? (
-          <WinnerCard post={post} onTap={() => setDrawerOpen(true)} />
-        ) : (
-          /* Standard card for non-winner posts */
-          <>
-            {(post as any).video_url ? (
-              <FeedVideo src={(post as any).video_url} aspectRatio="4 / 3" />
+        {/* Identity row */}
+        <div className="flex items-center gap-2.5 px-3 pt-3 pb-2">
+          <div
+            className="flex items-center justify-center rounded-full overflow-hidden flex-shrink-0"
+            style={{ width: 38, height: 38, backgroundColor: "#0A1628" }}
+          >
+            {breederLogo && typeof breederLogo === "string" && breederLogo.startsWith("http") ? (
+              <img src={breederLogo} alt="" className="h-full w-full object-cover" />
             ) : (
-              post.image && post.image !== "/placeholder.svg" && (
-                <button
-                  onClick={() => setViewerOpen(true)}
-                  className="block w-full overflow-hidden cursor-pointer"
-                  type="button"
-                >
-                  <img
-                    src={imageFailed ? "/placeholder.svg" : post.image}
-                    alt={resultTitle}
-                    className="w-full object-cover"
-                    style={{ aspectRatio: "4 / 3" }}
-                    loading="lazy"
-                    decoding="async"
-                    onError={() => setImageFailed(true)}
-                  />
-                </button>
-              )
+              <span style={{ fontSize: 16, color: "#fff" }}>
+                {breederLogo || breederName.charAt(0).toUpperCase()}
+              </span>
             )}
-            <div style={{ padding: "12px 16px 10px" }}>
-              {(post as any).caption && (
-                <p className="text-foreground" style={{ fontSize: 15, lineHeight: 1.5, whiteSpace: "pre-wrap", marginBottom: 8 }}>
-                  {(post as any).caption}
-                </p>
-              )}
-              {!(post as any).caption && resultTitle && (
-                <p className="text-foreground font-semibold" style={{ fontSize: 16, lineHeight: 1.25 }}>{resultTitle}</p>
-              )}
-              {post.shown_by && (
-                <p className="text-muted-foreground" style={{ fontSize: 13, lineHeight: 1.3, marginTop: 4 }}>Shown by {post.shown_by}</p>
-              )}
-              {post.show_name && (post as any).caption && (
-                <p className="text-muted-foreground font-medium" style={{ fontSize: 13, lineHeight: 1.3, marginTop: 4 }}>
-                  {post.created_at ? `${new Date(post.created_at).getFullYear()} ` : ""}{post.show_name}
-                </p>
-              )}
-              {post.breeder?.name && (
-                post.breeder?.slug ? (
-                  <Link to={`/breeder/${post.breeder.slug}`} className="text-muted-foreground hover:text-primary transition-colors block" style={{ fontSize: 13, lineHeight: 1.3, marginTop: 4 }}>
-                    Bred by <span className="font-semibold">{post.breeder.name}</span>
-                  </Link>
-                ) : (
-                  <p className="text-muted-foreground" style={{ fontSize: 13, lineHeight: 1.3, marginTop: 4 }}>Bred by {post.breeder.name}</p>
-                )
-              )}
-              {post.sired_by && post.sire_id && (
-                <Link to={`/sire/${post.sire_id}`} className="text-muted-foreground hover:text-primary transition-colors block" style={{ fontSize: 13, lineHeight: 1.3, marginTop: 4 }}>
-                  Sired by <span className="font-semibold">{post.sired_by}</span>
-                </Link>
-              )}
-            </div>
-          </>
+          </div>
+          <div className="flex-1 min-w-0">
+            {breederSlug ? (
+              <Link
+                to={`/breeder/${breederSlug}`}
+                onClick={(e) => e.stopPropagation()}
+                className="font-bold text-[14px] leading-tight block"
+                style={{ color: "#0A1628" }}
+              >
+                {breederName}
+              </Link>
+            ) : (
+              <span className="font-bold text-[14px] leading-tight block" style={{ color: "#0A1628" }}>
+                {breederName}
+              </span>
+            )}
+            <span className="text-[12px] text-muted-foreground leading-tight">
+              {post.created_at ? new Date(post.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : ""}
+            </span>
+          </div>
+        </div>
+
+        {/* Caption — always before photos */}
+        {(post as any).caption && (
+          <div className="px-3 pb-2">
+            <p className="text-foreground" style={{ fontSize: 15, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
+              {(post as any).caption}
+            </p>
+          </div>
         )}
 
-        {/* Engagement row — below image for all cards */}
-        <div className={cn("flex items-center gap-4 px-3 pb-3 pt-2", isWinner && "bg-card")}>
+        {/* Winner badge */}
+        {isWinner && (
+          <div className="px-3 pb-2">
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(true)}
+              className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left"
+              style={{
+                backgroundColor: "rgba(201,168,76,0.1)",
+                border: "1px solid rgba(201,168,76,0.3)",
+              }}
+            >
+              <span className="inline-block rounded-full" style={{ width: 8, height: 8, backgroundColor: accent }} />
+              <span className="font-semibold" style={{ fontSize: 13, color: "#0A1628" }}>
+                {post.win_placing || post.win_title}
+              </span>
+              {post.show_name && (
+                <span style={{ fontSize: 12, color: "#666" }}>
+                  · {post.created_at ? `${new Date(post.created_at).getFullYear()} ` : ""}{post.show_name}
+                </span>
+              )}
+              <span style={{ fontSize: 12, color: accent, fontWeight: 600 }}>Details →</span>
+            </button>
+          </div>
+        )}
+
+        {/* Photos */}
+        {(post as any).video_url ? (
+          <FeedVideo src={(post as any).video_url} aspectRatio="4 / 3" />
+        ) : (
+          <PhotoGrid images={allImages} onTap={openViewer} />
+        )}
+
+        {/* Engagement row */}
+        <div className="flex items-center gap-4 px-3 pb-3 pt-2 bg-white" style={{ borderTop: "1px solid #F3F4F6" }}>
           <button
             onClick={handleLike}
             className="flex items-center gap-1.5 hover:text-destructive transition-colors"
@@ -255,7 +384,6 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         </div>
       </motion.article>
 
-      {/* Winner detail drawer */}
       <WinnerDetailDrawer post={post} open={drawerOpen} onClose={() => setDrawerOpen(false)} />
 
       <AdminFlagModal open={showFlagModal} onOpenChange={setShowFlagModal} postId={post.id} postOwnerId={(post as any).user_id} onActionComplete={onModerated} />
@@ -290,8 +418,10 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
       <AuthGate open={showAuthGate} onOpenChange={setShowAuthGate} />
       <VerifyEmailModal open={showVerifyModal} onOpenChange={setShowVerifyModal} onResend={resendVerification} />
       <WinnerImageViewer
-        slides={[{ image: post.image, name: post.shown_by || resultTitle, placement: resultTitle, breeder: post.breeder?.name || null }]}
-        initialIndex={0} open={viewerOpen} onClose={() => setViewerOpen(false)}
+        slides={allImages.map((img) => ({ image: img, name: post.shown_by || resultTitle, placement: resultTitle, breeder: post.breeder?.name || null }))}
+        initialIndex={viewerIndex}
+        open={viewerOpen}
+        onClose={() => setViewerOpen(false)}
       />
     </>
   );

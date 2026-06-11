@@ -30,6 +30,7 @@ export type PostType = "lamb" | "champion" | "sire" | "sale" | "hauler" | "flush
 export interface Post {
   id: string;
   image: string;
+  image_urls?: string[];
   breeder: Breeder;
   caption: string;
   tags: { label: string; type: string }[];
