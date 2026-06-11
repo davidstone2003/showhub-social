@@ -72,6 +72,7 @@ interface SaleResult {
   sireBreakdown: SireStat[];
   species?: Exclude<SpeciesPill, "All">;
   link?: string;
+  photo?: string;
 }
 
 const saleResults: SaleResult[] = [
