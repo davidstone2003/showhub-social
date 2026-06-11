@@ -550,8 +550,9 @@ export default function CreatePostPage() {
 
             <FieldLabel>Show Name</FieldLabel>
             <AutocompleteInput
-              table="shows" value={showName} onValueChange={setShowName}
-              onSelectId={setShowId} placeholder="Search or type show name"
+              table="shows" value={showName}
+              onChange={(v, id) => { setShowName(v); setShowId(id); }}
+              placeholder="Search or type show name"
             />
 
             <FieldLabel>Shown By</FieldLabel>
