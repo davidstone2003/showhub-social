@@ -72,6 +72,7 @@ interface SaleResult {
   sireBreakdown: SireStat[];
   species?: Exclude<SpeciesPill, "All">;
   link?: string;
+  photo?: string;
 }
 
 const saleResults: SaleResult[] = [
@@ -279,6 +280,7 @@ export default function SalesPage() {
     sireBreakdown: [],
     species: s.species,
     link: s.link,
+    photo: s.photo,
   }));
   const allResultsRaw = [...scrapedResults, ...scoAsResults, ...saleResults];
   const allResults = allResultsRaw.filter((r) =>
@@ -445,8 +447,24 @@ function SaleResultCard({ sale, onSellerClick }: { sale: SaleResult; onSellerCli
   const hasResults = sale.topSellers.length > 0 || sale.sireBreakdown.length > 0;
 
   return (
-    <div className="rounded-xl bg-card border border-border shadow-[var(--shadow-card)] p-4">
-      <div className="flex items-start justify-between gap-2">
+    <div className="rounded-xl bg-card border border-border shadow-[var(--shadow-card)] overflow-hidden">
+      {sale.photo && (
+        <a
+          href={sale.link ?? "#"}
+          target={sale.link ? "_blank" : undefined}
+          rel="noopener noreferrer"
+          className="block bg-muted"
+        >
+          <img
+            src={sale.photo}
+            alt={sale.saleName}
+            loading="lazy"
+            className="w-full aspect-[16/9] object-cover"
+          />
+        </a>
+      )}
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <h3 className="text-[16px] font-bold text-foreground leading-snug">{sale.saleName}</h3>
           <p className="text-[12px] text-muted-foreground mt-0.5">{sale.date} · {sale.location}</p>
@@ -560,6 +578,7 @@ function SaleResultCard({ sale, onSellerClick }: { sale: SaleResult; onSellerCli
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }
