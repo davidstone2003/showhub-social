@@ -8,7 +8,7 @@ import { SireCardCatalog } from "@/components/sire-catalog/SireCard";
 import { SireListRow } from "@/components/sire-catalog/SireListRow";
 import { SireDetailModal } from "@/components/sire-catalog/SireDetailModal";
 import { parseGenotype } from "@/lib/genotype";
-import { CHAMPION_DRIVE_SIRES } from "@/data/championDriveSires";
+import { REPRO_SHEEP_SIRES } from "@/data/reproSheepSires";
 
 import {
   Select,
