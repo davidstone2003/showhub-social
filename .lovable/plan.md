@@ -1,90 +1,69 @@
-# Backdrop — Design System Consistency Pass
+## Goal
 
-Goal: every page feels like one app. Light-mode base, dark hero only on Breeders. Standardize tokens, header, bottom nav, cards, and typography. Fix Sires page. Polish Sales and Market.
+Make Backdrop's directory pages (Winners, Sales, Sires, Breeders) show each real-world event exactly once, no matter how many places it came from (daily scrape, breeder post, exhibitor post). The home feed stays untouched — every post still shows there.
 
-## 1. Design tokens (single source of truth)
+## Architecture
 
-Update `src/index.css` and `tailwind.config.ts` with:
+Two layers, already partially in place:
 
-- `--background` → `#F8F7F4` (warm off-white)
-- `--card` → `#FFFFFF`
-- `--foreground` → `#0A1628` (deep navy)
-- `--muted-foreground` → `#6B7280`
-- `--border` → `#E5E7EB`
-- `--divider-soft` → `#F3F4F6`
-- `--primary` → `#1B3A6B` (navy)
-- `--gold` → `#C9A84C`
-- `--radius` → `12px`
-- `--shadow-card` → `0 2px 8px rgba(0,0,0,0.08)`
+```text
+SOURCES                       MATCHING                CANONICAL RECORDS         SURFACES
+- scraped_results       ─┐                            ┌─ winners (canonical)    Winners page (1 card + "N posts")
+- scraped_upcoming       │                            │
+- posts (winner-tagged)  ├─►  match_event() ────────► ├─ sale_records           Sales page (1 card + "N posts")
+- posts (sale-tagged)    │    (fuzzy + date window)   │
+- winners (legacy)      ─┘                            └─ event_links            Home feed (all posts, unchanged)
+```
 
-Typography scale utilities:
-- `.text-page-title` 28px bold navy
-- `.text-section` 18px semibold navy
-- `.text-card-title` 16px semibold navy
-- `.text-body` 15px regular `#374151`
-- `.text-meta` 13px `#6B7280`
-- `.text-stat` 24px bold (navy or gold variant)
+A new `event_links` table connects every source row (scrape, post, winner) to a single `canonical_event_id`. Directory pages render canonical events; the feed renders posts.
 
-All existing semantic tokens stay — components don't need rewrites, just the token values shift.
+## Database changes (one migration)
 
-## 2. Header & Bottom Nav
+1. `canonical_events` — one row per real-world win/sale.
+   - `kind` ('winner' | 'sale')
+   - `show_name`, `show_name_normalized`
+   - `event_date` (date), `species`, `placement_slot` (null for sales)
+   - `breeder_name`, `breeder_name_normalized`
+   - `verified_level` ('none' | 'exhibitor' | 'breeder')
+   - `best_image_url`, `best_source_id`, `post_count`
+2. `event_links` — `(canonical_event_id, source_type, source_id)` unique. `source_type` in ('scrape_result','scrape_upcoming','winner','post').
+3. `event_aliases` — known short→long show name pairs (seed: OSF↔Ohio State Fair, NAILE, AKSARBEN, etc.) used by the matcher.
+4. RPC `public.match_or_create_event(...)` — security definer; runs the fuzzy match (normalized names + 3-day window + species + placement) and returns the canonical id, inserting if no match.
 
-`MobileHeader.tsx`:
-- White bg, bottom border `#E5E7EB`
-- Navy wordmark left, Search + (Filter on directory pages) right
-- Unauth: Join Free (navy pill) + Log In text
-- Auth: notification bell + avatar
+All tables get the required GRANTs + RLS (public SELECT on canonical_events/event_links; service_role write).
 
-`MobileNav.tsx`:
-- 6 tabs: Home | Winners | Sales | Breeders | Sires | Market (rename Sires from "Repo")
-- Active: gold `#C9A84C` icon+label
-- Inactive: `#9CA3AF`
-- Add tap bounce via `active:scale-90 transition-transform`
+## Matching rules
 
-## 3. Per-page changes
+`normalize(name)` = lowercase, strip punctuation, collapse spaces, apply alias map, drop years.
 
-**Home** — keep. Live banner becomes white card pill with pulsing red dot + gold border. Add Share icon next to like/comment in `PostCard.tsx`.
+Match if ALL true:
+- same `kind`
+- `normalized` show names equal OR one is a known alias of the other OR trigram similarity ≥ 0.75
+- `abs(date1 - date2) ≤ 3 days`
+- same species (or one is null)
+- for winners: same `placement_slot`
+- breeder name normalized matches OR one is null
 
-**Winners** — keep cards. Add horizontal filter pills: All | Grand Champions | Reserve | Class Winners | By Breed.
+Outcomes:
+- **no match** → insert canonical, link source, verified_level from source
+- **scrape ↔ user post** → user post wins: update canonical's `best_image_url` to user photo, bump `verified_level` to breeder/exhibitor, link both sources
+- **multiple user posts** → keep canonical, link each post, increment `post_count`, upgrade verified_level if a breeder post arrives
 
-**Sales** — keep live ticker concept. Restyle rows: money-bag icon, bold lot+price, right-aligned timestamp, soft dividers. Replace dropdowns with single "Filter & Sort" button → bottom sheet. Sale result rows: show name bold, date/location meta, indented lot rows with breeder left / price gold right.
+## Code changes
 
-**Breeders** — keep dark navy hero (`#0A1628`) with headline, search, stats. Below hero switch to light bg. Species tiles become white cards with navy text + gold count + soft shadow (not dark tiles). Update `BreedersPage.tsx` and `SpeciesHubPage.tsx` body sections.
+1. **Edge function `scrape-sales-daily`** — after each scrape row insert, call `match_or_create_event` and insert into `event_links`.
+2. **Edge function `match-event` (new)** — invoked from client when a post is created with structured winner/sale fields. Does the same RPC call so user posts join the canonical graph.
+3. **`SubmitWinnerPage` + post-create flow** — already collects show/date/placement/breeder/species. After insert, call `match-event`.
+4. **`WinnersPage` / `WinnersTab`** — query `canonical_events kind='winner'` joined with `event_links` for `post_count` and the best source row for display. Replace the current "group by show_name" logic with one card per canonical event. Add the "N posts about this" expandable that lists linked posts inline.
+5. **`SalesPage`** — same pattern for `kind='sale'`. Replace dedupe-by-(name,date) string logic with canonical_events query.
+6. **Verified badge** — small gold/silver pip in the corner of `WinnerCard` / sales card, driven by `verified_level`.
 
-**Sires (`/repo` → `/sires`)** — biggest fix:
-- Remove broken placeholder image card
-- Default to list view: horizontal rows (Apple Music style) — monogram avatar, sire name bold, breed + owner meta, green "SEMEN AVAILABLE" pill, chevron right
-- Grid toggle: 2-col cards with monogram + name + top stat
-- Add "Trending Sires" horizontal scroll row at top
-- Fix `SirePhoto.tsx` placeholder to clean monogram avatar (no broken icon)
+## Out of scope for this pass
 
-**Market** — add warm gradient hero "Buy. Sell. Connect." Category icons get tinted bg (Animals gold, Nutrition green, Supplies blue, Services purple). Add "Recently Listed" horizontal scroll row. Add gold FAB "Post a Listing" bottom-right above nav.
+- Sires and Breeders directories: they aggregate by breeder/sire identity, not by event, so they inherit dedup for free once Winners is canonical. No structural change needed; just confirm their queries pull from canonical_events.
+- Backfill of historical rows: handled by a one-shot SQL script after the schema lands (mentioned, not built here).
+- Manual "merge / unmerge" admin tools — follow-up.
 
-## 4. Universal card rules
+## Question before I build
 
-Audit `PostCard`, `WinnerCard`, `HorizontalBreederCard`, `SireListRow`, `SireCardCatalog`, sales rows, market rows to all use:
-- `bg-card` white
-- `rounded-xl` (12px)
-- `shadow-[var(--shadow-card)]`
-- `p-4` internal
-- Divider `#F3F4F6` between list items
-- `active:bg-muted/50` press state
-
-## 5. Transitions
-
-- Cards: `animate-fade-in` on scroll entry (use existing keyframe)
-- Bottom sheets: existing Sheet component already slides up — add `backdrop-blur-sm` to overlay
-- Directory drill: wrap level pages in slide transition class
-
-## Technical notes
-
-- Token changes in `index.css` propagate automatically — most components untouched
-- `SiresPage.tsx` currently exists separately from `RepoPage.tsx`; consolidate route so bottom nav `/sires` lands on the redesigned page
-- Skip the authenticated-feed redesign — user offered, hasn't requested it yet
-- No backend/data changes; pure presentation pass
-
-## Out of scope
-
-- Dark mode toggle (mentioned as future option, not building now)
-- New authenticated home feed (user offered separately)
-- Functional changes to filters, search, or data fetching
+This is a meaningful schema + matcher change. Want me to ship the whole thing in one pass, or land it in two PRs: (1) schema + matcher + scrape integration, then (2) post-create integration + UI badges + "N posts" expander?

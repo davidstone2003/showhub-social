@@ -124,6 +124,45 @@ async function recordStatus(
   );
 }
 
+// ───── Canonical event linker ───────────────────────────────────────────
+async function linkCanonical(
+  sb: SupabaseClient,
+  args: {
+    kind: 'winner' | 'sale';
+    show_name: string;
+    event_date: string | null;
+    species: string | null;
+    placement_slot: string | null;
+    breeder_name: string | null;
+    source_type: 'scrape_result' | 'scrape_upcoming';
+    source_id: string;
+    image_url: string | null;
+  },
+) {
+  try {
+    await sb.rpc('match_or_create_event', {
+      _kind: args.kind,
+      _show_name: args.show_name,
+      _event_date: args.event_date,
+      _species: args.species,
+      _placement_slot: args.placement_slot,
+      _breeder_name: args.breeder_name,
+      _source_type: args.source_type,
+      _source_id: args.source_id,
+      _contributor_kind: 'scrape',
+      _image_url: args.image_url,
+    });
+  } catch (e) {
+    console.error('match_or_create_event failed', e);
+  }
+}
+
+function isoDate(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
+}
+
 // ───── Per-source runners ──────────────────────────────────────────────
 async function runChampionDrive(sb: SupabaseClient, apiKey: string) {
   const extracted = await firecrawlScrape(
@@ -137,6 +176,12 @@ async function runChampionDrive(sb: SupabaseClient, apiKey: string) {
   for (const s of sales) {
     if (!s?.saleName) continue;
     const key = slug(`${s.saleName}-${s.date ?? ''}`);
+    const topLots = (Array.isArray(s.topLots) ? s.topLots : []).slice(0, 5).map((l: any) => ({
+      lot: String(l.lot ?? ''),
+      breeder: String(l.breeder ?? ''),
+      price: String(l.price ?? ''),
+      photo: l.photo && /^https?:\/\//.test(l.photo) ? l.photo : undefined,
+    }));
     const { error } = await sb.from('scraped_results').upsert(
       {
         source: 'champion-drive',
@@ -146,17 +191,27 @@ async function runChampionDrive(sb: SupabaseClient, apiKey: string) {
         location: s.location ?? null,
         managed_by: s.managedBy ?? null,
         source_url: s.sourceUrl ?? null,
-        top_lots: (Array.isArray(s.topLots) ? s.topLots : []).slice(0, 5).map((l: any) => ({
-          lot: String(l.lot ?? ''),
-          breeder: String(l.breeder ?? ''),
-          price: String(l.price ?? ''),
-          photo: l.photo && /^https?:\/\//.test(l.photo) ? l.photo : undefined,
-        })),
+        top_lots: topLots,
         scraped_at: new Date().toISOString(),
       },
       { onConflict: 'source,source_key' },
     );
-    if (!error) saved++;
+    if (!error) {
+      saved++;
+      const topBreeder = topLots[0]?.breeder || null;
+      const topPhoto = topLots.find((l: any) => l.photo)?.photo || null;
+      await linkCanonical(sb, {
+        kind: 'sale',
+        show_name: s.saleName,
+        event_date: isoDate(s.date),
+        species: null,
+        placement_slot: null,
+        breeder_name: topBreeder,
+        source_type: 'scrape_result',
+        source_id: `champion-drive:${key}`,
+        image_url: topPhoto,
+      });
+    }
   }
   return { found: sales.length, saved };
 }
@@ -171,8 +226,6 @@ async function runUpcoming(sb: SupabaseClient, apiKey: string, source: 'sc-onlin
       : 'Extract every upcoming auction: sale name, sale date, consignor name, and the absolute URL link to the full auction page.',
   );
   const sales = Array.isArray(extracted.sales) ? extracted.sales : [];
-  // Replace strategy for upcoming: stale upcoming sales should drop off.
-  // Use upsert by (source, source_key) and delete rows older than this run's timestamp for this source.
   const runAt = new Date().toISOString();
   let saved = 0;
   for (const s of sales) {
@@ -192,9 +245,21 @@ async function runUpcoming(sb: SupabaseClient, apiKey: string, source: 'sc-onlin
       },
       { onConflict: 'source,source_key' },
     );
-    if (!error) saved++;
+    if (!error) {
+      saved++;
+      await linkCanonical(sb, {
+        kind: 'sale',
+        show_name: s.saleName,
+        event_date: isoDate(s.date),
+        species: source === 'sc-online' ? 'sheep' : null,
+        placement_slot: null,
+        breeder_name: s.seller ?? null,
+        source_type: 'scrape_upcoming',
+        source_id: `${source}:${key}`,
+        image_url: null,
+      });
+    }
   }
-  // Remove rows for this source that weren't refreshed (older than runAt)
   await sb.from('scraped_upcoming').delete().eq('source', source).lt('scraped_at', runAt);
   return { found: sales.length, saved };
 }
