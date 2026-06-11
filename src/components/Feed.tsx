@@ -139,7 +139,7 @@ export function Feed() {
           video_url: p.video_url || null,
           caption: p.caption || "",
           tags: (p.tags || []).map((t: string) => ({ label: t, type: "breed" })),
-          post_type: cards.length > 0 ? ("champion" as const) : ((p.post_type || "champion") as any),
+          post_type: cards.length > 0 ? ("champion" as const) : ((p.post_type || "general") as any),
           created_at: p.created_at,
           likes: p.likes || 0,
           comments: p.comments || 0,

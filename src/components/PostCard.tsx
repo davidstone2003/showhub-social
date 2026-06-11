@@ -108,7 +108,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
     setShowDeleteConfirm(false);
   };
 
-  const resultTitle = post.win_placing || post.show_name || "New Post";
+  const resultTitle = post.win_placing || post.show_name || "";
   const status = (post as any).status || "active";
   const isFlagged = status === "flagged";
   const isRestricted = status === "restricted";
@@ -177,49 +177,52 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
             {(post as any).video_url ? (
               <FeedVideo src={(post as any).video_url} aspectRatio="4 / 3" />
             ) : (
-              <button
-                onClick={() => setViewerOpen(true)}
-                className="block w-full overflow-hidden cursor-pointer"
-                type="button"
-              >
-                <img
-                  src={imageFailed ? "/placeholder.svg" : post.image}
-                  alt={resultTitle}
-                  className="w-full object-cover"
-                  style={{ aspectRatio: "4 / 3" }}
-                  loading="lazy"
-                  decoding="async"
-                  onError={() => setImageFailed(true)}
-                />
-              </button>
+              post.image && post.image !== "/placeholder.svg" && (
+                <button
+                  onClick={() => setViewerOpen(true)}
+                  className="block w-full overflow-hidden cursor-pointer"
+                  type="button"
+                >
+                  <img
+                    src={imageFailed ? "/placeholder.svg" : post.image}
+                    alt={resultTitle}
+                    className="w-full object-cover"
+                    style={{ aspectRatio: "4 / 3" }}
+                    loading="lazy"
+                    decoding="async"
+                    onError={() => setImageFailed(true)}
+                  />
+                </button>
+              )
             )}
-            <div style={{ padding: "8px 12px 10px" }}>
-              <p className="text-foreground font-semibold" style={{ fontSize: 18, lineHeight: 1.25 }}>{resultTitle}</p>
-              {post.shown_by && <p className="text-muted-foreground" style={{ fontSize: 14, lineHeight: 1.3, marginTop: 8 }}>{post.shown_by}</p>}
-              {post.show_name && (
-                <p className="text-foreground font-semibold" style={{ fontSize: 14, lineHeight: 1.3, marginTop: 8 }}>
+            <div style={{ padding: "12px 16px 10px" }}>
+              {(post as any).caption && (
+                <p className="text-foreground" style={{ fontSize: 15, lineHeight: 1.5, whiteSpace: "pre-wrap", marginBottom: 8 }}>
+                  {(post as any).caption}
+                </p>
+              )}
+              {!(post as any).caption && resultTitle && (
+                <p className="text-foreground font-semibold" style={{ fontSize: 16, lineHeight: 1.25 }}>{resultTitle}</p>
+              )}
+              {post.shown_by && (
+                <p className="text-muted-foreground" style={{ fontSize: 13, lineHeight: 1.3, marginTop: 4 }}>Shown by {post.shown_by}</p>
+              )}
+              {post.show_name && (post as any).caption && (
+                <p className="text-muted-foreground font-medium" style={{ fontSize: 13, lineHeight: 1.3, marginTop: 4 }}>
                   {post.created_at ? `${new Date(post.created_at).getFullYear()} ` : ""}{post.show_name}
                 </p>
               )}
               {post.breeder?.name && (
                 post.breeder?.slug ? (
-                  <Link
-                    to={`/breeder/${post.breeder.slug}`}
-                    className="text-muted-foreground hover:text-primary transition-colors block"
-                    style={{ fontSize: 14, lineHeight: 1.3, marginTop: 8 }}
-                  >
+                  <Link to={`/breeder/${post.breeder.slug}`} className="text-muted-foreground hover:text-primary transition-colors block" style={{ fontSize: 13, lineHeight: 1.3, marginTop: 4 }}>
                     Bred by <span className="font-semibold">{post.breeder.name}</span>
                   </Link>
                 ) : (
-                  <p className="text-muted-foreground" style={{ fontSize: 14, lineHeight: 1.3, marginTop: 8 }}>Bred by {post.breeder.name}</p>
+                  <p className="text-muted-foreground" style={{ fontSize: 13, lineHeight: 1.3, marginTop: 4 }}>Bred by {post.breeder.name}</p>
                 )
               )}
               {post.sired_by && post.sire_id && (
-                <Link
-                  to={`/sire/${post.sire_id}`}
-                  className="text-muted-foreground hover:text-primary transition-colors block"
-                  style={{ fontSize: 14, lineHeight: 1.3, marginTop: 8 }}
-                >
+                <Link to={`/sire/${post.sire_id}`} className="text-muted-foreground hover:text-primary transition-colors block" style={{ fontSize: 13, lineHeight: 1.3, marginTop: 4 }}>
                   Sired by <span className="font-semibold">{post.sired_by}</span>
                 </Link>
               )}
