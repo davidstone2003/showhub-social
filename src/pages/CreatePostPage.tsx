@@ -277,7 +277,6 @@ export default function CreatePostPage() {
 
   const handlePost = () => {
     setShowEmojiPicker(false);
-    setShowFormatting(false);
     if (winnerReady) return handleSubmitWinner();
     if (saleLotReady) return handleSubmitSaleLot();
     if (saleEventReady) return handleSubmitSaleEvent();
