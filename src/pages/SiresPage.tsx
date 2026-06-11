@@ -78,12 +78,13 @@ const SiresPage = () => {
   }, []);
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return sires;
+    const bySpecies = sires.filter((s) => matchesSpecies(species, s.breed, s.name));
+    if (!search.trim()) return bySpecies;
     const q = search.toLowerCase();
-    return sires.filter((s) =>
+    return bySpecies.filter((s) =>
       s.name.toLowerCase().includes(q) || (s.breederName ?? "").toLowerCase().includes(q)
     );
-  }, [sires, search]);
+  }, [sires, search, species]);
 
   const trending = useMemo(() => sires.filter((s) => s.winCount > 0).slice(0, 8), [sires]);
 
