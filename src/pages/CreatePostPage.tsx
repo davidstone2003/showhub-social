@@ -277,6 +277,8 @@ export default function CreatePostPage() {
   const canPost = winnerReady || saleLotReady || saleEventReady || generalCaption.trim().length > 0 || media.length > 0;
 
   const handlePost = () => {
+    setShowEmojiPicker(false);
+    setShowFormatting(false);
     if (winnerReady) return handleSubmitWinner();
     if (saleLotReady) return handleSubmitSaleLot();
     if (saleEventReady) return handleSubmitSaleEvent();
