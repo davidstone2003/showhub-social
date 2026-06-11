@@ -720,22 +720,77 @@ export default function CreatePostPage() {
               </div>
               <div className="flex-1">
                 <div className="font-semibold text-[15px]" style={{ color: "#0A1628" }}>Smart Upload</div>
-                <div className="text-[13px] text-[#5C6470]">Auto-fill from a screenshot</div>
+                <div className="text-[13px] text-[#5C6470]">AI reads your photo or text and fills details</div>
               </div>
             </button>
             <button
-              onClick={() => { setShowMoreSheet(false); setShowPasteCaption(true); }}
+              onClick={() => { setShowMoreSheet(false); videoInputRef.current?.click(); }}
               className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#F8F7F4] hover:bg-[#EFEDE8] transition-colors text-left"
             >
               <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#C9A84C20" }}>
-                <ClipboardPaste className="w-5 h-5" style={{ color: "#C9A84C" }} />
+                <VideoIcon className="w-5 h-5" style={{ color: "#C9A84C" }} />
               </div>
               <div className="flex-1">
-                <div className="font-semibold text-[15px]" style={{ color: "#0A1628" }}>Paste Caption</div>
-                <div className="text-[13px] text-[#5C6470]">Auto-fill from pasted text</div>
+                <div className="font-semibold text-[15px]" style={{ color: "#0A1628" }}>Add Video</div>
+                <div className="text-[13px] text-[#5C6470]">Upload a video to your post</div>
+              </div>
+            </button>
+            <button
+              onClick={() => { setShowMoreSheet(false); setShowTagSheet(true); }}
+              className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#F8F7F4] hover:bg-[#EFEDE8] transition-colors text-left"
+            >
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#C9A84C20" }}>
+                <Users className="w-5 h-5" style={{ color: "#C9A84C" }} />
+              </div>
+              <div className="flex-1">
+                <div className="font-semibold text-[15px] flex items-center gap-2" style={{ color: "#0A1628" }}>
+                  Tag People
+                  {taggedPeople.length > 0 && (
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+                      {taggedPeople.length} tagged
+                    </span>
+                  )}
+                </div>
+                <div className="text-[13px] text-[#5C6470]">Tag exhibitors, breeders, fitters</div>
+              </div>
+            </button>
+            <button
+              onClick={() => { setShowMoreSheet(false); setShowSpeciesSheet(true); }}
+              className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#F8F7F4] hover:bg-[#EFEDE8] transition-colors text-left"
+            >
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#C9A84C20" }}>
+                <Leaf className="w-5 h-5" style={{ color: "#C9A84C" }} />
+              </div>
+              <div className="flex-1">
+                <div className="font-semibold text-[15px] flex items-center gap-2" style={{ color: "#0A1628" }}>
+                  Species
+                  {species && (
+                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: "#C9A84C20", color: "#8B6914" }}>
+                      {species}
+                    </span>
+                  )}
+                </div>
+                <div className="text-[13px] text-[#5C6470]">Tag the species in this post</div>
               </div>
             </button>
           </div>
+        </BottomSheet>
+      )}
+
+      {/* Tag People bottom sheet */}
+      {showTagSheet && (
+        <BottomSheet onClose={() => setShowTagSheet(false)} title="Tag People" tall>
+          <p className="text-[13px] text-[#5C6470] mb-3">
+            Tag exhibitors, breeders, fitters, or anyone with a Backdrop account
+          </p>
+          <PeopleTagger tagged={taggedPeople} onChange={setTaggedPeople} />
+          <Button
+            onClick={() => setShowTagSheet(false)}
+            className="w-full h-12 rounded-xl font-bold mt-4"
+            style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+          >
+            Done {taggedPeople.length > 0 ? `(${taggedPeople.length} tagged)` : ""}
+          </Button>
         </BottomSheet>
       )}
 
