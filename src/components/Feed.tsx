@@ -188,8 +188,7 @@ export function Feed() {
   }, [refreshKey]);
 
   const allPosts = useMemo(() => {
-    const sourcePosts = dbPosts.length > 0 ? dbPosts : mockPosts;
-    return sourcePosts.filter((post) => !hiddenPostIds.includes(post.id));
+    return dbPosts.filter((post) => !hiddenPostIds.includes(post.id));
   }, [dbPosts, hiddenPostIds]);
 
   return (
