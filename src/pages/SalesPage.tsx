@@ -394,38 +394,6 @@ export default function SalesPage() {
           </div>
         </div>
 
-        {/* Import from URL dialog */}
-        <Dialog open={importOpen} onOpenChange={(o) => !importing && setImportOpen(o)}>
-          <DialogContent className="max-w-md">
-            <DialogTitle>Import Sale Results</DialogTitle>
-            <DialogDescription>
-              Paste a sale results page URL (e.g. SC Online Sales). We'll pull the top sellers with photos automatically.
-            </DialogDescription>
-            <div className="mt-4 space-y-3">
-              <Input
-                value={importUrl}
-                onChange={(e) => setImportUrl(e.target.value)}
-                placeholder="https://www.sconlinesales.com/..."
-                disabled={importing}
-              />
-              <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={() => setImportOpen(false)} disabled={importing}>
-                  Cancel
-                </Button>
-                <Button className="flex-1" onClick={handleImport} disabled={importing || !importUrl.trim()}>
-                  {importing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Scraping…
-                    </>
-                  ) : (
-                    "Import"
-                  )}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
 
 
         {/* Top seller detail sheet */}
