@@ -18,8 +18,9 @@ import SmartUpload from "@/components/SmartUpload";
 import PostSuccessScreen from "@/components/PostSuccessScreen";
 import {
   Trophy, ChevronDown, X, Camera, Video as VideoIcon, Smile,
-  Tag, Leaf, MoreHorizontal, Play, Plus, Sparkles, ClipboardPaste,
+  Tag, Leaf, MoreHorizontal, Play, Plus, Sparkles, ClipboardPaste, Type,
 } from "lucide-react";
+import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { cn } from "@/lib/utils";
 
 type PostCategory = null | "winner" | "sale_lot" | "sale_event" | "general";
@@ -105,6 +106,8 @@ export default function CreatePostPage() {
 
   // General fields
   const [generalCaption, setGeneralCaption] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showFormatting, setShowFormatting] = useState(false);
 
   const captionRef = useRef<HTMLTextAreaElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -274,6 +277,8 @@ export default function CreatePostPage() {
   const canPost = winnerReady || saleLotReady || saleEventReady || generalCaption.trim().length > 0 || media.length > 0;
 
   const handlePost = () => {
+    setShowEmojiPicker(false);
+    setShowFormatting(false);
     if (winnerReady) return handleSubmitWinner();
     if (saleLotReady) return handleSubmitSaleLot();
     if (saleEventReady) return handleSubmitSaleEvent();
@@ -437,11 +442,83 @@ export default function CreatePostPage() {
         )}
       </div>
 
+      {/* Emoji picker panel */}
+      {showEmojiPicker && (
+        <div className="fixed left-0 right-0 bottom-[68px] z-40 px-2">
+          <div className="mx-auto max-w-md rounded-xl overflow-hidden shadow-2xl border border-[#E5E7EB] bg-white">
+            <EmojiPicker
+              onEmojiClick={(emojiData: EmojiClickData) => {
+                const ta = captionRef.current;
+                const cursor = ta?.selectionStart ?? generalCaption.length;
+                const end = ta?.selectionEnd ?? cursor;
+                const newCaption = generalCaption.slice(0, cursor) + emojiData.emoji + generalCaption.slice(end);
+                setGeneralCaption(newCaption);
+                setShowEmojiPicker(false);
+                setTimeout(() => ta?.focus(), 0);
+              }}
+              width="100%"
+              height={350}
+              searchDisabled={false}
+              skinTonesDisabled
+              previewConfig={{ showPreview: false }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Text formatting mini-toolbar */}
+      {showFormatting && (
+        <div className="fixed left-0 right-0 bottom-[68px] z-40 flex items-center gap-1 px-4 py-2 bg-white border-t border-[#E5E7EB] overflow-x-auto">
+          {[
+            { label: "B", style: "**", title: "Bold" },
+            { label: "I", style: "_", title: "Italic" },
+            { label: "H1", style: "# ", title: "Heading" },
+            { label: "•", style: "\n• ", title: "Bullet" },
+          ].map(({ label, style, title }) => (
+            <button
+              key={label}
+              title={title}
+              onClick={() => {
+                const ta = captionRef.current;
+                const start = ta?.selectionStart ?? generalCaption.length;
+                const end = ta?.selectionEnd ?? start;
+                const selected = generalCaption.slice(start, end);
+                const wrapped = selected ? `${style}${selected}${style}` : style;
+                const newCaption = generalCaption.slice(0, start) + wrapped + generalCaption.slice(end);
+                setGeneralCaption(newCaption);
+                setTimeout(() => ta?.focus(), 0);
+              }}
+              className="flex items-center justify-center w-9 h-9 rounded-lg border border-[#E5E7EB] text-[13px] font-bold text-[#0A1628] hover:bg-[#F8F7F4] shrink-0"
+            >
+              {label}
+            </button>
+          ))}
+          <div className="w-px h-6 bg-[#E5E7EB] mx-1 shrink-0" />
+          {["🏆", "🐑", "🐄", "🐖", "🐐", "⭐", "🔥", "👏", "💪", "❤️"].map(emoji => (
+            <button
+              key={emoji}
+              onClick={() => {
+                const ta = captionRef.current;
+                const cursor = ta?.selectionStart ?? generalCaption.length;
+                const end = ta?.selectionEnd ?? cursor;
+                const newCaption = generalCaption.slice(0, cursor) + emoji + generalCaption.slice(end);
+                setGeneralCaption(newCaption);
+                setTimeout(() => ta?.focus(), 0);
+              }}
+              className="text-[20px] w-9 h-9 flex items-center justify-center shrink-0"
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Bottom toolbar */}
       <div className="fixed left-0 right-0 bottom-16 z-30 bg-white border-t border-[#E5E7EB] h-[52px] flex items-center justify-around px-2">
         <ToolbarIcon icon={Camera} onClick={() => photoInputRef.current?.click()} />
         <ToolbarIcon icon={VideoIcon} onClick={() => videoInputRef.current?.click()} />
-        <ToolbarIcon icon={Smile} onClick={() => captionRef.current?.focus()} />
+        <ToolbarIcon icon={Smile} active={showEmojiPicker} onClick={() => { setShowFormatting(false); setShowEmojiPicker(v => !v); }} />
+        <ToolbarIcon icon={Type} active={showFormatting} onClick={() => { setShowEmojiPicker(false); setShowFormatting(v => !v); }} />
         <ToolbarIcon icon={Trophy} active={winnerHasData} onClick={() => setShowWinnerPanel(true)} />
         <ToolbarIcon icon={Tag} onClick={() => toast("Tagging coming soon")} />
         <ToolbarIcon icon={Leaf} active={!!species} onClick={() => setShowSpeciesSheet(true)} />
