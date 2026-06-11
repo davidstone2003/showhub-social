@@ -203,7 +203,7 @@ export function Feed() {
           </>
         ) : allPosts.length > 0 ? (
           allPosts.map((post, i) => (
-            <div key={post.id} className={post.post_type === "champion" ? "-mx-3" : ""}>
+            <div key={post.id} className="-mx-3">
               <PostCard post={post} index={i} onModerated={handleModerated} />
             </div>
           ))
