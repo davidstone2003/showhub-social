@@ -610,6 +610,45 @@ export type Database = {
           },
         ]
       }
+      scraped_sales: {
+        Row: {
+          average_price: string | null
+          created_at: string
+          id: string
+          location: string | null
+          sale_date: string | null
+          sale_name: string | null
+          scraped_at: string
+          source_url: string
+          top_sellers: Json
+          total_head: number | null
+        }
+        Insert: {
+          average_price?: string | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          sale_date?: string | null
+          sale_name?: string | null
+          scraped_at?: string
+          source_url: string
+          top_sellers?: Json
+          total_head?: number | null
+        }
+        Update: {
+          average_price?: string | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          sale_date?: string | null
+          sale_name?: string | null
+          scraped_at?: string
+          source_url?: string
+          top_sellers?: Json
+          total_head?: number | null
+        }
+        Relationships: []
+      }
       shows: {
         Row: {
           created_at: string
