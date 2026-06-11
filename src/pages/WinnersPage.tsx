@@ -92,6 +92,7 @@ export default function WinnersPage() {
   const [breederProfilesMap, setBreederProfilesMap] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [species, setSpecies] = useState<SpeciesPill>("All");
 
   const handleModerated = () => setRefreshKey((k) => k + 1);
 
