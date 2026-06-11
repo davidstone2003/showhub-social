@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
+import { SCO_RECENT_SALES } from "@/data/scoRecentSales";
 
 /* ── Upcoming sales ── */
 interface UpcomingSale {
@@ -69,6 +70,8 @@ interface SaleResult {
   averagePrice: string;
   topSellers: TopSeller[];
   sireBreakdown: SireStat[];
+  species?: Exclude<SpeciesPill, "All">;
+  link?: string;
 }
 
 const saleResults: SaleResult[] = [
@@ -265,15 +268,29 @@ export default function SalesPage() {
     return () => { cancelled = true; };
   }, []);
 
-  const allResultsRaw = [...scrapedResults, ...saleResults];
+  const scoAsResults: SaleResult[] = SCO_RECENT_SALES.map((s) => ({
+    id: s.id,
+    saleName: s.name,
+    date: s.date,
+    location: s.location,
+    totalHead: 0,
+    averagePrice: "—",
+    topSellers: [],
+    sireBreakdown: [],
+    species: s.species,
+    link: s.link,
+  }));
+  const allResultsRaw = [...scrapedResults, ...scoAsResults, ...saleResults];
   const allResults = allResultsRaw.filter((r) =>
-    matchesSpecies(
-      species,
-      r.saleName,
-      r.location,
-      ...r.topSellers.flatMap((t) => [t.lot, t.breeder, t.sire ?? null]),
-      ...r.sireBreakdown.map((s) => s.sire),
-    ),
+    r.species
+      ? species === "All" || r.species === species
+      : matchesSpecies(
+          species,
+          r.saleName,
+          r.location,
+          ...r.topSellers.flatMap((t) => [t.lot, t.breeder, t.sire ?? null]),
+          ...r.sireBreakdown.map((s) => s.sire),
+        ),
   );
   const upcomingFiltered = (list: UpcomingSale[]) =>
     list.filter((s) =>
@@ -425,47 +442,70 @@ function SaleResultCard({ sale, onSellerClick }: { sale: SaleResult; onSellerCli
   const topSire = getTopSire(sale);
   const sireCount = sireTable.filter((s) => s.sire.toLowerCase() !== "no sire listed").length;
 
+  const hasResults = sale.topSellers.length > 0 || sale.sireBreakdown.length > 0;
+
   return (
     <div className="rounded-xl bg-card border border-border shadow-[var(--shadow-card)] p-4">
-      <h3 className="text-[16px] font-bold text-foreground leading-snug">{sale.saleName}</h3>
-      <p className="text-[12px] text-muted-foreground mt-0.5">{sale.date} · {sale.location}</p>
-
-      {/* Stats: Head / Avg / Top Sire */}
-      <div className="mt-4 grid grid-cols-3 gap-2">
-        <Stat label="Head Sold" value={String(sale.totalHead)} />
-        <Stat label="Avg Price" value={sale.averagePrice} />
-        <Stat label="Top Sire" value={topSire ? topSire.sire : "—"} small />
-      </div>
-
-      {/* Top Sellers */}
-      <div className="mt-4">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Top Sellers</p>
-        <div className="flex gap-3 overflow-x-auto -mx-1 px-1 pb-1 snap-x snap-mandatory">
-          {sale.topSellers.map((s, i) => (
-            <button
-              key={i}
-              onClick={() => onSellerClick(s)}
-              className="snap-start shrink-0 w-[140px] text-left rounded-lg border border-border bg-background overflow-hidden active:scale-[0.98] transition-transform"
-            >
-              {s.photo ? (
-                <img src={s.photo} alt={s.lot} className="w-full aspect-square object-cover" />
-              ) : (
-                <div className="w-full aspect-square bg-muted flex items-center justify-center text-[11px] text-muted-foreground">
-                  No photo
-                </div>
-              )}
-              <div className="p-2">
-                <div className="flex items-baseline justify-between gap-1">
-                  <span className="text-[11px] font-bold text-muted-foreground">{s.lot}</span>
-                  <span className="text-[13px] font-bold text-[hsl(var(--gold))] tabular-nums">{s.price}</span>
-                </div>
-                {s.sire && <p className="text-[11px] text-foreground mt-1 truncate">{s.sire}</p>}
-                <p className="text-[10px] text-muted-foreground truncate">{s.breeder}</p>
-              </div>
-            </button>
-          ))}
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <h3 className="text-[16px] font-bold text-foreground leading-snug">{sale.saleName}</h3>
+          <p className="text-[12px] text-muted-foreground mt-0.5">{sale.date} · {sale.location}</p>
         </div>
+        {sale.link && (
+          <a
+            href={sale.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold"
+            style={{ backgroundColor: "#0A1628", color: "#FFFFFF" }}
+          >
+            View
+          </a>
+        )}
       </div>
+
+      {hasResults && (
+        <>
+          {/* Stats: Head / Avg / Top Sire */}
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            <Stat label="Head Sold" value={String(sale.totalHead)} />
+            <Stat label="Avg Price" value={sale.averagePrice} />
+            <Stat label="Top Sire" value={topSire ? topSire.sire : "—"} small />
+          </div>
+
+          {/* Top Sellers */}
+          {sale.topSellers.length > 0 && (
+            <div className="mt-4">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Top Sellers</p>
+              <div className="flex gap-3 overflow-x-auto -mx-1 px-1 pb-1 snap-x snap-mandatory">
+                {sale.topSellers.map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => onSellerClick(s)}
+                    className="snap-start shrink-0 w-[140px] text-left rounded-lg border border-border bg-background overflow-hidden active:scale-[0.98] transition-transform"
+                  >
+                    {s.photo ? (
+                      <img src={s.photo} alt={s.lot} className="w-full aspect-square object-cover" />
+                    ) : (
+                      <div className="w-full aspect-square bg-muted flex items-center justify-center text-[11px] text-muted-foreground">
+                        No photo
+                      </div>
+                    )}
+                    <div className="p-2">
+                      <div className="flex items-baseline justify-between gap-1">
+                        <span className="text-[11px] font-bold text-muted-foreground">{s.lot}</span>
+                        <span className="text-[13px] font-bold text-[hsl(var(--gold))] tabular-nums">{s.price}</span>
+                      </div>
+                      {s.sire && <p className="text-[11px] text-foreground mt-1 truncate">{s.sire}</p>}
+                      <p className="text-[10px] text-muted-foreground truncate">{s.breeder}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
 
       {/* By Sire (collapsible) */}
       {sireTable.length > 0 && (
