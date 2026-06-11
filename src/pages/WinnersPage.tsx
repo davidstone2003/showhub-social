@@ -183,8 +183,8 @@ export default function WinnersPage() {
           </div>
         </div>
 
-        {/* Species pills */}
-        <div className="px-4 pt-3 pb-3">
+        {/* Species pills — dark chrome band */}
+        <div className="px-4 pt-3 pb-3" style={{ backgroundColor: "#0A1628" }}>
           <SpeciesPills value={species} onChange={setSpecies} appMode />
         </div>
 
