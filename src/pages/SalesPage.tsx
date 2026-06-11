@@ -280,6 +280,7 @@ export default function SalesPage() {
     sireBreakdown: [],
     species: s.species,
     link: s.link,
+    photo: s.photo,
   }));
   const allResultsRaw = [...scrapedResults, ...scoAsResults, ...saleResults];
   const allResults = allResultsRaw.filter((r) =>
