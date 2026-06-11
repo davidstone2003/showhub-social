@@ -122,8 +122,27 @@ export default function CreatePostPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Pull the user's breeder profile name and use as Bred By default
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("breeder_profiles")
+        .select("id, breeder_name")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      const farmName = (data as any)?.breeder_name as string | undefined;
+      if (farmName) {
+        setSavedDefaults((prev) => ({ ...prev, farmName, bredBy: prev.bredBy || farmName }));
+        setBreederName((prev) => prev || farmName);
+      }
+    })();
+  }, [user]);
+
   const handleOpenWinnerPanel = () => {
-    if (!breederName && savedDefaults.bredBy) setBreederName(savedDefaults.bredBy);
+    if (!breederName && (savedDefaults.bredBy || savedDefaults.farmName)) {
+      setBreederName(savedDefaults.bredBy || savedDefaults.farmName);
+    }
     setShowWinnerPanel(true);
   };
 
