@@ -157,6 +157,46 @@ function getTopSire(sale: SaleResult): SireStat | null {
 export default function SalesPage() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [detail, setDetail] = useState<{ sale: SaleResult; seller: TopSeller } | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importUrl, setImportUrl] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [imported, setImported] = useState<SaleResult[]>([]);
+
+  const handleImport = async () => {
+    if (!importUrl.trim()) return;
+    setImporting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("scrape-sale-results", {
+        body: { url: importUrl.trim() },
+      });
+      if (error) throw error;
+      if (!data || !Array.isArray(data.topSellers)) {
+        throw new Error("No data extracted from that URL");
+      }
+      const newSale: SaleResult = {
+        id: `imported-${Date.now()}`,
+        saleName: data.saleName || "Imported Sale",
+        date: data.date || "—",
+        location: data.location || "—",
+        totalHead: typeof data.totalHead === "number" ? data.totalHead : 0,
+        averagePrice: data.averagePrice || "—",
+        topSellers: data.topSellers,
+        sireBreakdown: [],
+      };
+      setImported((prev) => [newSale, ...prev]);
+      toast({ title: "Sale imported", description: `${newSale.topSellers.length} top sellers loaded` });
+      setImportOpen(false);
+      setImportUrl("");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Import failed";
+      toast({ title: "Import failed", description: msg, variant: "destructive" });
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const allResults = [...imported, ...saleResults];
+
 
   return (
     <Layout showDiscovery={false}>
