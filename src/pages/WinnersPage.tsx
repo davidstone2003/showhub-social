@@ -4,6 +4,7 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PostCard } from "@/components/PostCard";
+import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
 import type { Post } from "@/data/mock";
 
 interface WinnerRow {
