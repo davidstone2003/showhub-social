@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Heart, MessageCircle, Share2, Flag, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { FeedVideo } from "@/components/post/VideoPlayer";
 import { motion } from "framer-motion";
@@ -200,7 +201,28 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                   {post.created_at ? `${new Date(post.created_at).getFullYear()} ` : ""}{post.show_name}
                 </p>
               )}
-              {post.breeder?.name && <p className="text-muted-foreground" style={{ fontSize: 14, lineHeight: 1.3, marginTop: 8 }}>Bred by {post.breeder.name}</p>}
+              {post.breeder?.name && (
+                post.breeder?.slug ? (
+                  <Link
+                    to={`/breeder/${post.breeder.slug}`}
+                    className="text-muted-foreground hover:text-primary transition-colors block"
+                    style={{ fontSize: 14, lineHeight: 1.3, marginTop: 8 }}
+                  >
+                    Bred by <span className="font-semibold">{post.breeder.name}</span>
+                  </Link>
+                ) : (
+                  <p className="text-muted-foreground" style={{ fontSize: 14, lineHeight: 1.3, marginTop: 8 }}>Bred by {post.breeder.name}</p>
+                )
+              )}
+              {post.sired_by && post.sire_id && (
+                <Link
+                  to={`/sire/${post.sire_id}`}
+                  className="text-muted-foreground hover:text-primary transition-colors block"
+                  style={{ fontSize: 14, lineHeight: 1.3, marginTop: 8 }}
+                >
+                  Sired by <span className="font-semibold">{post.sired_by}</span>
+                </Link>
+              )}
             </div>
           </>
         )}

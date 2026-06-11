@@ -1,9 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
-import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { posts as mockPosts, Post } from "@/data/mock";
 import { PostCard } from "./PostCard";
 import { PostCardSkeleton } from "./PostCardSkeleton";
+import { BackdropLogo } from "./RinglyLogo";
 import { supabase } from "@/integrations/supabase/client";
 
 interface WinnerCard {
@@ -199,23 +199,38 @@ export function Feed() {
           <>
             <PostCardSkeleton />
             <PostCardSkeleton />
+            <PostCardSkeleton />
           </>
         ) : allPosts.length > 0 ? (
           allPosts.map((post, i) => (
             <PostCard key={post.id} post={post} index={i} onModerated={handleModerated} />
           ))
         ) : (
-          <div className="text-center" style={{ padding: "80px 0" }}>
-            <p className="text-muted-foreground" style={{ fontSize: "16px", lineHeight: "24px" }}>
-              No posts yet. Be the first!
+          <div className="flex flex-col items-center text-center" style={{ padding: "80px 16px" }}>
+            <div className="mb-5">
+              <BackdropLogo size="lg" showTagline={false} onDark={false} />
+            </div>
+            <h2 className="font-bold text-foreground" style={{ fontSize: 22, lineHeight: 1.2 }}>
+              Nothing here yet
+            </h2>
+            <p className="text-muted-foreground mt-2 max-w-xs" style={{ fontSize: 14, lineHeight: 1.4 }}>
+              Be the first to post a win, sale result, or update
             </p>
             <Link
               to="/submit"
-              className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-colors"
-              style={{ marginTop: "12px", padding: "0 16px", height: "40px", borderRadius: "10px", fontSize: "14px" }}
+              className="inline-flex items-center justify-center font-bold active:scale-95 transition-transform"
+              style={{
+                marginTop: 20,
+                padding: "0 22px",
+                height: 48,
+                borderRadius: 24,
+                fontSize: 15,
+                backgroundColor: "#C9A84C",
+                color: "#0A1628",
+                boxShadow: "0 4px 12px rgba(201,168,76,0.35)",
+              }}
             >
-              <Plus className="w-4 h-4" />
-              Add to Backdrop
+              Post to Backdrop
             </Link>
           </div>
         )}
