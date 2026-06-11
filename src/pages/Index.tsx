@@ -7,11 +7,13 @@ import { Feed } from "@/components/Feed";
 const Index = () => {
   return (
     <Layout showDiscovery={false}>
-      <div className="max-w-2xl mx-auto w-full px-3 pb-24">
-        <div className="-mt-2">
-          <LiveStrip />
+      <div style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
+        <div className="max-w-2xl mx-auto w-full px-3 pb-24">
+          <div className="-mt-2">
+            <LiveStrip />
+          </div>
+          <Feed />
         </div>
-        <Feed />
       </div>
 
       {/* Floating action button */}
@@ -23,7 +25,7 @@ const Index = () => {
           width: 56,
           height: 56,
           right: 16,
-          bottom: 80,
+          bottom: 88,
           backgroundColor: "#C9A84C",
           color: "#0A1628",
           boxShadow: "0 6px 16px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.15)",
