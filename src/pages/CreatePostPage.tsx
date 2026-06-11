@@ -107,7 +107,6 @@ export default function CreatePostPage() {
   // General fields
   const [generalCaption, setGeneralCaption] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [showFormatting, setShowFormatting] = useState(false);
 
   const captionRef = useRef<HTMLTextAreaElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
