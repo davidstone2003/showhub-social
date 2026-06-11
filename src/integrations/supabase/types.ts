@@ -560,6 +560,7 @@ export type Database = {
           posted_as_breeder_id: string | null
           show_on_feed: boolean
           status: string
+          tagged_user_ids: string[]
           tags: string[] | null
           user_id: string | null
           video_url: string | null
@@ -575,6 +576,7 @@ export type Database = {
           posted_as_breeder_id?: string | null
           show_on_feed?: boolean
           status?: string
+          tagged_user_ids?: string[]
           tags?: string[] | null
           user_id?: string | null
           video_url?: string | null
@@ -590,6 +592,7 @@ export type Database = {
           posted_as_breeder_id?: string | null
           show_on_feed?: boolean
           status?: string
+          tagged_user_ids?: string[]
           tags?: string[] | null
           user_id?: string | null
           video_url?: string | null

@@ -18,10 +18,11 @@ import SmartUpload from "@/components/SmartUpload";
 import PostSuccessScreen from "@/components/PostSuccessScreen";
 import {
   Trophy, ChevronDown, X, Camera, Video as VideoIcon, Smile,
-  Tag, Leaf, MoreHorizontal, Play, Plus, Sparkles, ClipboardPaste,
+  Leaf, MoreHorizontal, Play, Plus, Sparkles, ClipboardPaste, Users,
 } from "lucide-react";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { cn } from "@/lib/utils";
+import { PeopleTagger, type TaggedPerson } from "@/components/post/PeopleTagger";
 
 type PostCategory = null | "winner" | "sale_lot" | "sale_event" | "general";
 
@@ -73,6 +74,8 @@ export default function CreatePostPage() {
   const [showSpeciesSheet, setShowSpeciesSheet] = useState(false);
   const [showMoreSheet, setShowMoreSheet] = useState(false);
   const [showIdentitySheet, setShowIdentitySheet] = useState(false);
+  const [showTagSheet, setShowTagSheet] = useState(false);
+  const [taggedPeople, setTaggedPeople] = useState<TaggedPerson[]>([]);
 
   // Winner fields
   const [resultTitle, setResultTitle] = useState("");
@@ -228,6 +231,7 @@ export default function CreatePostPage() {
         user_id: user?.id || null, posted_as_breeder_id: postedAsBreederId,
         caption: (notes.trim() || generalCaption.trim()) || null, image_urls: imageUrls, video_url: videoUrl,
         tags: species ? [species] : [], post_type: "winner", show_on_feed: true,
+        tagged_user_ids: taggedPeople.map(p => p.id),
       }).select("id").single();
       if (postError) throw postError;
 
@@ -301,7 +305,9 @@ export default function CreatePostPage() {
         user_id: user?.id || null, posted_as_breeder_id: postedAsBreederId,
         caption: generalCaption.trim() || null, image_urls: imageUrls, video_url: videoUrl,
         tags: species ? [species] : [], post_type: "general", show_on_feed: true,
+        tagged_user_ids: taggedPeople.map(p => p.id),
       });
+      setTaggedPeople([]);
       toast.success("Post shared!"); navigate("/");
     } catch (err: any) { toast.error("Failed to post", { description: err.message }); }
     finally { setSubmitting(false); }
@@ -517,6 +523,32 @@ export default function CreatePostPage() {
           </div>
         )}
 
+        {/* Tagged people chip */}
+        {taggedPeople.length > 0 && (
+          <div className="mx-4 mb-2 flex items-center gap-2 flex-wrap">
+            <span className="text-[12px] font-semibold text-[#5C6470]">With:</span>
+            {taggedPeople.map(person => (
+              <div
+                key={person.id}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium"
+                style={{ backgroundColor: "#C9A84C15", color: "#8B6914", border: "1px solid #C9A84C40" }}
+              >
+                {person.name}
+                <button onClick={() => setTaggedPeople(prev => prev.filter(p => p.id !== person.id))}>
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+            <button
+              onClick={() => setShowTagSheet(true)}
+              className="text-[12px] font-semibold"
+              style={{ color: "#C9A84C" }}
+            >
+              + Add more
+            </button>
+          </div>
+        )}
+
         {/* Caption area */}
         <div className="px-4 pt-2">
           <textarea
@@ -633,12 +665,14 @@ export default function CreatePostPage() {
       {/* Bottom toolbar */}
       <div className="fixed left-0 right-0 bottom-16 z-30 bg-white border-t border-[#E5E7EB] h-[52px] flex items-center justify-around px-2">
         <ToolbarIcon icon={Camera} onClick={() => photoInputRef.current?.click()} />
-        <ToolbarIcon icon={VideoIcon} onClick={() => videoInputRef.current?.click()} />
         <ToolbarIcon icon={Smile} active={showEmojiPicker} onClick={() => setShowEmojiPicker(v => !v)} />
+        <ToolbarIcon icon={Sparkles} gold onClick={() => setShowSmartUpload(true)} />
         <ToolbarIcon icon={Trophy} active={winnerHasData} onClick={handleOpenWinnerPanel} />
-        <ToolbarIcon icon={Tag} onClick={() => toast("Tagging coming soon")} />
-        <ToolbarIcon icon={Leaf} active={!!species} onClick={() => setShowSpeciesSheet(true)} />
-        <ToolbarIcon icon={MoreHorizontal} onClick={() => setShowMoreSheet(true)} />
+        <ToolbarIcon
+          icon={MoreHorizontal}
+          onClick={() => setShowMoreSheet(true)}
+          badge={taggedPeople.length > 0}
+        />
       </div>
 
       {/* Identity bottom sheet */}
@@ -687,22 +721,77 @@ export default function CreatePostPage() {
               </div>
               <div className="flex-1">
                 <div className="font-semibold text-[15px]" style={{ color: "#0A1628" }}>Smart Upload</div>
-                <div className="text-[13px] text-[#5C6470]">Auto-fill from a screenshot</div>
+                <div className="text-[13px] text-[#5C6470]">AI reads your photo or text and fills details</div>
               </div>
             </button>
             <button
-              onClick={() => { setShowMoreSheet(false); setShowPasteCaption(true); }}
+              onClick={() => { setShowMoreSheet(false); videoInputRef.current?.click(); }}
               className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#F8F7F4] hover:bg-[#EFEDE8] transition-colors text-left"
             >
               <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#C9A84C20" }}>
-                <ClipboardPaste className="w-5 h-5" style={{ color: "#C9A84C" }} />
+                <VideoIcon className="w-5 h-5" style={{ color: "#C9A84C" }} />
               </div>
               <div className="flex-1">
-                <div className="font-semibold text-[15px]" style={{ color: "#0A1628" }}>Paste Caption</div>
-                <div className="text-[13px] text-[#5C6470]">Auto-fill from pasted text</div>
+                <div className="font-semibold text-[15px]" style={{ color: "#0A1628" }}>Add Video</div>
+                <div className="text-[13px] text-[#5C6470]">Upload a video to your post</div>
+              </div>
+            </button>
+            <button
+              onClick={() => { setShowMoreSheet(false); setShowTagSheet(true); }}
+              className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#F8F7F4] hover:bg-[#EFEDE8] transition-colors text-left"
+            >
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#C9A84C20" }}>
+                <Users className="w-5 h-5" style={{ color: "#C9A84C" }} />
+              </div>
+              <div className="flex-1">
+                <div className="font-semibold text-[15px] flex items-center gap-2" style={{ color: "#0A1628" }}>
+                  Tag People
+                  {taggedPeople.length > 0 && (
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+                      {taggedPeople.length} tagged
+                    </span>
+                  )}
+                </div>
+                <div className="text-[13px] text-[#5C6470]">Tag exhibitors, breeders, fitters</div>
+              </div>
+            </button>
+            <button
+              onClick={() => { setShowMoreSheet(false); setShowSpeciesSheet(true); }}
+              className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#F8F7F4] hover:bg-[#EFEDE8] transition-colors text-left"
+            >
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#C9A84C20" }}>
+                <Leaf className="w-5 h-5" style={{ color: "#C9A84C" }} />
+              </div>
+              <div className="flex-1">
+                <div className="font-semibold text-[15px] flex items-center gap-2" style={{ color: "#0A1628" }}>
+                  Species
+                  {species && (
+                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: "#C9A84C20", color: "#8B6914" }}>
+                      {species}
+                    </span>
+                  )}
+                </div>
+                <div className="text-[13px] text-[#5C6470]">Tag the species in this post</div>
               </div>
             </button>
           </div>
+        </BottomSheet>
+      )}
+
+      {/* Tag People bottom sheet */}
+      {showTagSheet && (
+        <BottomSheet onClose={() => setShowTagSheet(false)} title="Tag People" tall>
+          <p className="text-[13px] text-[#5C6470] mb-3">
+            Tag exhibitors, breeders, fitters, or anyone with a Backdrop account
+          </p>
+          <PeopleTagger tagged={taggedPeople} onChange={setTaggedPeople} />
+          <Button
+            onClick={() => setShowTagSheet(false)}
+            className="w-full h-12 rounded-xl font-bold mt-4"
+            style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+          >
+            Done {taggedPeople.length > 0 ? `(${taggedPeople.length} tagged)` : ""}
+          </Button>
         </BottomSheet>
       )}
 
@@ -864,16 +953,24 @@ export default function CreatePostPage() {
   );
 }
 
-function ToolbarIcon({ icon: Icon, onClick, active }: { icon: any; onClick: () => void; active?: boolean }) {
+function ToolbarIcon({ icon: Icon, onClick, active, gold, badge }: {
+  icon: any; onClick: () => void; active?: boolean; gold?: boolean; badge?: boolean;
+}) {
   return (
     <button
       onClick={onClick}
-      className="w-11 h-11 rounded-full flex items-center justify-center transition-colors"
+      className="relative w-11 h-11 rounded-full flex items-center justify-center transition-colors"
       style={{
-        backgroundColor: active ? "#C9A84C" : "transparent",
+        backgroundColor: gold ? "#C9A84C" : active ? "#C9A84C" : "transparent",
       }}
     >
-      <Icon className="w-[22px] h-[22px]" style={{ color: active ? "#0A1628" : "#0A1628" }} />
+      <Icon className="w-[22px] h-[22px]" style={{ color: "#0A1628" }} />
+      {badge && (
+        <span
+          className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full"
+          style={{ backgroundColor: "#C9A84C", border: "2px solid white" }}
+        />
+      )}
     </button>
   );
 }
