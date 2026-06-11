@@ -74,6 +74,8 @@ export default function CreatePostPage() {
   const [showSpeciesSheet, setShowSpeciesSheet] = useState(false);
   const [showMoreSheet, setShowMoreSheet] = useState(false);
   const [showIdentitySheet, setShowIdentitySheet] = useState(false);
+  const [showTagSheet, setShowTagSheet] = useState(false);
+  const [taggedPeople, setTaggedPeople] = useState<TaggedPerson[]>([]);
 
   // Winner fields
   const [resultTitle, setResultTitle] = useState("");
