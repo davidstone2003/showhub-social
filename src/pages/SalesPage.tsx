@@ -179,10 +179,6 @@ function freshnessLabel(status: SourceStatus | undefined): string {
 export default function SalesPage() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [detail, setDetail] = useState<{ sale: SaleResult; seller: TopSeller } | null>(null);
-  const [importOpen, setImportOpen] = useState(false);
-  const [importUrl, setImportUrl] = useState("");
-  const [importing, setImporting] = useState(false);
-  const [imported, setImported] = useState<SaleResult[]>([]);
   const [scrapedResults, setScrapedResults] = useState<SaleResult[]>([]);
   const [scrapedUpcoming, setScrapedUpcoming] = useState<UpcomingSale[]>([]);
   const [sourceStatus, setSourceStatus] = useState<Record<string, SourceStatus>>({});
