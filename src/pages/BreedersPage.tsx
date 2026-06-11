@@ -1,28 +1,32 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search, BadgeCheck, MapPin, Play, ChevronRight, SlidersHorizontal } from "lucide-react";
+import { Search, BadgeCheck, MapPin, Play, ChevronRight, SlidersHorizontal, LayoutGrid, List as ListIcon } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
-import { SPECIES } from "@/data/breederTaxonomy";
 import { useBreederDirectory, stateAbbr, type DirectoryBreeder } from "@/hooks/useBreederDirectory";
 
 const NAVY = "#0A1628";
 const GOLD = "#C9A84C";
 
+function initials(name: string) {
+  return name.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("");
+}
 
-function speciesStats(breeders: DirectoryBreeder[], keywords: string[]) {
-  const matched = breeders.filter((b) =>
-    keywords.some((k) => b.searchText.includes(k.toLowerCase()))
+function Monogram({ name, size = 44 }: { name: string; size?: number }) {
+  return (
+    <div
+      className="flex items-center justify-center rounded-xl shrink-0 font-bold text-white tracking-wide"
+      style={{
+        width: size,
+        height: size,
+        background: `linear-gradient(135deg, ${NAVY} 0%, #1B3A6B 100%)`,
+        fontSize: size > 60 ? 20 : 14,
+      }}
+    >
+      {initials(name) || "?"}
+    </div>
   );
-  const states = new Set<string>();
-  matched.forEach((b) => { const s = stateAbbr(b.location); if (s) states.add(s); });
-  const topState = (() => {
-    const counts: Record<string, number> = {};
-    matched.forEach((b) => { const s = stateAbbr(b.location); if (s) counts[s] = (counts[s] || 0) + 1; });
-    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
-  })();
-  return { count: matched.length, topState };
 }
 
 function SpotlightCard({ b }: { b: DirectoryBreeder }) {
@@ -58,10 +62,15 @@ function SpotlightCard({ b }: { b: DirectoryBreeder }) {
   );
 }
 
+function breederSpecies(b: DirectoryBreeder): string {
+  return b.searchText || "";
+}
+
 export default function BreedersPage() {
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [species, setSpecies] = useState<SpeciesPill>("All");
+  const [view, setView] = useState<"list" | "grid">("list");
   const { data: breeders = [], isLoading } = useBreederDirectory();
 
   const stats = useMemo(() => {
@@ -80,26 +89,20 @@ export default function BreedersPage() {
     [breeders]
   );
 
-  const speciesCounts = useMemo(
-    () => SPECIES
-      .map((s) => ({ ...s, ...speciesStats(breeders, s.keywords) }))
-      .filter((s) => matchesSpecies(species, s.name, ...s.keywords)),
-    [breeders, species]
-  );
-
-  const searchResults = useMemo(() => {
-    if (!search.trim()) return [];
+  const filtered = useMemo(() => {
+    const bySpecies = breeders.filter((b) => matchesSpecies(species, breederSpecies(b)));
+    if (!search.trim()) return bySpecies;
     const q = search.toLowerCase();
-    return breeders.filter((b) => b.searchText.includes(q)).slice(0, 8);
-  }, [breeders, search]);
+    return bySpecies.filter((b) => b.searchText.includes(q));
+  }, [breeders, search, species]);
 
   return (
     <Layout showDiscovery={false}>
       <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
-        {/* Header — white bg, navy title (matches Winners/Sales/Sires) */}
+        {/* Header */}
         <div className="sticky top-0 z-10 bg-white border-b border-border px-4 flex items-center justify-between" style={{ height: 60 }}>
           <h1 className="text-[22px] font-bold leading-none" style={{ color: NAVY }}>Breeders</h1>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setSearchOpen((v) => !v)}
               className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors"
@@ -107,9 +110,26 @@ export default function BreedersPage() {
             >
               <Search className="w-5 h-5" style={{ color: NAVY }} />
             </button>
-            <button className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors" aria-label="Filter">
-              <SlidersHorizontal className="w-5 h-5" style={{ color: NAVY }} />
-            </button>
+            <div className="flex rounded-lg border border-border bg-white overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setView("list")}
+                aria-label="List view"
+                className={`p-2 transition-colors ${view === "list" ? "bg-muted" : ""}`}
+                style={{ color: view === "list" ? NAVY : "#9CA3AF" }}
+              >
+                <ListIcon className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("grid")}
+                aria-label="Grid view"
+                className={`p-2 transition-colors ${view === "grid" ? "bg-muted" : ""}`}
+                style={{ color: view === "grid" ? NAVY : "#9CA3AF" }}
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -131,26 +151,6 @@ export default function BreedersPage() {
                 className="h-11 w-full rounded-full bg-white pl-11 pr-4 text-sm focus:outline-none"
                 style={{ border: "1px solid #E5E7EB", color: NAVY }}
               />
-              {searchResults.length > 0 && (
-                <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-20 overflow-hidden rounded-2xl border border-border bg-white shadow-2xl">
-                  {searchResults.map((b) => (
-                    <Link
-                      key={b.id}
-                      to={`/breeder/${b.username}`}
-                      className="flex items-center gap-3 border-b border-border px-4 py-3 last:border-b-0 hover:bg-muted/50"
-                      onClick={() => { setSearch(""); setSearchOpen(false); }}
-                    >
-                      <div className="h-9 w-9 rounded-lg flex items-center justify-center text-[11px] font-black" style={{ backgroundColor: NAVY, color: GOLD }}>
-                        {(b.display_name || b.username).slice(0, 2).toUpperCase()}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold" style={{ color: NAVY }}>{b.display_name || b.username}</p>
-                        {b.location && <p className="truncate text-[11px]" style={{ color: "#6B7280" }}>{b.location}</p>}
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -165,39 +165,9 @@ export default function BreedersPage() {
           </div>
         </div>
 
-        {/* Species tiles */}
-        <section className="px-4 pt-5">
-          <h2 className="mb-2.5 text-[13px] font-bold uppercase tracking-[0.16em]" style={{ color: NAVY }}>Browse by Species</h2>
-          {isLoading ? (
-            <div className="grid grid-cols-2 gap-3">
-              {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-2xl" />)}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-3">
-              {speciesCounts.map((s) => (
-                <Link
-                  key={s.key}
-                  to={`/breeders/${s.key}`}
-                  className="group relative overflow-hidden rounded-2xl border border-border bg-white p-4 transition-all hover:-translate-y-0.5"
-                  style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}
-                >
-                  <span className="absolute right-3 top-3 text-3xl opacity-20 group-hover:opacity-40 transition-opacity">{s.silhouette}</span>
-                  <h3 className="text-lg font-bold tracking-tight" style={{ color: NAVY }}>{s.name}</h3>
-                  <p className="mt-0.5 text-[11px]" style={{ color: "#6B7280" }}>{s.blurb}</p>
-                  <p className="mt-3 text-[12px] font-bold" style={{ color: GOLD }}>{s.count} operation{s.count !== 1 ? "s" : ""}</p>
-                  {s.topState && (
-                    <p className="mt-1 text-[10px] uppercase tracking-wider" style={{ color: "#6B7280" }}>Most active: {s.topState}</p>
-                  )}
-                  <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 transition-transform group-hover:translate-x-0.5" style={{ color: "#9CA3AF" }} />
-                </Link>
-              ))}
-            </div>
-          )}
-        </section>
-
         {/* Spotlight */}
         {spotlights.length > 0 && (
-          <section className="pt-6">
+          <section className="pt-5">
             <div className="px-4">
               <div className="mb-2.5 flex items-baseline justify-between">
                 <h2 className="text-[13px] font-bold uppercase tracking-[0.16em]" style={{ color: NAVY }}>Spotlight</h2>
@@ -209,6 +179,88 @@ export default function BreedersPage() {
             </div>
           </section>
         )}
+
+        {/* Breeder catalog (Sires-style) */}
+        <section className="px-4 pt-5">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-[13px] font-bold uppercase tracking-wider" style={{ color: NAVY }}>
+              {search ? "Results" : "All Breeders"}
+              <span className="ml-2 text-muted-foreground font-medium normal-case tracking-normal">{filtered.length}</span>
+            </h2>
+          </div>
+
+          {isLoading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-xl" />)}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="rounded-2xl border border-border bg-white p-8 text-center">
+              <h3 className="text-lg font-bold" style={{ color: NAVY }}>No breeders found</h3>
+              <p className="mt-2 text-sm text-muted-foreground">Try a different species or search term.</p>
+            </div>
+          ) : view === "list" ? (
+            <div className="rounded-xl border border-border bg-white overflow-hidden shadow-[var(--shadow-card)]">
+              {filtered.map((b, i) => (
+                <Link
+                  key={b.id}
+                  to={`/breeder/${b.username}`}
+                  className={`flex items-center gap-3 px-3 py-2.5 active:bg-muted/50 transition-colors ${
+                    i !== filtered.length - 1 ? "border-b border-[hsl(var(--divider-soft))]" : ""
+                  }`}
+                >
+                  {b.hero_image_url ? (
+                    <img src={b.hero_image_url} alt={b.display_name || b.username} className="w-11 h-11 rounded-xl object-cover shrink-0" />
+                  ) : (
+                    <Monogram name={b.display_name || b.username} />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1">
+                      <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{b.display_name || b.username}</p>
+                      {b.subscription_tier === "breeder_page" && (
+                        <BadgeCheck className="h-3.5 w-3.5 fill-[#C9A84C] text-black shrink-0" strokeWidth={2.5} />
+                      )}
+                    </div>
+                    {b.location && (
+                      <p className="text-[12px] text-muted-foreground truncate flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />{b.location}
+                      </p>
+                    )}
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground/60 shrink-0" />
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {filtered.map((b) => (
+                <Link
+                  key={b.id}
+                  to={`/breeder/${b.username}`}
+                  className="rounded-xl border border-border bg-white overflow-hidden shadow-[var(--shadow-card)] hover:-translate-y-0.5 transition-transform"
+                >
+                  <div className="w-full aspect-square overflow-hidden">
+                    {b.hero_image_url ? (
+                      <img src={b.hero_image_url} alt={b.display_name || b.username} className="w-full h-full object-cover" />
+                    ) : (
+                      <Monogram name={b.display_name || b.username} size={180} />
+                    )}
+                  </div>
+                  <div className="p-2.5">
+                    <div className="flex items-center gap-1">
+                      <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{b.display_name || b.username}</p>
+                      {b.subscription_tier === "breeder_page" && (
+                        <BadgeCheck className="h-3.5 w-3.5 fill-[#C9A84C] text-black shrink-0" strokeWidth={2.5} />
+                      )}
+                    </div>
+                    {b.location && (
+                      <p className="text-[11px] text-muted-foreground truncate mt-0.5">{b.location}</p>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     </Layout>
   );
