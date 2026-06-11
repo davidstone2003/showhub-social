@@ -251,7 +251,18 @@ export default function SalesPage() {
     return () => { cancelled = true; };
   }, []);
 
-  const allResults = [...scrapedResults, ...saleResults];
+  const allResultsRaw = [...scrapedResults, ...saleResults];
+  const allResults = allResultsRaw.filter((r) =>
+    matchesSpecies(
+      species,
+      r.saleName,
+      r.location,
+      ...r.topSellers.flatMap((t) => [t.lot, t.breeder, t.sire ?? null]),
+      ...r.sireBreakdown.map((s) => s.sire),
+    ),
+  );
+  const upcomingFiltered = (list: UpcomingSale[]) =>
+    list.filter((s) => matchesSpecies(species, s.name, s.location, s.host));
 
   // Upcoming list: prefer live-scraped, fall back to mock if a scrape never ran
   const scoStatus = sourceStatus["sc-online"];
