@@ -18,7 +18,7 @@ import SmartUpload from "@/components/SmartUpload";
 import PostSuccessScreen from "@/components/PostSuccessScreen";
 import {
   Trophy, ChevronDown, X, Camera, Video as VideoIcon, Smile,
-  Tag, Leaf, MoreHorizontal, Play, Plus, Sparkles, ClipboardPaste, Type,
+  Tag, Leaf, MoreHorizontal, Play, Plus, Sparkles, ClipboardPaste,
 } from "lucide-react";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { cn } from "@/lib/utils";
