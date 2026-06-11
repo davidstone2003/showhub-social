@@ -7,8 +7,6 @@ import {
   Calendar,
   MapPin,
   ChevronDown,
-  Download,
-  Loader2,
 } from "lucide-react";
 import {
   Sheet,
@@ -17,16 +15,7 @@ import {
   SheetTrigger,
   SheetDescription,
 } from "@/components/ui/sheet";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/hooks/use-toast";
 
 /* ── Upcoming sales ── */
 interface UpcomingSale {
@@ -190,10 +179,6 @@ function freshnessLabel(status: SourceStatus | undefined): string {
 export default function SalesPage() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [detail, setDetail] = useState<{ sale: SaleResult; seller: TopSeller } | null>(null);
-  const [importOpen, setImportOpen] = useState(false);
-  const [importUrl, setImportUrl] = useState("");
-  const [importing, setImporting] = useState(false);
-  const [imported, setImported] = useState<SaleResult[]>([]);
   const [scrapedResults, setScrapedResults] = useState<SaleResult[]>([]);
   const [scrapedUpcoming, setScrapedUpcoming] = useState<UpcomingSale[]>([]);
   const [sourceStatus, setSourceStatus] = useState<Record<string, SourceStatus>>({});
@@ -264,40 +249,7 @@ export default function SalesPage() {
     return () => { cancelled = true; };
   }, []);
 
-  const handleImport = async () => {
-    if (!importUrl.trim()) return;
-    setImporting(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("scrape-sale-results", {
-        body: { url: importUrl.trim() },
-      });
-      if (error) throw error;
-      if (!data || !Array.isArray(data.topSellers)) {
-        throw new Error("No data extracted from that URL");
-      }
-      const newSale: SaleResult = {
-        id: `imported-${Date.now()}`,
-        saleName: data.saleName || "Imported Sale",
-        date: data.date || "—",
-        location: data.location || "—",
-        totalHead: typeof data.totalHead === "number" ? data.totalHead : 0,
-        averagePrice: data.averagePrice || "—",
-        topSellers: data.topSellers,
-        sireBreakdown: [],
-      };
-      setImported((prev) => [newSale, ...prev]);
-      toast({ title: "Sale imported", description: `${newSale.topSellers.length} top sellers loaded` });
-      setImportOpen(false);
-      setImportUrl("");
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Import failed";
-      toast({ title: "Import failed", description: msg, variant: "destructive" });
-    } finally {
-      setImporting(false);
-    }
-  };
-
-  const allResults = [...imported, ...scrapedResults, ...saleResults];
+  const allResults = [...scrapedResults, ...saleResults];
 
   // Upcoming list: prefer live-scraped, fall back to mock if a scrape never ran
   const scoStatus = sourceStatus["sc-online"];
@@ -362,13 +314,6 @@ export default function SalesPage() {
           <div className="flex items-center justify-between mb-1 gap-2">
             <h2 className="text-[15px] font-bold text-foreground">Sale Results</h2>
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setImportOpen(true)}
-                className="flex items-center gap-1.5 rounded-full bg-foreground text-background px-3 py-1.5 text-[12px] font-semibold hover:opacity-90 transition-opacity"
-              >
-                <Download className="w-3.5 h-3.5" />
-                Import URL
-              </button>
               <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
                 <SheetTrigger asChild>
                   <button className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-[12px] font-semibold text-foreground hover:bg-muted/50 transition-colors">
@@ -401,38 +346,6 @@ export default function SalesPage() {
           </div>
         </div>
 
-        {/* Import from URL dialog */}
-        <Dialog open={importOpen} onOpenChange={(o) => !importing && setImportOpen(o)}>
-          <DialogContent className="max-w-md">
-            <DialogTitle>Import Sale Results</DialogTitle>
-            <DialogDescription>
-              Paste a sale results page URL (e.g. SC Online Sales). We'll pull the top sellers with photos automatically.
-            </DialogDescription>
-            <div className="mt-4 space-y-3">
-              <Input
-                value={importUrl}
-                onChange={(e) => setImportUrl(e.target.value)}
-                placeholder="https://www.sconlinesales.com/..."
-                disabled={importing}
-              />
-              <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={() => setImportOpen(false)} disabled={importing}>
-                  Cancel
-                </Button>
-                <Button className="flex-1" onClick={handleImport} disabled={importing || !importUrl.trim()}>
-                  {importing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Scraping…
-                    </>
-                  ) : (
-                    "Import"
-                  )}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
 
 
         {/* Top seller detail sheet */}
