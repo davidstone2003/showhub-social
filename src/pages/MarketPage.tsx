@@ -56,7 +56,7 @@ export default function MarketPage() {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="app-mode mx-auto max-w-2xl pb-24 relative" style={{ backgroundColor: "#0A1628", minHeight: "100vh" }}>
+      <div className="mx-auto max-w-2xl pb-24 relative" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
         {/* Header */}
         <div
           className="sticky top-0 z-10 px-4 flex items-center justify-between"
