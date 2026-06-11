@@ -8,6 +8,7 @@ import {
   SheetTrigger,
   SheetDescription,
 } from "@/components/ui/sheet";
+import { SCOnlineSalesSection } from "@/components/sales/SCOnlineSalesSection";
 
 /* ── mock live sale updates ── */
 const liveSaleUpdates = [
@@ -174,6 +175,8 @@ export default function SalesPage() {
             ))}
           </div>
         </div>
+
+        <SCOnlineSalesSection />
       </div>
     </Layout>
   );
