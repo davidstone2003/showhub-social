@@ -276,7 +276,11 @@ export default function SalesPage() {
     ),
   );
   const upcomingFiltered = (list: UpcomingSale[]) =>
-    list.filter((s) => matchesSpecies(species, s.name, s.location, s.host));
+    list.filter((s) =>
+      s.species
+        ? species === "All" || s.species === species
+        : matchesSpecies(species, s.name, s.location, s.host),
+    );
 
   // Upcoming list: prefer live-scraped, fall back to mock if a scrape never ran
   const scoStatus = sourceStatus["sc-online"];
