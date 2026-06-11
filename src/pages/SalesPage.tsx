@@ -359,7 +359,7 @@ export default function SalesPage() {
 
         {/* ─── 2. SALE RESULTS ─── */}
         <div className="px-4 pt-6">
-          <div className="flex items-center justify-between mb-3 gap-2">
+          <div className="flex items-center justify-between mb-1 gap-2">
             <h2 className="text-[15px] font-bold text-foreground">Sale Results</h2>
             <div className="flex items-center gap-2">
               <button
