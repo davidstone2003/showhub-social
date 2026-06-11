@@ -542,7 +542,7 @@ export default function CreatePostPage() {
         <ToolbarIcon icon={Camera} onClick={() => photoInputRef.current?.click()} />
         <ToolbarIcon icon={VideoIcon} onClick={() => videoInputRef.current?.click()} />
         <ToolbarIcon icon={Smile} active={showEmojiPicker} onClick={() => setShowEmojiPicker(v => !v)} />
-        <ToolbarIcon icon={Trophy} active={winnerHasData} onClick={() => setShowWinnerPanel(true)} />
+        <ToolbarIcon icon={Trophy} active={winnerHasData} onClick={handleOpenWinnerPanel} />
         <ToolbarIcon icon={Tag} onClick={() => toast("Tagging coming soon")} />
         <ToolbarIcon icon={Leaf} active={!!species} onClick={() => setShowSpeciesSheet(true)} />
         <ToolbarIcon icon={MoreHorizontal} onClick={() => setShowMoreSheet(true)} />
