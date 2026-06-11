@@ -855,6 +855,45 @@ export type Database = {
         }
         Relationships: []
       }
+      sire_submissions: {
+        Row: {
+          breed: string | null
+          created_at: string
+          id: string
+          owner: string | null
+          semen_available: boolean
+          sire_name: string
+          species: string | null
+          status: string
+          submitted_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          breed?: string | null
+          created_at?: string
+          id?: string
+          owner?: string | null
+          semen_available?: boolean
+          sire_name: string
+          species?: string | null
+          status?: string
+          submitted_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          breed?: string | null
+          created_at?: string
+          id?: string
+          owner?: string | null
+          semen_available?: boolean
+          sire_name?: string
+          species?: string | null
+          status?: string
+          submitted_by?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sires_lookup: {
         Row: {
           created_at: string
