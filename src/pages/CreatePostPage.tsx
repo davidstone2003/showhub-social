@@ -231,6 +231,7 @@ export default function CreatePostPage() {
         user_id: user?.id || null, posted_as_breeder_id: postedAsBreederId,
         caption: (notes.trim() || generalCaption.trim()) || null, image_urls: imageUrls, video_url: videoUrl,
         tags: species ? [species] : [], post_type: "winner", show_on_feed: true,
+        tagged_user_ids: taggedPeople.map(p => p.id),
       }).select("id").single();
       if (postError) throw postError;
 
