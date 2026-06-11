@@ -56,25 +56,28 @@ export default function MarketPage() {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="mx-auto max-w-2xl pb-24 relative" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
+      <div className="app-mode mx-auto max-w-2xl pb-24 relative" style={{ backgroundColor: "#0A1628", minHeight: "100vh" }}>
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-white border-b border-border px-4 flex items-center justify-between" style={{ height: 60 }}>
-          <h1 className="text-[22px] font-bold leading-none" style={{ color: NAVY }}>Market</h1>
+        <div
+          className="sticky top-0 z-10 px-4 flex items-center justify-between"
+          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Market</h1>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSearchOpen((v) => !v)}
-              className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors"
+              className="p-1.5 rounded-lg transition-colors"
               aria-label="Search"
             >
-              <Search className="w-5 h-5" style={{ color: NAVY }} />
+              <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
             </button>
-            <div className="flex rounded-lg border border-border bg-white overflow-hidden">
+            <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.12)", backgroundColor: "rgba(255,255,255,0.06)" }}>
               <button
                 type="button"
                 onClick={() => setView("list")}
                 aria-label="List view"
-                className={`p-2 transition-colors ${view === "list" ? "bg-muted" : ""}`}
-                style={{ color: view === "list" ? NAVY : "#9CA3AF" }}
+                className="p-2 transition-colors"
+                style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "list" ? "rgba(255,255,255,0.08)" : "transparent" }}
               >
                 <ListIcon className="w-4 h-4" />
               </button>
@@ -82,8 +85,8 @@ export default function MarketPage() {
                 type="button"
                 onClick={() => setView("grid")}
                 aria-label="Grid view"
-                className={`p-2 transition-colors ${view === "grid" ? "bg-muted" : ""}`}
-                style={{ color: view === "grid" ? NAVY : "#9CA3AF" }}
+                className="p-2 transition-colors"
+                style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "grid" ? "rgba(255,255,255,0.08)" : "transparent" }}
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
@@ -105,8 +108,8 @@ export default function MarketPage() {
                   className="h-8 shrink-0 rounded-full px-3.5 text-[12px] font-semibold leading-none whitespace-nowrap transition-colors"
                   style={
                     active
-                      ? { backgroundColor: "#1B3A6B", color: "#FFFFFF", border: "1px solid #1B3A6B" }
-                      : { backgroundColor: "#FFFFFF", color: "#1B3A6B", border: "1px solid #1B3A6B" }
+                      ? { backgroundColor: "#C9A84C", color: "#0A1628", border: "1px solid #C9A84C" }
+                      : { backgroundColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", border: "1px solid transparent" }
                   }
                 >
                   {c}
@@ -120,14 +123,14 @@ export default function MarketPage() {
         {searchOpen && (
           <div className="px-4 pt-3">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "#9CA3AF" }} />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "rgba(255,255,255,0.4)" }} />
               <input
                 autoFocus
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search listings, sellers, categories…"
-                className="h-11 w-full rounded-full bg-white pl-11 pr-4 text-sm focus:outline-none"
-                style={{ border: "1px solid #E5E7EB", color: NAVY }}
+                className="h-11 w-full rounded-full pl-11 pr-4 text-sm focus:outline-none"
+                style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "#FFFFFF" }}
               />
             </div>
           </div>
@@ -135,7 +138,7 @@ export default function MarketPage() {
 
         {/* Compact stat strip */}
         <div className="px-4 pt-4">
-          <div className="grid grid-cols-4 gap-2 rounded-2xl bg-white p-3" style={{ border: "1px solid #E5E7EB", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
+          <div className="grid grid-cols-4 gap-2 rounded-2xl p-3" style={{ backgroundColor: "#141E2E", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 2px 8px rgba(0,0,0,0.3)" }}>
             <Stat value={stats.listings} label="Listings" />
             <Stat value={stats.sellers} label="Sellers" />
             <Stat value={stats.states} label="States" />
@@ -149,19 +152,19 @@ export default function MarketPage() {
         {/* Listings */}
         <section className="px-4 pt-5">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-[13px] font-bold uppercase tracking-wider" style={{ color: NAVY }}>
+            <h2 className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "#FFFFFF" }}>
               {search ? "Results" : category === "All" ? "Recently Listed" : category}
               <span className="ml-2 text-muted-foreground font-medium normal-case tracking-normal">{filtered.length}</span>
             </h2>
           </div>
 
           {filtered.length === 0 ? (
-            <div className="rounded-2xl border border-border bg-white p-8 text-center">
-              <h3 className="text-lg font-bold" style={{ color: NAVY }}>No listings found</h3>
+            <div className="rounded-2xl border border-border bg-card p-8 text-center">
+              <h3 className="text-lg font-bold" style={{ color: "#FFFFFF" }}>No listings found</h3>
               <p className="mt-2 text-sm text-muted-foreground">Try a different category or search term.</p>
             </div>
           ) : view === "list" ? (
-            <div className="rounded-xl border border-border bg-white overflow-hidden shadow-[var(--shadow-card)]">
+            <div className="rounded-xl border border-border bg-card overflow-hidden shadow-[var(--shadow-card)]">
               {filtered.map((l, i) => {
                 const meta = categoryMeta[l.category];
                 const Icon = meta.icon;
@@ -176,7 +179,7 @@ export default function MarketPage() {
                       <Icon className="w-5 h-5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{l.title}</p>
+                      <p className="text-sm font-semibold truncate" style={{ color: "#FFFFFF" }}>{l.title}</p>
                       <p className="text-[12px] text-muted-foreground truncate">{l.meta}</p>
                     </div>
                     <p className="text-[13px] font-bold shrink-0" style={{ color: GOLD }}>{l.price}</p>
@@ -191,12 +194,12 @@ export default function MarketPage() {
                 const meta = categoryMeta[l.category];
                 const Icon = meta.icon;
                 return (
-                  <div key={l.id} className="rounded-xl border border-border bg-white overflow-hidden shadow-[var(--shadow-card)] hover:-translate-y-0.5 transition-transform">
+                  <div key={l.id} className="rounded-xl border border-border bg-card overflow-hidden shadow-[var(--shadow-card)] hover:-translate-y-0.5 transition-transform">
                     <div className="w-full aspect-square flex items-center justify-center" style={{ background: meta.bg, color: meta.color }}>
                       <Icon className="w-10 h-10" />
                     </div>
                     <div className="p-2.5">
-                      <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{l.title}</p>
+                      <p className="text-sm font-semibold truncate" style={{ color: "#FFFFFF" }}>{l.title}</p>
                       <p className="text-[13px] font-bold mt-0.5" style={{ color: GOLD }}>{l.price}</p>
                       <p className="text-[11px] text-muted-foreground truncate mt-0.5">{l.meta}</p>
                     </div>
@@ -212,7 +215,7 @@ export default function MarketPage() {
           to="/submit"
           aria-label="Post a Listing"
           className="fixed bottom-20 right-4 z-40 flex items-center gap-2 rounded-full px-4 py-3 shadow-lg font-bold text-[13px] active:scale-95 transition-transform"
-          style={{ background: GOLD, color: NAVY, boxShadow: "0 8px 24px rgba(201,168,76,0.4)" }}
+          style={{ background: GOLD, color: "#FFFFFF", boxShadow: "0 8px 24px rgba(201,168,76,0.4)" }}
         >
           <Plus className="w-4 h-4 stroke-[3]" />
           Post a Listing

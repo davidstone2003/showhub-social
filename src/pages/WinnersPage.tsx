@@ -166,23 +166,26 @@ export default function WinnersPage() {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
-        {/* Header — white bg, navy title */}
-        <div className="sticky top-0 z-10 bg-white border-b border-border px-4 flex items-center justify-between" style={{ height: 60 }}>
-          <h1 className="text-[22px] font-bold leading-none" style={{ color: "#0A1628" }}>Winners</h1>
+      <div className="app-mode mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#0A1628", minHeight: "100vh" }}>
+        {/* Header — dark, white title */}
+        <div
+          className="sticky top-0 z-10 px-4 flex items-center justify-between"
+          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Winners</h1>
           <div className="flex items-center gap-3">
-            <button className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors">
-              <Search className="w-5 h-5" style={{ color: "#0A1628" }} />
+            <button className="p-1.5 rounded-lg transition-colors">
+              <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
             </button>
-            <button className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors">
-              <SlidersHorizontal className="w-5 h-5" style={{ color: "#0A1628" }} />
+            <button className="p-1.5 rounded-lg transition-colors">
+              <SlidersHorizontal className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
             </button>
           </div>
         </div>
 
         {/* Species pills */}
         <div className="px-4 pt-3 pb-3">
-          <SpeciesPills value={species} onChange={setSpecies} />
+          <SpeciesPills value={species} onChange={setSpecies} appMode />
         </div>
 
         <div className="px-4 pt-4">
@@ -195,7 +198,7 @@ export default function WinnersPage() {
           ) : showGroups.length === 0 ? (
             <div className="flex flex-col items-center text-center" style={{ paddingTop: 80, paddingBottom: 40 }}>
               <Trophy size={48} style={{ color: "#C9A84C" }} />
-              <h2 className="font-bold mt-4" style={{ fontSize: 22, lineHeight: 1.2, color: "#0A1628" }}>
+              <h2 className="font-bold mt-4" style={{ fontSize: 22, lineHeight: 1.2, color: "#FFFFFF" }}>
                 No winners yet
               </h2>
               <p className="text-muted-foreground mt-2 max-w-xs" style={{ fontSize: 14, lineHeight: 1.4 }}>
@@ -230,7 +233,7 @@ export default function WinnersPage() {
                       paddingLeft: 12,
                     }}
                   >
-                    <h3 className="font-bold leading-tight" style={{ fontSize: 16, color: "#0A1628" }}>
+                    <h3 className="font-bold leading-tight" style={{ fontSize: 16, color: "#FFFFFF" }}>
                       {group.year} {group.showName}
                     </h3>
                   </div>
@@ -256,7 +259,7 @@ export default function WinnersPage() {
           right: 16, bottom: 80,
           backgroundColor: "#C9A84C",
           color: "#0A1628",
-          boxShadow: "0 6px 16px rgba(0,0,0,0.25)"
+          boxShadow: "0 8px 20px rgba(201,168,76,0.4)"
         }}
       >
         <Plus className="w-7 h-7" strokeWidth={2.5} />
