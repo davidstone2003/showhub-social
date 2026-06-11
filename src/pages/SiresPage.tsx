@@ -5,6 +5,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
 import gooseImage from "@/assets/sires/goose.jpeg";
+import { REPRO_SHEEP_SIRES } from "@/data/reproSheepSires";
+
+const RSG_PHOTO_BY_NAME = new Map<string, string>(
+  REPRO_SHEEP_SIRES
+    .filter((s) => s.photo_url)
+    .map((s) => [s.sire_name.toLowerCase().trim(), s.photo_url as string])
+);
+function rsgPhoto(name: string): string | undefined {
+  return RSG_PHOTO_BY_NAME.get(name.toLowerCase().trim());
+}
 
 const NAVY = "#0A1628";
 const GOLD = "#C9A84C";
@@ -86,14 +96,16 @@ const SiresPage = () => {
         breed: "Sheep",
         semenAvailable: winsBySire.has(s.id),
         winCount: winsBySire.get(s.id) ?? 0,
-        image: s.name === "Goose" ? gooseImage : undefined,
+        image: s.name === "Goose" ? gooseImage : rsgPhoto(s.name),
       }));
 
       mapped.sort((a, b) => b.winCount - a.winCount || a.name.localeCompare(b.name));
 
       // Merge seeded sires (avoid duplicates by name) so the page never looks empty.
       const existingNames = new Set(mapped.map((m) => m.name.toLowerCase()));
-      const seedsToAdd = SEED_SIRES.filter((s) => !existingNames.has(s.name.toLowerCase()));
+      const seedsToAdd = SEED_SIRES
+        .filter((s) => !existingNames.has(s.name.toLowerCase()))
+        .map((s) => ({ ...s, image: s.image ?? rsgPhoto(s.name) }));
       setSires([...mapped, ...seedsToAdd]);
       setLoading(false);
     }
