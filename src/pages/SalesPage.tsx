@@ -70,6 +70,8 @@ interface SaleResult {
   averagePrice: string;
   topSellers: TopSeller[];
   sireBreakdown: SireStat[];
+  species?: Exclude<SpeciesPill, "All">;
+  link?: string;
 }
 
 const saleResults: SaleResult[] = [
