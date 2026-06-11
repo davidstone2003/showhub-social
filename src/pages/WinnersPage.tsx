@@ -161,7 +161,7 @@ export default function WinnersPage() {
     }
     result.sort((a, b) => b.year - a.year || a.showName.localeCompare(b.showName));
     return result;
-  }, [rows, profilesMap, breederProfilesMap]);
+  }, [rows, profilesMap, breederProfilesMap, species]);
 
   return (
     <Layout showDiscovery={false}>
