@@ -96,7 +96,7 @@ const SiresPage = () => {
         breed: "Sheep",
         semenAvailable: winsBySire.has(s.id),
         winCount: winsBySire.get(s.id) ?? 0,
-        image: s.name === "Goose" ? gooseImage : undefined,
+        image: s.name === "Goose" ? gooseImage : rsgPhoto(s.name),
       }));
 
       mapped.sort((a, b) => b.winCount - a.winCount || a.name.localeCompare(b.name));
