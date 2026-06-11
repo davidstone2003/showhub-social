@@ -712,8 +712,22 @@ export default function CreatePostPage() {
               })}
             </div>
 
-            <FieldLabel>Notes</FieldLabel>
-            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add any extra notes…" className="rounded-lg min-h-[80px]" />
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[12px] font-bold uppercase tracking-wide text-[#5C6470]">Notes / Caption</label>
+                <button
+                  type="button"
+                  onClick={handleGenerateCaption}
+                  disabled={generatingCaption || !effectiveResult}
+                  className="flex items-center gap-1 text-[11px] font-bold rounded-full px-2.5 py-1 disabled:opacity-40"
+                  style={{ backgroundColor: "rgba(201,168,76,0.15)", color: "#8B6914" }}
+                >
+                  <Sparkles className="w-3 h-3" />
+                  {generatingCaption ? "Generating…" : "AI Write Caption"}
+                </button>
+              </div>
+              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add any extra notes or let AI write your caption above…" className="rounded-lg min-h-[80px]" />
+            </div>
 
             <Button onClick={() => setShowWinnerPanel(false)} className="w-full h-12 rounded-xl font-bold mt-2" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
               Done
