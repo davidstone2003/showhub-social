@@ -1,7 +1,7 @@
 // Species + sub-category taxonomy for the Breeder Directory navigation.
 // Matched against `profiles.bio`, `tagline`, `display_name` (case-insensitive).
 
-export type SpeciesKey = "sheep" | "goats" | "cattle" | "hair";
+export type SpeciesKey = "sheep" | "goats" | "cattle" | "pigs";
 
 export interface SpeciesTile {
   key: SpeciesKey;
