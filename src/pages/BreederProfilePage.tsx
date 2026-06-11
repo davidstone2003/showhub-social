@@ -160,27 +160,28 @@ export default function BreederProfilePage() {
         <BreederHero
           profile={profile}
           tier={tier}
-          stats={isFeatured ? { winners: winners.length, sires: sires.length, posts: posts.length } : undefined}
+          stats={isPaid ? { winners: winners.length, sires: sires.length, posts: posts.length } : undefined}
         />
 
         <div className="max-w-2xl mx-auto px-4 py-5 space-y-6">
-          {!isFeatured && (
+          {!isPaid && (
             <>
               {recentPosts.length > 0 && (
                 <BreederSection icon={Activity} title="Recent Posts">
                   {renderCards(recentPosts)}
                 </BreederSection>
               )}
-              <LockedSection icon={Trophy} title="Winners" count={winners.length || 3} isOwner={false} />
-              <LockedSection icon={Dna} title="Sires" count={sires.length || 2} isOwner={false} />
-              <LockedSection icon={Dna} title="Donors / Genetics" count={donors.length || 2} isOwner={false} />
-              <LockedSection icon={ShoppingBag} title="Sales / Available" count={sales.length || 2} isOwner={false} />
+              <LockedSection icon={Trophy} title="Winners" count={winners.length || 3} isOwner={isOwnProfile} />
+              <LockedSection icon={Dna} title="Sires" count={sires.length || 2} isOwner={isOwnProfile} />
+              <LockedSection icon={Dna} title="Donors / Genetics" count={donors.length || 2} isOwner={isOwnProfile} />
+              <LockedSection icon={ShoppingBag} title="Sales / Available" count={sales.length || 2} isOwner={isOwnProfile} />
             </>
           )}
 
-          {isFeatured && (
+          {isPaid && (
             <>
               <div className="flex gap-1 border-b border-border -mx-4 px-4 sticky top-0 bg-background z-10">
+
                 {(["posts", "lambs", "results"] as const).map((t) => (
                   <button
                     key={t}
