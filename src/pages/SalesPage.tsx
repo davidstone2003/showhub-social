@@ -35,8 +35,9 @@ interface UpcomingSale {
   date: string;
   location: string;
   host: string;
+  link?: string;
 }
-const upcomingSales: UpcomingSale[] = [
+const fallbackUpcomingSales: UpcomingSale[] = [
   { id: "u1", name: "SC Online Summer Classic", date: "June 18, 2026", location: "Online", host: "SC Online Sales" },
   { id: "u2", name: "Midwest Elite Sale", date: "July 9, 2026", location: "Des Moines, IA", host: "Midwest Showstock" },
   { id: "u3", name: "Southern Showcase", date: "August 2, 2026", location: "Athens, GA", host: "Southern Cattle Co." },
