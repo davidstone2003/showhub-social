@@ -103,7 +103,9 @@ const SiresPage = () => {
 
       // Merge seeded sires (avoid duplicates by name) so the page never looks empty.
       const existingNames = new Set(mapped.map((m) => m.name.toLowerCase()));
-      const seedsToAdd = SEED_SIRES.filter((s) => !existingNames.has(s.name.toLowerCase()));
+      const seedsToAdd = SEED_SIRES
+        .filter((s) => !existingNames.has(s.name.toLowerCase()))
+        .map((s) => ({ ...s, image: s.image ?? rsgPhoto(s.name) }));
       setSires([...mapped, ...seedsToAdd]);
       setLoading(false);
     }
