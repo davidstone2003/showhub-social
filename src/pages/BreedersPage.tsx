@@ -285,7 +285,7 @@ function Stat({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center">
       <span className="text-xl font-bold tabular-nums leading-none" style={{ color: GOLD }}>{v.toLocaleString()}</span>
-      <span className="mt-1 text-[11px] uppercase tracking-[0.1em]" style={{ color: "#4B5563", fontWeight: 500 }}>{label}</span>
+      <span className="mt-1 text-[11px] uppercase tracking-[0.1em]" style={{ color: "rgba(255,255,255,0.6)", fontWeight: 500 }}>{label}</span>
     </div>
   );
 }
