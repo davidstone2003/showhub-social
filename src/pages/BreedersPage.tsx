@@ -136,35 +136,35 @@ export default function BreedersPage() {
           </div>
         </div>
 
-        {/* Species pills */}
-        <div className="px-4 pt-3">
-          <SpeciesPills value={species} onChange={setSpecies} appMode />
-        </div>
-
-        {/* Inline search (toggled) */}
-        {searchOpen && (
+        {/* Dark chrome band: pills + optional search + stats */}
+        <div style={{ backgroundColor: "#0A1628" }} className="pb-4">
           <div className="px-4 pt-3">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "rgba(255,255,255,0.4)" }} />
-              <input
-                autoFocus
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search breeders, sires, states, breeds…"
-                className="h-11 w-full rounded-full pl-11 pr-4 text-sm focus:outline-none"
-                style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "#FFFFFF" }}
-              />
-            </div>
+            <SpeciesPills value={species} onChange={setSpecies} appMode />
           </div>
-        )}
 
-        {/* Compact stat strip */}
-        <div className="px-4 pt-4">
-          <div className="grid grid-cols-4 gap-2 rounded-2xl p-3" style={{ backgroundColor: "#141E2E", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 2px 8px rgba(0,0,0,0.3)" }}>
-            <Stat value={stats.total} label="Breeders" />
-            <Stat value={stats.active} label="Active" />
-            <Stat value={stats.states} label="States" />
-            <Stat value={stats.breeds} label="Breeds" />
+          {searchOpen && (
+            <div className="px-4 pt-3">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "rgba(255,255,255,0.4)" }} />
+                <input
+                  autoFocus
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search breeders, sires, states, breeds…"
+                  className="h-11 w-full rounded-full pl-11 pr-4 text-sm focus:outline-none"
+                  style={{ backgroundColor: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", color: "#FFFFFF" }}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="px-4 pt-4">
+            <div className="grid grid-cols-4 gap-2 rounded-2xl p-3" style={{ backgroundColor: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <Stat value={stats.total} label="Breeders" />
+              <Stat value={stats.active} label="Active" />
+              <Stat value={stats.states} label="States" />
+              <Stat value={stats.breeds} label="Breeds" />
+            </div>
           </div>
         </div>
 
