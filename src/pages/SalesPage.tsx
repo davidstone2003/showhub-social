@@ -16,6 +16,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
+import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
 
 /* ── Upcoming sales ── */
 interface UpcomingSale {
@@ -182,6 +183,7 @@ export default function SalesPage() {
   const [scrapedResults, setScrapedResults] = useState<SaleResult[]>([]);
   const [scrapedUpcoming, setScrapedUpcoming] = useState<UpcomingSale[]>([]);
   const [sourceStatus, setSourceStatus] = useState<Record<string, SourceStatus>>({});
+  const [species, setSpecies] = useState<SpeciesPill>("All");
 
   useEffect(() => {
     let cancelled = false;
@@ -249,7 +251,18 @@ export default function SalesPage() {
     return () => { cancelled = true; };
   }, []);
 
-  const allResults = [...scrapedResults, ...saleResults];
+  const allResultsRaw = [...scrapedResults, ...saleResults];
+  const allResults = allResultsRaw.filter((r) =>
+    matchesSpecies(
+      species,
+      r.saleName,
+      r.location,
+      ...r.topSellers.flatMap((t) => [t.lot, t.breeder, t.sire ?? null]),
+      ...r.sireBreakdown.map((s) => s.sire),
+    ),
+  );
+  const upcomingFiltered = (list: UpcomingSale[]) =>
+    list.filter((s) => matchesSpecies(species, s.name, s.location, s.host));
 
   // Upcoming list: prefer live-scraped, fall back to mock if a scrape never ran
   const scoStatus = sourceStatus["sc-online"];
@@ -278,12 +291,17 @@ export default function SalesPage() {
           </button>
         </div>
 
+        {/* Species pills */}
+        <div className="px-4 pt-3">
+          <SpeciesPills value={species} onChange={setSpecies} />
+        </div>
+
         {/* ─── 1. UPCOMING SALES ─── */}
         <div className="px-4 pt-6">
           <h2 className="text-[15px] font-bold text-foreground">Upcoming Sales</h2>
           <p className="text-[11px] text-muted-foreground mb-3">{upcomingFreshness}</p>
           <div className="space-y-2">
-            {upcomingList.map((s) => {
+            {upcomingFiltered(upcomingList).map((s) => {
               const card = (
                 <div className="rounded-xl bg-card border border-border shadow-[var(--shadow-card)] p-3.5 flex items-center justify-between">
                   <div className="min-w-0">

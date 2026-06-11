@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronRight, Search, LayoutGrid, List as ListIcon, Flame } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
+import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
 import gooseImage from "@/assets/sires/goose.jpeg";
 
 interface Sire {
@@ -40,6 +41,7 @@ const SiresPage = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"list" | "grid">("list");
+  const [species, setSpecies] = useState<SpeciesPill>("All");
 
   useEffect(() => {
     async function fetchSires() {
@@ -76,12 +78,13 @@ const SiresPage = () => {
   }, []);
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return sires;
+    const bySpecies = sires.filter((s) => matchesSpecies(species, s.breed, s.name));
+    if (!search.trim()) return bySpecies;
     const q = search.toLowerCase();
-    return sires.filter((s) =>
+    return bySpecies.filter((s) =>
       s.name.toLowerCase().includes(q) || (s.breederName ?? "").toLowerCase().includes(q)
     );
-  }, [sires, search]);
+  }, [sires, search, species]);
 
   const trending = useMemo(() => sires.filter((s) => s.winCount > 0).slice(0, 8), [sires]);
 
@@ -112,6 +115,11 @@ const SiresPage = () => {
               <LayoutGrid className="w-4 h-4" />
             </button>
           </div>
+        </div>
+
+        {/* Species pills */}
+        <div className="px-4 pt-3">
+          <SpeciesPills value={species} onChange={setSpecies} />
         </div>
 
         <div className="px-4 pt-3">

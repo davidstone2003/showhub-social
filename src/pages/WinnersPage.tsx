@@ -4,6 +4,7 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PostCard } from "@/components/PostCard";
+import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
 import type { Post } from "@/data/mock";
 
 interface WinnerRow {
@@ -91,6 +92,7 @@ export default function WinnersPage() {
   const [breederProfilesMap, setBreederProfilesMap] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [species, setSpecies] = useState<SpeciesPill>("All");
 
   const handleModerated = () => setRefreshKey((k) => k + 1);
 
@@ -137,8 +139,11 @@ export default function WinnersPage() {
 
   // Group by show
   const showGroups = useMemo(() => {
+    const filteredRows = rows.filter((r) =>
+      matchesSpecies(species, r.species, r.show_name, r.title, r.caption, (r.tags || []).join(" "))
+    );
     const grouped = new Map<string, WinnerRow[]>();
-    for (const r of rows) {
+    for (const r of filteredRows) {
       const key = r.show_name.trim().toLowerCase();
       if (!grouped.has(key)) grouped.set(key, []);
       grouped.get(key)!.push(r);
@@ -156,7 +161,7 @@ export default function WinnersPage() {
     }
     result.sort((a, b) => b.year - a.year || a.showName.localeCompare(b.showName));
     return result;
-  }, [rows, profilesMap, breederProfilesMap]);
+  }, [rows, profilesMap, breederProfilesMap, species]);
 
   return (
     <Layout showDiscovery={false}>
@@ -174,20 +179,9 @@ export default function WinnersPage() {
           </div>
         </div>
 
-        {/* Filter pills */}
-        <div className="px-4 pt-3 flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
-          {["All", "Grand Champions", "Reserve", "Class Winners", "By Breed"].map((label, i) => (
-            <button
-              key={label}
-              className={`shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-colors ${
-                i === 0
-                  ? "bg-foreground text-background"
-                  : "bg-card border border-border text-muted-foreground hover:bg-muted/50"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+        {/* Species pills */}
+        <div className="px-4 pt-3 pb-1">
+          <SpeciesPills value={species} onChange={setSpecies} />
         </div>
 
         <div className="px-4 pt-4">
