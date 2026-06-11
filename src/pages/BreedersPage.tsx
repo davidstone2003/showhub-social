@@ -173,7 +173,7 @@ export default function BreedersPage() {
           <section className="pt-5">
             <div className="px-4">
               <div className="mb-2.5 flex items-baseline justify-between">
-                <h2 className="text-[13px] font-bold uppercase tracking-[0.16em]" style={{ color: "#FFFFFF" }}>Spotlight</h2>
+                <h2 className="text-[13px] font-bold uppercase tracking-[0.16em]" style={{ color: NAVY }}>Spotlight</h2>
                 <span className="text-[10px] uppercase tracking-wider" style={{ color: "#6B7280" }}>Featured Breeders</span>
               </div>
             </div>
@@ -186,7 +186,7 @@ export default function BreedersPage() {
         {/* Breeder catalog (Sires-style) */}
         <section className="px-4 pt-5">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "#FFFFFF" }}>
+            <h2 className="text-[13px] font-bold uppercase tracking-wider" style={{ color: NAVY }}>
               {search ? "Results" : "All Breeders"}
               <span className="ml-2 text-muted-foreground font-medium normal-case tracking-normal">{filtered.length}</span>
             </h2>
@@ -198,7 +198,7 @@ export default function BreedersPage() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="rounded-2xl border border-border bg-card p-8 text-center">
-              <h3 className="text-lg font-bold" style={{ color: "#FFFFFF" }}>No breeders found</h3>
+              <h3 className="text-lg font-bold" style={{ color: NAVY }}>No breeders found</h3>
               <p className="mt-2 text-sm text-muted-foreground">Try a different species or search term.</p>
             </div>
           ) : view === "list" ? (
@@ -218,7 +218,7 @@ export default function BreedersPage() {
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1">
-                      <p className="text-sm font-semibold truncate" style={{ color: "#FFFFFF" }}>{b.display_name || b.username}</p>
+                      <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{b.display_name || b.username}</p>
                       {b.subscription_tier === "breeder_page" && (
                         <BadgeCheck className="h-3.5 w-3.5 fill-[#C9A84C] text-black shrink-0" strokeWidth={2.5} />
                       )}
@@ -250,7 +250,7 @@ export default function BreedersPage() {
                   </div>
                   <div className="p-2.5">
                     <div className="flex items-center gap-1">
-                      <p className="text-sm font-semibold truncate" style={{ color: "#FFFFFF" }}>{b.display_name || b.username}</p>
+                      <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{b.display_name || b.username}</p>
                       {b.subscription_tier === "breeder_page" && (
                         <BadgeCheck className="h-3.5 w-3.5 fill-[#C9A84C] text-black shrink-0" strokeWidth={2.5} />
                       )}

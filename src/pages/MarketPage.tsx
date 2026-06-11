@@ -152,7 +152,7 @@ export default function MarketPage() {
         {/* Listings */}
         <section className="px-4 pt-5">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "#FFFFFF" }}>
+            <h2 className="text-[13px] font-bold uppercase tracking-wider" style={{ color: NAVY }}>
               {search ? "Results" : category === "All" ? "Recently Listed" : category}
               <span className="ml-2 text-muted-foreground font-medium normal-case tracking-normal">{filtered.length}</span>
             </h2>
@@ -160,7 +160,7 @@ export default function MarketPage() {
 
           {filtered.length === 0 ? (
             <div className="rounded-2xl border border-border bg-card p-8 text-center">
-              <h3 className="text-lg font-bold" style={{ color: "#FFFFFF" }}>No listings found</h3>
+              <h3 className="text-lg font-bold" style={{ color: NAVY }}>No listings found</h3>
               <p className="mt-2 text-sm text-muted-foreground">Try a different category or search term.</p>
             </div>
           ) : view === "list" ? (
@@ -179,7 +179,7 @@ export default function MarketPage() {
                       <Icon className="w-5 h-5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate" style={{ color: "#FFFFFF" }}>{l.title}</p>
+                      <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{l.title}</p>
                       <p className="text-[12px] text-muted-foreground truncate">{l.meta}</p>
                     </div>
                     <p className="text-[13px] font-bold shrink-0" style={{ color: GOLD }}>{l.price}</p>
@@ -199,7 +199,7 @@ export default function MarketPage() {
                       <Icon className="w-10 h-10" />
                     </div>
                     <div className="p-2.5">
-                      <p className="text-sm font-semibold truncate" style={{ color: "#FFFFFF" }}>{l.title}</p>
+                      <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{l.title}</p>
                       <p className="text-[13px] font-bold mt-0.5" style={{ color: GOLD }}>{l.price}</p>
                       <p className="text-[11px] text-muted-foreground truncate mt-0.5">{l.meta}</p>
                     </div>
@@ -215,7 +215,7 @@ export default function MarketPage() {
           to="/submit"
           aria-label="Post a Listing"
           className="fixed bottom-20 right-4 z-40 flex items-center gap-2 rounded-full px-4 py-3 shadow-lg font-bold text-[13px] active:scale-95 transition-transform"
-          style={{ background: GOLD, color: "#FFFFFF", boxShadow: "0 8px 24px rgba(201,168,76,0.4)" }}
+          style={{ background: GOLD, color: NAVY, boxShadow: "0 8px 24px rgba(201,168,76,0.4)" }}
         >
           <Plus className="w-4 h-4 stroke-[3]" />
           Post a Listing

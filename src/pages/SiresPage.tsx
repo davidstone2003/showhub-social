@@ -179,7 +179,7 @@ const SiresPage = () => {
             <section className="mb-5">
               <div className="flex items-center gap-1.5 mb-2.5">
                 <Flame className="w-4 h-4" style={{ color: GOLD }} />
-                <h2 className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "#FFFFFF" }}>Trending Sires</h2>
+                <h2 className="text-[13px] font-bold uppercase tracking-wider" style={{ color: NAVY }}>Trending Sires</h2>
               </div>
               <div className="flex gap-2.5 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1">
                 {trending.map((s) => (
@@ -195,7 +195,7 @@ const SiresPage = () => {
                         <Monogram name={s.name} size={120} />
                       </div>
                     )}
-                    <p className="text-sm font-semibold truncate" style={{ color: "#FFFFFF" }}>{s.name}</p>
+                    <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{s.name}</p>
                     <p className="text-[11px] font-semibold mt-0.5" style={{ color: GOLD }}>
                       {s.winCount} win{s.winCount !== 1 ? "s" : ""}
                     </p>
@@ -207,7 +207,7 @@ const SiresPage = () => {
 
           {/* Catalog header */}
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "#FFFFFF" }}>
+            <h2 className="text-[13px] font-bold uppercase tracking-wider" style={{ color: NAVY }}>
               {search ? "Results" : "All Sires"}
               <span className="ml-2 text-muted-foreground font-medium normal-case tracking-normal">
                 {filtered.length}
@@ -216,7 +216,7 @@ const SiresPage = () => {
             <Link
               to="/submit-sire"
               className="inline-flex items-center gap-1 rounded-full px-3 h-7 text-[11px] font-bold"
-              style={{ backgroundColor: GOLD, color: "#FFFFFF" }}
+              style={{ backgroundColor: GOLD, color: NAVY }}
             >
               <Plus className="w-3 h-3" strokeWidth={3} />
               Submit
@@ -238,7 +238,7 @@ const SiresPage = () => {
                       <Monogram name={s.name} />
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate" style={{ color: "#FFFFFF" }}>{s.name}</p>
+                      <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{s.name}</p>
                       <p className="text-[12px] text-muted-foreground truncate">
                         {s.breed}
                         {s.breederName ? ` · ${s.breederName}` : ""}
@@ -272,7 +272,7 @@ const SiresPage = () => {
                     </div>
                     <div className="p-2.5">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-sm font-semibold truncate" style={{ color: "#FFFFFF" }}>{s.name}</p>
+                        <p className="text-sm font-semibold truncate" style={{ color: NAVY }}>{s.name}</p>
                         {s.semenAvailable && <SemenBadge />}
                       </div>
                       <p className="text-[11px] font-semibold mt-0.5" style={{ color: GOLD }}>
@@ -301,14 +301,14 @@ const SiresPage = () => {
 function EmptyState() {
   return (
     <div className="rounded-2xl border border-border bg-card p-8 text-center">
-      <h3 className="text-xl font-bold" style={{ color: "#FFFFFF" }}>Sires Coming Soon</h3>
+      <h3 className="text-xl font-bold" style={{ color: NAVY }}>Sires Coming Soon</h3>
       <p className="mt-2 text-sm text-muted-foreground">
         We're building the most complete sire database in the industry. Check back daily as we add records.
       </p>
       <Link
         to="/submit-sire"
         className="inline-flex items-center gap-1.5 mt-5 rounded-full px-5 h-11 text-sm font-bold"
-        style={{ backgroundColor: GOLD, color: "#FFFFFF" }}
+        style={{ backgroundColor: GOLD, color: NAVY }}
       >
         <Plus className="w-4 h-4" strokeWidth={3} /> Submit a Sire
       </Link>
