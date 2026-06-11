@@ -1,38 +1,220 @@
-// Daily job: discovers new SC Online Sales results and scrapes each via Firecrawl.
+// Daily scraper for Backdrop Sales page.
+// Sources: Champion Drive (results) + SC Online Sales (upcoming sheep) + wlivestock (upcoming).
+// Each source is scraped independently. On failure, previous data is preserved and
+// last_error is recorded in scrape_source_status. A noon CT retry only re-runs
+// sources that have not succeeded today.
+
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
-import { createClient } from 'npm:@supabase/supabase-js@2';
+import { createClient, SupabaseClient } from 'npm:@supabase/supabase-js@2';
 
 const FIRECRAWL_V2 = 'https://api.firecrawl.dev/v2';
-const INDEX_URL = 'https://www.sconlinesales.com/sale-results';
-const MAX_NEW_PER_RUN = 10;
 
-const topSellerSchema = {
+type SourceKey = 'champion-drive' | 'sc-online' | 'wlivestock';
+
+const SOURCES: Record<SourceKey, { url: string; kind: 'results' | 'upcoming' }> = {
+  'champion-drive': { url: 'https://championdrive.com/results/', kind: 'results' },
+  'sc-online': { url: 'https://www.sconlinesales.com/Bids/UpcomingSales?lotType=4', kind: 'upcoming' },
+  'wlivestock': { url: 'https://wlivestock.com/auctions', kind: 'upcoming' },
+};
+
+// ───── Firecrawl schemas ────────────────────────────────────────────────
+const resultsSchema = {
   type: 'object',
   properties: {
-    saleName: { type: 'string' },
-    date: { type: 'string' },
-    location: { type: 'string' },
-    totalHead: { type: 'number' },
-    averagePrice: { type: 'string' },
-    topSellers: {
+    sales: {
       type: 'array',
-      maxItems: 3,
+      description: 'Each completed sale on the page',
       items: {
         type: 'object',
         properties: {
-          lot: { type: 'string' },
-          price: { type: 'string' },
-          sire: { type: 'string' },
-          breeder: { type: 'string' },
-          photo: { type: 'string' },
+          saleName: { type: 'string' },
+          date: { type: 'string' },
+          location: { type: 'string' },
+          managedBy: { type: 'string' },
+          sourceUrl: { type: 'string', description: 'Link to the sale detail/results page' },
+          topLots: {
+            type: 'array',
+            maxItems: 5,
+            items: {
+              type: 'object',
+              properties: {
+                lot: { type: 'string' },
+                breeder: { type: 'string' },
+                price: { type: 'string' },
+                photo: { type: 'string', description: 'Absolute URL to lot photo' },
+              },
+              required: ['lot', 'breeder', 'price'],
+            },
+          },
         },
-        required: ['lot', 'price', 'breeder'],
+        required: ['saleName', 'topLots'],
       },
     },
   },
-  required: ['topSellers'],
+  required: ['sales'],
 };
 
+const upcomingSchema = {
+  type: 'object',
+  properties: {
+    sales: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          saleName: { type: 'string' },
+          date: { type: 'string', description: 'Sale date in human-readable form' },
+          endTime: { type: 'string', description: 'End time if listed' },
+          seller: { type: 'string', description: 'Seller / consignor name' },
+          location: { type: 'string' },
+          link: { type: 'string', description: 'Absolute URL to the full sale page' },
+        },
+        required: ['saleName'],
+      },
+    },
+  },
+  required: ['sales'],
+};
+
+// ───── Helpers ──────────────────────────────────────────────────────────
+function json(payload: unknown, status: number) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
+function slug(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 120);
+}
+
+async function firecrawlScrape(apiKey: string, url: string, schema: unknown, prompt: string) {
+  const res = await fetch(`${FIRECRAWL_V2}/scrape`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      url,
+      formats: [{ type: 'json', schema, prompt }],
+      onlyMainContent: true,
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(`Firecrawl ${res.status}: ${data?.error || 'failed'}`);
+  const extracted = data?.data?.json ?? data?.json ?? null;
+  if (!extracted) throw new Error('No structured data extracted');
+  return extracted;
+}
+
+async function recordStatus(
+  sb: SupabaseClient,
+  source: SourceKey,
+  ok: boolean,
+  error: string | null,
+) {
+  const now = new Date().toISOString();
+  await sb.from('scrape_source_status').upsert(
+    {
+      source,
+      last_attempt_at: now,
+      last_success_at: ok ? now : undefined,
+      last_error: ok ? null : error,
+      updated_at: now,
+    },
+    { onConflict: 'source' },
+  );
+}
+
+// ───── Per-source runners ──────────────────────────────────────────────
+async function runChampionDrive(sb: SupabaseClient, apiKey: string) {
+  const extracted = await firecrawlScrape(
+    apiKey,
+    SOURCES['champion-drive'].url,
+    resultsSchema,
+    'Extract every completed sale on this page. For each: sale name, date, location, who managed the sale, and the top 3-5 lots with lot number, breeder name, price, and the absolute URL of the lot photo if shown. Return absolute https URLs for photos and sale links.',
+  );
+  const sales = Array.isArray(extracted.sales) ? extracted.sales : [];
+  let saved = 0;
+  for (const s of sales) {
+    if (!s?.saleName) continue;
+    const key = slug(`${s.saleName}-${s.date ?? ''}`);
+    const { error } = await sb.from('scraped_results').upsert(
+      {
+        source: 'champion-drive',
+        source_key: key,
+        sale_name: s.saleName ?? null,
+        sale_date: s.date ?? null,
+        location: s.location ?? null,
+        managed_by: s.managedBy ?? null,
+        source_url: s.sourceUrl ?? null,
+        top_lots: (Array.isArray(s.topLots) ? s.topLots : []).slice(0, 5).map((l: any) => ({
+          lot: String(l.lot ?? ''),
+          breeder: String(l.breeder ?? ''),
+          price: String(l.price ?? ''),
+          photo: l.photo && /^https?:\/\//.test(l.photo) ? l.photo : undefined,
+        })),
+        scraped_at: new Date().toISOString(),
+      },
+      { onConflict: 'source,source_key' },
+    );
+    if (!error) saved++;
+  }
+  return { found: sales.length, saved };
+}
+
+async function runUpcoming(sb: SupabaseClient, apiKey: string, source: 'sc-online' | 'wlivestock') {
+  const extracted = await firecrawlScrape(
+    apiKey,
+    SOURCES[source].url,
+    upcomingSchema,
+    source === 'sc-online'
+      ? 'Extract every upcoming sheep sale: sale name, date, end time if any, seller name, location, and the absolute URL link to the full sale page.'
+      : 'Extract every upcoming auction: sale name, sale date, consignor name, and the absolute URL link to the full auction page.',
+  );
+  const sales = Array.isArray(extracted.sales) ? extracted.sales : [];
+  // Replace strategy for upcoming: stale upcoming sales should drop off.
+  // Use upsert by (source, source_key) and delete rows older than this run's timestamp for this source.
+  const runAt = new Date().toISOString();
+  let saved = 0;
+  for (const s of sales) {
+    if (!s?.saleName) continue;
+    const key = slug(`${s.saleName}-${s.date ?? ''}-${s.seller ?? ''}`);
+    const { error } = await sb.from('scraped_upcoming').upsert(
+      {
+        source,
+        source_key: key,
+        sale_name: s.saleName ?? null,
+        sale_date: s.date ?? null,
+        end_time: s.endTime ?? null,
+        seller: s.seller ?? null,
+        location: s.location ?? null,
+        link: s.link && /^https?:\/\//.test(s.link) ? s.link : null,
+        scraped_at: runAt,
+      },
+      { onConflict: 'source,source_key' },
+    );
+    if (!error) saved++;
+  }
+  // Remove rows for this source that weren't refreshed (older than runAt)
+  await sb.from('scraped_upcoming').delete().eq('source', source).lt('scraped_at', runAt);
+  return { found: sales.length, saved };
+}
+
+async function runSource(sb: SupabaseClient, apiKey: string, source: SourceKey) {
+  try {
+    let result: { found: number; saved: number };
+    if (source === 'champion-drive') result = await runChampionDrive(sb, apiKey);
+    else result = await runUpcoming(sb, apiKey, source);
+    await recordStatus(sb, source, true, null);
+    return { source, ok: true, ...result };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'Unknown error';
+    console.error(`[${source}] failed:`, msg);
+    await recordStatus(sb, source, false, msg);
+    return { source, ok: false, error: msg };
+  }
+}
+
+// ───── Entrypoint ──────────────────────────────────────────────────────
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
@@ -45,123 +227,29 @@ Deno.serve(async (req) => {
     }
 
     const sb = createClient(supabaseUrl, serviceKey);
+    let body: any = null;
+    try { body = await req.json(); } catch { /* no body */ }
+    const mode: 'all' | 'retry-failed' = body?.mode === 'retry-failed' ? 'retry-failed' : 'all';
 
-    // 1) Discover candidate sale URLs from the SC Online sale-results index
-    const mapRes = await fetch(`${FIRECRAWL_V2}/map`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: INDEX_URL, limit: 200, includeSubdomains: false }),
-    });
-    const mapData = await mapRes.json();
-    if (!mapRes.ok) {
-      console.error('Firecrawl map error', mapRes.status, mapData);
-      return json({ error: 'Discovery failed', details: mapData }, 502);
+    let targets: SourceKey[] = ['champion-drive', 'sc-online', 'wlivestock'];
+
+    if (mode === 'retry-failed') {
+      const { data: statuses } = await sb.from('scrape_source_status').select('*');
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+      const startOfDay = today.getTime();
+      const succeededToday = new Set(
+        (statuses ?? [])
+          .filter((s: any) => s.last_success_at && new Date(s.last_success_at).getTime() >= startOfDay)
+          .map((s: any) => s.source as SourceKey),
+      );
+      targets = targets.filter((t) => !succeededToday.has(t));
     }
 
-    const rawLinks: string[] = Array.isArray(mapData?.links)
-      ? mapData.links.map((l: any) => (typeof l === 'string' ? l : l?.url)).filter(Boolean)
-      : Array.isArray(mapData?.data?.links)
-      ? mapData.data.links.map((l: any) => (typeof l === 'string' ? l : l?.url)).filter(Boolean)
-      : [];
-
-    // Keep only individual sale-result pages, dedupe
-    const candidates = Array.from(
-      new Set(
-        rawLinks.filter(
-          (u) =>
-            /sconlinesales\.com\/sale-results\//i.test(u) &&
-            !/\/sale-results\/?$/i.test(u),
-        ),
-      ),
-    );
-
-    // 2) Skip ones we've already scraped
-    const { data: existing } = await sb
-      .from('scraped_sales')
-      .select('source_url')
-      .in('source_url', candidates);
-    const known = new Set((existing ?? []).map((r: any) => r.source_url));
-    const fresh = candidates.filter((u) => !known.has(u)).slice(0, MAX_NEW_PER_RUN);
-
-    const results: any[] = [];
-    for (const url of fresh) {
-      try {
-        const scrapeRes = await fetch(`${FIRECRAWL_V2}/scrape`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            url,
-            formats: [
-              {
-                type: 'json',
-                schema: topSellerSchema,
-                prompt:
-                  'Extract sale name, date, location, total head sold, average price, and the top 3 highest-priced lots with lot number, price, sire (if listed), breeder, and the absolute URL of the lot photo.',
-              },
-            ],
-            onlyMainContent: true,
-          }),
-        });
-        const scrapeData = await scrapeRes.json();
-        if (!scrapeRes.ok) {
-          console.error('scrape failed', url, scrapeRes.status, scrapeData);
-          results.push({ url, ok: false });
-          continue;
-        }
-        const extracted = scrapeData?.data?.json ?? scrapeData?.json ?? null;
-        if (!extracted || !Array.isArray(extracted.topSellers) || extracted.topSellers.length === 0) {
-          results.push({ url, ok: false, reason: 'no-data' });
-          continue;
-        }
-
-        const row = {
-          source_url: url,
-          sale_name: extracted.saleName ?? null,
-          sale_date: extracted.date ?? null,
-          location: extracted.location ?? null,
-          total_head: typeof extracted.totalHead === 'number' ? extracted.totalHead : null,
-          average_price: extracted.averagePrice ?? null,
-          top_sellers: extracted.topSellers.slice(0, 3).map((s: any) => ({
-            lot: String(s.lot ?? ''),
-            price: String(s.price ?? ''),
-            sire: s.sire ? String(s.sire) : undefined,
-            breeder: String(s.breeder ?? ''),
-            photo: s.photo && /^https?:\/\//.test(s.photo) ? s.photo : undefined,
-          })),
-          scraped_at: new Date().toISOString(),
-        };
-
-        const { error: upErr } = await sb
-          .from('scraped_sales')
-          .upsert(row, { onConflict: 'source_url' });
-        if (upErr) {
-          console.error('upsert error', url, upErr);
-          results.push({ url, ok: false, reason: upErr.message });
-          continue;
-        }
-        results.push({ url, ok: true, saleName: row.sale_name });
-      } catch (e) {
-        console.error('scrape exception', url, e);
-        results.push({ url, ok: false, reason: e instanceof Error ? e.message : 'unknown' });
-      }
-    }
-
-    return json({
-      discovered: candidates.length,
-      alreadyKnown: known.size,
-      attempted: fresh.length,
-      succeeded: results.filter((r) => r.ok).length,
-      results,
-    }, 200);
+    const runs = await Promise.all(targets.map((t) => runSource(sb, apiKey, t)));
+    return json({ mode, runs }, 200);
   } catch (err) {
     console.error('scrape-sales-daily error', err);
     return json({ error: err instanceof Error ? err.message : 'Unknown error' }, 500);
   }
 });
-
-function json(payload: unknown, status: number) {
-  return new Response(JSON.stringify(payload), {
-    status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  });
-}

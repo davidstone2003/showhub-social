@@ -35,8 +35,9 @@ interface UpcomingSale {
   date: string;
   location: string;
   host: string;
+  link?: string;
 }
-const upcomingSales: UpcomingSale[] = [
+const fallbackUpcomingSales: UpcomingSale[] = [
   { id: "u1", name: "SC Online Summer Classic", date: "June 18, 2026", location: "Online", host: "SC Online Sales" },
   { id: "u2", name: "Midwest Elite Sale", date: "July 9, 2026", location: "Des Moines, IA", host: "Midwest Showstock" },
   { id: "u3", name: "Southern Showcase", date: "August 2, 2026", location: "Athens, GA", host: "Southern Cattle Co." },
@@ -154,6 +155,38 @@ function getTopSire(sale: SaleResult): SireStat | null {
   return named[0] ?? null;
 }
 
+type SourceStatus = {
+  source: string;
+  last_success_at: string | null;
+  last_attempt_at: string | null;
+  last_error: string | null;
+};
+
+function parseDate(s: string | null | undefined): number {
+  if (!s) return Number.POSITIVE_INFINITY;
+  const t = Date.parse(s);
+  return Number.isFinite(t) ? t : Number.POSITIVE_INFINITY;
+}
+
+function freshnessLabel(status: SourceStatus | undefined): string {
+  if (!status?.last_success_at) return "Source not yet updated";
+  const last = new Date(status.last_success_at);
+  const now = new Date();
+  const sameDay =
+    last.getFullYear() === now.getFullYear() &&
+    last.getMonth() === now.getMonth() &&
+    last.getDate() === now.getDate();
+  if (sameDay) return "Updated today at 6:00 AM CT";
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  const isYesterday =
+    last.getFullYear() === yesterday.getFullYear() &&
+    last.getMonth() === yesterday.getMonth() &&
+    last.getDate() === yesterday.getDate();
+  if (isYesterday) return "Source last updated yesterday";
+  return `Source last updated ${last.toLocaleDateString()}`;
+}
+
 export default function SalesPage() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [detail, setDetail] = useState<{ sale: SaleResult; seller: TopSeller } | null>(null);
@@ -161,28 +194,72 @@ export default function SalesPage() {
   const [importUrl, setImportUrl] = useState("");
   const [importing, setImporting] = useState(false);
   const [imported, setImported] = useState<SaleResult[]>([]);
-  const [autoScraped, setAutoScraped] = useState<SaleResult[]>([]);
+  const [scrapedResults, setScrapedResults] = useState<SaleResult[]>([]);
+  const [scrapedUpcoming, setScrapedUpcoming] = useState<UpcomingSale[]>([]);
+  const [sourceStatus, setSourceStatus] = useState<Record<string, SourceStatus>>({});
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data, error } = await supabase
-        .from("scraped_sales")
-        .select("*")
-        .order("scraped_at", { ascending: false })
-        .limit(20);
-      if (cancelled || error || !data) return;
-      const mapped: SaleResult[] = data.map((r: any) => ({
-        id: `scraped-${r.id}`,
-        saleName: r.sale_name || "SC Online Sale",
-        date: r.sale_date || "—",
-        location: r.location || "Online",
-        totalHead: typeof r.total_head === "number" ? r.total_head : 0,
-        averagePrice: r.average_price || "—",
-        topSellers: Array.isArray(r.top_sellers) ? r.top_sellers : [],
-        sireBreakdown: [],
-      }));
-      setAutoScraped(mapped);
+      const [resultsRes, upcomingRes, statusRes] = await Promise.all([
+        supabase
+          .from("scraped_results")
+          .select("*")
+          .order("scraped_at", { ascending: false })
+          .limit(30),
+        supabase
+          .from("scraped_upcoming")
+          .select("*")
+          .limit(100),
+        supabase.from("scrape_source_status").select("*"),
+      ]);
+      if (cancelled) return;
+
+      if (resultsRes.data) {
+        const mapped: SaleResult[] = resultsRes.data.map((r: any) => ({
+          id: `cd-${r.id}`,
+          saleName: r.sale_name || "Sale",
+          date: r.sale_date || "—",
+          location: r.location || (r.managed_by ? `Managed by ${r.managed_by}` : "—"),
+          totalHead: 0,
+          averagePrice: "—",
+          topSellers: (Array.isArray(r.top_lots) ? r.top_lots : []).map((l: any) => ({
+            lot: l.lot,
+            price: l.price,
+            breeder: l.breeder,
+            photo: l.photo,
+          })),
+          sireBreakdown: [],
+        }));
+        setScrapedResults(mapped);
+      }
+
+      if (upcomingRes.data) {
+        // Dedupe by normalized name+date across sources
+        const seen = new Map<string, UpcomingSale>();
+        for (const r of upcomingRes.data as any[]) {
+          const key = `${(r.sale_name || "").toLowerCase().trim()}|${(r.sale_date || "").toLowerCase().trim()}`;
+          if (seen.has(key)) continue;
+          seen.set(key, {
+            id: `up-${r.id}`,
+            name: r.sale_name || "Sale",
+            date: r.sale_date || "TBA",
+            location: r.location || (r.source === "sc-online" ? "Online" : "—"),
+            host: r.seller || (r.source === "sc-online" ? "SC Online Sales" : "wlivestock"),
+            link: r.link || undefined,
+          });
+        }
+        const list = Array.from(seen.values()).sort(
+          (a, b) => parseDate(a.date) - parseDate(b.date),
+        );
+        setScrapedUpcoming(list);
+      }
+
+      if (statusRes.data) {
+        const map: Record<string, SourceStatus> = {};
+        for (const s of statusRes.data as SourceStatus[]) map[s.source] = s;
+        setSourceStatus(map);
+      }
     })();
     return () => { cancelled = true; };
   }, []);
@@ -220,7 +297,22 @@ export default function SalesPage() {
     }
   };
 
-  const allResults = [...imported, ...autoScraped, ...saleResults];
+  const allResults = [...imported, ...scrapedResults, ...saleResults];
+
+  // Upcoming list: prefer live-scraped, fall back to mock if a scrape never ran
+  const scoStatus = sourceStatus["sc-online"];
+  const wlStatus = sourceStatus["wlivestock"];
+  const upcomingList: UpcomingSale[] = scrapedUpcoming.length > 0 ? scrapedUpcoming : fallbackUpcomingSales;
+  const upcomingFreshness =
+    !scoStatus?.last_success_at && !wlStatus?.last_success_at
+      ? "Source not yet updated"
+      : [
+          scoStatus?.last_success_at ? freshnessLabel(scoStatus).replace("Source ", "SCO ").replace("Updated", "SCO updated") : "SCO not yet updated",
+          wlStatus?.last_success_at ? freshnessLabel(wlStatus).replace("Source ", "wlivestock ").replace("Updated", "wlivestock updated") : "wlivestock not yet updated",
+        ].join(" · ");
+
+  const cdStatus = sourceStatus["champion-drive"];
+  const resultsFreshness = freshnessLabel(cdStatus);
 
 
   return (
@@ -236,31 +328,38 @@ export default function SalesPage() {
 
         {/* ─── 1. UPCOMING SALES ─── */}
         <div className="px-4 pt-6">
-          <h2 className="text-[15px] font-bold text-foreground mb-3">Upcoming Sales</h2>
+          <h2 className="text-[15px] font-bold text-foreground">Upcoming Sales</h2>
+          <p className="text-[11px] text-muted-foreground mb-3">{upcomingFreshness}</p>
           <div className="space-y-2">
-            {upcomingSales.map((s) => (
-              <div
-                key={s.id}
-                className="rounded-xl bg-card border border-border shadow-[var(--shadow-card)] p-3.5 flex items-center justify-between"
-              >
-                <div className="min-w-0">
-                  <h3 className="text-[14px] font-bold text-foreground truncate">{s.name}</h3>
-                  <div className="flex items-center gap-3 mt-1 text-[12px] text-muted-foreground">
-                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{s.date}</span>
-                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{s.location}</span>
+            {upcomingList.map((s) => {
+              const card = (
+                <div className="rounded-xl bg-card border border-border shadow-[var(--shadow-card)] p-3.5 flex items-center justify-between">
+                  <div className="min-w-0">
+                    <h3 className="text-[14px] font-bold text-foreground truncate">{s.name}</h3>
+                    <div className="flex items-center gap-3 mt-1 text-[12px] text-muted-foreground">
+                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{s.date}</span>
+                      <span className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{s.location}</span>
+                    </div>
                   </div>
+                  <button className="shrink-0 rounded-full bg-foreground text-background px-3 py-1.5 text-[12px] font-semibold">
+                    {s.link ? "View" : "Remind"}
+                  </button>
                 </div>
-                <button className="shrink-0 rounded-full bg-foreground text-background px-3 py-1.5 text-[12px] font-semibold">
-                  Remind
-                </button>
-              </div>
-            ))}
+              );
+              return s.link ? (
+                <a key={s.id} href={s.link} target="_blank" rel="noopener noreferrer" className="block">
+                  {card}
+                </a>
+              ) : (
+                <div key={s.id}>{card}</div>
+              );
+            })}
           </div>
         </div>
 
         {/* ─── 2. SALE RESULTS ─── */}
         <div className="px-4 pt-6">
-          <div className="flex items-center justify-between mb-3 gap-2">
+          <div className="flex items-center justify-between mb-1 gap-2">
             <h2 className="text-[15px] font-bold text-foreground">Sale Results</h2>
             <div className="flex items-center gap-2">
               <button
@@ -289,6 +388,7 @@ export default function SalesPage() {
               </Sheet>
             </div>
           </div>
+          <p className="text-[11px] text-muted-foreground mb-3">{resultsFreshness}</p>
 
           <div className="space-y-3">
             {allResults.map((sale) => (

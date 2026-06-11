@@ -610,42 +610,111 @@ export type Database = {
           },
         ]
       }
-      scraped_sales: {
+      scrape_source_status: {
         Row: {
-          average_price: string | null
+          last_attempt_at: string | null
+          last_error: string | null
+          last_success_at: string | null
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          last_attempt_at?: string | null
+          last_error?: string | null
+          last_success_at?: string | null
+          source: string
+          updated_at?: string
+        }
+        Update: {
+          last_attempt_at?: string | null
+          last_error?: string | null
+          last_success_at?: string | null
+          source?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      scraped_results: {
+        Row: {
           created_at: string
           id: string
+          location: string | null
+          managed_by: string | null
+          sale_date: string | null
+          sale_name: string | null
+          scraped_at: string
+          source: string
+          source_key: string
+          source_url: string | null
+          top_lots: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location?: string | null
+          managed_by?: string | null
+          sale_date?: string | null
+          sale_name?: string | null
+          scraped_at?: string
+          source: string
+          source_key: string
+          source_url?: string | null
+          top_lots?: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location?: string | null
+          managed_by?: string | null
+          sale_date?: string | null
+          sale_name?: string | null
+          scraped_at?: string
+          source?: string
+          source_key?: string
+          source_url?: string | null
+          top_lots?: Json
+        }
+        Relationships: []
+      }
+      scraped_upcoming: {
+        Row: {
+          created_at: string
+          end_time: string | null
+          id: string
+          link: string | null
           location: string | null
           sale_date: string | null
           sale_name: string | null
           scraped_at: string
-          source_url: string
-          top_sellers: Json
-          total_head: number | null
+          seller: string | null
+          source: string
+          source_key: string
         }
         Insert: {
-          average_price?: string | null
           created_at?: string
+          end_time?: string | null
           id?: string
+          link?: string | null
           location?: string | null
           sale_date?: string | null
           sale_name?: string | null
           scraped_at?: string
-          source_url: string
-          top_sellers?: Json
-          total_head?: number | null
+          seller?: string | null
+          source: string
+          source_key: string
         }
         Update: {
-          average_price?: string | null
           created_at?: string
+          end_time?: string | null
           id?: string
+          link?: string | null
           location?: string | null
           sale_date?: string | null
           sale_name?: string | null
           scraped_at?: string
-          source_url?: string
-          top_sellers?: Json
-          total_head?: number | null
+          seller?: string | null
+          source?: string
+          source_key?: string
         }
         Relationships: []
       }
