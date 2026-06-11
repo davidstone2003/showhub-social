@@ -41,6 +41,7 @@ const SiresPage = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"list" | "grid">("list");
+  const [species, setSpecies] = useState<SpeciesPill>("All");
 
   useEffect(() => {
     async function fetchSires() {
