@@ -479,7 +479,9 @@ export default function CreatePostPage() {
             <div className="flex-1 min-w-0 text-[13px] truncate" style={{ color: "#0A1628" }}>
               <span className="font-semibold">{effectiveResult || "Result"}</span>
               {showName && <span className="text-[#5C6470]"> · {showName}</span>}
+              {placedBy && <span className="text-[#5C6470]"> · Placed by {placedBy}</span>}
             </div>
+
             <button onClick={() => setShowWinnerPanel(true)} className="text-[12px] font-semibold" style={{ color: "#8B6914" }}>Edit</button>
           </div>
         )}
@@ -542,7 +544,23 @@ export default function CreatePostPage() {
             </div>
           </div>
         )}
+
+        {/* Inline Post button */}
+        <div className="px-4 pt-4 pb-2">
+          <button
+            onClick={handlePost}
+            disabled={!canPost || submitting}
+            className={cn(
+              "w-full h-12 rounded-xl text-[16px] font-bold transition-opacity",
+              (!canPost || submitting) && "opacity-40"
+            )}
+            style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+          >
+            {submitting ? "Posting…" : "Post"}
+          </button>
+        </div>
       </div>
+
 
       {/* Emoji picker panel */}
       {showEmojiPicker && (
