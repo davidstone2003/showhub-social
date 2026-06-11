@@ -235,29 +235,38 @@ export default function SalesPage() {
 
         {/* ─── 2. SALE RESULTS ─── */}
         <div className="px-4 pt-6">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-3 gap-2">
             <h2 className="text-[15px] font-bold text-foreground">Sale Results</h2>
-            <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
-              <SheetTrigger asChild>
-                <button className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-[12px] font-semibold text-foreground hover:bg-muted/50 transition-colors">
-                  <SlidersHorizontal className="w-3.5 h-3.5" />
-                  Filter & Sort
-                </button>
-              </SheetTrigger>
-              <SheetContent side="bottom" className="rounded-t-2xl">
-                <SheetTitle>Filter & Sort</SheetTitle>
-                <SheetDescription>Refine sale results by sale, year, or price.</SheetDescription>
-                <div className="mt-4 space-y-4">
-                  <FilterSection label="Sale" options={["All Sales", "SC Online", "The Exposure", "The Brand Sale"]} />
-                  <FilterSection label="Year" options={["2026", "2025", "2024"]} />
-                  <FilterSection label="Sort by" options={["Most Recent", "Highest Avg", "Most Head"]} />
-                </div>
-              </SheetContent>
-            </Sheet>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setImportOpen(true)}
+                className="flex items-center gap-1.5 rounded-full bg-foreground text-background px-3 py-1.5 text-[12px] font-semibold hover:opacity-90 transition-opacity"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Import URL
+              </button>
+              <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
+                <SheetTrigger asChild>
+                  <button className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-[12px] font-semibold text-foreground hover:bg-muted/50 transition-colors">
+                    <SlidersHorizontal className="w-3.5 h-3.5" />
+                    Filter
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="bottom" className="rounded-t-2xl">
+                  <SheetTitle>Filter & Sort</SheetTitle>
+                  <SheetDescription>Refine sale results by sale, year, or price.</SheetDescription>
+                  <div className="mt-4 space-y-4">
+                    <FilterSection label="Sale" options={["All Sales", "SC Online", "The Exposure", "The Brand Sale"]} />
+                    <FilterSection label="Year" options={["2026", "2025", "2024"]} />
+                    <FilterSection label="Sort by" options={["Most Recent", "Highest Avg", "Most Head"]} />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
 
           <div className="space-y-3">
-            {saleResults.map((sale) => (
+            {allResults.map((sale) => (
               <SaleResultCard
                 key={sale.id}
                 sale={sale}
@@ -266,6 +275,40 @@ export default function SalesPage() {
             ))}
           </div>
         </div>
+
+        {/* Import from URL dialog */}
+        <Dialog open={importOpen} onOpenChange={(o) => !importing && setImportOpen(o)}>
+          <DialogContent className="max-w-md">
+            <DialogTitle>Import Sale Results</DialogTitle>
+            <DialogDescription>
+              Paste a sale results page URL (e.g. SC Online Sales). We'll pull the top sellers with photos automatically.
+            </DialogDescription>
+            <div className="mt-4 space-y-3">
+              <Input
+                value={importUrl}
+                onChange={(e) => setImportUrl(e.target.value)}
+                placeholder="https://www.sconlinesales.com/..."
+                disabled={importing}
+              />
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1" onClick={() => setImportOpen(false)} disabled={importing}>
+                  Cancel
+                </Button>
+                <Button className="flex-1" onClick={handleImport} disabled={importing || !importUrl.trim()}>
+                  {importing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Scraping…
+                    </>
+                  ) : (
+                    "Import"
+                  )}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
 
         {/* Top seller detail sheet */}
         <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
