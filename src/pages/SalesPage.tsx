@@ -7,8 +7,6 @@ import {
   Calendar,
   MapPin,
   ChevronDown,
-  Download,
-  Loader2,
 } from "lucide-react";
 import {
   Sheet,
@@ -17,16 +15,7 @@ import {
   SheetTrigger,
   SheetDescription,
 } from "@/components/ui/sheet";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/hooks/use-toast";
 
 /* ── Upcoming sales ── */
 interface UpcomingSale {
