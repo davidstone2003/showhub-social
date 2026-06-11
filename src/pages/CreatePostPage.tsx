@@ -86,7 +86,7 @@ export default function CreatePostPage() {
   const [sireId, setSireId] = useState<string | null>(null);
   const [damName, setDamName] = useState("");
   const [notes, setNotes] = useState("");
-  const [species, setSpecies] = useState("");
+  const [species, setSpecies] = useState("sheep");
 
   // Sale Lot fields
   const [lotNumber, setLotNumber] = useState("");
@@ -99,7 +99,7 @@ export default function CreatePostPage() {
 
   // Sale/Event fields
   const [eventName, setEventName] = useState("");
-  const [eventDate, setEventDate] = useState("");
+  const [eventDate, setEventDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [eventLocation, setEventLocation] = useState("");
   const [eventLink, setEventLink] = useState("");
   const [eventCaption, setEventCaption] = useState("");
@@ -129,7 +129,7 @@ export default function CreatePostPage() {
       const { data } = await (supabase as any)
         .from("breeder_profiles")
         .select("id, breeder_name")
-        .eq("user_id", user.id)
+        .eq("owner_user_id", user.id)
         .maybeSingle();
       const farmName = (data as any)?.breeder_name as string | undefined;
       if (farmName) {
