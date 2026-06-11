@@ -1,7 +1,7 @@
 // Species + sub-category taxonomy for the Breeder Directory navigation.
 // Matched against `profiles.bio`, `tagline`, `display_name` (case-insensitive).
 
-export type SpeciesKey = "sheep" | "goats" | "cattle" | "hair";
+export type SpeciesKey = "sheep" | "goats" | "cattle" | "pigs";
 
 export interface SpeciesTile {
   key: SpeciesKey;
@@ -65,16 +65,18 @@ export const SPECIES: SpeciesTile[] = [
     ],
   },
   {
-    key: "hair",
-    name: "Hair Breeds",
-    blurb: "Dorper, Valais Blacknose & Katahdin",
-    keywords: ["dorper", "valais", "blacknose", "katahdin", "hair sheep"],
-    silhouette: "🐑",
+    key: "pigs",
+    name: "Pigs",
+    blurb: "Market hogs, breeding stock & show pigs",
+    keywords: ["pig", "hog", "barrow", "gilt", "swine", "duroc", "yorkshire", "hampshire pig", "berkshire", "chester"],
+    silhouette: "🐖",
     subcategories: [
-      { slug: "dorper", name: "Dorper", keywords: ["dorper"], silhouette: "🐑" },
-      { slug: "valais", name: "Valais Blacknose", keywords: ["valais", "blacknose"], silhouette: "🐑" },
-      { slug: "katahdin", name: "Katahdin", keywords: ["katahdin"], silhouette: "🐑" },
-      { slug: "et", name: "Breeding Stock & ET Programs", keywords: ["et program", "embryo", "donor"], silhouette: "🐑" },
+      { slug: "market-hogs", name: "Market Hogs", keywords: ["market hog", "barrow", "market pig"], silhouette: "🐖" },
+      { slug: "gilts", name: "Breeding Gilts", keywords: ["gilt", "breeding gilt"], silhouette: "🐖" },
+      { slug: "duroc", name: "Duroc", keywords: ["duroc"], silhouette: "🐖" },
+      { slug: "yorkshire", name: "Yorkshire", keywords: ["yorkshire"], silhouette: "🐖" },
+      { slug: "berkshire", name: "Berkshire", keywords: ["berkshire"], silhouette: "🐖" },
+      { slug: "crossbred", name: "Crossbred Show Pigs", keywords: ["crossbred", "crossbred pig", "show pig"], silhouette: "🐖" },
     ],
   },
 ];
