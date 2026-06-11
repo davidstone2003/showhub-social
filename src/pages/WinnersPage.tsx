@@ -139,8 +139,11 @@ export default function WinnersPage() {
 
   // Group by show
   const showGroups = useMemo(() => {
+    const filteredRows = rows.filter((r) =>
+      matchesSpecies(species, r.species, r.show_name, r.title, r.caption, (r.tags || []).join(" "))
+    );
     const grouped = new Map<string, WinnerRow[]>();
-    for (const r of rows) {
+    for (const r of filteredRows) {
       const key = r.show_name.trim().toLowerCase();
       if (!grouped.has(key)) grouped.set(key, []);
       grouped.get(key)!.push(r);
