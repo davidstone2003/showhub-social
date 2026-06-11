@@ -126,7 +126,7 @@ export default function CreatePostPage() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from("breeder_profiles")
         .select("id, breeder_name")
         .eq("user_id", user.id)
