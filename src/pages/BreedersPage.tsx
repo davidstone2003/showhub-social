@@ -21,8 +21,8 @@ function CountUp({ end, label }: { end: number; label: string }) {
   }, [end]);
   return (
     <div className="flex flex-col items-center md:items-start">
-      <span className="text-2xl md:text-3xl font-bold tracking-tight text-white tabular-nums">{val.toLocaleString()}</span>
-      <span className="text-[10px] md:text-[11px] uppercase tracking-[0.14em] text-white/50 mt-0.5">{label}</span>
+      <span className="text-2xl md:text-3xl font-bold tracking-tight tabular-nums" style={{ color: "#C9A84C" }}>{val.toLocaleString()}</span>
+      <span className="text-[10px] md:text-[11px] uppercase tracking-[0.14em] mt-0.5" style={{ color: "#6B7280" }}>{label}</span>
     </div>
   );
 }
@@ -107,48 +107,42 @@ export default function BreedersPage() {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="min-h-screen bg-background text-foreground">
-        {/* HERO — stays dark */}
-        <section className="relative overflow-hidden bg-[#0A1628] text-white">
-          <div
-            className="absolute inset-0 opacity-30"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 20% 20%, rgba(201,168,76,0.25), transparent 50%), radial-gradient(circle at 80% 60%, rgba(57,217,138,0.08), transparent 60%)",
-            }}
-          />
-          <div className="relative mx-auto max-w-6xl px-4 pt-10 pb-8 md:pt-14 md:pb-10">
-            <p className="text-[11px] uppercase tracking-[0.22em] text-[#C9A84C]">The Backdrop Directory</p>
-            <h1 className="mt-2 text-3xl md:text-5xl font-bold tracking-tight leading-[1.05]">
-              Find Your Next<br /><span className="text-[#C9A84C]">Champion</span>
+      <div className="min-h-screen" style={{ backgroundColor: "#F8F7F4", color: "#0A1628" }}>
+        {/* HERO — light */}
+        <section className="relative overflow-hidden" style={{ backgroundColor: "#F8F7F4" }}>
+          <div className="relative mx-auto max-w-6xl px-4 pt-8 pb-6 md:pt-12 md:pb-10">
+            <p className="text-[11px] uppercase tracking-[0.22em]" style={{ color: "#C9A84C" }}>The Backdrop Directory</p>
+            <h1 className="mt-2 text-3xl md:text-5xl font-bold tracking-tight leading-[1.05]" style={{ color: "#0A1628" }}>
+              Find Your Next<br /><span style={{ color: "#C9A84C" }}>Champion</span>
             </h1>
-            <p className="mt-3 max-w-md text-sm md:text-base text-white/60">
+            <p className="mt-3 max-w-md text-sm md:text-base" style={{ color: "#4B5563" }}>
               The serious breeders. The bloodlines that matter. The wins that count.
             </p>
 
             <div className="relative mt-6 md:mt-8 max-w-2xl">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "#9CA3AF" }} />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search breeders, sires, states, breeds…"
-                className="h-12 w-full rounded-full border border-white/10 bg-white/5 pl-11 pr-4 text-sm text-white placeholder:text-white/40 backdrop-blur-sm focus:outline-none focus:border-[#C9A84C]/60 focus:bg-white/10 transition-colors"
+                className="h-12 w-full rounded-full bg-white pl-11 pr-4 text-sm focus:outline-none transition-colors"
+                style={{ border: "1px solid #E5E7EB", color: "#0A1628" }}
               />
               {searchResults.length > 0 && (
-                <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-20 overflow-hidden rounded-2xl border border-white/10 bg-[#141E2E] shadow-2xl">
+                <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-20 overflow-hidden rounded-2xl border border-border bg-white shadow-2xl">
                   {searchResults.map((b) => (
                     <Link
                       key={b.id}
                       to={`/breeder/${b.username}`}
-                      className="flex items-center gap-3 border-b border-white/5 px-4 py-3 last:border-b-0 hover:bg-white/5"
+                      className="flex items-center gap-3 border-b border-border px-4 py-3 last:border-b-0 hover:bg-muted/50"
                       onClick={() => setSearch("")}
                     >
-                      <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-[#1a2a44] to-black flex items-center justify-center text-[11px] font-black text-[#C9A84C]/80">
+                      <div className="h-9 w-9 rounded-lg flex items-center justify-center text-[11px] font-black" style={{ backgroundColor: "#0A1628", color: "#C9A84C" }}>
                         {(b.display_name || b.username).slice(0, 2).toUpperCase()}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-white">{b.display_name || b.username}</p>
-                        {b.location && <p className="truncate text-[11px] text-white/50">{b.location}</p>}
+                        <p className="truncate text-sm font-semibold" style={{ color: "#0A1628" }}>{b.display_name || b.username}</p>
+                        {b.location && <p className="truncate text-[11px]" style={{ color: "#6B7280" }}>{b.location}</p>}
                       </div>
                     </Link>
                   ))}
@@ -156,7 +150,7 @@ export default function BreedersPage() {
               )}
             </div>
 
-            <div className="mt-8 grid grid-cols-4 gap-3 md:gap-8 rounded-2xl border border-white/10 bg-black/20 p-4 md:p-5 backdrop-blur-sm">
+            <div className="mt-8 grid grid-cols-4 gap-3 md:gap-8 rounded-2xl bg-white p-4 md:p-5" style={{ border: "1px solid #E5E7EB" }}>
               <CountUp end={stats.total} label="Breeders" />
               <CountUp end={stats.active} label="Active This Week" />
               <CountUp end={stats.states} label="States" />
