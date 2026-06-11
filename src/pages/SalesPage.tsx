@@ -297,7 +297,22 @@ export default function SalesPage() {
     }
   };
 
-  const allResults = [...imported, ...autoScraped, ...saleResults];
+  const allResults = [...imported, ...scrapedResults, ...saleResults];
+
+  // Upcoming list: prefer live-scraped, fall back to mock if a scrape never ran
+  const scoStatus = sourceStatus["sc-online"];
+  const wlStatus = sourceStatus["wlivestock"];
+  const upcomingList: UpcomingSale[] = scrapedUpcoming.length > 0 ? scrapedUpcoming : fallbackUpcomingSales;
+  const upcomingFreshness =
+    !scoStatus?.last_success_at && !wlStatus?.last_success_at
+      ? "Source not yet updated"
+      : [
+          scoStatus?.last_success_at ? freshnessLabel(scoStatus).replace("Source ", "SCO ").replace("Updated", "SCO updated") : "SCO not yet updated",
+          wlStatus?.last_success_at ? freshnessLabel(wlStatus).replace("Source ", "wlivestock ").replace("Updated", "wlivestock updated") : "wlivestock not yet updated",
+        ].join(" · ");
+
+  const cdStatus = sourceStatus["champion-drive"];
+  const resultsFreshness = freshnessLabel(cdStatus);
 
 
   return (
@@ -313,25 +328,32 @@ export default function SalesPage() {
 
         {/* ─── 1. UPCOMING SALES ─── */}
         <div className="px-4 pt-6">
-          <h2 className="text-[15px] font-bold text-foreground mb-3">Upcoming Sales</h2>
+          <h2 className="text-[15px] font-bold text-foreground">Upcoming Sales</h2>
+          <p className="text-[11px] text-muted-foreground mb-3">{upcomingFreshness}</p>
           <div className="space-y-2">
-            {upcomingSales.map((s) => (
-              <div
-                key={s.id}
-                className="rounded-xl bg-card border border-border shadow-[var(--shadow-card)] p-3.5 flex items-center justify-between"
-              >
-                <div className="min-w-0">
-                  <h3 className="text-[14px] font-bold text-foreground truncate">{s.name}</h3>
-                  <div className="flex items-center gap-3 mt-1 text-[12px] text-muted-foreground">
-                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{s.date}</span>
-                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{s.location}</span>
+            {upcomingList.map((s) => {
+              const card = (
+                <div className="rounded-xl bg-card border border-border shadow-[var(--shadow-card)] p-3.5 flex items-center justify-between">
+                  <div className="min-w-0">
+                    <h3 className="text-[14px] font-bold text-foreground truncate">{s.name}</h3>
+                    <div className="flex items-center gap-3 mt-1 text-[12px] text-muted-foreground">
+                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{s.date}</span>
+                      <span className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{s.location}</span>
+                    </div>
                   </div>
+                  <button className="shrink-0 rounded-full bg-foreground text-background px-3 py-1.5 text-[12px] font-semibold">
+                    {s.link ? "View" : "Remind"}
+                  </button>
                 </div>
-                <button className="shrink-0 rounded-full bg-foreground text-background px-3 py-1.5 text-[12px] font-semibold">
-                  Remind
-                </button>
-              </div>
-            ))}
+              );
+              return s.link ? (
+                <a key={s.id} href={s.link} target="_blank" rel="noopener noreferrer" className="block">
+                  {card}
+                </a>
+              ) : (
+                <div key={s.id}>{card}</div>
+              );
+            })}
           </div>
         </div>
 
