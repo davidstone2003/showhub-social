@@ -466,34 +466,9 @@ export default function CreatePostPage() {
         </div>
       )}
 
-      {/* Text formatting mini-toolbar */}
-      {showFormatting && (
-        <div className="fixed left-0 right-0 bottom-[120px] z-40 flex items-center gap-1 px-4 py-2 bg-white border-t border-[#E5E7EB] overflow-x-auto">
-          {[
-            { label: "B", style: "**", title: "Bold" },
-            { label: "I", style: "_", title: "Italic" },
-            { label: "H1", style: "# ", title: "Heading" },
-            { label: "•", style: "\n• ", title: "Bullet" },
-          ].map(({ label, style, title }) => (
-            <button
-              key={label}
-              title={title}
-              onClick={() => {
-                const ta = captionRef.current;
-                const start = ta?.selectionStart ?? generalCaption.length;
-                const end = ta?.selectionEnd ?? start;
-                const selected = generalCaption.slice(start, end);
-                const wrapped = selected ? `${style}${selected}${style}` : style;
-                const newCaption = generalCaption.slice(0, start) + wrapped + generalCaption.slice(end);
-                setGeneralCaption(newCaption);
-                setTimeout(() => ta?.focus(), 0);
-              }}
-              className="flex items-center justify-center w-9 h-9 rounded-lg border border-[#E5E7EB] text-[13px] font-bold text-[#0A1628] hover:bg-[#F8F7F4] shrink-0"
-            >
-              {label}
-            </button>
-          ))}
-          <div className="w-px h-6 bg-[#E5E7EB] mx-1 shrink-0" />
+      {/* Quick-tap livestock emoji row */}
+      {showEmojiPicker && (
+        <div className="fixed left-0 right-0 bottom-[478px] z-40 flex items-center gap-1 px-4 py-2 bg-white border-t border-[#E5E7EB] overflow-x-auto">
           {["🏆", "🐑", "🐄", "🐖", "🐐", "⭐", "🔥", "👏", "💪", "❤️"].map(emoji => (
             <button
               key={emoji}
@@ -505,7 +480,7 @@ export default function CreatePostPage() {
                 setGeneralCaption(newCaption);
                 setTimeout(() => ta?.focus(), 0);
               }}
-              className="text-[20px] w-9 h-9 flex items-center justify-center shrink-0"
+              className="text-[22px] w-10 h-10 flex items-center justify-center shrink-0 hover:bg-[#F8F7F4] rounded-lg"
             >
               {emoji}
             </button>
@@ -517,8 +492,7 @@ export default function CreatePostPage() {
       <div className="fixed left-0 right-0 bottom-16 z-30 bg-white border-t border-[#E5E7EB] h-[52px] flex items-center justify-around px-2">
         <ToolbarIcon icon={Camera} onClick={() => photoInputRef.current?.click()} />
         <ToolbarIcon icon={VideoIcon} onClick={() => videoInputRef.current?.click()} />
-        <ToolbarIcon icon={Smile} active={showEmojiPicker} onClick={() => { setShowFormatting(false); setShowEmojiPicker(v => !v); }} />
-        <ToolbarIcon icon={Type} active={showFormatting} onClick={() => { setShowEmojiPicker(false); setShowFormatting(v => !v); }} />
+        <ToolbarIcon icon={Smile} active={showEmojiPicker} onClick={() => setShowEmojiPicker(v => !v)} />
         <ToolbarIcon icon={Trophy} active={winnerHasData} onClick={() => setShowWinnerPanel(true)} />
         <ToolbarIcon icon={Tag} onClick={() => toast("Tagging coming soon")} />
         <ToolbarIcon icon={Leaf} active={!!species} onClick={() => setShowSpeciesSheet(true)} />
