@@ -326,31 +326,41 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </div>
         )}
 
-        {/* Winner badge */}
-        {isWinner && (
-          <div className="px-3 pb-2">
+        {/* Winner info — plain text, no card */}
+        {isWinner && (post.win_placing || post.win_title) && (
+          <div className="px-3 pb-1">
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
-              className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left"
-              style={{
-                backgroundColor: "rgba(201,168,76,0.1)",
-                border: "1px solid rgba(201,168,76,0.3)",
-              }}
+              className="w-full text-left"
             >
-              <span className="inline-block rounded-full" style={{ width: 8, height: 8, backgroundColor: accent }} />
-              <span className="font-semibold" style={{ fontSize: 13, color: "#0A1628" }}>
-                {post.win_placing || post.win_title}
-              </span>
-              {post.show_name && (
-                <span style={{ fontSize: 12, color: "#666" }}>
-                  · {post.created_at ? `${new Date(post.created_at).getFullYear()} ` : ""}{post.show_name}
-                </span>
+              <p style={{ fontSize: 14, color: "#0A1628", lineHeight: 1.4 }}>
+                <span className="font-bold">{post.win_placing || post.win_title}</span>
+                {post.show_name && (
+                  <span style={{ color: "#6B7280", fontWeight: 400 }}>
+                    {" "}· {post.created_at ? `${new Date(post.created_at).getFullYear()} ` : ""}{post.show_name}
+                  </span>
+                )}
+              </p>
+              {post.breeder?.name && (
+                <p style={{ fontSize: 13, color: "#6B7280", marginTop: 1 }}>
+                  Bred by <span style={{ fontWeight: 600, color: "#0A1628" }}>{post.breeder.name}</span>
+                </p>
               )}
-              <span style={{ fontSize: 12, color: accent, fontWeight: 600 }}>Details →</span>
+              {(post as any).placed_by && (
+                <p style={{ fontSize: 13, color: "#6B7280", marginTop: 1 }}>
+                  Placed by <span style={{ fontWeight: 600, color: "#0A1628" }}>{(post as any).placed_by}</span>
+                </p>
+              )}
+              {post.sired_by && (
+                <p style={{ fontSize: 13, color: "#6B7280", marginTop: 1 }}>
+                  Sired by <span style={{ fontWeight: 600, color: "#C9A84C" }}>{post.sired_by}</span>
+                </p>
+              )}
             </button>
           </div>
         )}
+
 
         {/* Photos */}
         {(post as any).video_url ? (
