@@ -314,7 +314,7 @@ export default function CreatePostPage() {
     if (fields.shownBy) setExhibitorName(fields.shownBy);
     if (fields.siredBy) setSireName(fields.siredBy);
     if (fields.caption) { setNotes(fields.caption); setGeneralCaption(fields.caption); }
-    if (fields.placedBy) setBreederName(fields.placedBy);
+    if (fields.placedBy) setPlacedBy(fields.placedBy);
     setShowSmartUpload(false);
     setShowMoreSheet(false);
   };
@@ -329,7 +329,7 @@ export default function CreatePostPage() {
       if (raw.show_name) setShowName(raw.show_name);
       if (raw.win_placing) setResultTitle(raw.win_placing);
       if (raw.shown_by) setExhibitorName(raw.shown_by);
-      if (raw.placed_by) setBreederName(raw.placed_by);
+      if (raw.placed_by) setPlacedBy(raw.placed_by);
       if (raw.sired_by) setSireName(raw.sired_by);
       if (raw.caption) { setNotes(raw.caption); setGeneralCaption(raw.caption); }
       toast.success("Fields auto-filled from text");
@@ -343,10 +343,10 @@ export default function CreatePostPage() {
   };
 
   // Determine which submit handler to use
-  const winnerReady = !!effectiveResult.trim() && !!showName.trim() && !!exhibitorName.trim();
+  const winnerReady = !!showName.trim() && !!exhibitorName.trim();
   const saleLotReady = !!saleName.trim();
   const saleEventReady = !!eventName.trim();
-  const canPost = winnerReady || saleLotReady || saleEventReady || generalCaption.trim().length > 0 || media.length > 0;
+  const canPost = winnerReady || saleLotReady || saleEventReady || generalCaption.trim().length > 0 || notes.trim().length > 0 || media.length > 0;
 
   const handlePost = async () => {
     setShowEmojiPicker(false);
@@ -387,7 +387,7 @@ export default function CreatePostPage() {
       if (raw.show_name) { setShowName(raw.show_name); filled++; }
       if (raw.win_placing) { setResultTitle(raw.win_placing); filled++; }
       if (raw.shown_by) { setExhibitorName(raw.shown_by); filled++; }
-      if (raw.placed_by) { setBreederName((prev) => prev || raw.placed_by); filled++; }
+      if (raw.placed_by) { setPlacedBy(raw.placed_by); filled++; }
       if (raw.sired_by) { setSireName(raw.sired_by); filled++; }
       if (raw.dam) { setDamName(raw.dam); filled++; }
       if (raw.caption) { setNotes(raw.caption); filled++; }
