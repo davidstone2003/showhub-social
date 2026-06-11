@@ -161,6 +161,31 @@ export default function SalesPage() {
   const [importUrl, setImportUrl] = useState("");
   const [importing, setImporting] = useState(false);
   const [imported, setImported] = useState<SaleResult[]>([]);
+  const [autoScraped, setAutoScraped] = useState<SaleResult[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("scraped_sales")
+        .select("*")
+        .order("scraped_at", { ascending: false })
+        .limit(20);
+      if (cancelled || error || !data) return;
+      const mapped: SaleResult[] = data.map((r: any) => ({
+        id: `scraped-${r.id}`,
+        saleName: r.sale_name || "SC Online Sale",
+        date: r.sale_date || "—",
+        location: r.location || "Online",
+        totalHead: typeof r.total_head === "number" ? r.total_head : 0,
+        averagePrice: r.average_price || "—",
+        topSellers: Array.isArray(r.top_sellers) ? r.top_sellers : [],
+        sireBreakdown: [],
+      }));
+      setAutoScraped(mapped);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const handleImport = async () => {
     if (!importUrl.trim()) return;
