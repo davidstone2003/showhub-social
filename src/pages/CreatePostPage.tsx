@@ -305,6 +305,7 @@ export default function CreatePostPage() {
         user_id: user?.id || null, posted_as_breeder_id: postedAsBreederId,
         caption: generalCaption.trim() || null, image_urls: imageUrls, video_url: videoUrl,
         tags: species ? [species] : [], post_type: "general", show_on_feed: true,
+        tagged_user_ids: taggedPeople.map(p => p.id),
       });
       toast.success("Post shared!"); navigate("/");
     } catch (err: any) { toast.error("Failed to post", { description: err.message }); }
