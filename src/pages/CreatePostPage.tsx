@@ -563,8 +563,9 @@ export default function CreatePostPage() {
 
             <FieldLabel>Sired By</FieldLabel>
             <AutocompleteInput
-              table="sires_lookup" value={sireName} onValueChange={setSireName}
-              onSelectId={setSireId} placeholder="Search or type sire name"
+              table="sires_lookup" value={sireName}
+              onChange={(v, id) => { setSireName(v); setSireId(id); }}
+              placeholder="Search or type sire name"
             />
 
             <FieldLabel>Dam</FieldLabel>
