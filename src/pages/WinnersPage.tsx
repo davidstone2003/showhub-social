@@ -259,7 +259,7 @@ export default function WinnersPage() {
           right: 16, bottom: 80,
           backgroundColor: "#C9A84C",
           color: "#0A1628",
-          boxShadow: "0 6px 16px rgba(0,0,0,0.25)"
+          boxShadow: "0 8px 20px rgba(201,168,76,0.4)"
         }}
       >
         <Plus className="w-7 h-7" strokeWidth={2.5} />
