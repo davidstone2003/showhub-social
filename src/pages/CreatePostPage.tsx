@@ -301,17 +301,65 @@ export default function CreatePostPage() {
     setSubmitting(true);
     try {
       const { imageUrls, videoUrl } = await uploadMedia();
-      await (supabase.from("posts") as any).insert({
+      const { data: post, error: postError } = await (supabase.from("posts") as any).insert({
         user_id: user?.id || null, posted_as_breeder_id: postedAsBreederId,
         caption: generalCaption.trim() || null, image_urls: imageUrls, video_url: videoUrl,
         tags: species ? [species] : [], post_type: "general", show_on_feed: true,
         tagged_user_ids: taggedPeople.map(p => p.id),
-      });
+      }).select("id").single();
+      if (postError) throw postError;
+
+      // AI extraction in background — don't block the post
+      if (generalCaption.trim()) {
+        supabase.functions.invoke("extract-winner", {
+          body: { text: generalCaption, postId: post.id }
+        }).then(async ({ data }) => {
+          const results = data?.results || (data?.extracted ? [data.extracted] : []);
+          if (results.length === 0) return;
+          let created = 0;
+          for (let i = 0; i < results.length; i++) {
+            const r = results[i];
+            if (!r.show_name && !r.win_placing) continue;
+            const matchedImage = imageUrls[i] || imageUrls[0] || null;
+            await (supabase.from("winners") as any).insert({
+              source_post_id: post.id,
+              title: r.win_placing ? `${r.win_placing} — ${r.show_name || ""}`.trim() : (r.show_name || "Winner"),
+              show_name: r.show_name || "",
+              shown_by: r.shown_by || "",
+              placed_by: r.placed_by || null,
+              bred_by: r.bred_by || (breederName || null),
+              sired_by: r.sired_by || null,
+              win_placing: r.win_placing || null,
+              caption: generalCaption.trim(),
+              image_urls: matchedImage ? [matchedImage] : imageUrls,
+              date: new Date().toISOString().split("T")[0],
+              user_id: user?.id || null,
+              posted_as_breeder_id: postedAsBreederId,
+              post_type: "winner",
+              show_on_feed: false,
+              show_on_breeder_page: true,
+              show_on_winners_archive: true,
+              status: "active",
+              species: species || null,
+            });
+            created++;
+          }
+          if (created > 0) {
+            toast.success(`${created} winner${created > 1 ? "s" : ""} added to Winners archive`, {
+              description: "View them on the Winners page"
+            });
+          }
+        }).catch(() => {
+          // Silent fail — post already succeeded
+        });
+      }
+
       setTaggedPeople([]);
       toast.success("Post shared!"); navigate("/");
     } catch (err: any) { toast.error("Failed to post", { description: err.message }); }
     finally { setSubmitting(false); }
   };
+
 
   const handleSmartExtracted = (fields: any) => {
     if (fields.imageFile && fields.imagePreview) {

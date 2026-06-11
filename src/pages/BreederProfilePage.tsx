@@ -108,13 +108,17 @@ export default function BreederProfilePage() {
 
   const tier: string = profile?.subscription_tier || "free";
   const isFeatured = tier === "featured" || tier === "breeder_page";
+  const isContacted = tier === "listing" || tier === "contacted" || isFeatured;
+  const isPaid = isFeatured || isContacted;
+  const isOwnProfile = user?.id === profile?.id;
 
   const featured = posts.filter((p) => p.is_featured);
   const winners = posts.filter((p) => p.post_type === "winner");
   const sires = posts.filter((p) => p.post_type === "sire");
   const donors = posts.filter((p) => p.post_type === "donor");
   const sales = posts.filter((p) => p.post_type === "sale");
-  const recentPosts = posts.slice(0, isFeatured ? 10 : 3);
+  const recentPosts = posts.slice(0, isPaid ? 10 : 3);
+
 
   const breederName = profile?.display_name || profile?.username || "";
   const lambs = useMemo(
@@ -156,27 +160,28 @@ export default function BreederProfilePage() {
         <BreederHero
           profile={profile}
           tier={tier}
-          stats={isFeatured ? { winners: winners.length, sires: sires.length, posts: posts.length } : undefined}
+          stats={isPaid ? { winners: winners.length, sires: sires.length, posts: posts.length } : undefined}
         />
 
         <div className="max-w-2xl mx-auto px-4 py-5 space-y-6">
-          {!isFeatured && (
+          {!isPaid && (
             <>
               {recentPosts.length > 0 && (
                 <BreederSection icon={Activity} title="Recent Posts">
                   {renderCards(recentPosts)}
                 </BreederSection>
               )}
-              <LockedSection icon={Trophy} title="Winners" count={winners.length || 3} isOwner={false} />
-              <LockedSection icon={Dna} title="Sires" count={sires.length || 2} isOwner={false} />
-              <LockedSection icon={Dna} title="Donors / Genetics" count={donors.length || 2} isOwner={false} />
-              <LockedSection icon={ShoppingBag} title="Sales / Available" count={sales.length || 2} isOwner={false} />
+              <LockedSection icon={Trophy} title="Winners" count={winners.length || 3} isOwner={isOwnProfile} />
+              <LockedSection icon={Dna} title="Sires" count={sires.length || 2} isOwner={isOwnProfile} />
+              <LockedSection icon={Dna} title="Donors / Genetics" count={donors.length || 2} isOwner={isOwnProfile} />
+              <LockedSection icon={ShoppingBag} title="Sales / Available" count={sales.length || 2} isOwner={isOwnProfile} />
             </>
           )}
 
-          {isFeatured && (
+          {isPaid && (
             <>
               <div className="flex gap-1 border-b border-border -mx-4 px-4 sticky top-0 bg-background z-10">
+
                 {(["posts", "lambs", "results"] as const).map((t) => (
                   <button
                     key={t}
@@ -240,14 +245,70 @@ export default function BreederProfilePage() {
               )}
 
               {tab === "results" && (
-                <BreederSection icon={Trophy} title="Show Results">
-                  {winners.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No results yet.</p>
-                  ) : (
-                    renderCards(winners)
-                  )}
-                </BreederSection>
+                winners.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Trophy className="w-10 h-10 mx-auto mb-3" style={{ color: "#C9A84C" }} />
+                    <p className="font-semibold text-[15px]" style={{ color: "#0A1628" }}>No winners yet</p>
+                    <p className="text-[13px] text-[#6B7280] mt-1">Post your results to build your record</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6 px-4 py-3">
+                    {(() => {
+                      const grouped = new Map<string, WinnerRow[]>();
+                      winners.forEach((w) => {
+                        const key = w.show_name || "Other";
+                        if (!grouped.has(key)) grouped.set(key, []);
+                        grouped.get(key)!.push(w);
+                      });
+                      return [...grouped.entries()].map(([showName, showWinners]) => (
+                        <div key={showName}>
+                          <div className="mb-3" style={{ borderLeft: "3px solid #C9A84C", paddingLeft: 10 }}>
+                            <h3 className="font-bold text-[14px]" style={{ color: "#0A1628" }}>
+                              {showWinners[0]?.created_at
+                                ? `${new Date(showWinners[0].created_at).getFullYear()} `
+                                : ""}{showName}
+                            </h3>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            {showWinners.map((w) => {
+                              const img = w.image_urls?.[0];
+                              return (
+                                <div key={w.id} className="rounded-xl overflow-hidden border border-[#E5E7EB] bg-white shadow-sm">
+                                  {img ? (
+                                    <img src={img} alt={w.win_placing || ""} className="w-full aspect-square object-cover" />
+                                  ) : (
+                                    <div className="w-full aspect-square flex items-center justify-center"
+                                      style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
+                                      <span className="text-3xl font-black text-white/20">
+                                        {(showName || "W").charAt(0)}
+                                      </span>
+                                    </div>
+                                  )}
+                                  <div className="p-2">
+                                    <p className="text-[10px] font-black uppercase tracking-wider truncate"
+                                      style={{ color: "#C9A84C" }}>
+                                      {w.win_placing || "Winner"}
+                                    </p>
+                                    <p className="text-[12px] font-semibold text-[#0A1628] truncate mt-0.5">
+                                      {w.shown_by}
+                                    </p>
+                                    {w.sired_by && (
+                                      <p className="text-[11px] text-[#6B7280] truncate">
+                                        {w.sired_by}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                )
               )}
+
             </>
           )}
 
@@ -258,7 +319,7 @@ export default function BreederProfilePage() {
             </div>
           )}
 
-          {!postsLoading && posts.length === 0 && !isFeatured && (
+          {!postsLoading && posts.length === 0 && !isPaid && (
             <div className="text-center py-8">
               <p className="text-sm text-muted-foreground">No posts yet</p>
             </div>
