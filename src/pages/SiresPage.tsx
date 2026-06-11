@@ -125,20 +125,20 @@ const SiresPage = () => {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
-        {/* Header — white bg, navy title */}
+      <div className="app-mode mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#0A1628", minHeight: "100vh" }}>
+        {/* Header */}
         <div
-          className="sticky top-0 z-10 bg-white border-b border-border px-4 flex items-center justify-between"
-          style={{ height: 60 }}
+          className="sticky top-0 z-10 px-4 flex items-center justify-between"
+          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
         >
-          <h1 className="text-[22px] font-bold leading-none" style={{ color: NAVY }}>Sires</h1>
-          <div className="flex rounded-lg border border-border bg-white overflow-hidden">
+          <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Sires</h1>
+          <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.12)", backgroundColor: "rgba(255,255,255,0.06)" }}>
             <button
               type="button"
               onClick={() => setView("list")}
               aria-label="List view"
-              className={`p-2 transition-colors ${view === "list" ? "bg-muted" : ""}`}
-              style={{ color: view === "list" ? NAVY : "#9CA3AF" }}
+              className="p-2 transition-colors"
+              style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "list" ? "rgba(255,255,255,0.08)" : "transparent" }}
             >
               <ListIcon className="w-4 h-4" />
             </button>
@@ -146,8 +146,8 @@ const SiresPage = () => {
               type="button"
               onClick={() => setView("grid")}
               aria-label="Grid view"
-              className={`p-2 transition-colors ${view === "grid" ? "bg-muted" : ""}`}
-              style={{ color: view === "grid" ? NAVY : "#9CA3AF" }}
+              className="p-2 transition-colors"
+              style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "grid" ? "rgba(255,255,255,0.08)" : "transparent" }}
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
@@ -156,19 +156,19 @@ const SiresPage = () => {
 
         {/* Species pills */}
         <div className="px-4 pt-3">
-          <SpeciesPills value={species} onChange={setSpecies} />
+          <SpeciesPills value={species} onChange={setSpecies} appMode />
         </div>
 
         <div className="px-4 pt-3">
           {/* Search */}
           <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "rgba(255,255,255,0.4)" }} />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search sires or breeders…"
-              className="h-10 w-full rounded-xl border border-border bg-white pl-10 pr-4 text-sm placeholder:text-muted-foreground focus:outline-none"
-              style={{ color: NAVY }}
+              className="h-10 w-full rounded-xl pl-10 pr-4 text-sm focus:outline-none"
+              style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "#FFFFFF" }}
             />
           </div>
 
