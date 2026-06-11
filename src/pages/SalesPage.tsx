@@ -9,20 +9,6 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 
-/* ── Live ticker ── */
-type LiveStatus = "sold" | "bidding" | "avg";
-const liveSaleUpdates: { id: string; lot: string; price: string; time: string; note: string; status: LiveStatus }[] = [
-  { id: "1", lot: "Lot 14", price: "$12,500", time: "1m ago", note: "Sold", status: "sold" },
-  { id: "2", lot: "Lot 27", price: "—", time: "4m ago", note: "Bidding open", status: "bidding" },
-  { id: "3", lot: "Avg", price: "$4,850", time: "7m ago", note: "Running avg updated", status: "avg" },
-  { id: "4", lot: "Lot 9", price: "$8,200", time: "12m ago", note: "Sold", status: "sold" },
-];
-
-const statusDot: Record<LiveStatus, string> = {
-  sold: "bg-[hsl(var(--gold))]",
-  bidding: "bg-blue-500",
-  avg: "bg-muted-foreground",
-};
 
 /* ── Upcoming sales ── */
 interface UpcomingSale {
