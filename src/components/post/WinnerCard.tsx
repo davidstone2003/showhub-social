@@ -66,7 +66,7 @@ export function WinnerCard({ post, onTap }: WinnerCardProps) {
               right: 8,
               zIndex: 2,
               border: "2px solid rgba(255,255,255,0.85)",
-              backgroundColor: "#1A1A1A",
+              backgroundColor: "#0A1628",
             }}
           >
             {breederLogo && typeof breederLogo === "string" && breederLogo.startsWith("http") ? (
@@ -81,7 +81,7 @@ export function WinnerCard({ post, onTap }: WinnerCardProps) {
       </div>
 
       {/* Champion footer */}
-      <div className="relative overflow-hidden" style={{ backgroundColor: "#1A1A1A" }}>
+      <div className="relative overflow-hidden" style={{ backgroundColor: "#0A1628" }}>
         {/* Top accent line */}
         <div className="absolute top-0 left-0 right-0" style={{ height: 3, backgroundColor: accent }} />
         {/* Left accent bar */}

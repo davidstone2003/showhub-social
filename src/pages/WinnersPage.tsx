@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { Search, SlidersHorizontal, Trophy } from "lucide-react";
+import { Search, SlidersHorizontal, Trophy, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PostCard } from "@/components/PostCard";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton";
@@ -181,7 +181,7 @@ export default function WinnersPage() {
         </div>
 
         {/* Species pills */}
-        <div className="px-4 pt-3 pb-1">
+        <div className="px-4 pt-3 pb-3">
           <SpeciesPills value={species} onChange={setSpecies} />
         </div>
 
