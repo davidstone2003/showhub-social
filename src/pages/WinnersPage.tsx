@@ -198,7 +198,7 @@ export default function WinnersPage() {
           ) : showGroups.length === 0 ? (
             <div className="flex flex-col items-center text-center" style={{ paddingTop: 80, paddingBottom: 40 }}>
               <Trophy size={48} style={{ color: "#C9A84C" }} />
-              <h2 className="font-bold mt-4" style={{ fontSize: 22, lineHeight: 1.2, color: "#0A1628" }}>
+              <h2 className="font-bold mt-4" style={{ fontSize: 22, lineHeight: 1.2, color: "#FFFFFF" }}>
                 No winners yet
               </h2>
               <p className="text-muted-foreground mt-2 max-w-xs" style={{ fontSize: 14, lineHeight: 1.4 }}>
