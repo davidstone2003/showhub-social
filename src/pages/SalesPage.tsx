@@ -253,40 +253,7 @@ export default function SalesPage() {
     return () => { cancelled = true; };
   }, []);
 
-  const handleImport = async () => {
-    if (!importUrl.trim()) return;
-    setImporting(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("scrape-sale-results", {
-        body: { url: importUrl.trim() },
-      });
-      if (error) throw error;
-      if (!data || !Array.isArray(data.topSellers)) {
-        throw new Error("No data extracted from that URL");
-      }
-      const newSale: SaleResult = {
-        id: `imported-${Date.now()}`,
-        saleName: data.saleName || "Imported Sale",
-        date: data.date || "—",
-        location: data.location || "—",
-        totalHead: typeof data.totalHead === "number" ? data.totalHead : 0,
-        averagePrice: data.averagePrice || "—",
-        topSellers: data.topSellers,
-        sireBreakdown: [],
-      };
-      setImported((prev) => [newSale, ...prev]);
-      toast({ title: "Sale imported", description: `${newSale.topSellers.length} top sellers loaded` });
-      setImportOpen(false);
-      setImportUrl("");
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Import failed";
-      toast({ title: "Import failed", description: msg, variant: "destructive" });
-    } finally {
-      setImporting(false);
-    }
-  };
-
-  const allResults = [...imported, ...scrapedResults, ...saleResults];
+  const allResults = [...scrapedResults, ...saleResults];
 
   // Upcoming list: prefer live-scraped, fall back to mock if a scrape never ran
   const scoStatus = sourceStatus["sc-online"];
