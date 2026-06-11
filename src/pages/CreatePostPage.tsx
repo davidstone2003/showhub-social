@@ -387,7 +387,7 @@ export default function CreatePostPage() {
       if (raw.show_name) { setShowName(raw.show_name); filled++; }
       if (raw.win_placing) { setResultTitle(raw.win_placing); filled++; }
       if (raw.shown_by) { setExhibitorName(raw.shown_by); filled++; }
-      if (raw.placed_by) { setBreederName((prev) => prev || raw.placed_by); filled++; }
+      if (raw.placed_by) { setPlacedBy(raw.placed_by); filled++; }
       if (raw.sired_by) { setSireName(raw.sired_by); filled++; }
       if (raw.dam) { setDamName(raw.dam); filled++; }
       if (raw.caption) { setNotes(raw.caption); filled++; }
