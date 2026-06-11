@@ -399,15 +399,10 @@ export default function CreatePostPage() {
             onChange={(e) => setGeneralCaption(e.target.value)}
             placeholder="What's happening in your program? Share a win, sale, update, or anything on your mind…"
             className="w-full resize-none border-0 outline-none bg-transparent placeholder:text-[#9CA3AF]"
-            style={{ fontSize: "17px", lineHeight: 1.5, color: "#0A1628", minHeight: "120px" }}
+            style={{ fontSize: "17px", lineHeight: 1.5, color: "#0A1628", minHeight: "120px", whiteSpace: "pre-wrap" }}
           />
-          {generalCaption.trim() && /(\*\*|_|^#\s|^•\s|\n#\s|\n•\s)/m.test(generalCaption) && (
-            <div className="mt-3 pt-3 border-t border-dashed border-[#E5E7EB]">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-[#9CA3AF] mb-2">Post Preview</div>
-              <CaptionPreview text={generalCaption} />
-            </div>
-          )}
         </div>
+
 
 
         {/* Media preview strip */}
