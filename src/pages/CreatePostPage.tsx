@@ -664,12 +664,14 @@ export default function CreatePostPage() {
       {/* Bottom toolbar */}
       <div className="fixed left-0 right-0 bottom-16 z-30 bg-white border-t border-[#E5E7EB] h-[52px] flex items-center justify-around px-2">
         <ToolbarIcon icon={Camera} onClick={() => photoInputRef.current?.click()} />
-        <ToolbarIcon icon={VideoIcon} onClick={() => videoInputRef.current?.click()} />
         <ToolbarIcon icon={Smile} active={showEmojiPicker} onClick={() => setShowEmojiPicker(v => !v)} />
+        <ToolbarIcon icon={Sparkles} gold onClick={() => setShowSmartUpload(true)} />
         <ToolbarIcon icon={Trophy} active={winnerHasData} onClick={handleOpenWinnerPanel} />
-        <ToolbarIcon icon={Tag} onClick={() => toast("Tagging coming soon")} />
-        <ToolbarIcon icon={Leaf} active={!!species} onClick={() => setShowSpeciesSheet(true)} />
-        <ToolbarIcon icon={MoreHorizontal} onClick={() => setShowMoreSheet(true)} />
+        <ToolbarIcon
+          icon={MoreHorizontal}
+          onClick={() => setShowMoreSheet(true)}
+          badge={taggedPeople.length > 0}
+        />
       </div>
 
       {/* Identity bottom sheet */}
