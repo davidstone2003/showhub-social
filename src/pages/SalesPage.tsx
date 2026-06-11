@@ -388,6 +388,7 @@ export default function SalesPage() {
               </Sheet>
             </div>
           </div>
+          <p className="text-[11px] text-muted-foreground mb-3">{resultsFreshness}</p>
 
           <div className="space-y-3">
             {allResults.map((sale) => (
