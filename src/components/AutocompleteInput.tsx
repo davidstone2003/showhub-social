@@ -31,21 +31,18 @@ export function AutocompleteInput({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!value || value.length < 1) {
-      setSuggestions([]);
-      return;
-    }
-
     const timeout = setTimeout(async () => {
       setLoading(true);
-      const { data } = await supabase
-        .from(table)
-        .select("id, name")
-        .ilike("name", `%${value}%`)
-        .limit(8);
+      let query = supabase.from(table).select("id, name").limit(8);
+      if (value && value.length >= 1) {
+        query = query.ilike("name", `%${value}%`);
+      } else {
+        query = query.order("created_at", { ascending: false });
+      }
+      const { data } = await query;
       setSuggestions((data as AutocompleteResult[]) || []);
       setLoading(false);
-    }, 150);
+    }, value.length >= 1 ? 150 : 0);
 
     return () => clearTimeout(timeout);
   }, [value, table]);
