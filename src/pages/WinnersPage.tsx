@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { Search, SlidersHorizontal, Trophy } from "lucide-react";
+import { Search, SlidersHorizontal, Trophy, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PostCard } from "@/components/PostCard";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton";
@@ -181,7 +181,7 @@ export default function WinnersPage() {
         </div>
 
         {/* Species pills */}
-        <div className="px-4 pt-3 pb-1">
+        <div className="px-4 pt-3 pb-3">
           <SpeciesPills value={species} onChange={setSpecies} />
         </div>
 
@@ -246,6 +246,21 @@ export default function WinnersPage() {
           )}
         </div>
       </div>
+
+      <Link
+        to="/submit"
+        aria-label="Post a Win"
+        className="fixed z-40 flex items-center justify-center rounded-full active:scale-95 transition-transform"
+        style={{
+          width: 56, height: 56,
+          right: 16, bottom: 80,
+          backgroundColor: "#C9A84C",
+          color: "#0A1628",
+          boxShadow: "0 6px 16px rgba(0,0,0,0.25)"
+        }}
+      >
+        <Plus className="w-7 h-7" strokeWidth={2.5} />
+      </Link>
     </Layout>
   );
 }
