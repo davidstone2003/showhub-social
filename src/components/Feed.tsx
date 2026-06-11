@@ -194,7 +194,7 @@ export function Feed() {
 
   return (
     <div className="flex-1 max-w-2xl mx-auto w-full">
-      <div style={{ padding: "8px 0 12px", display: "flex", flexDirection: "column", gap: "16px" }}>
+      <div style={{ padding: "8px 0 12px", display: "flex", flexDirection: "column", gap: "0px" }}>
         {loading ? (
           <>
             <PostCardSkeleton />
@@ -203,9 +203,7 @@ export function Feed() {
           </>
         ) : allPosts.length > 0 ? (
           allPosts.map((post, i) => (
-            <div key={post.id} className="-mx-3">
-              <PostCard post={post} index={i} onModerated={handleModerated} />
-            </div>
+            <PostCard key={post.id} post={post} index={i} onModerated={handleModerated} />
           ))
         ) : (
           <div className="flex flex-col items-center text-center" style={{ padding: "80px 16px" }}>
