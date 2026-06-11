@@ -510,15 +510,16 @@ export default function CreatePostPage() {
           </h1>
           <button
             onClick={handlePost}
-            disabled={!canPost || submitting}
+            disabled={submitting}
             className={cn(
               "px-5 h-9 rounded-full text-[14px] font-bold transition-opacity",
-              (!canPost || submitting) && "opacity-40"
+              submitting && "opacity-40"
             )}
             style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
           >
             {submitting ? "Posting…" : "Post"}
           </button>
+
         </div>
 
         {/* Identity row */}
