@@ -10,22 +10,36 @@ const navItems = [
   { icon: ShoppingBag, label: "Market", to: "/market" },
 ];
 
+const ACTIVE = "#C9A84C";
+const INACTIVE = "#9CA3AF";
+
 export function MobileNav() {
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-border">
       <div className="flex items-center justify-around py-1.5 px-1 safe-area-pb">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
-            className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 px-1.5 py-1.5 rounded-lg text-[10px] font-medium transition-all active:scale-90 ${
-                isActive ? "text-[hsl(var(--gold))]" : "text-[#9CA3AF]"
-              }`
-            }
+            className="flex flex-col items-center gap-0.5 px-1.5 py-1.5 rounded-lg text-[10px] transition-all active:scale-90"
           >
-            <item.icon className="w-5 h-5" />
-            {item.label}
+            {({ isActive }) => (
+              <>
+                <item.icon
+                  className="w-5 h-5"
+                  strokeWidth={isActive ? 2.5 : 2}
+                  style={{ color: isActive ? ACTIVE : INACTIVE }}
+                />
+                <span
+                  style={{
+                    color: isActive ? ACTIVE : INACTIVE,
+                    fontWeight: isActive ? 700 : 400,
+                  }}
+                >
+                  {item.label}
+                </span>
+              </>
+            )}
           </NavLink>
         ))}
       </div>
