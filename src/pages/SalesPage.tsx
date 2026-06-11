@@ -155,6 +155,38 @@ function getTopSire(sale: SaleResult): SireStat | null {
   return named[0] ?? null;
 }
 
+type SourceStatus = {
+  source: string;
+  last_success_at: string | null;
+  last_attempt_at: string | null;
+  last_error: string | null;
+};
+
+function parseDate(s: string | null | undefined): number {
+  if (!s) return Number.POSITIVE_INFINITY;
+  const t = Date.parse(s);
+  return Number.isFinite(t) ? t : Number.POSITIVE_INFINITY;
+}
+
+function freshnessLabel(status: SourceStatus | undefined): string {
+  if (!status?.last_success_at) return "Source not yet updated";
+  const last = new Date(status.last_success_at);
+  const now = new Date();
+  const sameDay =
+    last.getFullYear() === now.getFullYear() &&
+    last.getMonth() === now.getMonth() &&
+    last.getDate() === now.getDate();
+  if (sameDay) return "Updated today at 6:00 AM CT";
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  const isYesterday =
+    last.getFullYear() === yesterday.getFullYear() &&
+    last.getMonth() === yesterday.getMonth() &&
+    last.getDate() === yesterday.getDate();
+  if (isYesterday) return "Source last updated yesterday";
+  return `Source last updated ${last.toLocaleDateString()}`;
+}
+
 export default function SalesPage() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [detail, setDetail] = useState<{ sale: SaleResult; seller: TopSeller } | null>(null);
@@ -162,28 +194,72 @@ export default function SalesPage() {
   const [importUrl, setImportUrl] = useState("");
   const [importing, setImporting] = useState(false);
   const [imported, setImported] = useState<SaleResult[]>([]);
-  const [autoScraped, setAutoScraped] = useState<SaleResult[]>([]);
+  const [scrapedResults, setScrapedResults] = useState<SaleResult[]>([]);
+  const [scrapedUpcoming, setScrapedUpcoming] = useState<UpcomingSale[]>([]);
+  const [sourceStatus, setSourceStatus] = useState<Record<string, SourceStatus>>({});
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data, error } = await supabase
-        .from("scraped_sales")
-        .select("*")
-        .order("scraped_at", { ascending: false })
-        .limit(20);
-      if (cancelled || error || !data) return;
-      const mapped: SaleResult[] = data.map((r: any) => ({
-        id: `scraped-${r.id}`,
-        saleName: r.sale_name || "SC Online Sale",
-        date: r.sale_date || "—",
-        location: r.location || "Online",
-        totalHead: typeof r.total_head === "number" ? r.total_head : 0,
-        averagePrice: r.average_price || "—",
-        topSellers: Array.isArray(r.top_sellers) ? r.top_sellers : [],
-        sireBreakdown: [],
-      }));
-      setAutoScraped(mapped);
+      const [resultsRes, upcomingRes, statusRes] = await Promise.all([
+        supabase
+          .from("scraped_results")
+          .select("*")
+          .order("scraped_at", { ascending: false })
+          .limit(30),
+        supabase
+          .from("scraped_upcoming")
+          .select("*")
+          .limit(100),
+        supabase.from("scrape_source_status").select("*"),
+      ]);
+      if (cancelled) return;
+
+      if (resultsRes.data) {
+        const mapped: SaleResult[] = resultsRes.data.map((r: any) => ({
+          id: `cd-${r.id}`,
+          saleName: r.sale_name || "Sale",
+          date: r.sale_date || "—",
+          location: r.location || (r.managed_by ? `Managed by ${r.managed_by}` : "—"),
+          totalHead: 0,
+          averagePrice: "—",
+          topSellers: (Array.isArray(r.top_lots) ? r.top_lots : []).map((l: any) => ({
+            lot: l.lot,
+            price: l.price,
+            breeder: l.breeder,
+            photo: l.photo,
+          })),
+          sireBreakdown: [],
+        }));
+        setScrapedResults(mapped);
+      }
+
+      if (upcomingRes.data) {
+        // Dedupe by normalized name+date across sources
+        const seen = new Map<string, UpcomingSale>();
+        for (const r of upcomingRes.data as any[]) {
+          const key = `${(r.sale_name || "").toLowerCase().trim()}|${(r.sale_date || "").toLowerCase().trim()}`;
+          if (seen.has(key)) continue;
+          seen.set(key, {
+            id: `up-${r.id}`,
+            name: r.sale_name || "Sale",
+            date: r.sale_date || "TBA",
+            location: r.location || (r.source === "sc-online" ? "Online" : "—"),
+            host: r.seller || (r.source === "sc-online" ? "SC Online Sales" : "wlivestock"),
+            link: r.link || undefined,
+          });
+        }
+        const list = Array.from(seen.values()).sort(
+          (a, b) => parseDate(a.date) - parseDate(b.date),
+        );
+        setScrapedUpcoming(list);
+      }
+
+      if (statusRes.data) {
+        const map: Record<string, SourceStatus> = {};
+        for (const s of statusRes.data as SourceStatus[]) map[s.source] = s;
+        setSourceStatus(map);
+      }
     })();
     return () => { cancelled = true; };
   }, []);
