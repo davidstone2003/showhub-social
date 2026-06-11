@@ -22,7 +22,7 @@ function CountUp({ end, label }: { end: number; label: string }) {
   return (
     <div className="flex flex-col items-center md:items-start">
       <span className="text-2xl md:text-3xl font-bold tracking-tight tabular-nums" style={{ color: "#C9A84C" }}>{val.toLocaleString()}</span>
-      <span className="text-[10px] md:text-[11px] uppercase tracking-[0.14em] mt-0.5" style={{ color: "#6B7280" }}>{label}</span>
+      <span className="text-[12px] uppercase tracking-[0.12em] mt-1" style={{ color: "#4B5563", fontWeight: 500 }}>{label}</span>
     </div>
   );
 }
@@ -119,7 +119,7 @@ export default function BreedersPage() {
               The serious breeders. The bloodlines that matter. The wins that count.
             </p>
 
-            <div className="relative mt-6 md:mt-8 max-w-2xl">
+            <div className="relative mt-3 md:mt-4 max-w-2xl">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "#9CA3AF" }} />
               <input
                 value={search}
@@ -172,7 +172,8 @@ export default function BreedersPage() {
                 <Link
                   key={s.key}
                   to={`/breeders/${s.key}`}
-                  className="group relative overflow-hidden rounded-2xl border border-border bg-card p-4 md:p-5 shadow-[var(--shadow-card)] transition-all hover:border-[hsl(var(--gold))]/40 hover:-translate-y-0.5"
+                  className="group relative overflow-hidden rounded-2xl border border-border bg-white p-4 md:p-5 transition-all hover:border-[hsl(var(--gold))]/40 hover:-translate-y-0.5"
+                  style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}
                 >
                   <span className="absolute right-3 top-3 text-3xl md:text-4xl opacity-20 group-hover:opacity-40 transition-opacity">{s.silhouette}</span>
                   <h3 className="text-lg md:text-2xl font-bold tracking-tight text-foreground">{s.name}</h3>
