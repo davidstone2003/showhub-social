@@ -64,7 +64,7 @@ export function AutocompleteInput({
           onChange(e.target.value, null);
           setOpen(true);
         }}
-        onFocus={() => value.length > 0 && setOpen(true)}
+        onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 180)}
         className={cn(
           "flex h-12 w-full rounded-xl border border-input bg-card px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
