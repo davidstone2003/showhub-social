@@ -343,13 +343,24 @@ export default function CreatePostPage() {
   const saleEventReady = !!eventName.trim();
   const canPost = winnerReady || saleLotReady || saleEventReady || generalCaption.trim().length > 0 || media.length > 0;
 
-  const handlePost = () => {
+  const handlePost = async () => {
     setShowEmojiPicker(false);
+    // Verify we have a live Supabase session before posting (refresh if expired)
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      const { data: refreshed } = await supabase.auth.refreshSession();
+      if (!refreshed.session) {
+        toast.error("Your session expired", { description: "Please sign in again to post." });
+        navigate("/auth");
+        return;
+      }
+    }
     if (winnerReady) return handleSubmitWinner();
     if (saleLotReady) return handleSubmitSaleLot();
     if (saleEventReady) return handleSubmitSaleEvent();
     return handleSubmitGeneral();
   };
+
 
   // Auto-extract winner details from a photo using AI
   const autoExtractFromPhoto = async (file: File) => {
