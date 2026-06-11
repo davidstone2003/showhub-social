@@ -117,6 +117,11 @@ const SiresPage = () => {
           </div>
         </div>
 
+        {/* Species pills */}
+        <div className="px-4 pt-3">
+          <SpeciesPills value={species} onChange={setSpecies} />
+        </div>
+
         <div className="px-4 pt-3">
           {/* Search */}
           <div className="relative mb-4">
