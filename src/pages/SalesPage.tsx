@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { Search, SlidersHorizontal, Calendar, MapPin } from "lucide-react";
+import { Search, SlidersHorizontal, Calendar, MapPin, ChevronDown } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -8,7 +9,6 @@ import {
   SheetTrigger,
   SheetDescription,
 } from "@/components/ui/sheet";
-
 
 /* ── Upcoming sales ── */
 interface UpcomingSale {
@@ -32,6 +32,11 @@ interface TopSeller {
   breeder: string;
   photo?: string;
 }
+interface SireStat {
+  sire: string;
+  head: number;
+  avgPrice: number; // numeric for sorting
+}
 interface SaleResult {
   id: string;
   saleName: string;
@@ -40,6 +45,7 @@ interface SaleResult {
   totalHead: number;
   averagePrice: string;
   topSellers: TopSeller[];
+  sireBreakdown: SireStat[];
 }
 
 const saleResults: SaleResult[] = [
@@ -55,6 +61,15 @@ const saleResults: SaleResult[] = [
       { lot: "Lot 22", price: "$8,800", sire: "Spectacle", breeder: "Pine Creek" },
       { lot: "Lot 41", price: "$7,400", sire: "Monopoly", breeder: "H&T Showstock" },
     ],
+    sireBreakdown: [
+      { sire: "Thank Me Later", head: 4, avgPrice: 8750 },
+      { sire: "Spectacle", head: 3, avgPrice: 6200 },
+      { sire: "Tres Amigos", head: 2, avgPrice: 4500 },
+      { sire: "Monopoly", head: 5, avgPrice: 4100 },
+      { sire: "Heatwave", head: 3, avgPrice: 3300 },
+      { sire: "Solo Cup", head: 1, avgPrice: 2900 }, // excluded (min 2)
+      { sire: "No Sire Listed", head: 8, avgPrice: 2100 },
+    ],
   },
   {
     id: "exposure-sale",
@@ -67,6 +82,14 @@ const saleResults: SaleResult[] = [
       { lot: "Lot 105", price: "$4,750", breeder: "Stone Show Stock" },
       { lot: "Lot 118", price: "$3,100", breeder: "Beatty" },
       { lot: "Lot 140", price: "$2,400", breeder: "H&T Showstock" },
+    ],
+    sireBreakdown: [
+      { sire: "Big League", head: 6, avgPrice: 4200 },
+      { sire: "Spectacle", head: 9, avgPrice: 3450 },
+      { sire: "Black Ice", head: 4, avgPrice: 3100 },
+      { sire: "Lightning", head: 7, avgPrice: 2800 },
+      { sire: "Hot Sauce", head: 5, avgPrice: 2400 },
+      { sire: "No Sire Listed", head: 18, avgPrice: 1850 },
     ],
   },
   {
@@ -81,8 +104,37 @@ const saleResults: SaleResult[] = [
       { lot: "Lot 12", price: "$9,750", breeder: "Hild Bros." },
       { lot: "Lot 24", price: "$5,200", breeder: "Silver Smith" },
     ],
+    sireBreakdown: [
+      { sire: "Walk The Line", head: 3, avgPrice: 12500 },
+      { sire: "Cash Money", head: 5, avgPrice: 9800 },
+      { sire: "Heatwave", head: 4, avgPrice: 7400 },
+      { sire: "Monopoly", head: 6, avgPrice: 5600 },
+      { sire: "No Sire Listed", head: 4, avgPrice: 3200 },
+    ],
   },
 ];
+
+const slugify = (s: string) =>
+  s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+const formatMoney = (n: number) =>
+  `$${n.toLocaleString("en-US")}`;
+
+function getSireTable(sale: SaleResult) {
+  const eligible = sale.sireBreakdown.filter((s) => s.head >= 2);
+  const noListing = eligible.filter((s) => s.sire.toLowerCase() === "no sire listed");
+  const named = eligible
+    .filter((s) => s.sire.toLowerCase() !== "no sire listed")
+    .sort((a, b) => b.avgPrice - a.avgPrice);
+  return [...named, ...noListing];
+}
+
+function getTopSire(sale: SaleResult): SireStat | null {
+  const named = sale.sireBreakdown
+    .filter((s) => s.head >= 2 && s.sire.toLowerCase() !== "no sire listed")
+    .sort((a, b) => b.avgPrice - a.avgPrice);
+  return named[0] ?? null;
+}
 
 export default function SalesPage() {
   const [filterOpen, setFilterOpen] = useState(false);
@@ -99,7 +151,7 @@ export default function SalesPage() {
           </button>
         </div>
 
-        {/* ─── 2. UPCOMING SALES ─── */}
+        {/* ─── 1. UPCOMING SALES ─── */}
         <div className="px-4 pt-6">
           <h2 className="text-[15px] font-bold text-foreground mb-3">Upcoming Sales</h2>
           <div className="space-y-2">
@@ -123,7 +175,7 @@ export default function SalesPage() {
           </div>
         </div>
 
-        {/* ─── 3. SALE RESULTS ─── */}
+        {/* ─── 2. SALE RESULTS ─── */}
         <div className="px-4 pt-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-[15px] font-bold text-foreground">Sale Results</h2>
@@ -186,16 +238,24 @@ export default function SalesPage() {
 }
 
 function SaleResultCard({ sale, onSellerClick }: { sale: SaleResult; onSellerClick: (s: TopSeller) => void }) {
+  const [sireOpen, setSireOpen] = useState(false);
+  const sireTable = getSireTable(sale);
+  const topSire = getTopSire(sale);
+  const sireCount = sireTable.filter((s) => s.sire.toLowerCase() !== "no sire listed").length;
+
   return (
     <div className="rounded-xl bg-card border border-border shadow-[var(--shadow-card)] p-4">
       <h3 className="text-[16px] font-bold text-foreground leading-snug">{sale.saleName}</h3>
       <p className="text-[12px] text-muted-foreground mt-0.5">{sale.date} · {sale.location}</p>
 
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        <Stat label="Total Head Sold" value={String(sale.totalHead)} />
-        <Stat label="Average Price" value={sale.averagePrice} />
+      {/* Stats: Head / Avg / Top Sire */}
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <Stat label="Head Sold" value={String(sale.totalHead)} />
+        <Stat label="Avg Price" value={sale.averagePrice} />
+        <Stat label="Top Sire" value={topSire ? topSire.sire : "—"} small />
       </div>
 
+      {/* Top Sellers */}
       <div className="mt-4">
         <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Top Sellers</p>
         <div className="flex gap-3 overflow-x-auto -mx-1 px-1 pb-1 snap-x snap-mandatory">
@@ -224,15 +284,75 @@ function SaleResultCard({ sale, onSellerClick }: { sale: SaleResult; onSellerCli
           ))}
         </div>
       </div>
+
+      {/* By Sire (collapsible) */}
+      {sireTable.length > 0 && (
+        <div className="mt-4 border-t border-[hsl(var(--divider-soft))] pt-3">
+          <button
+            onClick={() => setSireOpen((v) => !v)}
+            className="w-full flex items-center justify-between"
+          >
+            <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">By Sire</span>
+            <ChevronDown
+              className={`w-4 h-4 text-muted-foreground transition-transform ${sireOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+
+          {sireOpen && (
+            <div className="mt-3">
+              <p className="text-[11px] text-muted-foreground mb-2">{sireCount} sires represented</p>
+              <div className="rounded-lg border border-border overflow-hidden">
+                <div className="grid grid-cols-[1fr_auto_auto] gap-x-4 px-3 py-2 bg-muted/40 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  <span>Sire</span>
+                  <span className="text-center w-10">Head</span>
+                  <span className="text-right w-16">Avg</span>
+                </div>
+                {sireTable.map((s, i) => {
+                  const isNoListing = s.sire.toLowerCase() === "no sire listed";
+                  return (
+                    <div
+                      key={i}
+                      className={`grid grid-cols-[1fr_auto_auto] gap-x-4 px-3 py-2.5 items-center ${
+                        i !== sireTable.length - 1 ? "border-b border-[hsl(var(--divider-soft))]" : ""
+                      }`}
+                    >
+                      {isNoListing ? (
+                        <span className="text-[13px] font-semibold text-muted-foreground italic">{s.sire}</span>
+                      ) : (
+                        <Link
+                          to={`/sires/${slugify(s.sire)}`}
+                          className="text-[13px] font-bold text-foreground hover:text-[hsl(var(--gold))] truncate"
+                        >
+                          {s.sire}
+                        </Link>
+                      )}
+                      <span className="text-[13px] text-foreground text-center w-10 tabular-nums">{s.head}</span>
+                      <span className="text-[13px] font-bold text-[hsl(var(--gold))] text-right w-16 tabular-nums">
+                        {formatMoney(s.avgPrice)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, small }: { label: string; value: string; small?: boolean }) {
   return (
-    <div className="rounded-lg bg-muted/40 p-3">
-      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p className="text-[22px] font-bold text-[hsl(var(--gold))] mt-0.5 tabular-nums leading-none">{value}</p>
+    <div className="rounded-lg bg-muted/40 p-3 min-w-0">
+      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground truncate">{label}</p>
+      <p
+        className={`font-bold text-[hsl(var(--gold))] mt-0.5 tabular-nums leading-tight truncate ${
+          small ? "text-[14px]" : "text-[22px]"
+        }`}
+      >
+        {value}
+      </p>
     </div>
   );
 }
