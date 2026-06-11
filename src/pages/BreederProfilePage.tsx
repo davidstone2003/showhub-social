@@ -319,7 +319,7 @@ export default function BreederProfilePage() {
             </div>
           )}
 
-          {!postsLoading && posts.length === 0 && !isFeatured && (
+          {!postsLoading && posts.length === 0 && !isPaid && (
             <div className="text-center py-8">
               <p className="text-sm text-muted-foreground">No posts yet</p>
             </div>
