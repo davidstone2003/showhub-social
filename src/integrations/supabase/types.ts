@@ -65,6 +65,63 @@ export type Database = {
         }
         Relationships: []
       }
+      canonical_events: {
+        Row: {
+          best_image_url: string | null
+          best_source_id: string | null
+          best_source_type: string | null
+          breeder_name: string | null
+          breeder_name_normalized: string | null
+          created_at: string
+          event_date: string | null
+          id: string
+          kind: string
+          placement_slot: string | null
+          post_count: number
+          show_name: string
+          show_name_normalized: string
+          species: string | null
+          updated_at: string
+          verified_level: string
+        }
+        Insert: {
+          best_image_url?: string | null
+          best_source_id?: string | null
+          best_source_type?: string | null
+          breeder_name?: string | null
+          breeder_name_normalized?: string | null
+          created_at?: string
+          event_date?: string | null
+          id?: string
+          kind: string
+          placement_slot?: string | null
+          post_count?: number
+          show_name: string
+          show_name_normalized: string
+          species?: string | null
+          updated_at?: string
+          verified_level?: string
+        }
+        Update: {
+          best_image_url?: string | null
+          best_source_id?: string | null
+          best_source_type?: string | null
+          breeder_name?: string | null
+          breeder_name_normalized?: string | null
+          created_at?: string
+          event_date?: string | null
+          id?: string
+          kind?: string
+          placement_slot?: string | null
+          post_count?: number
+          show_name?: string
+          show_name_normalized?: string
+          species?: string | null
+          updated_at?: string
+          verified_level?: string
+        }
+        Relationships: []
+      }
       catalog_breeders: {
         Row: {
           accent_color: string
@@ -150,6 +207,68 @@ export type Database = {
             columns: ["breeder_id"]
             isOneToOne: false
             referencedRelation: "catalog_breeders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_aliases: {
+        Row: {
+          alias: string
+          alias_normalized: string
+          canonical_name: string
+          canonical_normalized: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          alias: string
+          alias_normalized: string
+          canonical_name: string
+          canonical_normalized: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          alias?: string
+          alias_normalized?: string
+          canonical_name?: string
+          canonical_normalized?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      event_links: {
+        Row: {
+          canonical_event_id: string
+          contributor_kind: string | null
+          created_at: string
+          id: string
+          source_id: string
+          source_type: string
+        }
+        Insert: {
+          canonical_event_id: string
+          contributor_kind?: string | null
+          created_at?: string
+          id?: string
+          source_id: string
+          source_type: string
+        }
+        Update: {
+          canonical_event_id?: string
+          contributor_kind?: string | null
+          created_at?: string
+          id?: string
+          source_id?: string
+          source_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_links_canonical_event_id_fkey"
+            columns: ["canonical_event_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_events"
             referencedColumns: ["id"]
           },
         ]
@@ -1025,6 +1144,26 @@ export type Database = {
         }
         Returns: boolean
       }
+      match_or_create_event: {
+        Args: {
+          _breeder_name: string
+          _contributor_kind: string
+          _event_date: string
+          _image_url: string
+          _kind: string
+          _placement_slot: string
+          _show_name: string
+          _source_id: string
+          _source_type: string
+          _species: string
+        }
+        Returns: string
+      }
+      normalize_event_name: { Args: { _raw: string }; Returns: string }
+      resolve_event_alias: { Args: { _normalized: string }; Returns: string }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
+      unaccent: { Args: { "": string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
