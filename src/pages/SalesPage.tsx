@@ -220,7 +220,7 @@ export default function SalesPage() {
     }
   };
 
-  const allResults = [...imported, ...saleResults];
+  const allResults = [...imported, ...autoScraped, ...saleResults];
 
 
   return (
