@@ -107,6 +107,55 @@ export default function CreatePostPage() {
   // General fields
   const [generalCaption, setGeneralCaption] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [generatingCaption, setGeneratingCaption] = useState(false);
+  const [savedDefaults, setSavedDefaults] = useState<{ farmName: string; bredBy: string }>({ farmName: "", bredBy: "" });
+
+  useEffect(() => {
+    const saved = localStorage.getItem("backdrop_post_defaults");
+    if (saved) {
+      try {
+        const defaults = JSON.parse(saved);
+        setSavedDefaults(defaults);
+        setBreederName((prev) => (!prev && defaults.bredBy ? defaults.bredBy : prev));
+      } catch {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleOpenWinnerPanel = () => {
+    if (!breederName && savedDefaults.bredBy) setBreederName(savedDefaults.bredBy);
+    setShowWinnerPanel(true);
+  };
+
+  const handleGenerateCaption = async () => {
+    if (!effectiveResult) return;
+    setGeneratingCaption(true);
+    try {
+      const fields = {
+        Placement: effectiveResult,
+        Show: showName,
+        "Shown by": exhibitorName,
+        "Bred by": breederName,
+        "Sired by": sireName,
+        "Placed by": placedBy,
+        Species: species,
+      };
+      const { data, error } = await supabase.functions.invoke("generate-caption", { body: { fields } });
+      if (error) throw error;
+      const caption = (data as any)?.caption || "";
+      if (caption) {
+        setNotes(caption);
+        setGeneralCaption(caption);
+        toast.success("Caption generated!");
+      } else {
+        toast.error("Couldn't generate caption");
+      }
+    } catch (err: any) {
+      toast.error("Couldn't generate caption", { description: err?.message });
+    } finally {
+      setGeneratingCaption(false);
+    }
+  };
 
   const captionRef = useRef<HTMLTextAreaElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -493,7 +542,7 @@ export default function CreatePostPage() {
         <ToolbarIcon icon={Camera} onClick={() => photoInputRef.current?.click()} />
         <ToolbarIcon icon={VideoIcon} onClick={() => videoInputRef.current?.click()} />
         <ToolbarIcon icon={Smile} active={showEmojiPicker} onClick={() => setShowEmojiPicker(v => !v)} />
-        <ToolbarIcon icon={Trophy} active={winnerHasData} onClick={() => setShowWinnerPanel(true)} />
+        <ToolbarIcon icon={Trophy} active={winnerHasData} onClick={handleOpenWinnerPanel} />
         <ToolbarIcon icon={Tag} onClick={() => toast("Tagging coming soon")} />
         <ToolbarIcon icon={Leaf} active={!!species} onClick={() => setShowSpeciesSheet(true)} />
         <ToolbarIcon icon={MoreHorizontal} onClick={() => setShowMoreSheet(true)} />
@@ -570,18 +619,18 @@ export default function CreatePostPage() {
           <div className="space-y-4 pb-2">
             <div>
               <label className="text-[12px] font-bold uppercase tracking-wide text-[#5C6470] mb-2 block">Placement</label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
                 {WINNER_RESULTS.map(r => {
                   const sel = resultTitle === r;
                   return (
                     <button
                       key={r}
                       onClick={() => setResultTitle(sel ? "" : r)}
-                      className="px-4 h-10 rounded-full text-[13px] font-semibold transition-all"
+                      className="shrink-0 rounded-full px-3 py-2 text-[13px] font-semibold transition-all border"
                       style={{
-                        backgroundColor: sel ? "#C9A84C" : "#F3F4F6",
-                        color: sel ? "#0A1628" : "#0A1628",
-                        border: sel ? "1px solid #C9A84C" : "1px solid #E5E7EB",
+                        backgroundColor: sel ? "#C9A84C" : "white",
+                        color: "#0A1628",
+                        borderColor: sel ? "#C9A84C" : "#E5E7EB",
                       }}
                     >
                       {r}
@@ -611,6 +660,26 @@ export default function CreatePostPage() {
 
             <FieldLabel>Bred By</FieldLabel>
             <Input value={breederName} onChange={(e) => setBreederName(e.target.value)} placeholder="Breeder name" className="h-11 rounded-lg" />
+            <div className="flex items-center justify-between -mt-2">
+              <span className="text-[11px] text-[#9CA3AF]">
+                {savedDefaults.bredBy === breederName && breederName ? "✓ This is your default" : ""}
+              </span>
+              {breederName && savedDefaults.bredBy !== breederName && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newDefaults = { ...savedDefaults, bredBy: breederName };
+                    setSavedDefaults(newDefaults);
+                    localStorage.setItem("backdrop_post_defaults", JSON.stringify(newDefaults));
+                    toast.success("Saved as default breeder name");
+                  }}
+                  className="text-[11px] font-semibold"
+                  style={{ color: "#C9A84C" }}
+                >
+                  Save as my default
+                </button>
+              )}
+            </div>
 
             <FieldLabel>Sired By</FieldLabel>
             <AutocompleteInput
@@ -643,8 +712,22 @@ export default function CreatePostPage() {
               })}
             </div>
 
-            <FieldLabel>Notes</FieldLabel>
-            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add any extra notes…" className="rounded-lg min-h-[80px]" />
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[12px] font-bold uppercase tracking-wide text-[#5C6470]">Notes / Caption</label>
+                <button
+                  type="button"
+                  onClick={handleGenerateCaption}
+                  disabled={generatingCaption || !effectiveResult}
+                  className="flex items-center gap-1 text-[11px] font-bold rounded-full px-2.5 py-1 disabled:opacity-40"
+                  style={{ backgroundColor: "rgba(201,168,76,0.15)", color: "#8B6914" }}
+                >
+                  <Sparkles className="w-3 h-3" />
+                  {generatingCaption ? "Generating…" : "AI Write Caption"}
+                </button>
+              </div>
+              <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add any extra notes or let AI write your caption above…" className="rounded-lg min-h-[80px]" />
+            </div>
 
             <Button onClick={() => setShowWinnerPanel(false)} className="w-full h-12 rounded-xl font-bold mt-2" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
               Done

@@ -31,21 +31,18 @@ export function AutocompleteInput({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!value || value.length < 1) {
-      setSuggestions([]);
-      return;
-    }
-
     const timeout = setTimeout(async () => {
       setLoading(true);
-      const { data } = await supabase
-        .from(table)
-        .select("id, name")
-        .ilike("name", `%${value}%`)
-        .limit(8);
+      let query = supabase.from(table).select("id, name").limit(8);
+      if (value && value.length >= 1) {
+        query = query.ilike("name", `%${value}%`);
+      } else {
+        query = query.order("created_at", { ascending: false });
+      }
+      const { data } = await query;
       setSuggestions((data as AutocompleteResult[]) || []);
       setLoading(false);
-    }, 150);
+    }, value.length >= 1 ? 150 : 0);
 
     return () => clearTimeout(timeout);
   }, [value, table]);
@@ -67,7 +64,7 @@ export function AutocompleteInput({
           onChange(e.target.value, null);
           setOpen(true);
         }}
-        onFocus={() => value.length > 0 && setOpen(true)}
+        onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 180)}
         className={cn(
           "flex h-12 w-full rounded-xl border border-input bg-card px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
