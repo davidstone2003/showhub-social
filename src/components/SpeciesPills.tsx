@@ -5,17 +5,10 @@ interface SpeciesPillsProps {
   value: SpeciesPill;
   onChange: (v: SpeciesPill) => void;
   className?: string;
+  appMode?: boolean;
 }
 
-/**
- * Standard species filter row used across every directory/feed page.
- * Order is locked: All · Sheep · Goats · Cattle · Pigs.
- *
- * Visual contract (do NOT diverge per-page):
- * - Active   → solid navy #1B3A6B fill, white text, no border
- * - Inactive → white fill, navy text, 1px navy border
- */
-export function SpeciesPills({ value, onChange, className = "" }: SpeciesPillsProps) {
+export function SpeciesPills({ value, onChange, className = "", appMode = false }: SpeciesPillsProps) {
   return (
     <div
       className={`flex gap-1.5 overflow-x-auto scrollbar-hide ${className}`}
@@ -24,6 +17,13 @@ export function SpeciesPills({ value, onChange, className = "" }: SpeciesPillsPr
     >
       {SPECIES_OPTIONS.map((option) => {
         const active = value === option;
+        const style = appMode
+          ? active
+            ? { backgroundColor: "#C9A84C", color: "#0A1628", border: "1px solid #C9A84C" }
+            : { backgroundColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", border: "1px solid transparent" }
+          : active
+            ? { backgroundColor: "#1B3A6B", color: "#FFFFFF", border: "1px solid #1B3A6B" }
+            : { backgroundColor: "#FFFFFF", color: "#1B3A6B", border: "1px solid #1B3A6B" };
         return (
           <button
             key={option}
@@ -31,11 +31,7 @@ export function SpeciesPills({ value, onChange, className = "" }: SpeciesPillsPr
             aria-selected={active}
             onClick={() => onChange(option)}
             className="h-8 shrink-0 rounded-full px-3.5 text-[12px] font-semibold leading-none transition-colors"
-            style={
-              active
-                ? { backgroundColor: "#1B3A6B", color: "#FFFFFF", border: "1px solid #1B3A6B" }
-                : { backgroundColor: "#FFFFFF", color: "#1B3A6B", border: "1px solid #1B3A6B" }
-            }
+            style={style}
           >
             {option}
           </button>
