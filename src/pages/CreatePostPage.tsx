@@ -444,7 +444,7 @@ export default function CreatePostPage() {
 
       {/* Emoji picker panel */}
       {showEmojiPicker && (
-        <div className="fixed left-0 right-0 bottom-[68px] z-40 px-2">
+        <div className="fixed left-0 right-0 bottom-[120px] z-40 px-2">
           <div className="mx-auto max-w-md rounded-xl overflow-hidden shadow-2xl border border-[#E5E7EB] bg-white">
             <EmojiPicker
               onEmojiClick={(emojiData: EmojiClickData) => {
@@ -468,7 +468,7 @@ export default function CreatePostPage() {
 
       {/* Text formatting mini-toolbar */}
       {showFormatting && (
-        <div className="fixed left-0 right-0 bottom-[68px] z-40 flex items-center gap-1 px-4 py-2 bg-white border-t border-[#E5E7EB] overflow-x-auto">
+        <div className="fixed left-0 right-0 bottom-[120px] z-40 flex items-center gap-1 px-4 py-2 bg-white border-t border-[#E5E7EB] overflow-x-auto">
           {[
             { label: "B", style: "**", title: "Bold" },
             { label: "I", style: "_", title: "Italic" },
