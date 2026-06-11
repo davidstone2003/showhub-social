@@ -1,9 +1,11 @@
 import React from "react";
 import { Drawer, DrawerContent, DrawerClose } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { X, Share2, Trophy, MapPin, User, Scissors, FlaskConical, Calendar } from "lucide-react";
+import { X, Share2, Trophy, MapPin, User, Scissors, FlaskConical, Calendar, Building2 } from "lucide-react";
 import type { Post } from "@/data/mock";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface WinnerDetailDrawerProps {
   post: Post & { status?: string; user_id?: string | null };
@@ -26,12 +28,14 @@ function Chip({ icon: Icon, label, tappable, onClick }: { icon: any; label: stri
 }
 
 export function WinnerDetailDrawer({ post, open, onClose }: WinnerDetailDrawerProps) {
+  const { user } = useAuth();
   const placing = post.win_placing || post.win_title || "";
   const showName = post.show_name || "";
   const year = post.created_at ? new Date(post.created_at).getFullYear() : new Date().getFullYear();
   const shownBy = post.shown_by || "";
   const bredBy = post.bred_by || post.breeder?.name || "";
   const siredBy = post.sired_by || "";
+  const placedBy = (post as any).placed_by || "";
   const dateStr = post.created_at || "";
 
   const handleShare = async () => {
@@ -47,6 +51,48 @@ export function WinnerDetailDrawer({ post, open, onClose }: WinnerDetailDrawerPr
       if (e.name !== "AbortError") {
         try { await navigator.clipboard.writeText(caption); toast.success("Caption copied!"); } catch {}
       }
+    }
+  };
+
+  const handlePostToWinners = async () => {
+    if (!user) {
+      toast.error("Sign in to add to Winners Archive");
+      return;
+    }
+    if (!placing && !showName) {
+      toast.error("Please add a placement and show name first");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("winners")
+        .insert({
+          source_post_id: post.id,
+          title: placing || showName,
+          show_name: showName || "",
+          shown_by: shownBy || "",
+          bred_by: bredBy || null,
+          sired_by: siredBy || null,
+          placed_by: placedBy || null,
+          win_placing: placing || null,
+          caption: (post as any).caption || null,
+          image_urls: post.image ? [post.image] : [],
+          date: new Date().toISOString().split("T")[0],
+          user_id: user.id,
+          posted_as_breeder_id: (post as any).posted_as_breeder_id || null,
+          post_type: "winner",
+          show_on_feed: false,
+          show_on_breeder_page: true,
+          show_on_winners_archive: true,
+          status: "active",
+        } as any);
+
+      if (error) throw error;
+      toast.success("Added to Winners Archive! 🏆");
+      onClose();
+    } catch (err: any) {
+      toast.error("Failed to add", { description: err.message });
     }
   };
 
@@ -71,6 +117,7 @@ export function WinnerDetailDrawer({ post, open, onClose }: WinnerDetailDrawerPr
             {showName && <Chip icon={MapPin} label={`${year} ${showName}`} />}
             {shownBy && <Chip icon={User} label={`Shown by ${shownBy}`} />}
             {bredBy && <Chip icon={Scissors} label={`Bred by ${bredBy}`} />}
+            {placedBy && <Chip icon={Building2} label={`Placed by ${placedBy}`} />}
             {siredBy && <Chip icon={FlaskConical} label={`Sired by ${siredBy}`} tappable />}
             {dateStr && <Chip icon={Calendar} label={new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} />}
           </div>
@@ -83,6 +130,16 @@ export function WinnerDetailDrawer({ post, open, onClose }: WinnerDetailDrawerPr
           >
             <Share2 className="w-4 h-4" />
             Share
+          </Button>
+
+          {/* Post to Winners */}
+          <Button
+            onClick={handlePostToWinners}
+            className="w-full h-11 rounded-xl mt-2 font-bold gap-2"
+            style={{ backgroundColor: "#0A1628", color: "#FFFFFF" }}
+          >
+            <Trophy className="w-4 h-4" />
+            Add to Winners Archive
           </Button>
         </div>
       </DrawerContent>
