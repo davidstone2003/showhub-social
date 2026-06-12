@@ -24,26 +24,47 @@ import type { ResultData } from "@/components/ResultBlock";
 type ImageFile = { file: File; preview: string };
 
 /* ── helpers ── */
+const normalizeName = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+// Resolves a free-text name to a lookup row. Returns the canonical { id, name }
+// so callers can persist the canonical spelling (snaps "Ridetime" → "Ride Time").
 const ensureLookupEntry = async (
   table: "shows" | "sires_lookup" | "breeders_lookup",
   displayText: string,
   existingId: string | null
-): Promise<string | null> => {
-  if (!displayText.trim()) return null;
-  if (existingId) return existingId;
-  const { data: existing } = await supabase
+): Promise<{ id: string | null; name: string }> => {
+  const trimmed = displayText.trim();
+  if (!trimmed) return { id: null, name: "" };
+  if (existingId) return { id: existingId, name: trimmed };
+
+  // Exact (case-insensitive) match first
+  const { data: exact } = await supabase
     .from(table)
-    .select("id")
-    .ilike("name", displayText.trim())
+    .select("id, name")
+    .ilike("name", trimmed)
     .limit(1);
-  if (existing && existing.length > 0) return existing[0].id;
+  if (exact && exact.length > 0) return { id: exact[0].id, name: exact[0].name };
+
+  // For sires, also try a normalized (space/punctuation-insensitive) match
+  if (table === "sires_lookup") {
+    const needle = normalizeName(trimmed);
+    if (needle.length >= 3) {
+      const { data: pool } = await supabase
+        .from(table)
+        .select("id, name")
+        .limit(500);
+      const hit = (pool || []).find((r: any) => normalizeName(r.name) === needle);
+      if (hit) return { id: hit.id, name: hit.name };
+    }
+  }
+
   const { data: inserted, error } = await supabase
     .from(table)
-    .insert({ name: displayText.trim() })
-    .select("id")
+    .insert({ name: trimmed })
+    .select("id, name")
     .single();
-  if (error || !inserted) return null;
-  return inserted.id;
+  if (error || !inserted) return { id: null, name: trimmed };
+  return { id: inserted.id, name: inserted.name };
 };
 
 /* ── page ── */
