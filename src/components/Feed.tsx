@@ -22,6 +22,7 @@ export function Feed() {
   const [dbPosts, setDbPosts] = useState<Post[]>([]);
   const [hiddenPostIds, setHiddenPostIds] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [featuredBreeder, setFeaturedBreeder] = useState<any>(null);
 
   const handleModerated = (postId?: string) => {
     if (postId) {
