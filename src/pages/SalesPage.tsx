@@ -204,6 +204,8 @@ export default function SalesPage() {
   const [scrapedUpcoming, setScrapedUpcoming] = useState<UpcomingSale[]>([]);
   const [sourceStatus, setSourceStatus] = useState<Record<string, SourceStatus>>({});
   const [species, setSpecies] = useState<SpeciesPill>("All");
+  const [search, setSearch] = useState("");
+
 
   useEffect(() => {
     let cancelled = false;
@@ -322,19 +324,14 @@ export default function SalesPage() {
   return (
     <Layout showDiscovery={false}>
       <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
-        {/* Header */}
-        <div
-          className="sticky top-0 z-10 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "hsl(var(--primary))", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
-        >
-          <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Sales</h1>
-          <div className="flex items-center gap-2">
-            <button className="p-1.5 rounded-lg transition-colors" aria-label="Search">
-              <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
-            </button>
-            <CreateButton to="/submit?type=sale" label="Add sale" />
-          </div>
-        </div>
+        <PageHeader
+          title="Sales"
+          searchPlaceholder="Search sales by name or location..."
+          searchValue={search}
+          onSearchChange={setSearch}
+          createButton={<CreateButton to="/submit?type=sale" label="Add sale" />}
+        />
+
 
         {/* Species pills on WHITE band — shared chip style */}
         <div className="bg-white border-b border-[#E5E7EB] px-4 py-2">
