@@ -246,35 +246,13 @@ export default function WinnersPage() {
   return (
     <Layout showDiscovery={false}>
       <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
-        {/* Header */}
-        <div
-          className="sticky top-0 z-10 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "hsl(var(--primary))", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
-        >
-          {searchOpen ? (
-            <div className="flex items-center gap-2 w-full">
-              <input
-                autoFocus
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search shows, breeders, exhibitors..."
-                className="flex-1 bg-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-white/40 outline-none"
-              />
-              <button onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="text-white/60 text-sm">Cancel</button>
-            </div>
-          ) : (
-            <>
-              <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Winners</h1>
-              <div className="flex items-center gap-2">
-                <button onClick={() => setSearchOpen(true)} className="p-1.5" aria-label="Search">
-                  <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
-                </button>
-                <CreateButton to="/submit" label="Add win" />
-              </div>
-            </>
-
-          )}
-        </div>
+        <PageHeader
+          title="Winners"
+          searchPlaceholder="Search shows, breeders, exhibitors..."
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          createButton={<CreateButton to="/submit" label="Add win" />}
+        />
 
         {/* Section tabs */}
         <div className="bg-white border-b border-[#E5E7EB] flex sticky top-[60px] z-20">
@@ -282,7 +260,7 @@ export default function WinnersPage() {
             onClick={() => setSection("current")}
             className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
             style={section === "current"
-              ? { borderColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }
+              ? { borderColor: "hsl(var(--primary))", color: "hsl(var(--primary))" }
               : { borderColor: "transparent", color: "#9CA3AF" }
             }
           >
@@ -292,7 +270,7 @@ export default function WinnersPage() {
             onClick={() => setSection("archive")}
             className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
             style={section === "archive"
-              ? { borderColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }
+              ? { borderColor: "hsl(var(--primary))", color: "hsl(var(--primary))" }
               : { borderColor: "transparent", color: "#9CA3AF" }
             }
           >
@@ -300,76 +278,43 @@ export default function WinnersPage() {
           </button>
         </div>
 
-        {/* Filter bar — sticky below dark header */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10">
+        {/* Filter bar */}
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[108px] z-10">
           <div className="px-4 pt-2 pb-1">
             <SpeciesPills value={species} onChange={setSpecies} />
           </div>
-          <div
-            data-filter-row
-            className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide"
-          >
-            {/* Show Level dropdown */}
-            <div className="relative shrink-0">
-              <button
-                onClick={() => { setCategoryOpen(v => !v); setYearOpen(false); setStateOpen(false); setBreederOpen(false); }}
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
-                style={selectedCategory !== "All Levels"
-                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
-              >
-                {selectedCategory}
-                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </button>
-            </div>
-
-            {/* Year dropdown */}
-            <div className="relative shrink-0">
-              <button
-                onClick={() => {
-                  setYearOpen(v => !v); setStateOpen(false); setBreederOpen(false); setCategoryOpen(false);
-                }}
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
-                style={selectedYear
-                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
-              >
-                {selectedYear || "All Years"}
-                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </button>
-            </div>
-
-            {/* State dropdown */}
-            <div className="relative shrink-0">
-              <button
-                onClick={() => { setStateOpen(v => !v); setCategoryOpen(false); setYearOpen(false); setBreederOpen(false); }}
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
-                style={selectedState !== "All States"
-                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
-              >
-                {selectedState}
-                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </button>
-            </div>
-
-            {/* Breeder dropdown */}
-            <div className="relative shrink-0">
-              <button
-                onClick={() => { setBreederOpen(v => !v); setCategoryOpen(false); setYearOpen(false); setStateOpen(false); }}
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
-                style={selectedBreeder !== "All Breeders"
-                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
-              >
-                {selectedBreeder === "All Breeders" ? "Breeder" : selectedBreeder}
-                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </button>
-            </div>
-
+          <div className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide">
+            <FilterDropdown
+              label="Level"
+              value={selectedCategory}
+              defaultValue="All Levels"
+              options={categoryOptions}
+              onChange={setSelectedCategory}
+            />
+            <FilterDropdown
+              label="Year"
+              value={selectedYear ? String(selectedYear) : "All Years"}
+              defaultValue="All Years"
+              options={["All Years", ...years.map(String)]}
+              onChange={(v) => setSelectedYear(v === "All Years" ? null : Number(v))}
+            />
+            <FilterDropdown
+              label="State"
+              value={selectedState}
+              defaultValue="All States"
+              options={availableStates}
+              onChange={setSelectedState}
+            />
+            <FilterDropdown
+              label="Breeder"
+              value={selectedBreeder}
+              defaultValue="All Breeders"
+              options={availableBreeders}
+              onChange={setSelectedBreeder}
+            />
             {(selectedCategory !== "All Levels" || selectedState !== "All States" || selectedBreeder !== "All Breeders" || selectedYear || selectedShow || searchQuery) && (
               <button
-                onClick={() => { setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); setSelectedYear(null); setSelectedShow(null); setSearchQuery(""); closeFilterMenus(); }}
+                onClick={() => { setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); setSelectedYear(null); setSelectedShow(null); setSearchQuery(""); }}
                 className="shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold"
                 style={{ backgroundColor: "#FFF8E7", color: "#8B6914", border: "1px solid rgba(201,168,76,0.3)" }}
               >
@@ -377,55 +322,8 @@ export default function WinnersPage() {
               </button>
             )}
           </div>
-          {activeFilterPanel && (
-            <div data-filter-panel className="px-4 pb-3">
-              <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-lg overflow-hidden max-h-[260px] overflow-y-auto">
-                {activeFilterPanel === "category" && categoryOptions.map(cat => (
-                  <button key={cat} onClick={() => { setSelectedCategory(cat); closeFilterMenus(); }}
-                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
-                    style={{ borderBottom: "1px solid #F3F4F6" }}>
-                    <span className="text-[14px] font-medium text-[hsl(var(--primary))]">{cat}</span>
-                    {selectedCategory === cat && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                  </button>
-                ))}
-                {activeFilterPanel === "year" && (
-                  <>
-                    <button onClick={() => { setSelectedYear(null); closeFilterMenus(); }}
-                      className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
-                      style={{ borderBottom: "1px solid #F3F4F6" }}>
-                      <span className="text-[14px] font-medium text-[hsl(var(--primary))]">All Years</span>
-                      {!selectedYear && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                    </button>
-                    {years.map(y => (
-                      <button key={y} onClick={() => { setSelectedYear(y); closeFilterMenus(); }}
-                        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
-                        style={{ borderBottom: "1px solid #F3F4F6" }}>
-                        <span className="text-[14px] font-medium text-[hsl(var(--primary))]">{y}</span>
-                        {selectedYear === y && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                      </button>
-                    ))}
-                  </>
-                )}
-                {activeFilterPanel === "state" && availableStates.map(state => (
-                  <button key={state} onClick={() => { setSelectedState(state); closeFilterMenus(); }}
-                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
-                    style={{ borderBottom: "1px solid #F3F4F6" }}>
-                    <span className="text-[14px] font-medium text-[hsl(var(--primary))]">{state}</span>
-                    {selectedState === state && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                  </button>
-                ))}
-                {activeFilterPanel === "breeder" && availableBreeders.map(name => (
-                  <button key={name} onClick={() => { setSelectedBreeder(name); closeFilterMenus(); }}
-                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
-                    style={{ borderBottom: "1px solid #F3F4F6" }}>
-                    <span className="text-[14px] font-medium text-[hsl(var(--primary))] truncate">{name}</span>
-                    {selectedBreeder === name && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5} className="shrink-0 ml-2"><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
+
 
         <div>
           {loading ? (
