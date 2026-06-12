@@ -129,7 +129,7 @@ export function AdminEditModal({ open, onOpenChange, post, onSaved }: AdminEditM
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-medium text-muted-foreground">Tag People</label>
               {taggedPeople.length > 0 && (
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}>
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
                   {taggedPeople.length} tagged
                 </span>
               )}

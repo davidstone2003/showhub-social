@@ -181,8 +181,8 @@ export default function BreederProfilePage() {
 
   const lockedGate = (
     <div className="rounded-2xl p-6 text-center" style={{ backgroundColor: "#FFFBF0", border: "1px solid rgba(201,168,76,0.3)" }}>
-      <Lock className="w-8 h-8 mx-auto mb-2" style={{ color: "hsl(var(--gold))" }} />
-      <p className="font-bold text-[16px]" style={{ color: "hsl(var(--primary))" }}>Full profile is for upgraded breeders</p>
+      <Lock className="w-8 h-8 mx-auto mb-2" style={{ color: "#C9A84C" }} />
+      <p className="font-bold text-[16px]" style={{ color: "#0A1628" }}>Full profile is for upgraded breeders</p>
       <p className="text-[13px] mt-1 mb-3" style={{ color: "#6B7280" }}>
         This breeder hasn't unlocked their full page yet.
       </p>
@@ -207,7 +207,7 @@ export default function BreederProfilePage() {
                 onClick={() => setTab(key as any)}
                 className="shrink-0 px-4 py-3 text-[13px] font-bold border-b-2 transition-colors whitespace-nowrap"
                 style={tab === key
-                  ? { borderColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }
+                  ? { borderColor: "#C9A84C", color: "#0A1628" }
                   : { borderColor: "transparent", color: "#9CA3AF" }}
               >
                 {label}
@@ -229,8 +229,8 @@ export default function BreederProfilePage() {
                     <PostCard key={post.id} post={toPost(post, profile)} index={i} />
                   ))}
                   <div className="rounded-2xl p-6 text-center" style={{ backgroundColor: "#FFFBF0", border: "1px solid rgba(201,168,76,0.3)" }}>
-                    <Lock className="w-8 h-8 mx-auto mb-2" style={{ color: "hsl(var(--gold))" }} />
-                    <p className="font-bold text-[16px]" style={{ color: "hsl(var(--primary))" }}>
+                    <Lock className="w-8 h-8 mx-auto mb-2" style={{ color: "#C9A84C" }} />
+                    <p className="font-bold text-[16px]" style={{ color: "#0A1628" }}>
                       See all posts from {breederName}
                     </p>
                     <p className="text-[13px] mt-1 mb-3" style={{ color: "#6B7280" }}>
@@ -239,7 +239,7 @@ export default function BreederProfilePage() {
                     {user ? (
                       <button
                         className="rounded-full px-5 py-2 font-bold text-[14px]"
-                        style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}
+                        style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
                       >
                         Follow
                       </button>
@@ -247,7 +247,7 @@ export default function BreederProfilePage() {
                       <Link
                         to="/auth"
                         className="inline-block rounded-full px-5 py-2 font-bold text-[14px]"
-                        style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}
+                        style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
                       >
                         Join Free to Follow
                       </Link>
@@ -256,13 +256,13 @@ export default function BreederProfilePage() {
                 </>
               ) : recentPosts.length === 0 ? (
                 <div className="flex flex-col items-center py-16 px-4 text-center">
-                  <Trophy className="w-12 h-12 mb-3" style={{ color: "hsl(var(--gold))" }} />
-                  <p className="font-bold text-[17px]" style={{ color: "hsl(var(--primary))" }}>No posts yet</p>
+                  <Trophy className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
+                  <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No posts yet</p>
                   {isOwnProfile && (
                     <Link
                       to="/create"
                       className="mt-3 inline-block rounded-full px-5 py-2 font-bold text-[14px]"
-                      style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}
+                      style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
                     >
                       Post Your First Win
                     </Link>
@@ -282,7 +282,7 @@ export default function BreederProfilePage() {
               {/* About card */}
               <div className="rounded-2xl bg-white border border-[#E5E7EB] overflow-hidden">
                 <div className="px-4 py-3 border-b border-[#F3F4F6]">
-                  <h3 className="font-black text-[15px]" style={{ color: "hsl(var(--primary))" }}>About</h3>
+                  <h3 className="font-black text-[15px]" style={{ color: "#0A1628" }}>About</h3>
                 </div>
                 <div className="px-4 py-3 space-y-3">
                   {shortBio && (
@@ -328,14 +328,14 @@ export default function BreederProfilePage() {
               {speciesTags.length > 0 && (
                 <div className="rounded-2xl bg-white border border-[#E5E7EB] overflow-hidden">
                   <div className="px-4 py-3 border-b border-[#F3F4F6]">
-                    <h3 className="font-black text-[15px]" style={{ color: "hsl(var(--primary))" }}>Breeds / Species</h3>
+                    <h3 className="font-black text-[15px]" style={{ color: "#0A1628" }}>Breeds / Species</h3>
                   </div>
                   <div className="px-4 py-3 flex flex-wrap gap-2">
                     {speciesTags.map((s) => (
                       <span
                         key={s}
                         className="px-3 py-1 rounded-full text-[12px] font-bold"
-                        style={{ backgroundColor: "#FFFBF0", color: "hsl(var(--primary))", border: "1px solid rgba(201,168,76,0.3)" }}
+                        style={{ backgroundColor: "#FFFBF0", color: "#0A1628", border: "1px solid rgba(201,168,76,0.3)" }}
                       >
                         {s}
                       </span>
@@ -347,7 +347,7 @@ export default function BreederProfilePage() {
               {/* Availability */}
               <div className="rounded-2xl bg-white border border-[#E5E7EB] overflow-hidden">
                 <div className="px-4 py-3 border-b border-[#F3F4F6]">
-                  <h3 className="font-black text-[15px]" style={{ color: "hsl(var(--primary))" }}>Lambs Available</h3>
+                  <h3 className="font-black text-[15px]" style={{ color: "#0A1628" }}>Lambs Available</h3>
                 </div>
                 <div className="px-4 py-3">
                   {Object.values(availability).some(Boolean) ? (
@@ -395,7 +395,7 @@ export default function BreederProfilePage() {
               {profile?.facebook_url && (
                 <div className="rounded-2xl bg-white border border-[#E5E7EB] overflow-hidden">
                   <div className="px-4 py-3 border-b border-[#F3F4F6]">
-                    <h3 className="font-black text-[15px]" style={{ color: "hsl(var(--primary))" }}>Follow on Social</h3>
+                    <h3 className="font-black text-[15px]" style={{ color: "#0A1628" }}>Follow on Social</h3>
                   </div>
                   <a
                     href={profile.facebook_url}
@@ -408,7 +408,7 @@ export default function BreederProfilePage() {
                         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                       </svg>
                     </div>
-                    <span className="text-[14px] font-semibold" style={{ color: "hsl(var(--primary))" }}>Facebook Page</span>
+                    <span className="text-[14px] font-semibold" style={{ color: "#0A1628" }}>Facebook Page</span>
                   </a>
                 </div>
               )}
@@ -422,13 +422,13 @@ export default function BreederProfilePage() {
                 <div className="px-4"><LockedSection icon={Trophy} title="Winners" count={winners.length || 3} isOwner={false} /></div>
               ) : winners.length === 0 ? (
                 <div className="flex flex-col items-center py-16 px-4 text-center">
-                  <Trophy className="w-12 h-12 mb-3" style={{ color: "hsl(var(--gold))" }} />
-                  <p className="font-bold text-[17px]" style={{ color: "hsl(var(--primary))" }}>No winners yet</p>
+                  <Trophy className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
+                  <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No winners yet</p>
                   {isOwnProfile && (
                     <Link
                       to="/create"
                       className="mt-3 inline-block rounded-full px-5 py-2 font-bold text-[14px]"
-                      style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}
+                      style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
                     >
                       Post Your First Win
                     </Link>
@@ -440,7 +440,7 @@ export default function BreederProfilePage() {
                     <span className="text-[12px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>
                       {winners.length} total wins
                     </span>
-                    <span className="text-[12px] font-bold" style={{ color: "hsl(var(--gold))" }}>
+                    <span className="text-[12px] font-bold" style={{ color: "#C9A84C" }}>
                       {winners.filter((w) => w.win_placing?.toLowerCase().includes("grand")).length} Grand Championships
                     </span>
                   </div>
@@ -456,7 +456,7 @@ export default function BreederProfilePage() {
                           <img src={w.image_urls[0]} alt={w.win_placing || ""} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center"
-                            style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, #1B3A6B 100%)" }}>
+                            style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
                             <span className="text-[10px] font-black text-center px-1 leading-tight"
                               style={{ color: "rgba(201,168,76,0.6)" }}>
                               {w.win_placing?.slice(0, 15) || "W"}
@@ -493,8 +493,8 @@ export default function BreederProfilePage() {
                 <LockedSection icon={Dna} title="Sires" count={sires.length || 2} isOwner={false} />
               ) : sires.length === 0 ? (
                 <div className="flex flex-col items-center py-16 px-4 text-center">
-                  <Dna className="w-12 h-12 mb-3" style={{ color: "hsl(var(--gold))" }} />
-                  <p className="font-bold text-[17px]" style={{ color: "hsl(var(--primary))" }}>No sires yet</p>
+                  <Dna className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
+                  <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No sires yet</p>
                 </div>
               ) : (
                 sires.map((post, i) => (
@@ -511,13 +511,13 @@ export default function BreederProfilePage() {
                 <LockedSection icon={ShoppingBag} title="For Sale" count={sales.length || 2} isOwner={false} />
               ) : sales.length === 0 ? (
                 <div className="flex flex-col items-center py-16 px-4 text-center">
-                  <ShoppingBag className="w-12 h-12 mb-3" style={{ color: "hsl(var(--gold))" }} />
-                  <p className="font-bold text-[17px]" style={{ color: "hsl(var(--primary))" }}>Nothing listed for sale</p>
+                  <ShoppingBag className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
+                  <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>Nothing listed for sale</p>
                   {isOwnProfile && (
                     <Link
                       to="/create"
                       className="mt-3 inline-block rounded-full px-5 py-2 font-bold text-[14px]"
-                      style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}
+                      style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
                     >
                       + Add a Listing
                     </Link>
@@ -537,7 +537,7 @@ export default function BreederProfilePage() {
                         )}
                       </div>
                       <div className="p-3">
-                        <p className="font-bold text-[13px] line-clamp-1" style={{ color: "hsl(var(--primary))" }}>
+                        <p className="font-bold text-[13px] line-clamp-1" style={{ color: "#0A1628" }}>
                           {s.title || "For Sale"}
                         </p>
                         {s.caption && (
@@ -559,7 +559,7 @@ export default function BreederProfilePage() {
               {breederVideos.length === 0 ? (
                 <div className="flex flex-col items-center py-16 px-4 text-center">
                   <div style={{ fontSize: 40 }}>🎬</div>
-                  <p className="font-bold text-[17px] mt-2" style={{ color: "hsl(var(--primary))" }}>No videos yet</p>
+                  <p className="font-bold text-[17px] mt-2" style={{ color: "#0A1628" }}>No videos yet</p>
                   <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>
                     Post fitting videos, walk-arounds, and show day moments
                   </p>

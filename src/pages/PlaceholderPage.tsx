@@ -48,7 +48,7 @@ export const MarketPage = () => (
         className="px-5 pt-8 pb-7 mx-3 mt-3 rounded-2xl shadow-[var(--shadow-card)]"
         style={{
           background:
-            "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-dark)) 60%, hsl(var(--primary)) 100%)",
+            "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-dark)) 60%, #0A1628 100%)",
         }}
       >
         <p className="text-[10px] uppercase tracking-[0.22em] text-[hsl(var(--gold))] font-bold">The Market</p>
@@ -117,7 +117,7 @@ export const MarketPage = () => (
         className="fixed bottom-20 right-4 z-40 flex items-center gap-2 rounded-full px-4 py-3 shadow-lg font-bold text-[13px] active:scale-95 transition-transform"
         style={{
           background: "hsl(var(--gold))",
-          color: "hsl(var(--primary))",
+          color: "#0A1628",
           boxShadow: "0 8px 24px rgba(201,168,76,0.4)",
         }}
       >

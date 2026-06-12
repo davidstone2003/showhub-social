@@ -71,7 +71,7 @@ export function PeopleTagger({ tagged, onChange }: PeopleTaggerProps) {
             <div
               key={person.id}
               className="inline-flex items-center gap-2 pl-1 pr-2 py-1 rounded-full"
-              style={{ backgroundColor: "hsl(var(--gold))20", border: "1px solid hsl(var(--gold))40" }}
+              style={{ backgroundColor: "#C9A84C20", border: "1px solid #C9A84C40" }}
             >
               {person.logo_url ? (
                 <img
@@ -81,13 +81,13 @@ export function PeopleTagger({ tagged, onChange }: PeopleTaggerProps) {
                 />
               ) : (
                 <div
-                  className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-[hsl(var(--gold))]"
-                  style={{ background: "linear-gradient(135deg, hsl(var(--primary)), #1a2a44)" }}
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-[#C9A84C]"
+                  style={{ background: "linear-gradient(135deg, #0A1628, #1a2a44)" }}
                 >
                   {person.name.charAt(0).toUpperCase()}
                 </div>
               )}
-              <span className="text-[13px] font-semibold" style={{ color: "hsl(var(--primary))" }}>
+              <span className="text-[13px] font-semibold" style={{ color: "#0A1628" }}>
                 {person.name}
               </span>
               <button onClick={() => removePerson(person.id)} aria-label="Remove">
@@ -106,7 +106,7 @@ export function PeopleTagger({ tagged, onChange }: PeopleTaggerProps) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by name or @username..."
-          className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-[#E5E7EB] text-[14px] text-[hsl(var(--primary))] placeholder:text-[#9CA3AF] outline-none focus:border-[hsl(var(--gold))]"
+          className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-[#E5E7EB] text-[14px] text-[#0A1628] placeholder:text-[#9CA3AF] outline-none focus:border-[#C9A84C]"
         />
       </div>
 
@@ -129,14 +129,14 @@ export function PeopleTagger({ tagged, onChange }: PeopleTaggerProps) {
                 />
               ) : (
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-[15px] font-bold text-[hsl(var(--gold))] flex-shrink-0"
-                  style={{ background: "linear-gradient(135deg, hsl(var(--primary)), #1a2a44)" }}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-[15px] font-bold text-[#C9A84C] flex-shrink-0"
+                  style={{ background: "linear-gradient(135deg, #0A1628, #1a2a44)" }}
                 >
                   {person.name.charAt(0).toUpperCase()}
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <div className="text-[14px] font-semibold truncate" style={{ color: "hsl(var(--primary))" }}>
+                <div className="text-[14px] font-semibold truncate" style={{ color: "#0A1628" }}>
                   {person.name}
                 </div>
                 {person.username && (

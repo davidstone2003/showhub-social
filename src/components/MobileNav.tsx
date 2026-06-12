@@ -1,5 +1,5 @@
 import { Home, Trophy, Users, Dna, ShoppingBag, Coins } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 const navItems = [
   { icon: Home, label: "Home", to: "/" },
@@ -10,14 +10,23 @@ const navItems = [
   { icon: ShoppingBag, label: "Market", to: "/market" },
 ];
 
-const ACTIVE = "hsl(var(--gold))";
-const INACTIVE = "rgba(255,255,255,0.55)";
+const ACTIVE = "#C9A84C";
 
 export function MobileNav() {
+  const { pathname } = useLocation();
+  const isHome = pathname === "/" || pathname === "/index";
+  const navBg = isHome ? "#FFFFFF" : "#0A1628";
+  const navBorder = isHome ? "1px solid hsl(var(--border))" : "1px solid rgba(255,255,255,0.08)";
+  const inactive = isHome ? "#9CA3AF" : "rgba(255,255,255,0.35)";
+
   return (
     <nav
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-primary"
-      style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-50"
+      style={{
+        backgroundColor: navBg,
+        borderTop: navBorder,
+        transition: "background-color 200ms ease, border-color 200ms ease",
+      }}
     >
       <div className="flex items-center justify-around py-1.5 px-1 safe-area-pb">
         {navItems.map((item) => (
@@ -31,11 +40,11 @@ export function MobileNav() {
                 <item.icon
                   className="w-5 h-5"
                   strokeWidth={isActive ? 2.5 : 2}
-                  style={{ color: isActive ? ACTIVE : INACTIVE }}
+                  style={{ color: isActive ? ACTIVE : inactive }}
                 />
                 <span
                   style={{
-                    color: isActive ? ACTIVE : INACTIVE,
+                    color: isActive ? ACTIVE : inactive,
                     fontWeight: isActive ? 700 : 400,
                   }}
                 >

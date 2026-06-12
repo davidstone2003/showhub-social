@@ -1,11 +1,10 @@
 import { useMemo, useState, useEffect } from "react";
-
-import { Search, ChevronRight, LayoutGrid, List as ListIcon, ShoppingBag, Wheat, SprayCan, Wrench } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Search, ChevronRight, LayoutGrid, List as ListIcon, ShoppingBag, Wheat, SprayCan, Wrench, Plus } from "lucide-react";
 import { Layout } from "@/components/Layout";
-import { CreateButton } from "@/components/shared/CreateButton";
 
-const NAVY = "hsl(var(--primary))";
-const GOLD = "hsl(var(--gold))";
+const NAVY = "#0A1628";
+const GOLD = "#C9A84C";
 
 type Category = "All" | "Stock" | "Nutrition" | "Show Supplies" | "Services";
 const CATEGORIES: Category[] = ["All", "Stock", "Nutrition", "Show Supplies", "Services"];
@@ -102,7 +101,7 @@ export default function MarketPage() {
         {/* Header */}
         <div
           className="sticky top-0 z-10 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "hsl(var(--primary))", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
         >
           <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Market</h1>
           <div className="flex items-center gap-2">
@@ -119,7 +118,7 @@ export default function MarketPage() {
                 onClick={() => setView("list")}
                 aria-label="List view"
                 className="p-2 transition-colors"
-                style={{ color: view === "list" ? "hsl(var(--gold))" : "rgba(255,255,255,0.5)", backgroundColor: view === "list" ? "rgba(255,255,255,0.08)" : "transparent" }}
+                style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "list" ? "rgba(255,255,255,0.08)" : "transparent" }}
               >
                 <ListIcon className="w-4 h-4" />
               </button>
@@ -128,14 +127,12 @@ export default function MarketPage() {
                 onClick={() => setView("grid")}
                 aria-label="Grid view"
                 className="p-2 transition-colors"
-                style={{ color: view === "grid" ? "hsl(var(--gold))" : "rgba(255,255,255,0.5)", backgroundColor: view === "grid" ? "rgba(255,255,255,0.08)" : "transparent" }}
+                style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "grid" ? "rgba(255,255,255,0.08)" : "transparent" }}
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
             </div>
-            <CreateButton to="/submit?type=listing" label="Post listing" />
           </div>
-
         </div>
 
         {/* Optional search */}
@@ -148,7 +145,7 @@ export default function MarketPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search listings, sellers, categories…"
-                className="flex-1 bg-transparent text-[14px] text-[hsl(var(--primary))] outline-none placeholder:text-[#9CA3AF]"
+                className="flex-1 bg-transparent text-[14px] text-[#0A1628] outline-none placeholder:text-[#9CA3AF]"
               />
               {search && (
                 <button onClick={() => setSearch("")} className="text-[#9CA3AF] text-[18px] leading-none">×</button>
@@ -167,7 +164,7 @@ export default function MarketPage() {
                 onClick={() => setCategory(cat)}
                 className="shrink-0 rounded-full px-3 py-1.5 border text-[12px] font-bold transition-colors"
                 style={category === cat
-                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
                   : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
               >
                 {cat}
@@ -183,7 +180,7 @@ export default function MarketPage() {
                 onClick={() => { setSpeciesOpen((v) => !v); setStateOpen(false); setPriceOpen(false); }}
                 className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
                 style={selectedSpecies !== "All"
-                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
                   : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
               >
                 {selectedSpecies === "All" ? "Species" : selectedSpecies}
@@ -197,9 +194,9 @@ export default function MarketPage() {
                     <button key={opt} onClick={() => { setSelectedSpecies(opt); setSpeciesOpen(false); }}
                       className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
                       style={{ borderBottom: "1px solid #F3F4F6" }}>
-                      <span className="text-[13px] font-medium text-[hsl(var(--primary))]">{opt}</span>
+                      <span className="text-[13px] font-medium text-[#0A1628]">{opt}</span>
                       {selectedSpecies === opt && (
-                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5}>
+                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}>
                           <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       )}
@@ -215,7 +212,7 @@ export default function MarketPage() {
                 onClick={() => { setStateOpen((v) => !v); setSpeciesOpen(false); setPriceOpen(false); }}
                 className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
                 style={selectedState !== "All States"
-                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
                   : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
               >
                 {selectedState}
@@ -229,9 +226,9 @@ export default function MarketPage() {
                     <button key={state} onClick={() => { setSelectedState(state); setStateOpen(false); }}
                       className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
                       style={{ borderBottom: "1px solid #F3F4F6" }}>
-                      <span className="text-[13px] font-medium text-[hsl(var(--primary))]">{state}</span>
+                      <span className="text-[13px] font-medium text-[#0A1628]">{state}</span>
                       {selectedState === state && (
-                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5}>
+                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}>
                           <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       )}
@@ -247,7 +244,7 @@ export default function MarketPage() {
                 onClick={() => { setPriceOpen((v) => !v); setStateOpen(false); setSpeciesOpen(false); }}
                 className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
                 style={priceRange !== "All"
-                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
                   : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
               >
                 {priceRange === "All" ? "Price" : priceRange}
@@ -261,9 +258,9 @@ export default function MarketPage() {
                     <button key={opt} onClick={() => { setPriceRange(opt as any); setPriceOpen(false); }}
                       className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
                       style={{ borderBottom: "1px solid #F3F4F6" }}>
-                      <span className="text-[13px] font-medium text-[hsl(var(--primary))]">{opt}</span>
+                      <span className="text-[13px] font-medium text-[#0A1628]">{opt}</span>
                       {priceRange === opt && (
-                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5}>
+                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}>
                           <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       )}
@@ -350,11 +347,20 @@ export default function MarketPage() {
           )}
         </section>
 
+        {/* FAB */}
+        <Link
+          to="/submit"
+          aria-label="Post a Listing"
+          className="fixed bottom-20 right-4 z-40 flex items-center gap-2 rounded-full px-4 py-3 shadow-lg font-bold text-[13px] active:scale-95 transition-transform"
+          style={{ background: GOLD, color: NAVY, boxShadow: "0 8px 24px rgba(201,168,76,0.4)" }}
+        >
+          <Plus className="w-4 h-4 stroke-[3]" />
+          Post a Listing
+        </Link>
       </div>
     </Layout>
   );
 }
-
 
 function Stat({ value, label }: { value: number; label: string }) {
   const [v, setV] = useState(0);

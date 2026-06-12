@@ -5,7 +5,7 @@ import type { Post } from "@/data/mock";
 function accentColor(placing?: string | null): string {
   if (!placing) return "#C4A882";
   const p = placing.toLowerCase();
-  if (/grand\s*champ/i.test(p) && !/reserve/i.test(p)) return "hsl(var(--gold))";
+  if (/grand\s*champ/i.test(p) && !/reserve/i.test(p)) return "#C9A84C";
   if (/reserve/i.test(p)) return "#A8A9AD";
   if (/class\s*winner/i.test(p)) return "#4A7C59";
   return "#C4A882";
@@ -67,7 +67,7 @@ export function WinnerCard({ post, onTap }: WinnerCardProps) {
               right: 8,
               zIndex: 2,
               border: "2px solid rgba(255,255,255,0.85)",
-              backgroundColor: "hsl(var(--primary))",
+              backgroundColor: "#0A1628",
             }}
           >
             {breederLogo && typeof breederLogo === "string" && breederLogo.startsWith("http") ? (
@@ -82,7 +82,7 @@ export function WinnerCard({ post, onTap }: WinnerCardProps) {
       </div>
 
       {/* Champion footer */}
-      <div className="relative overflow-hidden" style={{ backgroundColor: "hsl(var(--primary))" }}>
+      <div className="relative overflow-hidden" style={{ backgroundColor: "#0A1628" }}>
         {/* Top accent line */}
         <div className="absolute top-0 left-0 right-0" style={{ height: 3, backgroundColor: accent }} />
         {/* Left accent bar */}

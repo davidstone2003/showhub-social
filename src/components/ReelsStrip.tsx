@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Play } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Plus, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ReelCard {
@@ -72,7 +73,26 @@ export function ReelsStrip({ onOpen }: ReelsStripProps) {
   return (
     <div className="-mx-3 px-3 pt-2 pb-3">
       <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
-
+        {/* Create Reel tile */}
+        <Link
+          to="/submit?type=reel"
+          className="shrink-0 snap-start relative rounded-2xl overflow-hidden flex flex-col items-center justify-end"
+          style={{
+            width: 84,
+            height: 126,
+            background: "linear-gradient(180deg, #1B3A6B 0%, #0A1628 100%)",
+          }}
+        >
+          <div
+            className="absolute top-2 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full flex items-center justify-center border-2 border-white"
+            style={{ backgroundColor: "#C9A84C" }}
+          >
+            <Plus className="w-3.5 h-3.5" strokeWidth={3} style={{ color: "#0A1628" }} />
+          </div>
+          <div className="w-full text-center pb-2">
+            <p className="text-white text-[10px] font-bold leading-tight">Post a Reel</p>
+          </div>
+        </Link>
 
         {loading
           ? Array.from({ length: 4 }).map((_, i) => (
@@ -112,12 +132,12 @@ export function ReelsStrip({ onOpen }: ReelsStripProps) {
                 {/* Avatar circle */}
                 <div
                   className="absolute top-1.5 left-1.5 w-6 h-6 rounded-full overflow-hidden flex items-center justify-center border-2"
-                  style={{ borderColor: "hsl(var(--gold))", background: "linear-gradient(135deg, hsl(var(--primary)), #1B3A6B)" }}
+                  style={{ borderColor: "#C9A84C", background: "linear-gradient(135deg, #0A1628, #1B3A6B)" }}
                 >
                   {r.breeder_logo ? (
                     <img src={r.breeder_logo} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-[9px] font-bold text-[hsl(var(--gold))]">
+                    <span className="text-[9px] font-bold text-[#C9A84C]">
                       {r.breeder_name.charAt(0).toUpperCase()}
                     </span>
                   )}

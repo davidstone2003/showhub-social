@@ -29,14 +29,14 @@ export function HorizontalBreederCard({ b, index = 0 }: { b: DirectoryBreeder; i
     <Link
       to={link}
       style={{ animationDelay: `${Math.min(index * 40, 400)}ms` }}
-      className="group flex gap-3 rounded-2xl border border-white/10 bg-[#141E2E] p-3 opacity-0 animate-fade-in transition-all hover:border-[hsl(var(--gold))]/40 hover:bg-[#1a263a]"
+      className="group flex gap-3 rounded-2xl border border-white/10 bg-[#141E2E] p-3 opacity-0 animate-fade-in transition-all hover:border-[#C9A84C]/40 hover:bg-[#1a263a]"
     >
       <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl">
         {b.logo_url ? (
           <img src={b.logo_url} alt={name} className="h-full w-full object-cover" loading="lazy" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1a2a44] to-[hsl(var(--primary))]">
-            <span className="text-xl font-black text-[hsl(var(--gold))]/80">{initials(name)}</span>
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1a2a44] to-[#0A1628]">
+            <span className="text-xl font-black text-[#C9A84C]/80">{initials(name)}</span>
           </div>
         )}
       </div>
@@ -45,7 +45,7 @@ export function HorizontalBreederCard({ b, index = 0 }: { b: DirectoryBreeder; i
         <div>
           <div className="flex items-center gap-1.5">
             <h3 className="truncate text-[15px] font-bold leading-tight text-white">{name}</h3>
-            {isPaid && <BadgeCheck className="h-3.5 w-3.5 shrink-0 fill-[hsl(var(--gold))] text-black" strokeWidth={2.5} />}
+            {isPaid && <BadgeCheck className="h-3.5 w-3.5 shrink-0 fill-[#C9A84C] text-black" strokeWidth={2.5} />}
             {state && (
               <span className="ml-auto rounded-full bg-white/8 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white/70">
                 {state}
@@ -59,7 +59,7 @@ export function HorizontalBreederCard({ b, index = 0 }: { b: DirectoryBreeder; i
             </p>
           )}
           {b.winnerCount > 0 && (
-            <p className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-[hsl(var(--gold))]">
+            <p className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-[#C9A84C]">
               <Trophy className="h-3 w-3" />
               {b.winnerCount} championship win{b.winnerCount !== 1 ? "s" : ""}
             </p>
@@ -73,7 +73,7 @@ export function HorizontalBreederCard({ b, index = 0 }: { b: DirectoryBreeder; i
           </span>
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            className="rounded-full bg-[hsl(var(--gold))] px-3 py-0.5 text-[10px] font-bold text-black hover:bg-[#d4b558]"
+            className="rounded-full bg-[#C9A84C] px-3 py-0.5 text-[10px] font-bold text-black hover:bg-[#d4b558]"
           >
             Follow
           </button>

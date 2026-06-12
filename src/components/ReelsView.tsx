@@ -112,7 +112,7 @@ export function ReelsView() {
   if (loading) {
     return (
       <div className="flex items-center justify-center" style={{ height: "70vh" }}>
-        <div className="w-8 h-8 rounded-full border-2 border-[hsl(var(--gold))] border-t-transparent animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-[#C9A84C] border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -121,14 +121,14 @@ export function ReelsView() {
     return (
       <div className="flex flex-col items-center text-center px-6" style={{ paddingTop: 80 }}>
         <div style={{ fontSize: 56 }}>🎬</div>
-        <h3 className="font-bold mt-3 text-[18px]" style={{ color: "hsl(var(--primary))" }}>No Reels Yet</h3>
+        <h3 className="font-bold mt-3 text-[18px]" style={{ color: "#0A1628" }}>No Reels Yet</h3>
         <p className="text-[#6B7280] text-[14px] mt-2 max-w-xs">
           Be the first to post a fitting video, walk-around, or show day moment.
         </p>
         <Link
           to="/submit?type=reel"
           className="inline-flex items-center justify-center font-bold active:scale-95 transition-transform mt-5"
-          style={{ padding: "0 22px", height: 48, borderRadius: 24, fontSize: 15, backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))", boxShadow: "0 4px 12px rgba(201,168,76,0.35)" }}
+          style={{ padding: "0 22px", height: 48, borderRadius: 24, fontSize: 15, backgroundColor: "#C9A84C", color: "#0A1628", boxShadow: "0 4px 12px rgba(201,168,76,0.35)" }}
         >
           Post a Reel
         </Link>
@@ -219,11 +219,11 @@ export function ReelsView() {
           <div className="absolute inset-x-0 bottom-0 p-4 z-10">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center shrink-0"
-                style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, #1B3A6B 100%)" }}>
+                style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
                 {clip.breeder_logo ? (
                   <img src={clip.breeder_logo} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-[13px] font-bold text-[hsl(var(--gold))]">
+                  <span className="text-[13px] font-bold text-[#C9A84C]">
                     {clip.breeder_name.charAt(0).toUpperCase()}
                   </span>
                 )}
@@ -236,7 +236,7 @@ export function ReelsView() {
                 <span className="font-bold text-white text-[14px]">{clip.breeder_name}</span>
               )}
               {clip.species && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "rgba(201,168,76,0.9)", color: "hsl(var(--primary))" }}>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "rgba(201,168,76,0.9)", color: "#0A1628" }}>
                   {clip.species}
                 </span>
               )}

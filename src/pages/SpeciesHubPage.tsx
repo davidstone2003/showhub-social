@@ -42,7 +42,7 @@ export default function SpeciesHubPage() {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="min-h-screen bg-[hsl(var(--primary))] text-white">
+      <div className="min-h-screen bg-[#0A1628] text-white">
         <section className="border-b border-white/5">
           <div className="mx-auto max-w-6xl px-4 pt-6 pb-6">
             <DirectoryBreadcrumb items={[{ label: "Directory", to: "/breeders" }, { label: species.name }]} />
@@ -62,13 +62,13 @@ export default function SpeciesHubPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={`Search ${species.name.toLowerCase()} breeders…`}
-                className="h-11 w-full rounded-full border border-white/10 bg-white/5 pl-11 pr-4 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[hsl(var(--gold))]/60"
+                className="h-11 w-full rounded-full border border-white/10 bg-white/5 pl-11 pr-4 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#C9A84C]/60"
               />
             </div>
 
             {filters.activeCount > 0 && (
               <div className="mt-3 flex items-center gap-2 text-[11px]">
-                <span className="rounded-full bg-[hsl(var(--gold))]/15 px-3 py-1 font-semibold text-[hsl(var(--gold))]">
+                <span className="rounded-full bg-[#C9A84C]/15 px-3 py-1 font-semibold text-[#C9A84C]">
                   {filters.activeCount} filter{filters.activeCount !== 1 ? "s" : ""} active
                 </span>
               </div>
@@ -89,12 +89,12 @@ export default function SpeciesHubPage() {
                 <Link
                   key={sub.slug}
                   to={`/breeders/${species.key}/${sub.slug}`}
-                  className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#141E2E] p-4 transition-all hover:border-[hsl(var(--gold))]/40 hover:-translate-y-0.5"
+                  className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#141E2E] p-4 transition-all hover:border-[#C9A84C]/40 hover:-translate-y-0.5"
                 >
                   <span className="absolute right-3 top-3 text-2xl opacity-20 group-hover:opacity-40">{sub.silhouette}</span>
                   <h3 className="text-sm md:text-base font-bold text-white pr-8 leading-tight">{sub.name}</h3>
-                  <p className="mt-2 text-[11px] font-semibold text-[hsl(var(--gold))]">{sub.count} breeder{sub.count !== 1 ? "s" : ""}</p>
-                  <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-white/30 group-hover:translate-x-0.5 group-hover:text-[hsl(var(--gold))] transition-transform" />
+                  <p className="mt-2 text-[11px] font-semibold text-[#C9A84C]">{sub.count} breeder{sub.count !== 1 ? "s" : ""}</p>
+                  <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-white/30 group-hover:translate-x-0.5 group-hover:text-[#C9A84C] transition-transform" />
                 </Link>
               ))}
             </div>

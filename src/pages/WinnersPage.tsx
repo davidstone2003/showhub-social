@@ -1,11 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { Trophy } from "lucide-react";
-import { CreateButton } from "@/components/shared/CreateButton";
-import { PageHeader } from "@/components/shared/PageHeader";
-import { FilterDropdown } from "@/components/shared/FilterDropdown";
-
+import { Search, Trophy, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PostCard } from "@/components/PostCard";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton";
@@ -114,11 +110,15 @@ export default function WinnersPage() {
   const [selectedShow, setSelectedShow] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("All Levels");
   const [selectedState, setSelectedState] = useState<string>("All States");
   const [selectedBreeder, setSelectedBreeder] = useState<string>("All Breeders");
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [yearOpen, setYearOpen] = useState(false);
+  const [stateOpen, setStateOpen] = useState(false);
+  const [breederOpen, setBreederOpen] = useState(false);
   const [drawerPost, setDrawerPost] = useState<Post | null>(null);
-
 
   const handleModerated = () => setRefreshKey((k) => k + 1);
 
@@ -180,8 +180,25 @@ export default function WinnersPage() {
 
   const categoryOptions = ["All Levels", "National / Major", "State Fair", "Jackpot", "County / Local"];
 
-  
+  const closeFilterMenus = () => {
+    setCategoryOpen(false);
+    setYearOpen(false);
+    setStateOpen(false);
+    setBreederOpen(false);
+  };
 
+  const activeFilterPanel = categoryOpen ? "category" : yearOpen ? "year" : stateOpen ? "state" : breederOpen ? "breeder" : null;
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && t.closest("[data-filter-row]")) return;
+      if (t && t.closest("[data-filter-panel]")) return;
+      setCategoryOpen(false); setYearOpen(false); setStateOpen(false); setBreederOpen(false);
+    };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, []);
 
   const allShowNames = useMemo(() => {
     const counts = new Map<string, number>();
@@ -246,13 +263,33 @@ export default function WinnersPage() {
   return (
     <Layout showDiscovery={false}>
       <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
-        <PageHeader
-          title="Winners"
-          searchPlaceholder="Search shows, breeders, exhibitors..."
-          searchValue={searchQuery}
-          onSearchChange={setSearchQuery}
-          createButton={<CreateButton to="/submit" label="Add win" />}
-        />
+        {/* Header */}
+        <div
+          className="sticky top-0 z-10 px-4 flex items-center justify-between"
+          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          {searchOpen ? (
+            <div className="flex items-center gap-2 w-full">
+              <input
+                autoFocus
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search shows, breeders, exhibitors..."
+                className="flex-1 bg-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-white/40 outline-none"
+              />
+              <button onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="text-white/60 text-sm">Cancel</button>
+            </div>
+          ) : (
+            <>
+              <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Winners</h1>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setSearchOpen(true)} className="p-1.5">
+                  <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
+                </button>
+              </div>
+            </>
+          )}
+        </div>
 
         {/* Section tabs */}
         <div className="bg-white border-b border-[#E5E7EB] flex sticky top-[60px] z-20">
@@ -260,7 +297,7 @@ export default function WinnersPage() {
             onClick={() => setSection("current")}
             className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
             style={section === "current"
-              ? { borderColor: "hsl(var(--primary))", color: "hsl(var(--primary))" }
+              ? { borderColor: "#C9A84C", color: "#0A1628" }
               : { borderColor: "transparent", color: "#9CA3AF" }
             }
           >
@@ -270,7 +307,7 @@ export default function WinnersPage() {
             onClick={() => setSection("archive")}
             className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
             style={section === "archive"
-              ? { borderColor: "hsl(var(--primary))", color: "hsl(var(--primary))" }
+              ? { borderColor: "#C9A84C", color: "#0A1628" }
               : { borderColor: "transparent", color: "#9CA3AF" }
             }
           >
@@ -278,43 +315,76 @@ export default function WinnersPage() {
           </button>
         </div>
 
-        {/* Filter bar */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[108px] z-10">
+        {/* Filter bar — sticky below dark header */}
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10">
           <div className="px-4 pt-2 pb-1">
             <SpeciesPills value={species} onChange={setSpecies} />
           </div>
-          <div className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide">
-            <FilterDropdown
-              label="Level"
-              value={selectedCategory}
-              defaultValue="All Levels"
-              options={categoryOptions}
-              onChange={setSelectedCategory}
-            />
-            <FilterDropdown
-              label="Year"
-              value={selectedYear ? String(selectedYear) : "All Years"}
-              defaultValue="All Years"
-              options={["All Years", ...years.map(String)]}
-              onChange={(v) => setSelectedYear(v === "All Years" ? null : Number(v))}
-            />
-            <FilterDropdown
-              label="State"
-              value={selectedState}
-              defaultValue="All States"
-              options={availableStates}
-              onChange={setSelectedState}
-            />
-            <FilterDropdown
-              label="Breeder"
-              value={selectedBreeder}
-              defaultValue="All Breeders"
-              options={availableBreeders}
-              onChange={setSelectedBreeder}
-            />
+          <div
+            data-filter-row
+            className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide"
+          >
+            {/* Show Level dropdown */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => { setCategoryOpen(v => !v); setYearOpen(false); setStateOpen(false); setBreederOpen(false); }}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
+                style={selectedCategory !== "All Levels"
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+              >
+                {selectedCategory}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+            </div>
+
+            {/* Year dropdown */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => {
+                  setYearOpen(v => !v); setStateOpen(false); setBreederOpen(false); setCategoryOpen(false);
+                }}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
+                style={selectedYear
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+              >
+                {selectedYear || "All Years"}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+            </div>
+
+            {/* State dropdown */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => { setStateOpen(v => !v); setCategoryOpen(false); setYearOpen(false); setBreederOpen(false); }}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
+                style={selectedState !== "All States"
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+              >
+                {selectedState}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+            </div>
+
+            {/* Breeder dropdown */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => { setBreederOpen(v => !v); setCategoryOpen(false); setYearOpen(false); setStateOpen(false); }}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
+                style={selectedBreeder !== "All Breeders"
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+              >
+                {selectedBreeder === "All Breeders" ? "Breeder" : selectedBreeder}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+            </div>
+
             {(selectedCategory !== "All Levels" || selectedState !== "All States" || selectedBreeder !== "All Breeders" || selectedYear || selectedShow || searchQuery) && (
               <button
-                onClick={() => { setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); setSelectedYear(null); setSelectedShow(null); setSearchQuery(""); }}
+                onClick={() => { setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); setSelectedYear(null); setSelectedShow(null); setSearchQuery(""); closeFilterMenus(); }}
                 className="shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold"
                 style={{ backgroundColor: "#FFF8E7", color: "#8B6914", border: "1px solid rgba(201,168,76,0.3)" }}
               >
@@ -322,8 +392,55 @@ export default function WinnersPage() {
               </button>
             )}
           </div>
+          {activeFilterPanel && (
+            <div data-filter-panel className="px-4 pb-3">
+              <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-lg overflow-hidden max-h-[260px] overflow-y-auto">
+                {activeFilterPanel === "category" && categoryOptions.map(cat => (
+                  <button key={cat} onClick={() => { setSelectedCategory(cat); closeFilterMenus(); }}
+                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
+                    style={{ borderBottom: "1px solid #F3F4F6" }}>
+                    <span className="text-[14px] font-medium text-[#0A1628]">{cat}</span>
+                    {selectedCategory === cat && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  </button>
+                ))}
+                {activeFilterPanel === "year" && (
+                  <>
+                    <button onClick={() => { setSelectedYear(null); closeFilterMenus(); }}
+                      className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
+                      style={{ borderBottom: "1px solid #F3F4F6" }}>
+                      <span className="text-[14px] font-medium text-[#0A1628]">All Years</span>
+                      {!selectedYear && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                    </button>
+                    {years.map(y => (
+                      <button key={y} onClick={() => { setSelectedYear(y); closeFilterMenus(); }}
+                        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
+                        style={{ borderBottom: "1px solid #F3F4F6" }}>
+                        <span className="text-[14px] font-medium text-[#0A1628]">{y}</span>
+                        {selectedYear === y && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                      </button>
+                    ))}
+                  </>
+                )}
+                {activeFilterPanel === "state" && availableStates.map(state => (
+                  <button key={state} onClick={() => { setSelectedState(state); closeFilterMenus(); }}
+                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
+                    style={{ borderBottom: "1px solid #F3F4F6" }}>
+                    <span className="text-[14px] font-medium text-[#0A1628]">{state}</span>
+                    {selectedState === state && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  </button>
+                ))}
+                {activeFilterPanel === "breeder" && availableBreeders.map(name => (
+                  <button key={name} onClick={() => { setSelectedBreeder(name); closeFilterMenus(); }}
+                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
+                    style={{ borderBottom: "1px solid #F3F4F6" }}>
+                    <span className="text-[14px] font-medium text-[#0A1628] truncate">{name}</span>
+                    {selectedBreeder === name && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5} className="shrink-0 ml-2"><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-
 
         <div>
           {loading ? (
@@ -336,20 +453,20 @@ export default function WinnersPage() {
             <div className="px-4 pt-3 pb-24 flex flex-col gap-6">
               {currentSeasonGroups.length === 0 ? (
                 <div className="flex flex-col items-center py-16 text-center">
-                  <Trophy className="w-12 h-12 mb-3" style={{ color: "hsl(var(--gold))" }} />
-                  <p className="font-bold text-[18px]" style={{ color: "hsl(var(--primary))" }}>No results yet this season</p>
+                  <Trophy className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
+                  <p className="font-bold text-[18px]" style={{ color: "#0A1628" }}>No results yet this season</p>
                   <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>Post your wins to build the record</p>
                   <Link to="/submit"
                     className="mt-4 rounded-full px-5 py-2.5 font-bold text-[14px]"
-                    style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}>
+                    style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
                     Post a Win
                   </Link>
                 </div>
               ) : (
                 currentSeasonGroups.map(group => (
                   <div key={group.showName + group.year}>
-                    <div className="mb-3 pb-2 border-b-2 border-[hsl(var(--gold))]">
-                      <h2 className="font-bold text-[17px]" style={{ color: "hsl(var(--primary))" }}>{group.showName}</h2>
+                    <div className="mb-3 pb-2 border-b-2 border-[#C9A84C]">
+                      <h2 className="font-bold text-[17px]" style={{ color: "#0A1628" }}>{group.showName}</h2>
                       {!group.showName.includes(String(group.year)) && (
                         <p className="text-[12px] mt-0.5" style={{ color: "#9CA3AF" }}>{group.year}</p>
                       )}
@@ -370,7 +487,7 @@ export default function WinnersPage() {
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center"
-                                style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, #1B3A6B 100%)" }}>
+                                style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
                                 <span className="text-2xl font-black" style={{ color: "rgba(201,168,76,0.3)" }}>
                                   {group.showName.charAt(0)}
                                 </span>
@@ -378,10 +495,10 @@ export default function WinnersPage() {
                             )}
                           </div>
                           <div className="p-2.5">
-                            <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: "hsl(var(--gold))" }}>
+                            <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: "#C9A84C" }}>
                               {r.win_placing || "Winner"}
                             </p>
-                            <p className="text-[13px] font-bold truncate mt-0.5" style={{ color: "hsl(var(--primary))" }}>
+                            <p className="text-[13px] font-bold truncate mt-0.5" style={{ color: "#0A1628" }}>
                               {r.shown_by || "—"}
                             </p>
                             {r.bred_by && (
@@ -390,7 +507,7 @@ export default function WinnersPage() {
                               </p>
                             )}
                             {r.sired_by && (
-                              <p className="text-[11px] truncate mt-0.5" style={{ color: "hsl(var(--gold))" }}>
+                              <p className="text-[11px] truncate mt-0.5" style={{ color: "#C9A84C" }}>
                                 {r.sired_by}
                               </p>
                             )}
@@ -406,11 +523,11 @@ export default function WinnersPage() {
             <div className="px-4 pt-3 pb-24 flex flex-col gap-2">
               {showGroups.length === 0 ? (
                 <div className="flex flex-col items-center py-16 text-center">
-                  <p className="font-bold text-[17px]" style={{ color: "hsl(var(--primary))" }}>No results found</p>
+                  <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No results found</p>
                   <button
                     onClick={() => { setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); setSelectedYear(null); setSearchQuery(""); }}
                     className="mt-4 rounded-full px-5 py-2 font-bold text-[14px]"
-                    style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}>
+                    style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
                     Clear Filters
                   </button>
                 </div>
@@ -440,10 +557,23 @@ export default function WinnersPage() {
         />
       )}
 
+      <Link
+        to="/submit"
+        aria-label="Post a Win"
+        className="fixed z-40 flex items-center justify-center rounded-full active:scale-95 transition-transform"
+        style={{
+          width: 56, height: 56,
+          right: 16, bottom: 80,
+          backgroundColor: "#C9A84C",
+          color: "#0A1628",
+          boxShadow: "0 8px 20px rgba(201,168,76,0.4)"
+        }}
+      >
+        <Plus className="w-7 h-7" strokeWidth={2.5} />
+      </Link>
     </Layout>
   );
 }
-
 
 function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: {
   group: { showName: string; year: number; rows: WinnerRow[] };
@@ -465,7 +595,7 @@ function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: 
             <img src={topWinner.image_urls[0]} alt="" className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, #1B3A6B 100%)" }}>
+              style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
               <span className="text-[10px] font-black text-white/30">
                 {group.showName.charAt(0)}
               </span>
@@ -473,7 +603,7 @@ function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: 
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-[14px] leading-snug text-[hsl(var(--primary))] truncate">
+          <p className="font-bold text-[14px] leading-snug text-[#0A1628] truncate">
             {group.showName}
           </p>
           <p className="text-[12px] text-[#9CA3AF] mt-0.5">
@@ -481,7 +611,7 @@ function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: 
             {!group.showName.includes(String(group.year)) ? ` · ${group.year}` : ""}
           </p>
           {topWinner?.win_placing && (
-            <p className="text-[11px] font-bold mt-0.5 truncate" style={{ color: "hsl(var(--gold))" }}>
+            <p className="text-[11px] font-bold mt-0.5 truncate" style={{ color: "#C9A84C" }}>
               {topWinner.win_placing}
               {topWinner.shown_by ? ` · ${topWinner.shown_by}` : ""}
             </p>
@@ -509,14 +639,14 @@ function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: 
                 {r.image_urls?.[0] ? (
                   <img src={r.image_urls[0]} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full" style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, #1B3A6B 100%)" }} />
+                  <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }} />
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-[11px] uppercase tracking-wider truncate" style={{ color: "hsl(var(--gold))" }}>
+                <p className="font-bold text-[11px] uppercase tracking-wider truncate" style={{ color: "#C9A84C" }}>
                   {r.win_placing || "Winner"}
                 </p>
-                <p className="font-semibold text-[13px] truncate text-[hsl(var(--primary))] mt-0.5">
+                <p className="font-semibold text-[13px] truncate text-[#0A1628] mt-0.5">
                   {r.shown_by || r.bred_by || "—"}
                 </p>
                 {r.sired_by && (

@@ -80,7 +80,7 @@ export default function PostSuccessScreen({ data }: { data: WinData }) {
         style={{ backgroundColor: "rgba(34,197,94,0.12)" }}>
         <Check className="w-8 h-8 text-green-500" strokeWidth={3} />
       </div>
-      <h1 className="text-[22px] font-bold text-[hsl(var(--primary))]">Posted!</h1>
+      <h1 className="text-[22px] font-bold text-[#0A1628]">Posted!</h1>
       <p className="text-[14px] text-[#6B7280] mt-1 text-center">
         {data.showName ? `${data.showName}${data.shownBy ? ` — ${data.shownBy}` : ""}` : "Your post is live on Backdrop"}
       </p>
@@ -89,7 +89,7 @@ export default function PostSuccessScreen({ data }: { data: WinData }) {
         <button
           onClick={() => navigate("/")}
           className="w-full h-12 rounded-xl text-[15px] font-bold"
-          style={{ backgroundColor: "hsl(var(--primary))", color: "white" }}
+          style={{ backgroundColor: "#0A1628", color: "white" }}
         >
           View Feed
         </button>
@@ -106,7 +106,7 @@ export default function PostSuccessScreen({ data }: { data: WinData }) {
         <button
           onClick={handlePostAnother}
           className="w-full py-3 text-[14px] font-semibold text-center"
-          style={{ color: "hsl(var(--gold))" }}
+          style={{ color: "#C9A84C" }}
         >
           + Post Another
         </button>
