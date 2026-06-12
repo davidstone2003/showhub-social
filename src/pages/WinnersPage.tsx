@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { Search, Trophy, Plus, List, LayoutGrid } from "lucide-react";
+import { Search, Trophy, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PostCard } from "@/components/PostCard";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton";
@@ -105,7 +105,8 @@ export default function WinnersPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [species, setSpecies] = useState<SpeciesPill>("All");
 
-  const [view, setView] = useState<"list" | "grid">("list");
+  const [section, setSection] = useState<"current" | "archive">("current");
+  const currentYear = new Date().getFullYear();
   const [selectedShow, setSelectedShow] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -255,6 +256,10 @@ export default function WinnersPage() {
     return result;
   }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery, selectedCategory, selectedState, selectedBreeder]);
 
+  const currentSeasonGroups = useMemo(() => {
+    return showGroups.filter(g => g.year >= currentYear - 1);
+  }, [showGroups, currentYear]);
+
   return (
     <Layout showDiscovery={false}>
       <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
@@ -278,28 +283,36 @@ export default function WinnersPage() {
             <>
               <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Winners</h1>
               <div className="flex items-center gap-2">
-                <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.15)", backgroundColor: "rgba(255,255,255,0.06)" }}>
-                  <button
-                    onClick={() => setView("list")}
-                    className="p-2 transition-colors"
-                    style={{ backgroundColor: view === "list" ? "rgba(201,168,76,0.25)" : "transparent" }}
-                  >
-                    <List className="w-4 h-4" style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)" }} />
-                  </button>
-                  <button
-                    onClick={() => setView("grid")}
-                    className="p-2 transition-colors"
-                    style={{ backgroundColor: view === "grid" ? "rgba(201,168,76,0.25)" : "transparent" }}
-                  >
-                    <LayoutGrid className="w-4 h-4" style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)" }} />
-                  </button>
-                </div>
                 <button onClick={() => setSearchOpen(true)} className="p-1.5">
                   <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
                 </button>
               </div>
             </>
           )}
+        </div>
+
+        {/* Section tabs */}
+        <div className="bg-white border-b border-[#E5E7EB] flex sticky top-[60px] z-20">
+          <button
+            onClick={() => setSection("current")}
+            className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
+            style={section === "current"
+              ? { borderColor: "#C9A84C", color: "#0A1628" }
+              : { borderColor: "transparent", color: "#9CA3AF" }
+            }
+          >
+            🏆 Current Season
+          </button>
+          <button
+            onClick={() => setSection("archive")}
+            className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
+            style={section === "archive"
+              ? { borderColor: "#C9A84C", color: "#0A1628" }
+              : { borderColor: "transparent", color: "#9CA3AF" }
+            }
+          >
+            📋 All Results
+          </button>
         </div>
 
         {/* Filter bar — sticky below dark header */}
@@ -432,108 +445,108 @@ export default function WinnersPage() {
         <div>
           {loading ? (
             <div className="flex flex-col gap-3 px-4 pt-4">
-              <PostCardSkeleton />
-              <PostCardSkeleton />
-              <PostCardSkeleton />
+              {[1,2,3].map(i => (
+                <div key={i} className="h-48 rounded-2xl bg-[#E5E7EB] animate-pulse" />
+              ))}
             </div>
-          ) : showGroups.length === 0 ? (
-            <div className="flex flex-col items-center text-center px-4" style={{ paddingTop: 60 }}>
-              <Trophy size={40} style={{ color: "#C9A84C" }} />
-              <h3 className="font-bold mt-3 text-[18px]" style={{ color: "#0A1628" }}>
-                {(selectedShow || selectedYear || searchQuery) ? "No results found" : "No winners yet"}
-              </h3>
-              <p className="text-[#6B7280] text-[14px] mt-1">
-                {selectedShow ? `No winners from ${selectedShow}` : (selectedShow || selectedYear || searchQuery) ? "Try adjusting your filters" : "Post your champions and show results here"}
-              </p>
-              {(selectedShow || selectedYear || searchQuery) ? (
-                <button
-                  onClick={() => { setSelectedShow(null); setSelectedYear(null); setSearchQuery(""); setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); }}
-                  className="mt-4 rounded-full px-5 py-2 font-bold text-[14px]"
-                  style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
-                >
-                  Clear Filters
-                </button>
+          ) : section === "current" ? (
+            <div className="px-4 pt-3 pb-24 flex flex-col gap-6">
+              {currentSeasonGroups.length === 0 ? (
+                <div className="flex flex-col items-center py-16 text-center">
+                  <Trophy className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
+                  <p className="font-bold text-[18px]" style={{ color: "#0A1628" }}>No results yet this season</p>
+                  <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>Post your wins to build the record</p>
+                  <Link to="/submit"
+                    className="mt-4 rounded-full px-5 py-2.5 font-bold text-[14px]"
+                    style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+                    Post a Win
+                  </Link>
+                </div>
               ) : (
-                <Link
-                  to="/submit"
-                  className="inline-flex items-center justify-center font-bold active:scale-95 transition-transform mt-5"
-                  style={{ padding: "0 22px", height: 48, borderRadius: 24, fontSize: 15, backgroundColor: "#C9A84C", color: "#0A1628", boxShadow: "0 4px 12px rgba(201,168,76,0.35)" }}
-                >
-                  Post a Win
-                </Link>
+                currentSeasonGroups.map(group => (
+                  <div key={group.showName + group.year}>
+                    <div className="mb-3 pb-2 border-b-2 border-[#C9A84C]">
+                      <h2 className="font-bold text-[17px]" style={{ color: "#0A1628" }}>{group.showName}</h2>
+                      {!group.showName.includes(String(group.year)) && (
+                        <p className="text-[12px] mt-0.5" style={{ color: "#9CA3AF" }}>{group.year}</p>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2.5">
+                      {group.rows.map(r => (
+                        <button
+                          key={r.id}
+                          onClick={() => setDrawerPost(winnerToPost(r, profilesMap, breederProfilesMap))}
+                          className="rounded-xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm text-left active:scale-[0.98] transition-transform w-full"
+                        >
+                          <div className="w-full overflow-hidden" style={{ aspectRatio: "4/3" }}>
+                            {r.image_urls?.[0] ? (
+                              <img
+                                src={r.image_urls[0]}
+                                alt={r.win_placing || ""}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center"
+                                style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
+                                <span className="text-2xl font-black" style={{ color: "rgba(201,168,76,0.3)" }}>
+                                  {group.showName.charAt(0)}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="p-2.5">
+                            <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: "#C9A84C" }}>
+                              {r.win_placing || "Winner"}
+                            </p>
+                            <p className="text-[13px] font-bold truncate mt-0.5" style={{ color: "#0A1628" }}>
+                              {r.shown_by || "—"}
+                            </p>
+                            {r.bred_by && (
+                              <p className="text-[11px] truncate mt-0.5" style={{ color: "#6B7280" }}>
+                                {r.bred_by}
+                              </p>
+                            )}
+                            {r.sired_by && (
+                              <p className="text-[11px] truncate mt-0.5" style={{ color: "#C9A84C" }}>
+                                {r.sired_by}
+                              </p>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))
               )}
             </div>
           ) : (
-            <>
-              {/* LIST VIEW (default) */}
-              {view === "list" && (
-                <div className="px-4 pt-4 pb-4 flex flex-col gap-2">
-                  {showGroups.map((group) => (
-                    <ShowGroupRow
-                      key={group.showName}
-                      group={group}
-                      profilesMap={profilesMap}
-                      breederProfilesMap={breederProfilesMap}
-                      onSelectPost={setDrawerPost}
-                    />
-                  ))}
+            <div className="px-4 pt-3 pb-24 flex flex-col gap-2">
+              {showGroups.length === 0 ? (
+                <div className="flex flex-col items-center py-16 text-center">
+                  <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No results found</p>
+                  <button
+                    onClick={() => { setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); setSelectedYear(null); setSearchQuery(""); }}
+                    className="mt-4 rounded-full px-5 py-2 font-bold text-[14px]"
+                    style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+                    Clear Filters
+                  </button>
                 </div>
+              ) : (
+                showGroups.map(group => (
+                  <ShowGroupRow
+                    key={group.showName + group.year}
+                    group={group}
+                    profilesMap={profilesMap}
+                    breederProfilesMap={breederProfilesMap}
+                    onSelectPost={setDrawerPost}
+                  />
+                ))
               )}
-
-              {/* GRID VIEW */}
-              {view === "grid" && (
-                <div className="px-4 pt-4 pb-4 flex flex-col gap-6">
-                  {showGroups.map((group) => (
-                    <div key={group.showName}>
-                      <div className="mb-3" style={{ borderLeft: "3px solid #C9A84C", paddingLeft: 10 }}>
-                        <h3 className="font-bold text-[15px] text-[#0A1628]">{group.showName}</h3>
-                        {!group.showName.includes(String(group.year)) && (
-                          <p className="text-[12px] text-[#9CA3AF]">{group.year}</p>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        {group.rows.map((r) => (
-                          <button
-                            key={r.id}
-                            onClick={() => setDrawerPost(winnerToPost(r, profilesMap, breederProfilesMap))}
-                            className="rounded-xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm text-left active:scale-[0.98] transition-transform w-full"
-                          >
-                            <div className="w-full aspect-[4/3] bg-[#F3F4F6] overflow-hidden">
-                              {r.image_urls?.[0] ? (
-                                <img src={r.image_urls[0]} alt="" className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center"
-                                  style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
-                                  <span className="text-2xl font-black" style={{ color: "rgba(201,168,76,0.3)" }}>
-                                    {group.showName.charAt(0)}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                            <div className="p-2">
-                              <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: "#C9A84C" }}>
-                                {r.win_placing || "Winner"}
-                              </p>
-                              <p className="text-[12px] font-bold text-[#0A1628] mt-0.5 truncate">
-                                {r.shown_by || r.bred_by || "—"}
-                              </p>
-                              {r.sired_by && (
-                                <p className="text-[11px] truncate mt-0.5" style={{ color: "#6B7280" }}>
-                                  {r.sired_by}
-                                </p>
-                              )}
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
+            </div>
           )}
         </div>
       </div>
+
 
 
       {drawerPost && (
