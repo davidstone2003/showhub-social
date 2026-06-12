@@ -2,7 +2,7 @@ import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { Search, ChevronDown, Check } from "lucide-react";
 import { Layout } from "@/components/Layout";
 
-const speciesOptions = ["All", "Sheep", "Goats", "Cattle", "Pigs"] as const;
+const speciesOptions = ["All", "Cattle", "Sheep", "Goats", "Pigs"] as const;
 export type Species = (typeof speciesOptions)[number];
 
 export interface FilterDropdown {

@@ -140,7 +140,7 @@ export default function EventDetailPage() {
 
 /* ─── Live Tab ─── */
 
-const SPECIES_OPTIONS = ["All", "Sheep", "Goats", "Cattle", "Pigs"] as const;
+const SPECIES_OPTIONS = ["All", "Cattle", "Sheep", "Goats", "Pigs"] as const;
 type Species = (typeof SPECIES_OPTIONS)[number];
 
 interface LiveItem {

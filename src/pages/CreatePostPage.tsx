@@ -39,7 +39,7 @@ const WINNER_RESULTS = [
   "Other",
 ];
 
-const SPECIES_OPTIONS = ["Sheep", "Goats", "Cattle", "Pigs"];
+const SPECIES_OPTIONS = ["Cattle", "Sheep", "Goats", "Pigs"];
 
 const ensureLookupEntry = async (
   table: "shows" | "sires_lookup" | "breeders_lookup",

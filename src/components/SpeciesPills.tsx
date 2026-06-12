@@ -1,4 +1,4 @@
-export const SPECIES_OPTIONS = ["All", "Sheep", "Goats", "Cattle", "Pigs"] as const;
+export const SPECIES_OPTIONS = ["All", "Cattle", "Sheep", "Goats", "Pigs"] as const;
 export type SpeciesPill = (typeof SPECIES_OPTIONS)[number];
 
 interface SpeciesPillsProps {
