@@ -36,11 +36,10 @@ function breederSpecies(b: any): string {
 
 export default function BreedersPage() {
   const [search, setSearch] = useState("");
-  const [searchOpen, setSearchOpen] = useState(false);
   const [species, setSpecies] = useState<SpeciesPill>("All");
   const [view, setView] = useState<"list" | "grid">("list");
   const [selectedState, setSelectedState] = useState<string>("All States");
-  const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
+
   const { data: breeders = [], isLoading } = useBreederDirectory();
 
   const availableStates = useMemo(() => {
@@ -67,100 +66,28 @@ export default function BreedersPage() {
   return (
     <Layout showDiscovery={false}>
       <div style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
-        {/* Dark header */}
-        <div
-          className="sticky top-0 z-20 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "hsl(var(--primary))", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
-        >
-          <h1 className="text-[22px] font-bold text-white">Breeders</h1>
-          <div className="flex items-center gap-3">
-            <button onClick={() => setSearchOpen((v) => !v)} className="p-1.5" aria-label="Search">
-              <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
-            </button>
-            <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.15)" }}>
-              <button
-                onClick={() => setView("list")}
-                className="p-2"
-                style={{ backgroundColor: view === "list" ? "rgba(201,168,76,0.25)" : "transparent" }}
-                aria-label="List view"
-              >
-                <ListIcon className="w-4 h-4" style={{ color: view === "list" ? "hsl(var(--gold))" : "rgba(255,255,255,0.5)" }} />
-              </button>
-              <button
-                onClick={() => setView("grid")}
-                className="p-2"
-                style={{ backgroundColor: view === "grid" ? "rgba(201,168,76,0.25)" : "transparent" }}
-                aria-label="Grid view"
-              >
-                <LayoutGrid className="w-4 h-4" style={{ color: view === "grid" ? "hsl(var(--gold))" : "rgba(255,255,255,0.5)" }} />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Search bar */}
-        {searchOpen && (
-          <div className="px-4 py-2 bg-white border-b border-[#E5E7EB]">
-            <div className="flex items-center gap-2 bg-[#F3F4F6] rounded-xl px-3 py-2">
-              <Search className="w-4 h-4 text-[#9CA3AF] shrink-0" />
-              <input
-                autoFocus
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name, farm, or location..."
-                className="flex-1 bg-transparent text-[14px] text-[hsl(var(--primary))] outline-none placeholder:text-[#9CA3AF]"
-              />
-              {search && (
-                <button onClick={() => setSearch("")} className="text-[#9CA3AF] text-[18px] leading-none">×</button>
-              )}
-            </div>
-          </div>
-        )}
+        <PageHeader
+          title="Breeders"
+          searchPlaceholder="Search by name, farm, or location..."
+          searchValue={search}
+          onSearchChange={setSearch}
+          viewToggle={{ view, onViewChange: setView }}
+        />
 
         {/* Filters row */}
         <div className="bg-white border-b border-[#E5E7EB] px-4 py-2 flex items-center gap-2">
           <div className="flex-1 overflow-x-auto scrollbar-hide">
             <SpeciesPills value={species} onChange={setSpecies} />
           </div>
-          <div className="relative shrink-0">
-            <button
-              onClick={() => setStateDropdownOpen((v) => !v)}
-              className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
-              style={
-                selectedState !== "All States"
-                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
-              }
-            >
-              {selectedState}
-              <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            {stateDropdownOpen && (
-              <div
-                className="absolute right-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl overflow-hidden z-30"
-                style={{ minWidth: 140, maxHeight: 280, overflowY: "auto" }}
-              >
-                {availableStates.map((state) => (
-                  <button
-                    key={state}
-                    onClick={() => { setSelectedState(state); setStateDropdownOpen(false); }}
-                    className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4] transition-colors"
-                    style={{ borderBottom: "1px solid #F3F4F6" }}
-                  >
-                    <span className="text-[14px] font-medium text-[hsl(var(--primary))]">{state}</span>
-                    {selectedState === state && (
-                      <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5}>
-                        <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <FilterDropdown
+            label="State"
+            value={selectedState}
+            defaultValue="All States"
+            options={availableStates}
+            onChange={setSelectedState}
+          />
         </div>
+
 
         {/* Results count */}
         <div className="flex items-center justify-between px-4 py-2">
