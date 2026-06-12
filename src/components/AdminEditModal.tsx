@@ -39,28 +39,33 @@ export function AdminEditModal({ open, onOpenChange, post, onSaved }: AdminEditM
 
   const handleSave = async () => {
     setSaving(true);
-    const { error } = await supabase
-      .from("winners")
-      .update({
-        title,
-        show_name: showName,
-        shown_by: shownBy,
-        win_placing: winPlacing || null,
-        caption: caption || null,
-        bred_by: bredBy || null,
-        sired_by: siredBy || null,
-        dam: dam || null,
-        date: date || undefined,
-      })
-      .eq("id", post.id);
+    try {
+      const { error: winnersError } = await supabase
+        .from("winners")
+        .update({
+          title, show_name: showName, shown_by: shownBy,
+          win_placing: winPlacing || null, caption: caption || null,
+          bred_by: bredBy || null, sired_by: siredBy || null,
+          dam: dam || null, date: date || undefined,
+        })
+        .eq("id", post.id);
 
-    setSaving(false);
-    if (error) {
-      toast.error("Failed to save changes");
-    } else {
+      if (winnersError) throw winnersError;
+
+      if ((post as any).source_post_id) {
+        await supabase
+          .from("posts")
+          .update({ caption: caption || null })
+          .eq("id", (post as any).source_post_id);
+      }
+
       toast.success("Post updated");
       onOpenChange(false);
       onSaved?.();
+    } catch (err: any) {
+      toast.error("Failed to save changes", { description: err.message });
+    } finally {
+      setSaving(false);
     }
   };
 
