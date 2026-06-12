@@ -465,126 +465,63 @@ export default function WinnersPage() {
             </div>
           ) : (
             <>
-              {/* FEED VIEW */}
-              {viewMode === "feed" && (
-                <div className="px-4 pt-4" style={{ display: "flex", flexDirection: "column" }}>
-                  {showGroups.map((group, gi) => (
-                    <div key={group.showName} style={{ marginTop: gi === 0 ? 0 : 20 }}>
-                      <div className="mb-3" style={{ borderLeft: "3px solid #C9A84C", paddingLeft: 12 }}>
-                        <h3 className="font-bold leading-tight" style={{ fontSize: 16, color: "#0A1628" }}>
-                          {group.year} {group.showName}
-                        </h3>
-                      </div>
-                      <div className="flex flex-col gap-3">
-                        {group.posts.map((post, i) => (
-                          <PostCard key={post.id} post={post} index={i} onModerated={handleModerated} />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* RESULTS VIEW */}
-              {viewMode === "results" && (
-                <div className="px-4 pt-4 flex flex-col gap-8">
+              {/* LIST VIEW (default) */}
+              {view === "list" && (
+                <div className="px-4 pt-4 pb-4 flex flex-col gap-2">
                   {showGroups.map((group) => (
-                    <div key={group.showName}>
-                      <div className="mb-4 pb-3 border-b-2 border-[#C9A84C]">
-                        <h2 className="text-[20px] font-bold" style={{ color: "#0A1628" }}>{group.showName}</h2>
-                        <p className="text-[13px] text-[#6B7280] mt-0.5">{group.year}</p>
-                      </div>
-                      {group.rows.filter(r => r.image_urls?.[0]).length > 0 && (
-                        <div className="grid grid-cols-2 gap-3 mb-4">
-                          {group.rows.filter(r => r.image_urls?.[0]).map(r => (
-                            <div key={r.id} className="rounded-xl overflow-hidden border border-[#E5E7EB] bg-white shadow-sm">
-                              <img
-                                src={r.image_urls![0]}
-                                alt={r.win_placing || r.show_name}
-                                className="w-full aspect-[4/3] object-cover"
-                              />
-                              <div className="p-2.5">
-                                <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: "#C9A84C" }}>
-                                  {r.win_placing || "Winner"}
-                                </p>
-                                <p className="text-[13px] font-bold text-[#0A1628] mt-0.5 leading-tight">{r.shown_by}</p>
-                                {r.bred_by && (
-                                  <p className="text-[11px] text-[#6B7280] mt-0.5 truncate">
-                                    Bred by <span className="font-semibold text-[#0A1628]">{r.bred_by}</span>
-                                  </p>
-                                )}
-                                {r.sired_by && (
-                                  <p className="text-[11px] mt-0.5 truncate" style={{ color: "#C9A84C" }}>
-                                    Sired by {r.sired_by}
-                                  </p>
-                                )}
-                                {r.placed_by && (
-                                  <p className="text-[11px] text-[#6B7280] mt-0.5 truncate">
-                                    Placed by {r.placed_by}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {group.rows.filter(r => !r.image_urls?.[0]).length > 0 && (
-                        <div className="rounded-xl border border-[#E5E7EB] bg-white overflow-hidden">
-                          {group.rows.filter(r => !r.image_urls?.[0]).map((r, i, arr) => (
-                            <div
-                              key={r.id}
-                              className="px-4 py-3"
-                              style={{ borderBottom: i < arr.length - 1 ? "1px solid #F3F4F6" : "none" }}
-                            >
-                              <p className="text-[11px] font-black uppercase tracking-wider" style={{ color: "#C9A84C" }}>
-                                {r.win_placing || "Winner"}
-                              </p>
-                              <p className="text-[14px] font-bold text-[#0A1628] mt-0.5">
-                                {r.shown_by}
-                                {r.bred_by && (
-                                  <span className="font-normal text-[#6B7280]"> — Bred by {r.bred_by}</span>
-                                )}
-                              </p>
-                              {r.sired_by && (
-                                <p className="text-[12px] mt-0.5" style={{ color: "#C9A84C" }}>Sired by {r.sired_by}</p>
-                              )}
-                              {r.placed_by && (
-                                <p className="text-[12px] text-[#6B7280] mt-0.5">Placed by {r.placed_by}</p>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                    <ShowGroupRow
+                      key={group.showName}
+                      group={group}
+                      profilesMap={profilesMap}
+                      breederProfilesMap={breederProfilesMap}
+                      onSelectPost={setDrawerPost}
+                    />
                   ))}
                 </div>
               )}
 
               {/* GRID VIEW */}
-              {viewMode === "grid" && (
-                <div className="px-3 pt-4">
+              {view === "grid" && (
+                <div className="px-4 pt-4 pb-4 flex flex-col gap-6">
                   {showGroups.map((group) => (
-                    <div key={group.showName} className="mb-6">
-                      <div className="mb-3 px-1" style={{ borderLeft: "3px solid #C9A84C", paddingLeft: 10 }}>
-                        <h3 className="font-bold text-[15px]" style={{ color: "#0A1628" }}>{group.year} {group.showName}</h3>
+                    <div key={group.showName}>
+                      <div className="mb-3" style={{ borderLeft: "3px solid #C9A84C", paddingLeft: 10 }}>
+                        <h3 className="font-bold text-[15px] text-[#0A1628]">{group.showName}</h3>
+                        {!group.showName.includes(String(group.year)) && (
+                          <p className="text-[12px] text-[#9CA3AF]">{group.year}</p>
+                        )}
                       </div>
-                      <div className="grid grid-cols-2 gap-1.5">
-                        {group.posts.map((post) => (
+                      <div className="grid grid-cols-2 gap-2">
+                        {group.rows.map((r) => (
                           <button
-                            key={post.id}
-                            onClick={() => setDrawerPost(post)}
-                            className="relative aspect-square overflow-hidden rounded-lg active:scale-[0.98] transition-transform"
+                            key={r.id}
+                            onClick={() => setDrawerPost(winnerToPost(r, profilesMap, breederProfilesMap))}
+                            className="rounded-xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm text-left active:scale-[0.98] transition-transform w-full"
                           >
-                            {post.image && post.image !== "/placeholder.svg" ? (
-                              <img src={post.image} alt={post.win_placing} className="w-full h-full object-cover" />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
-                                <span className="text-2xl font-black text-white/30">{group.showName.charAt(0)}</span>
-                              </div>
-                            )}
-                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-                              <p className="text-[9px] font-black uppercase tracking-wider" style={{ color: "#C9A84C" }}>{post.win_placing}</p>
-                              <p className="text-[8px] text-white/70 truncate">{post.show_name}</p>
+                            <div className="w-full aspect-[4/3] bg-[#F3F4F6] overflow-hidden">
+                              {r.image_urls?.[0] ? (
+                                <img src={r.image_urls[0]} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center"
+                                  style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
+                                  <span className="text-2xl font-black" style={{ color: "rgba(201,168,76,0.3)" }}>
+                                    {group.showName.charAt(0)}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="p-2">
+                              <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: "#C9A84C" }}>
+                                {r.win_placing || "Winner"}
+                              </p>
+                              <p className="text-[12px] font-bold text-[#0A1628] mt-0.5 truncate">
+                                {r.shown_by || r.bred_by || "—"}
+                              </p>
+                              {r.sired_by && (
+                                <p className="text-[11px] truncate mt-0.5" style={{ color: "#6B7280" }}>
+                                  {r.sired_by}
+                                </p>
+                              )}
                             </div>
                           </button>
                         ))}
