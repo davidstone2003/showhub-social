@@ -246,66 +246,50 @@ export default function BreederProfilePage() {
 
               {tab === "results" && (
                 winners.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Trophy className="w-10 h-10 mx-auto mb-3" style={{ color: "#C9A84C" }} />
-                    <p className="font-semibold text-[15px]" style={{ color: "#0A1628" }}>No winners yet</p>
-                    <p className="text-[13px] text-[#6B7280] mt-1">Post your results to build your record</p>
+                  <div className="flex flex-col items-center py-16 px-4 text-center">
+                    <Trophy className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
+                    <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No winners yet</p>
+                    <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>Post your results to build your record</p>
                   </div>
                 ) : (
-                  <div className="space-y-6 px-4 py-3">
-                    {(() => {
-                      const grouped = new Map<string, WinnerRow[]>();
-                      winners.forEach((w) => {
-                        const key = w.show_name || "Other";
-                        if (!grouped.has(key)) grouped.set(key, []);
-                        grouped.get(key)!.push(w);
-                      });
-                      return [...grouped.entries()].map(([showName, showWinners]) => (
-                        <div key={showName}>
-                          <div className="mb-3" style={{ borderLeft: "3px solid #C9A84C", paddingLeft: 10 }}>
-                            <h3 className="font-bold text-[14px]" style={{ color: "#0A1628" }}>
-                              {showWinners[0]?.created_at
-                                ? `${new Date(showWinners[0].created_at).getFullYear()} `
-                                : ""}{showName}
-                            </h3>
+                  <>
+                    <p className="text-[12px] px-4 pt-3 pb-2 font-semibold" style={{ color: "#9CA3AF" }}>
+                      {winners.length} result{winners.length !== 1 ? "s" : ""}
+                    </p>
+                    <div className="grid grid-cols-3 gap-0.5">
+                      {winners.map((w) => {
+                        const img = w.image_urls?.[0];
+                        return (
+                          <div
+                            key={w.id}
+                            className="relative aspect-square overflow-hidden cursor-pointer active:opacity-80 bg-[#F3F4F6]"
+                          >
+                            {img ? (
+                              <img
+                                src={img}
+                                alt={w.win_placing || ""}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center"
+                                style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
+                                <span className="text-[10px] font-black text-center px-1 leading-tight"
+                                  style={{ color: "rgba(201,168,76,0.6)" }}>
+                                  {w.win_placing?.slice(0, 15) || "W"}
+                                </span>
+                              </div>
+                            )}
+                            <div className="absolute inset-x-0 bottom-0 h-1/3"
+                              style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75), transparent)" }}>
+                              <p className="absolute bottom-1 left-1 right-1 text-[8px] font-bold text-white truncate leading-tight">
+                                {w.win_placing || ""}
+                              </p>
+                            </div>
                           </div>
-                          <div className="grid grid-cols-2 gap-3">
-                            {showWinners.map((w) => {
-                              const img = w.image_urls?.[0];
-                              return (
-                                <div key={w.id} className="rounded-xl overflow-hidden border border-[#E5E7EB] bg-white shadow-sm">
-                                  {img ? (
-                                    <img src={img} alt={w.win_placing || ""} className="w-full aspect-square object-cover" />
-                                  ) : (
-                                    <div className="w-full aspect-square flex items-center justify-center"
-                                      style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
-                                      <span className="text-3xl font-black text-white/20">
-                                        {(showName || "W").charAt(0)}
-                                      </span>
-                                    </div>
-                                  )}
-                                  <div className="p-2">
-                                    <p className="text-[10px] font-black uppercase tracking-wider truncate"
-                                      style={{ color: "#C9A84C" }}>
-                                      {w.win_placing || "Winner"}
-                                    </p>
-                                    <p className="text-[12px] font-semibold text-[#0A1628] truncate mt-0.5">
-                                      {w.shown_by}
-                                    </p>
-                                    {w.sired_by && (
-                                      <p className="text-[11px] text-[#6B7280] truncate">
-                                        {w.sired_by}
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ));
-                    })()}
-                  </div>
+                        );
+                      })}
+                    </div>
+                  </>
                 )
               )}
 
