@@ -77,6 +77,7 @@ const SiresPage = () => {
   const [selectedOwner, setSelectedOwner] = useState<string>("All Owners");
   const [semenFilter, setSemenFilter] = useState<"All" | "Available">("All");
   const [ownerOpen, setOwnerOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     async function fetchSires() {
