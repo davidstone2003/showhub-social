@@ -6,13 +6,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Layout } from "@/components/Layout";
 import { PostCard } from "@/components/PostCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Trophy, Dna, ShoppingBag, Star, Activity, Play } from "lucide-react";
+import { Trophy, Dna, ShoppingBag, Play, MapPin, Phone, Mail, Globe, Lock } from "lucide-react";
 import { BreederHero } from "@/components/breeder/BreederHero";
-import { BreederSection } from "@/components/breeder/BreederSection";
 import { LockedSection } from "@/components/breeder/LockedSection";
 import { allDemoLambs } from "@/data/demoLambs";
 import type { Post } from "@/data/mock";
-
 
 type WinnerRow = {
   id: string;
@@ -112,13 +110,10 @@ export default function BreederProfilePage() {
   const isPaid = isFeatured || isContacted;
   const isOwnProfile = user?.id === profile?.id;
 
-  const featured = posts.filter((p) => p.is_featured);
   const winners = posts.filter((p) => p.post_type === "winner");
   const sires = posts.filter((p) => p.post_type === "sire");
-  const donors = posts.filter((p) => p.post_type === "donor");
   const sales = posts.filter((p) => p.post_type === "sale");
-  const recentPosts = posts.slice(0, isPaid ? 10 : 3);
-
+  const recentPosts = posts.slice(0, isPaid ? 20 : 3);
 
   const breederName = profile?.display_name || profile?.username || "";
   const lambs = useMemo(
@@ -126,7 +121,7 @@ export default function BreederProfilePage() {
     [breederName]
   );
 
-  const [tab, setTab] = useState<"posts" | "winners" | "sires" | "videos" | "forsale">("posts");
+  const [tab, setTab] = useState<"feed" | "about" | "winners" | "sires" | "forsale" | "videos">("feed");
 
   const { data: breederVideos = [] } = useQuery({
     queryKey: ["breeder-videos", profile?.id],
@@ -142,10 +137,6 @@ export default function BreederProfilePage() {
     },
     enabled: !!profile?.id,
   });
-
-  const renderCards = (items: WinnerRow[]) =>
-    items.map((post, i) => <PostCard key={post.id} post={toPost(post, profile)} index={i} />);
-
 
   if (profileLoading) {
     return (
@@ -169,6 +160,31 @@ export default function BreederProfilePage() {
     );
   }
 
+  const p: any = profile;
+  const availability = p.availability || {};
+  const speciesTags: string[] = p.species_tags || [];
+  const shortBio: string = p.short_bio || p.bio || "";
+  const profileEmail: string | null = p.email || null;
+
+  const tabs = [
+    { key: "feed", label: "Posts" },
+    { key: "about", label: "About" },
+    { key: "winners", label: `Winners${winners.length > 0 ? ` (${winners.length})` : ""}` },
+    { key: "sires", label: `Sires${sires.length > 0 ? ` (${sires.length})` : ""}` },
+    { key: "forsale", label: "For Sale" },
+    { key: "videos", label: `Videos${breederVideos.length > 0 ? ` (${breederVideos.length})` : ""}` },
+  ] as const;
+
+  const lockedGate = (
+    <div className="rounded-2xl p-6 text-center" style={{ backgroundColor: "#FFFBF0", border: "1px solid rgba(201,168,76,0.3)" }}>
+      <Lock className="w-8 h-8 mx-auto mb-2" style={{ color: "#C9A84C" }} />
+      <p className="font-bold text-[16px]" style={{ color: "#0A1628" }}>Full profile is for upgraded breeders</p>
+      <p className="text-[13px] mt-1 mb-3" style={{ color: "#6B7280" }}>
+        This breeder hasn't unlocked their full page yet.
+      </p>
+    </div>
+  );
+
   return (
     <Layout showDiscovery={false}>
       <div className="min-h-screen bg-background pb-24">
@@ -178,201 +194,390 @@ export default function BreederProfilePage() {
           stats={isPaid ? { winners: winners.length, sires: sires.length, posts: posts.length } : undefined}
         />
 
-        <div className="max-w-2xl mx-auto px-4 py-5 space-y-6">
-          {!isPaid && (
-            <>
-              {isOwnProfile && (
-                <div
-                  className="p-4 rounded-2xl text-center"
-                  style={{ backgroundColor: "#FFFBF0", border: "1px solid rgba(201,168,76,0.3)" }}
-                >
-                  <p className="font-bold text-[16px]" style={{ color: "#0A1628" }}>
-                    Unlock Your Breeder Page
-                  </p>
-                  <p className="text-[13px] mt-1 mb-3" style={{ color: "#6B7280" }}>
-                    Show your winners, sires, and available animals in one place
-                  </p>
-                  <Link
-                    to="/pricing"
-                    className="inline-block rounded-full px-5 py-2 font-bold text-[14px]"
-                    style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
-                  >
-                    Upgrade for $24.99/mo
-                  </Link>
+        {/* Tab bar — horizontal scroll */}
+        <div className="sticky top-0 z-10 bg-white border-b border-[#E5E7EB] overflow-x-auto">
+          <div className="flex max-w-2xl mx-auto px-2">
+            {tabs.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setTab(key as any)}
+                className="shrink-0 px-4 py-3 text-[13px] font-bold border-b-2 transition-colors whitespace-nowrap"
+                style={tab === key
+                  ? { borderColor: "#C9A84C", color: "#0A1628" }
+                  : { borderColor: "transparent", color: "#9CA3AF" }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="max-w-2xl mx-auto px-4 py-5 space-y-4">
+
+          {/* FEED */}
+          {tab === "feed" && (
+            <div className="space-y-4">
+              {postsLoading ? (
+                <Skeleton className="h-64 w-full rounded-xl" />
+              ) : !isPaid && !isOwnProfile ? (
+                <>
+                  {recentPosts.slice(0, 3).map((post, i) => (
+                    <PostCard key={post.id} post={toPost(post, profile)} index={i} />
+                  ))}
+                  <div className="rounded-2xl p-6 text-center" style={{ backgroundColor: "#FFFBF0", border: "1px solid rgba(201,168,76,0.3)" }}>
+                    <Lock className="w-8 h-8 mx-auto mb-2" style={{ color: "#C9A84C" }} />
+                    <p className="font-bold text-[16px]" style={{ color: "#0A1628" }}>
+                      See all posts from {breederName}
+                    </p>
+                    <p className="text-[13px] mt-1 mb-3" style={{ color: "#6B7280" }}>
+                      Follow this breeder to see their full feed
+                    </p>
+                    {user ? (
+                      <button
+                        className="rounded-full px-5 py-2 font-bold text-[14px]"
+                        style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+                      >
+                        Follow
+                      </button>
+                    ) : (
+                      <Link
+                        to="/auth"
+                        className="inline-block rounded-full px-5 py-2 font-bold text-[14px]"
+                        style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+                      >
+                        Join Free to Follow
+                      </Link>
+                    )}
+                  </div>
+                </>
+              ) : recentPosts.length === 0 ? (
+                <div className="flex flex-col items-center py-16 px-4 text-center">
+                  <Trophy className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
+                  <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No posts yet</p>
+                  {isOwnProfile && (
+                    <Link
+                      to="/create"
+                      className="mt-3 inline-block rounded-full px-5 py-2 font-bold text-[14px]"
+                      style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+                    >
+                      Post Your First Win
+                    </Link>
+                  )}
                 </div>
+              ) : (
+                recentPosts.map((post, i) => (
+                  <PostCard key={post.id} post={toPost(post, profile)} index={i} />
+                ))
               )}
-              {recentPosts.length > 0 && (
-                <BreederSection icon={Activity} title="Recent Posts">
-                  {renderCards(recentPosts)}
-                </BreederSection>
-              )}
-              <LockedSection icon={Trophy} title="Winners" count={winners.length || 3} isOwner={isOwnProfile} />
-              <LockedSection icon={Dna} title="Sires" count={sires.length || 2} isOwner={isOwnProfile} />
-              <LockedSection icon={Dna} title="Donors / Genetics" count={donors.length || 2} isOwner={isOwnProfile} />
-              <LockedSection icon={ShoppingBag} title="Sales / Available" count={sales.length || 2} isOwner={isOwnProfile} />
-            </>
+            </div>
           )}
 
-
-          {isPaid && (
-            <>
-              <div className="flex gap-1 border-b border-border -mx-4 px-4 sticky top-0 bg-background z-10">
-                {(["posts", "winners", "sires", "videos", "forsale"] as const).map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setTab(t)}
-                    className="flex-1 py-2.5 text-[12px] font-bold border-b-2 transition-colors"
-                    style={tab === t
-                      ? { borderColor: "#C9A84C", color: "#0A1628" }
-                      : { borderColor: "transparent", color: "#9CA3AF" }
-                    }
-                  >
-                    {t === "posts" ? "Posts" : t === "winners" ? `Winners (${winners.length})` : t === "sires" ? `Sires (${sires.length})` : t === "videos" ? `Videos (${breederVideos.length})` : `For Sale (${sales.length})`}
-                  </button>
-                ))}
-              </div>
-
-              {tab === "posts" && (
-                <>
-                  {featured.length > 0 && (
-                    <BreederSection icon={Star} title="Featured">{renderCards(featured)}</BreederSection>
+          {/* ABOUT */}
+          {tab === "about" && (
+            <div className="space-y-3">
+              {/* About card */}
+              <div className="rounded-2xl bg-white border border-[#E5E7EB] overflow-hidden">
+                <div className="px-4 py-3 border-b border-[#F3F4F6]">
+                  <h3 className="font-black text-[15px]" style={{ color: "#0A1628" }}>About</h3>
+                </div>
+                <div className="px-4 py-3 space-y-3">
+                  {shortBio && (
+                    <p className="text-[14px] leading-relaxed" style={{ color: "#374151" }}>{shortBio}</p>
                   )}
-                  {recentPosts.length > 0 ? (
-                    <BreederSection icon={Activity} title="Recent Activity">
-                      {renderCards(recentPosts)}
-                    </BreederSection>
-                  ) : (
-                    <div className="text-center py-12 text-sm text-muted-foreground">No posts yet</div>
-                  )}
-                </>
-              )}
-
-              {tab === "winners" && (
-                winners.length === 0 ? (
-                  <div className="flex flex-col items-center py-16 px-4 text-center">
-                    <Trophy className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
-                    <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No winners yet</p>
-                    <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>Post your results to build your record</p>
-                  </div>
-                ) : (
-                  <>
-                    <p className="text-[12px] px-4 pt-3 pb-2 font-semibold" style={{ color: "#9CA3AF" }}>
-                      {winners.length} result{winners.length !== 1 ? "s" : ""}
-                    </p>
-                    <div className="grid grid-cols-3 gap-0.5">
-                      {winners.map((w) => {
-                        const img = w.image_urls?.[0];
-                        return (
-                          <div
-                            key={w.id}
-                            className="relative aspect-square overflow-hidden cursor-pointer active:opacity-80 bg-[#F3F4F6]"
-                          >
-                            {img ? (
-                              <img
-                                src={img}
-                                alt={w.win_placing || ""}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center"
-                                style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
-                                <span className="text-[10px] font-black text-center px-1 leading-tight"
-                                  style={{ color: "rgba(201,168,76,0.6)" }}>
-                                  {w.win_placing?.slice(0, 15) || "W"}
-                                </span>
-                              </div>
-                            )}
-                            <div className="absolute inset-x-0 bottom-0 h-1/3"
-                              style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75), transparent)" }}>
-                              <p className="absolute bottom-1 left-1 right-1 text-[8px] font-bold text-white truncate leading-tight">
-                                {w.win_placing || ""}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </>
-                )
-              )}
-
-              {tab === "sires" && (
-                sires.length === 0 ? (
-                  <div className="flex flex-col items-center py-16 px-4 text-center">
-                    <Dna className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
-                    <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No sires yet</p>
-                  </div>
-                ) : (
-                  <BreederSection icon={Dna} title="Sires">{renderCards(sires)}</BreederSection>
-                )
-              )}
-
-              {tab === "videos" && (
-                breederVideos.length === 0 ? (
-                  <div className="flex flex-col items-center py-16 px-4 text-center">
-                    <div style={{ fontSize: 40 }}>🎬</div>
-                    <p className="font-bold text-[17px] mt-2" style={{ color: "#0A1628" }}>No videos yet</p>
-                    <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>
-                      Post fitting videos, walk-arounds, and show day moments
-                    </p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-3 gap-0.5">
-                    {breederVideos.map((v: any) => (
-                      <div key={v.id} className="relative aspect-square overflow-hidden bg-black">
-                        <video
-                          src={v.video_url}
-                          className="absolute inset-0 w-full h-full object-cover"
-                          muted
-                          playsInline
-                          preload="metadata"
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                          <div className="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center">
-                            <Play className="w-5 h-5 text-white" fill="white" />
-                          </div>
+                  {[
+                    { icon: MapPin, value: profile?.location, label: "Location" },
+                    { icon: Phone, value: profile?.phone, label: "Phone", href: profile?.phone ? `tel:${profile.phone}` : undefined },
+                    { icon: Mail, value: profileEmail, label: "Email", href: profileEmail ? `mailto:${profileEmail}` : undefined },
+                    {
+                      icon: Globe,
+                      value: profile?.website_url,
+                      label: "Website",
+                      href: profile?.website_url,
+                      display: profile?.website_url?.replace(/^https?:\/\//, ""),
+                    },
+                  ]
+                    .filter((item) => item.value)
+                    .map(({ icon: Icon, value, href, display }, idx) => (
+                      <div key={idx} className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[#F3F4F6] flex items-center justify-center shrink-0">
+                          <Icon className="w-4 h-4" style={{ color: "#6B7280" }} />
                         </div>
-                        {v.caption && (
-                          <div className="absolute inset-x-0 bottom-0 p-1.5"
-                            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75), transparent)" }}>
-                            <p className="text-[9px] font-bold text-white truncate leading-tight">{v.caption}</p>
-                          </div>
+                        {href ? (
+                          <a
+                            href={href}
+                            target={href.startsWith("http") ? "_blank" : undefined}
+                            rel="noopener noreferrer"
+                            className="text-[14px] font-semibold underline"
+                            style={{ color: "#1B3A6B" }}
+                          >
+                            {display || value}
+                          </a>
+                        ) : (
+                          <span className="text-[14px]" style={{ color: "#374151" }}>{value}</span>
                         )}
                       </div>
                     ))}
+                </div>
+              </div>
+
+              {/* Species */}
+              {speciesTags.length > 0 && (
+                <div className="rounded-2xl bg-white border border-[#E5E7EB] overflow-hidden">
+                  <div className="px-4 py-3 border-b border-[#F3F4F6]">
+                    <h3 className="font-black text-[15px]" style={{ color: "#0A1628" }}>Breeds / Species</h3>
                   </div>
-                )
+                  <div className="px-4 py-3 flex flex-wrap gap-2">
+                    {speciesTags.map((s) => (
+                      <span
+                        key={s}
+                        className="px-3 py-1 rounded-full text-[12px] font-bold"
+                        style={{ backgroundColor: "#FFFBF0", color: "#0A1628", border: "1px solid rgba(201,168,76,0.3)" }}
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               )}
 
-              {tab === "forsale" && (
-                sales.length === 0 ? (
-                  <div className="flex flex-col items-center py-16 px-4 text-center">
-                    <ShoppingBag className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
-                    <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>Nothing for sale right now</p>
+              {/* Availability */}
+              <div className="rounded-2xl bg-white border border-[#E5E7EB] overflow-hidden">
+                <div className="px-4 py-3 border-b border-[#F3F4F6]">
+                  <h3 className="font-black text-[15px]" style={{ color: "#0A1628" }}>Lambs Available</h3>
+                </div>
+                <div className="px-4 py-3">
+                  {Object.values(availability).some(Boolean) ? (
+                    <div className="flex flex-wrap gap-2">
+                      {availability.currently_available && (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold"
+                          style={{ backgroundColor: "#DCFCE7", color: "#166534" }}>
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#166534]" />
+                          Available Now
+                        </span>
+                      )}
+                      {[
+                        [availability.fall_borns, "Fall Borns"],
+                        [availability.december, "December"],
+                        [availability.jan_feb, "Jan–Feb"],
+                        [availability.mar_april, "Mar–April"],
+                        [availability.semen, "Semen"],
+                        [availability.breeding_stock, "Breeding Stock"],
+                      ]
+                        .filter(([v]) => v)
+                        .map(([, label]) => (
+                          <span
+                            key={String(label)}
+                            className="px-3 py-1 rounded-full text-[12px] font-bold"
+                            style={{ backgroundColor: "#F3F4F6", color: "#374151" }}
+                          >
+                            {String(label)}
+                          </span>
+                        ))}
+                    </div>
+                  ) : (
+                    <p className="text-[13px]" style={{ color: "#9CA3AF" }}>
+                      {isOwnProfile ? "Add your availability in profile settings" : "No availability listed"}
+                    </p>
+                  )}
+                  {availability.availability_note && (
+                    <p className="text-[13px] mt-3 pt-3 border-t border-[#F3F4F6]" style={{ color: "#6B7280" }}>
+                      {availability.availability_note}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Social */}
+              {profile?.facebook_url && (
+                <div className="rounded-2xl bg-white border border-[#E5E7EB] overflow-hidden">
+                  <div className="px-4 py-3 border-b border-[#F3F4F6]">
+                    <h3 className="font-black text-[15px]" style={{ color: "#0A1628" }}>Follow on Social</h3>
                   </div>
-                ) : (
-                  <BreederSection icon={ShoppingBag} title="Available / For Sale">{renderCards(sales)}</BreederSection>
-                )
+                  <a
+                    href={profile.facebook_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-4 py-3 active:bg-[#F9FAFB]"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-[#1877F2] flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                      </svg>
+                    </div>
+                    <span className="text-[14px] font-semibold" style={{ color: "#0A1628" }}>Facebook Page</span>
+                  </a>
+                </div>
               )}
-
-
-            </>
-          )}
-
-          {postsLoading && (
-            <div className="space-y-3">
-              <Skeleton className="h-48 w-full rounded-xl" />
-              <Skeleton className="h-48 w-full rounded-xl" />
             </div>
           )}
 
-          {!postsLoading && posts.length === 0 && !isPaid && (
-            <div className="text-center py-8">
-              <p className="text-sm text-muted-foreground">No posts yet</p>
+          {/* WINNERS */}
+          {tab === "winners" && (
+            <div className="-mx-4">
+              {!isPaid && !isOwnProfile ? (
+                <div className="px-4"><LockedSection icon={Trophy} title="Winners" count={winners.length || 3} isOwner={false} /></div>
+              ) : winners.length === 0 ? (
+                <div className="flex flex-col items-center py-16 px-4 text-center">
+                  <Trophy className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
+                  <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No winners yet</p>
+                  {isOwnProfile && (
+                    <Link
+                      to="/create"
+                      className="mt-3 inline-block rounded-full px-5 py-2 font-bold text-[14px]"
+                      style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+                    >
+                      Post Your First Win
+                    </Link>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between px-4 py-3">
+                    <span className="text-[12px] font-bold uppercase tracking-wide" style={{ color: "#6B7280" }}>
+                      {winners.length} total wins
+                    </span>
+                    <span className="text-[12px] font-bold" style={{ color: "#C9A84C" }}>
+                      {winners.filter((w) => w.win_placing?.toLowerCase().includes("grand")).length} Grand Championships
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-0.5">
+                    {winners.map((w) => (
+                      <button
+                        key={w.id}
+                        className="relative aspect-square overflow-hidden bg-[#F3F4F6] active:opacity-80"
+                      >
+                        {w.image_urls?.[0] ? (
+                          <img src={w.image_urls[0]} alt={w.win_placing || ""} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center"
+                            style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
+                            <span className="text-[10px] font-black text-center px-1 leading-tight"
+                              style={{ color: "rgba(201,168,76,0.6)" }}>
+                              {w.win_placing?.slice(0, 15) || "W"}
+                            </span>
+                          </div>
+                        )}
+                        <div className="absolute inset-x-0 bottom-0 p-1.5"
+                          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}>
+                          <p className="text-[9px] font-bold text-white truncate leading-tight">
+                            {w.win_placing || ""}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* SIRES */}
+          {tab === "sires" && (
+            <div className="space-y-3">
+              {!isPaid && !isOwnProfile ? (
+                <LockedSection icon={Dna} title="Sires" count={sires.length || 2} isOwner={false} />
+              ) : sires.length === 0 ? (
+                <div className="flex flex-col items-center py-16 px-4 text-center">
+                  <Dna className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
+                  <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No sires yet</p>
+                </div>
+              ) : (
+                sires.map((post, i) => (
+                  <PostCard key={post.id} post={toPost(post, profile)} index={i} />
+                ))
+              )}
+            </div>
+          )}
+
+          {/* FOR SALE */}
+          {tab === "forsale" && (
+            <div>
+              {!isPaid && !isOwnProfile ? (
+                <LockedSection icon={ShoppingBag} title="For Sale" count={sales.length || 2} isOwner={false} />
+              ) : sales.length === 0 ? (
+                <div className="flex flex-col items-center py-16 px-4 text-center">
+                  <ShoppingBag className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
+                  <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>Nothing listed for sale</p>
+                  {isOwnProfile && (
+                    <Link
+                      to="/create"
+                      className="mt-3 inline-block rounded-full px-5 py-2 font-bold text-[14px]"
+                      style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+                    >
+                      + Add a Listing
+                    </Link>
+                  )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  {sales.map((s) => (
+                    <div key={s.id} className="rounded-xl overflow-hidden bg-white border border-[#E5E7EB]">
+                      <div className="aspect-square bg-[#F3F4F6]">
+                        {s.image_urls?.[0] ? (
+                          <img src={s.image_urls[0]} alt={s.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <ShoppingBag className="w-8 h-8" style={{ color: "#D1D5DB" }} />
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-3">
+                        <p className="font-bold text-[13px] line-clamp-1" style={{ color: "#0A1628" }}>
+                          {s.title || "For Sale"}
+                        </p>
+                        {s.caption && (
+                          <p className="text-[12px] mt-1 line-clamp-2" style={{ color: "#6B7280" }}>
+                            {s.caption}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* VIDEOS */}
+          {tab === "videos" && (
+            <div className="-mx-4">
+              {breederVideos.length === 0 ? (
+                <div className="flex flex-col items-center py-16 px-4 text-center">
+                  <div style={{ fontSize: 40 }}>🎬</div>
+                  <p className="font-bold text-[17px] mt-2" style={{ color: "#0A1628" }}>No videos yet</p>
+                  <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>
+                    Post fitting videos, walk-arounds, and show day moments
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-0.5">
+                  {breederVideos.map((v: any) => (
+                    <div key={v.id} className="relative aspect-square overflow-hidden bg-black">
+                      <video
+                        src={v.video_url}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        muted
+                        playsInline
+                        preload="metadata"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center">
+                          <Play className="w-5 h-5 text-white" fill="white" />
+                        </div>
+                      </div>
+                      {v.caption && (
+                        <div className="absolute inset-x-0 bottom-0 p-1.5"
+                          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75), transparent)" }}>
+                          <p className="text-[9px] font-bold text-white truncate leading-tight">{v.caption}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
-
       </div>
     </Layout>
   );
