@@ -1,21 +1,78 @@
 import { Plus, Search } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useMatch } from "react-router-dom";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
 import { NotificationBell } from "@/components/NotificationBell";
+import { BackButton } from "@/components/BackButton";
+
+// Top-level tab roots — these show the logo, not a back button
+const ROOT_ROUTES = new Set([
+  "/",
+  "/index",
+  "/winners",
+  "/sales",
+  "/breeders",
+  "/sires",
+  "/market",
+  "/dashboard",
+]);
+
+// Map of route patterns -> screen titles for the back-button header
+const TITLE_RULES: { match: (path: string) => boolean; title: string }[] = [
+  { match: (p) => p === "/submit", title: "New Post" },
+  { match: (p) => p === "/submit/legacy", title: "Add Result" },
+  { match: (p) => p === "/submit-sire", title: "Add Sire" },
+  { match: (p) => p === "/auth", title: "Sign In" },
+  { match: (p) => p === "/reset-password", title: "Reset Password" },
+  { match: (p) => p === "/onboarding", title: "Welcome" },
+  { match: (p) => p === "/account-type", title: "Account Type" },
+  { match: (p) => p === "/pricing", title: "Pricing" },
+  { match: (p) => p === "/saved", title: "Saved" },
+  { match: (p) => p === "/repo", title: "Repo" },
+  { match: (p) => p === "/admin", title: "Admin" },
+  { match: (p) => p === "/events", title: "Events" },
+  { match: (p) => p.startsWith("/events/"), title: "Event" },
+  { match: (p) => p.startsWith("/breeders/"), title: "Breeders" },
+  { match: (p) => p.startsWith("/breeder/"), title: "Breeder" },
+  { match: (p) => p.startsWith("/animal/"), title: "Animal" },
+  { match: (p) => p.startsWith("/sire/"), title: "Sire" },
+  { match: (p) => p.startsWith("/lamb/"), title: "Lamb" },
+  { match: (p) => p.startsWith("/live"), title: "Live" },
+  { match: (p) => p === "/dashboard/lambs", title: "My Lambs" },
+  { match: (p) => p === "/dashboard/lambs/new", title: "Register Lamb" },
+  { match: (p) => p === "/haulers", title: "Haulers" },
+];
+
+function getTitle(path: string): string {
+  const rule = TITLE_RULES.find((r) => r.match(path));
+  return rule?.title ?? "";
+}
 
 export function MobileHeader() {
   const { user } = useAuth();
+  const { pathname } = useLocation();
+  const isRoot = ROOT_ROUTES.has(pathname);
 
   return (
     <header className="lg:hidden sticky top-0 z-40 bg-white border-b border-border" style={{ padding: '8px 12px' }}>
-      <div className="flex items-center justify-between">
-        <BackdropLogo size="sm" showTagline={false} onDark={false} />
+      <div className="flex items-center justify-between gap-2">
+        {isRoot ? (
+          <BackdropLogo size="sm" showTagline={false} onDark={false} />
+        ) : (
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <BackButton fallback="/" />
+            <span className="text-sm font-bold text-foreground truncate">
+              {getTitle(pathname)}
+            </span>
+          </div>
+        )}
 
         <div className="flex items-center gap-2">
-          <button className="p-2 rounded-lg hover:bg-muted transition-colors">
-            <Search className="w-5 h-5 text-muted-foreground" />
-          </button>
+          {isRoot && (
+            <button className="p-2 rounded-lg hover:bg-muted transition-colors" aria-label="Search">
+              <Search className="w-5 h-5 text-muted-foreground" />
+            </button>
+          )}
 
           {user ? (
             <>
