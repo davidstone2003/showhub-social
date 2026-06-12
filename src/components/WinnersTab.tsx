@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
+import PhotoViewer from "@/components/PhotoViewer";
+
 
 interface WinnerRecord {
   id: string;
