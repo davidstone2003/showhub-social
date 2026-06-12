@@ -309,14 +309,6 @@ const SiresPage = () => {
                 {filtered.length}
               </span>
             </h2>
-            <Link
-              to="/submit-sire"
-              className="inline-flex items-center gap-1 rounded-full px-3 h-7 text-[11px] font-bold"
-              style={{ backgroundColor: GOLD, color: NAVY }}
-            >
-              <Plus className="w-3 h-3" strokeWidth={3} />
-              Submit
-            </Link>
           </div>
 
           {loading ? (
