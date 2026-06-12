@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Search, LayoutGrid, List as ListIcon, Flame, Plus } from "lucide-react";
+import { CreateButton } from "@/components/shared/CreateButton";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
@@ -76,6 +77,7 @@ const SiresPage = () => {
   const [selectedOwner, setSelectedOwner] = useState<string>("All Owners");
   const [semenFilter, setSemenFilter] = useState<"All" | "Available">("All");
   const [ownerOpen, setOwnerOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     async function fetchSires() {
@@ -153,27 +155,57 @@ const SiresPage = () => {
           style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
         >
           <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Sires</h1>
-          <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.12)", backgroundColor: "rgba(255,255,255,0.06)" }}>
+          <div className="flex items-center gap-2">
             <button
-              type="button"
-              onClick={() => setView("list")}
-              aria-label="List view"
-              className="p-2 transition-colors"
-              style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "list" ? "rgba(255,255,255,0.08)" : "transparent" }}
+              onClick={() => setSearchOpen((v) => !v)}
+              className="p-1.5"
+              aria-label="Search"
             >
-              <ListIcon className="w-4 h-4" />
+              <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
             </button>
-            <button
-              type="button"
-              onClick={() => setView("grid")}
-              aria-label="Grid view"
-              className="p-2 transition-colors"
-              style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "grid" ? "rgba(255,255,255,0.08)" : "transparent" }}
-            >
-              <LayoutGrid className="w-4 h-4" />
-            </button>
+            <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.12)", backgroundColor: "rgba(255,255,255,0.06)" }}>
+              <button
+                type="button"
+                onClick={() => setView("list")}
+                aria-label="List view"
+                className="p-2 transition-colors"
+                style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "list" ? "rgba(255,255,255,0.08)" : "transparent" }}
+              >
+                <ListIcon className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("grid")}
+                aria-label="Grid view"
+                className="p-2 transition-colors"
+                style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "grid" ? "rgba(255,255,255,0.08)" : "transparent" }}
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+            </div>
+            <CreateButton to="/submit-sire" label="Add sire" />
           </div>
         </div>
+
+        {/* Inline search (collapsible) */}
+        {searchOpen && (
+          <div className="px-4 py-2 bg-white border-b border-[#E5E7EB]">
+            <div className="flex items-center gap-2 bg-[#F3F4F6] rounded-xl px-3 py-2">
+              <Search className="w-4 h-4 text-[#9CA3AF] shrink-0" />
+              <input
+                autoFocus
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search sires or breeders…"
+                className="flex-1 bg-transparent text-[14px] text-[#0A1628] outline-none placeholder:text-[#9CA3AF]"
+              />
+              {search && (
+                <button onClick={() => setSearch("")} className="text-[#9CA3AF] text-[18px] leading-none">×</button>
+              )}
+            </div>
+          </div>
+        )}
+
 
         {/* Filter bar — light */}
         <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10">
@@ -235,17 +267,7 @@ const SiresPage = () => {
         </div>
 
         <div className="px-4 pt-3">
-          {/* Search */}
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search sires or breeders…"
-              className="h-10 w-full rounded-xl border border-border bg-white pl-10 pr-4 text-sm placeholder:text-muted-foreground focus:outline-none"
-              style={{ color: NAVY }}
-            />
-          </div>
+
 
 
           {/* Trending */}
@@ -287,14 +309,6 @@ const SiresPage = () => {
                 {filtered.length}
               </span>
             </h2>
-            <Link
-              to="/submit-sire"
-              className="inline-flex items-center gap-1 rounded-full px-3 h-7 text-[11px] font-bold"
-              style={{ backgroundColor: GOLD, color: NAVY }}
-            >
-              <Plus className="w-3 h-3" strokeWidth={3} />
-              Submit
-            </Link>
           </div>
 
           {loading ? (
