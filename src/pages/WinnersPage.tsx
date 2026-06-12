@@ -180,25 +180,8 @@ export default function WinnersPage() {
 
   const categoryOptions = ["All Levels", "National / Major", "State Fair", "Jackpot", "County / Local"];
 
-  const closeFilterMenus = () => {
-    setCategoryOpen(false);
-    setYearOpen(false);
-    setStateOpen(false);
-    setBreederOpen(false);
-  };
+  const closeFilterMenus = () => {};
 
-  const activeFilterPanel = categoryOpen ? "category" : yearOpen ? "year" : stateOpen ? "state" : breederOpen ? "breeder" : null;
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      const t = e.target as HTMLElement | null;
-      if (t && t.closest("[data-filter-row]")) return;
-      if (t && t.closest("[data-filter-panel]")) return;
-      setCategoryOpen(false); setYearOpen(false); setStateOpen(false); setBreederOpen(false);
-    };
-    document.addEventListener("click", handler);
-    return () => document.removeEventListener("click", handler);
-  }, []);
 
   const allShowNames = useMemo(() => {
     const counts = new Map<string, number>();
