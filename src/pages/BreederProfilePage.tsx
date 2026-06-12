@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Layout } from "@/components/Layout";
 import { PostCard } from "@/components/PostCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Trophy, Dna, ShoppingBag, Star, Activity } from "lucide-react";
+import { Trophy, Dna, ShoppingBag, Star, Activity, Play } from "lucide-react";
 import { BreederHero } from "@/components/breeder/BreederHero";
 import { BreederSection } from "@/components/breeder/BreederSection";
 import { LockedSection } from "@/components/breeder/LockedSection";
