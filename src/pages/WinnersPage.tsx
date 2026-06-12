@@ -180,7 +180,12 @@ export default function WinnersPage() {
   const categoryOptions = ["All Levels", "National / Major", "State Fair", "Jackpot", "County / Local"];
 
   useEffect(() => {
-    const handler = () => { setCategoryOpen(false); setStateOpen(false); setBreederOpen(false); };
+    const handler = (e: MouseEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && t.closest("[data-filter-row]")) return;
+      setCategoryOpen(false); setStateOpen(false); setBreederOpen(false);
+      document.getElementById("year-dropdown")?.classList.add("hidden");
+    };
     document.addEventListener("click", handler);
     return () => document.removeEventListener("click", handler);
   }, []);
@@ -290,8 +295,8 @@ export default function WinnersPage() {
             <SpeciesPills value={species} onChange={setSpecies} />
           </div>
           <div
+            data-filter-row
             className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide"
-            onClick={e => e.stopPropagation()}
           >
             {/* Show Level dropdown */}
             <div className="relative shrink-0">
