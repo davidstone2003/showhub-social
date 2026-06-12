@@ -1,6 +1,9 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, BadgeCheck, MapPin, ChevronRight, LayoutGrid, List as ListIcon } from "lucide-react";
+import { BadgeCheck, ChevronRight, LayoutGrid, List as ListIcon } from "lucide-react";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { FilterDropdown } from "@/components/shared/FilterDropdown";
+
 import { Layout } from "@/components/Layout";
 import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
 import { useBreederDirectory, stateAbbr } from "@/hooks/useBreederDirectory";
