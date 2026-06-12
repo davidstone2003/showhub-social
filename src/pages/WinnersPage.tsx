@@ -163,7 +163,7 @@ export default function WinnersPage() {
   }, [refreshKey]);
 
   const years = useMemo(() => {
-    const ys = [...new Set(rows.map(r => new Date(r.date || r.created_at).getFullYear()))];
+    const ys = [...new Set(rows.filter(r => r.date).map(r => new Date(r.date).getFullYear()))];
     return ys.sort((a, b) => b - a);
   }, [rows]);
 
