@@ -879,7 +879,12 @@ export default function CreatePostPage() {
             <ExhibitorPicker value={exhibitorName} onChange={setExhibitorName} />
 
             <FieldLabel>Bred By</FieldLabel>
-            <Input value={breederName} onChange={(e) => setBreederName(e.target.value)} placeholder="Breeder name" className="h-11 rounded-lg" />
+            <AutocompleteInput
+              table="breeders_lookup"
+              value={breederName}
+              onChange={(v) => setBreederName(v)}
+              placeholder="Breeder name"
+            />
             <div className="flex items-center justify-between -mt-2">
               <span className="text-[11px] text-[#9CA3AF]">
                 {savedDefaults.bredBy === breederName && breederName ? "✓ This is your default" : ""}
@@ -902,7 +907,12 @@ export default function CreatePostPage() {
             </div>
 
             <FieldLabel>Placed By</FieldLabel>
-            <Input value={placedBy} onChange={(e) => setPlacedBy(e.target.value)} placeholder="Placed by" className="h-11 rounded-lg" />
+            <AutocompleteInput
+              table="breeders_lookup"
+              value={placedBy}
+              onChange={(v) => setPlacedBy(v)}
+              placeholder="Placed by"
+            />
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
