@@ -8,8 +8,9 @@
   :root {
     /* Warm off-white #F8F7F4 */
     --background: 45 20% 97%;
-    /* Deep navy (brand primary) */
-    --foreground: 217 60% 26%;
+    /* Body text: deep navy for readability */
+    --foreground: 217 62% 14%;
+
 
 
     --card: 0 0% 100%;
