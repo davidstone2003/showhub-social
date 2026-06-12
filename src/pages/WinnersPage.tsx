@@ -612,7 +612,7 @@ function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: 
           </p>
           <p className="text-[12px] text-[#9CA3AF] mt-0.5">
             {group.rows.length} winner{group.rows.length !== 1 ? "s" : ""}
-            {!group.showName.includes(String(group.year)) ? ` · ${group.year}` : ""}
+            {group.year !== null && !group.showName.includes(String(group.year)) ? ` · ${group.year}` : ""}
           </p>
           {topWinner?.win_placing && (
             <p className="text-[11px] font-bold mt-0.5 truncate" style={{ color: "#C9A84C" }}>
