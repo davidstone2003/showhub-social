@@ -241,10 +241,10 @@ export default function WinnersPage() {
       if (!grouped.has(key)) grouped.set(key, []);
       grouped.get(key)!.push(r);
     }
-    const result: { showName: string; year: number; posts: Post[]; rows: WinnerRow[] }[] = [];
+    const result: { showName: string; year: number | null; posts: Post[]; rows: WinnerRow[] }[] = [];
     for (const [, winners] of grouped) {
       const ref = winners[0];
-      const year = new Date(ref.date || ref.created_at).getFullYear();
+      const year = ref.date ? new Date(ref.date).getFullYear() : null;
       result.push({
         showName: ref.show_name,
         year,
@@ -252,7 +252,7 @@ export default function WinnersPage() {
         rows: winners,
       });
     }
-    result.sort((a, b) => b.year - a.year || a.showName.localeCompare(b.showName));
+    result.sort((a, b) => (b.year ?? -1) - (a.year ?? -1) || a.showName.localeCompare(b.showName));
     return result;
   }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery, selectedCategory, selectedState, selectedBreeder]);
 
