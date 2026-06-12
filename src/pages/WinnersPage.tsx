@@ -180,7 +180,7 @@ export default function WinnersPage() {
 
   const categoryOptions = ["All Levels", "National / Major", "State Fair", "Jackpot", "County / Local"];
 
-  const closeFilterMenus = () => {};
+  
 
 
   const allShowNames = useMemo(() => {
