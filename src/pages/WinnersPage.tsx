@@ -586,39 +586,6 @@ export default function WinnersPage() {
         </div>
       </div>
 
-      {/* Show selector bottom sheet */}
-      {showSelectorOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ backgroundColor: "rgba(0,0,0,0.5)" }} onClick={() => setShowSelectorOpen(false)}>
-          <div className="bg-white rounded-t-2xl max-h-[70vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E7EB]">
-              <h3 className="font-bold text-[16px] text-[#0A1628]">Filter by Show</h3>
-              <button onClick={() => setShowSelectorOpen(false)} className="text-[#6B7280] text-sm">Done</button>
-            </div>
-            <div className="overflow-y-auto flex-1 px-4 py-2">
-              <button
-                onClick={() => { setSelectedShow(null); setShowSelectorOpen(false); }}
-                className="w-full flex items-center justify-between py-3 border-b border-[#F3F4F6]"
-              >
-                <span className="text-[14px] font-semibold text-[#0A1628]">All Shows</span>
-                {!selectedShow && <span style={{ color: "#C9A84C" }}>✓</span>}
-              </button>
-              {allShowNames.map(([name, count]) => (
-                <button
-                  key={name}
-                  onClick={() => { setSelectedShow(name); setShowSelectorOpen(false); }}
-                  className="w-full flex items-center justify-between py-3 border-b border-[#F3F4F6]"
-                >
-                  <span className="text-[14px] text-[#0A1628]">{name}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[12px] text-[#6B7280]">{count} winners</span>
-                    {selectedShow === name && <span style={{ color: "#C9A84C" }}>✓</span>}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {drawerPost && (
         <WinnerDetailDrawer
