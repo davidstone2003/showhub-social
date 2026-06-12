@@ -471,7 +471,7 @@ export default function WinnersPage() {
                   <div key={group.showName + group.year}>
                     <div className="mb-3 pb-2 border-b-2 border-[#C9A84C]">
                       <h2 className="font-bold text-[17px]" style={{ color: "#0A1628" }}>{group.showName}</h2>
-                      {!group.showName.includes(String(group.year)) && (
+                      {group.year !== null && !group.showName.includes(String(group.year)) && (
                         <p className="text-[12px] mt-0.5" style={{ color: "#9CA3AF" }}>{group.year}</p>
                       )}
                     </div>
