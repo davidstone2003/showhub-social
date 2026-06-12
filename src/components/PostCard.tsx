@@ -380,12 +380,35 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
             <Heart className={cn("w-4 h-4", liked && "fill-destructive text-destructive")} />
             <span>{likeCount}</span>
           </button>
-          <span className="flex items-center gap-1.5" style={{ fontSize: 13, color: "hsl(var(--muted-foreground))" }}>
-            <MessageCircle className="w-4 h-4" />
-            <span>{post.comments}</span>
-          </span>
           <button
-            onClick={(e) => { e.preventDefault(); }}
+            onClick={() => {
+              if (!user) { setShowAuthGate(true); return; }
+              setShowComments(true);
+            }}
+            className="flex items-center gap-1.5 hover:text-primary transition-colors"
+            style={{ fontSize: 13, color: "hsl(var(--muted-foreground))" }}
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span>{post.comments || 0}</span>
+          </button>
+          <button
+            onClick={async () => {
+              const shareUrl = `${window.location.origin}/post/${post.id}`;
+              const shareText = [
+                post.win_placing,
+                post.show_name,
+                post.breeder?.name ? `Bred by ${post.breeder.name}` : null,
+                (post as any).caption
+              ].filter(Boolean).join(" · ");
+              if (navigator.share) {
+                try {
+                  await navigator.share({ title: post.win_placing || "Backdrop Post", text: shareText, url: shareUrl });
+                } catch {}
+              } else {
+                await navigator.clipboard.writeText(shareUrl);
+                toast.success("Link copied to clipboard");
+              }
+            }}
             className="flex items-center gap-1.5 ml-auto hover:text-primary transition-colors"
             style={{ fontSize: 13, color: "hsl(var(--muted-foreground))" }}
             aria-label="Share"
