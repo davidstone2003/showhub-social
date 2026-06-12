@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { Search, SlidersHorizontal, Trophy, Plus, List, AlignLeft, LayoutGrid } from "lucide-react";
+import { Search, Trophy, Plus, List, AlignLeft, LayoutGrid } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PostCard } from "@/components/PostCard";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton";
@@ -110,11 +110,11 @@ export default function WinnersPage() {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
-  const [showSelectorOpen, setShowSelectorOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("All Levels");
   const [selectedState, setSelectedState] = useState<string>("All States");
   const [selectedBreeder, setSelectedBreeder] = useState<string>("All Breeders");
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [yearOpen, setYearOpen] = useState(false);
   const [stateOpen, setStateOpen] = useState(false);
   const [breederOpen, setBreederOpen] = useState(false);
   const [drawerPost, setDrawerPost] = useState<Post | null>(null);
@@ -183,8 +183,8 @@ export default function WinnersPage() {
     const handler = (e: MouseEvent) => {
       const t = e.target as HTMLElement | null;
       if (t && t.closest("[data-filter-row]")) return;
-      setCategoryOpen(false); setStateOpen(false); setBreederOpen(false);
-      document.getElementById("year-dropdown")?.classList.add("hidden");
+      if (t && t.closest("[data-filter-panel]")) return;
+      setCategoryOpen(false); setYearOpen(false); setStateOpen(false); setBreederOpen(false);
     };
     document.addEventListener("click", handler);
     return () => document.removeEventListener("click", handler);
