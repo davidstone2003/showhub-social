@@ -257,7 +257,7 @@ export default function WinnersPage() {
   }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery, selectedCategory, selectedState, selectedBreeder]);
 
   const currentSeasonGroups = useMemo(() => {
-    return showGroups.filter(g => g.year >= currentYear);
+    return showGroups.filter(g => g.year !== null && g.year >= currentYear);
   }, [showGroups, currentYear]);
 
   return (
