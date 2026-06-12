@@ -166,6 +166,25 @@ export default function WinnersPage() {
     return ys.sort((a, b) => b - a);
   }, [rows]);
 
+  const availableStates = useMemo(() => {
+    const pattern = /\(([A-Z]{2})\)/;
+    const states = rows.map(r => pattern.exec(r.show_name)?.[1]).filter(Boolean) as string[];
+    return ["All States", ...Array.from(new Set(states)).sort()];
+  }, [rows]);
+
+  const availableBreeders = useMemo(() => {
+    const names = rows.map(r => r.bred_by).filter(Boolean) as string[];
+    return ["All Breeders", ...Array.from(new Set(names)).sort()];
+  }, [rows]);
+
+  const categoryOptions = ["All Levels", "National / Major", "State Fair", "Jackpot", "County / Local"];
+
+  useEffect(() => {
+    const handler = () => { setCategoryOpen(false); setStateOpen(false); setBreederOpen(false); };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, []);
+
   const allShowNames = useMemo(() => {
     const counts = new Map<string, number>();
     rows.forEach(r => counts.set(r.show_name, (counts.get(r.show_name) || 0) + 1));
