@@ -286,24 +286,33 @@ export default function SalesPage() {
     link: s.link,
     photo: s.photo,
   }));
+  const q = search.trim().toLowerCase();
+  const matchesSearch = (...fields: (string | null | undefined)[]) =>
+    !q || fields.some((f) => (f ?? "").toLowerCase().includes(q));
+
   const allResultsRaw = [...scrapedResults, ...scoAsResults, ...saleResults];
-  const allResults = allResultsRaw.filter((r) =>
-    r.species
-      ? species === "All" || r.species === species
-      : matchesSpecies(
-          species,
-          r.saleName,
-          r.location,
-          ...r.topSellers.flatMap((t) => [t.lot, t.breeder, t.sire ?? null]),
-          ...r.sireBreakdown.map((s) => s.sire),
-        ),
-  );
+  const allResults = allResultsRaw
+    .filter((r) =>
+      r.species
+        ? species === "All" || r.species === species
+        : matchesSpecies(
+            species,
+            r.saleName,
+            r.location,
+            ...r.topSellers.flatMap((t) => [t.lot, t.breeder, t.sire ?? null]),
+            ...r.sireBreakdown.map((s) => s.sire),
+          ),
+    )
+    .filter((r) => matchesSearch(r.saleName, r.location));
   const upcomingFiltered = (list: UpcomingSale[]) =>
-    list.filter((s) =>
-      s.species
-        ? species === "All" || s.species === species
-        : matchesSpecies(species, s.name, s.location, s.host),
-    );
+    list
+      .filter((s) =>
+        s.species
+          ? species === "All" || s.species === species
+          : matchesSpecies(species, s.name, s.location, s.host),
+      )
+      .filter((s) => matchesSearch(s.name, s.location, s.host));
+
 
   // Upcoming list: prefer live-scraped, fall back to mock if a scrape never ran
   const scoStatus = sourceStatus["sc-online"];
