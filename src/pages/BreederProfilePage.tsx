@@ -124,6 +124,8 @@ export default function BreederProfilePage() {
   );
 
   const [tab, setTab] = useState<"feed" | "about" | "winners" | "sires" | "forsale" | "videos">("feed");
+  const [winnerViewerIndex, setWinnerViewerIndex] = useState<number | null>(null);
+
 
   const { data: breederVideos = [] } = useQuery({
     queryKey: ["breeder-videos", profile?.id],
