@@ -88,6 +88,15 @@ function winnerToPost(row: WinnerRow, profilesMap: Record<string, any>, breederP
   };
 }
 
+function detectShowCategory(showName: string): string {
+  const n = (showName || "").toLowerCase();
+  if (["national","american royal","houston livestock","san antonio","denver","fort worth","arizona national","oklahoma youth expo","oye","naile","world","supreme","major","nugget","exchange","the show reno","wde","louisville","kansas city"].some(k => n.includes(k))) return "National / Major";
+  if (["state fair","state show","state livestock","ohio state","indiana state","texas state","colorado state","california state","michigan state","illinois state","kansas state","iowa state","missouri state"].some(k => n.includes(k))) return "State Fair";
+  if (["jackpot","classic","invitational","open show","revival","exposure","showcase","brand sale","elite","premier","palooza","showdown","challenge","series","qualifier","bid board","stock show"].some(k => n.includes(k))) return "Jackpot";
+  if (["county","district","regional","local","4h","ffa","chapter","club","young farmer","junior livestock"].some(k => n.includes(k))) return "County / Local";
+  return "Jackpot";
+}
+
 export default function WinnersPage() {
   const [rows, setRows] = useState<WinnerRow[]>([]);
   const [profilesMap, setProfilesMap] = useState<Record<string, any>>({});
@@ -102,6 +111,12 @@ export default function WinnersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [showSelectorOpen, setShowSelectorOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>("All Levels");
+  const [selectedState, setSelectedState] = useState<string>("All States");
+  const [selectedBreeder, setSelectedBreeder] = useState<string>("All Breeders");
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [stateOpen, setStateOpen] = useState(false);
+  const [breederOpen, setBreederOpen] = useState(false);
   const [drawerPost, setDrawerPost] = useState<Post | null>(null);
 
   const handleModerated = () => setRefreshKey((k) => k + 1);
@@ -151,6 +166,25 @@ export default function WinnersPage() {
     return ys.sort((a, b) => b - a);
   }, [rows]);
 
+  const availableStates = useMemo(() => {
+    const pattern = /\(([A-Z]{2})\)/;
+    const states = rows.map(r => pattern.exec(r.show_name)?.[1]).filter(Boolean) as string[];
+    return ["All States", ...Array.from(new Set(states)).sort()];
+  }, [rows]);
+
+  const availableBreeders = useMemo(() => {
+    const names = rows.map(r => r.bred_by).filter(Boolean) as string[];
+    return ["All Breeders", ...Array.from(new Set(names)).sort()];
+  }, [rows]);
+
+  const categoryOptions = ["All Levels", "National / Major", "State Fair", "Jackpot", "County / Local"];
+
+  useEffect(() => {
+    const handler = () => { setCategoryOpen(false); setStateOpen(false); setBreederOpen(false); };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, []);
+
   const allShowNames = useMemo(() => {
     const counts = new Map<string, number>();
     rows.forEach(r => counts.set(r.show_name, (counts.get(r.show_name) || 0) + 1));
@@ -166,6 +200,15 @@ export default function WinnersPage() {
     }
     if (selectedShow) {
       filteredRows = filteredRows.filter(r => r.show_name === selectedShow);
+    }
+    if (selectedCategory !== "All Levels") {
+      filteredRows = filteredRows.filter(r => detectShowCategory(r.show_name || "") === selectedCategory);
+    }
+    if (selectedState !== "All States") {
+      filteredRows = filteredRows.filter(r => r.show_name?.includes(`(${selectedState})`));
+    }
+    if (selectedBreeder !== "All Breeders") {
+      filteredRows = filteredRows.filter(r => r.bred_by === selectedBreeder);
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -196,7 +239,7 @@ export default function WinnersPage() {
     }
     result.sort((a, b) => b.year - a.year || a.showName.localeCompare(b.showName));
     return result;
-  }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery]);
+  }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery, selectedCategory, selectedState, selectedBreeder]);
 
   return (
     <Layout showDiscovery={false}>
@@ -236,89 +279,142 @@ export default function WinnersPage() {
                 <button onClick={() => setSearchOpen(true)} className="p-1.5">
                   <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
                 </button>
-                <button onClick={() => setShowSelectorOpen(true)} className="p-1.5">
-                  <SlidersHorizontal className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
-                </button>
               </div>
             </>
           )}
         </div>
 
-        {/* Filters — light background, directly above content */}
+        {/* Filter bar — sticky below dark header */}
         <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10">
-          {/* Species pills */}
           <div className="px-4 pt-2 pb-1">
             <SpeciesPills value={species} onChange={setSpecies} />
           </div>
-
-          {/* Year pills + Filter button row */}
-          <div className="flex items-center gap-2 px-4 pb-2">
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide flex-1">
+          <div
+            className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Show Level dropdown */}
+            <div className="relative shrink-0">
               <button
-                onClick={() => setSelectedYear(null)}
-                className="shrink-0 rounded-full px-3 py-1 text-[12px] font-bold border transition-colors"
-                style={!selectedYear
-                  ? { backgroundColor: "#0A1628", color: "#FFFFFF", borderColor: "#0A1628" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
-                }
+                onClick={() => { setCategoryOpen(v => !v); setStateOpen(false); setBreederOpen(false); }}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
+                style={selectedCategory !== "All Levels"
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
               >
-                All Years
+                {selectedCategory}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
-              {years.map(y => (
-                <button
-                  key={y}
-                  onClick={() => setSelectedYear(selectedYear === y ? null : y)}
-                  className="shrink-0 rounded-full px-3 py-1 text-[12px] font-bold border transition-colors"
-                  style={selectedYear === y
-                    ? { backgroundColor: "#0A1628", color: "#FFFFFF", borderColor: "#0A1628" }
-                    : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
-                  }
-                >
-                  {y}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setShowSelectorOpen(true)}
-              className="shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-bold relative transition-colors"
-              style={selectedShow
-                ? { backgroundColor: "#0A1628", color: "#FFFFFF", borderColor: "#0A1628" }
-                : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
-              }
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-              Filters
-              {selectedShow && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] ml-0.5" />
+              {categoryOpen && (
+                <div className="absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 180 }}>
+                  {categoryOptions.map(cat => (
+                    <button key={cat} onClick={() => { setSelectedCategory(cat); setCategoryOpen(false); }}
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
+                      style={{ borderBottom: "1px solid #F3F4F6" }}>
+                      <span className="text-[13px] font-medium text-[#0A1628]">{cat}</span>
+                      {selectedCategory === cat && <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                    </button>
+                  ))}
+                </div>
               )}
-            </button>
-          </div>
-
-          {/* Active filter chips */}
-          {(selectedShow || searchQuery) && (
-            <div className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide">
-              {[
-                { val: selectedShow, clear: () => setSelectedShow(null) },
-                { val: searchQuery ? `"${searchQuery}"` : null, clear: () => setSearchQuery("") },
-              ].filter(f => f.val).map((f, i) => (
-                <span
-                  key={i}
-                  className="shrink-0 flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold"
-                  style={{ backgroundColor: "#FFFBF0", color: "#8B6914", border: "1px solid rgba(201,168,76,0.4)" }}
-                >
-                  {f.val}
-                  <button onClick={f.clear} className="ml-0.5 font-bold">×</button>
-                </span>
-              ))}
-              <button
-                onClick={() => { setSelectedShow(null); setSelectedYear(null); setSearchQuery(""); }}
-                className="shrink-0 text-[11px] font-bold"
-                style={{ color: "#C9A84C" }}
-              >
-                Clear all
-              </button>
             </div>
-          )}
+
+            {/* Year dropdown */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => {
+                  setStateOpen(false); setBreederOpen(false); setCategoryOpen(false);
+                  const el = document.getElementById("year-dropdown");
+                  if (el) el.classList.toggle("hidden");
+                }}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
+                style={selectedYear
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+              >
+                {selectedYear || "All Years"}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+              <div id="year-dropdown" className="hidden absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 130 }}>
+                <button onClick={() => { setSelectedYear(null); document.getElementById("year-dropdown")?.classList.add("hidden"); }}
+                  className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
+                  style={{ borderBottom: "1px solid #F3F4F6" }}>
+                  <span className="text-[13px] font-medium text-[#0A1628]">All Years</span>
+                  {!selectedYear && <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                </button>
+                {years.map(y => (
+                  <button key={y} onClick={() => { setSelectedYear(y); document.getElementById("year-dropdown")?.classList.add("hidden"); }}
+                    className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
+                    style={{ borderBottom: "1px solid #F3F4F6" }}>
+                    <span className="text-[13px] font-medium text-[#0A1628]">{y}</span>
+                    {selectedYear === y && <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* State dropdown */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => { setStateOpen(v => !v); setCategoryOpen(false); setBreederOpen(false); }}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
+                style={selectedState !== "All States"
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+              >
+                {selectedState}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+              {stateOpen && (
+                <div className="absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 140, maxHeight: 240, overflowY: "auto" }}>
+                  {availableStates.map(state => (
+                    <button key={state} onClick={() => { setSelectedState(state); setStateOpen(false); }}
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
+                      style={{ borderBottom: "1px solid #F3F4F6" }}>
+                      <span className="text-[13px] font-medium text-[#0A1628]">{state}</span>
+                      {selectedState === state && <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Breeder dropdown */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => { setBreederOpen(v => !v); setCategoryOpen(false); setStateOpen(false); }}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
+                style={selectedBreeder !== "All Breeders"
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+              >
+                {selectedBreeder === "All Breeders" ? "Breeder" : selectedBreeder}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+              {breederOpen && (
+                <div className="absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 180, maxHeight: 240, overflowY: "auto" }}>
+                  {availableBreeders.map(name => (
+                    <button key={name} onClick={() => { setSelectedBreeder(name); setBreederOpen(false); }}
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
+                      style={{ borderBottom: "1px solid #F3F4F6" }}>
+                      <span className="text-[13px] font-medium text-[#0A1628] truncate">{name}</span>
+                      {selectedBreeder === name && <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5} className="shrink-0 ml-2"><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {(selectedCategory !== "All Levels" || selectedState !== "All States" || selectedBreeder !== "All Breeders" || selectedYear || selectedShow || searchQuery) && (
+              <button
+                onClick={() => { setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); setSelectedYear(null); setSelectedShow(null); setSearchQuery(""); }}
+                className="shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold"
+                style={{ backgroundColor: "#FFF8E7", color: "#8B6914", border: "1px solid rgba(201,168,76,0.3)" }}
+              >
+                Clear ×
+              </button>
+            )}
+          </div>
         </div>
 
         <div>
@@ -339,7 +435,7 @@ export default function WinnersPage() {
               </p>
               {(selectedShow || selectedYear || searchQuery) ? (
                 <button
-                  onClick={() => { setSelectedShow(null); setSelectedYear(null); setSearchQuery(""); }}
+                  onClick={() => { setSelectedShow(null); setSelectedYear(null); setSearchQuery(""); setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); }}
                   className="mt-4 rounded-full px-5 py-2 font-bold text-[14px]"
                   style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
                 >
@@ -490,39 +586,6 @@ export default function WinnersPage() {
         </div>
       </div>
 
-      {/* Show selector bottom sheet */}
-      {showSelectorOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ backgroundColor: "rgba(0,0,0,0.5)" }} onClick={() => setShowSelectorOpen(false)}>
-          <div className="bg-white rounded-t-2xl max-h-[70vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E7EB]">
-              <h3 className="font-bold text-[16px] text-[#0A1628]">Filter by Show</h3>
-              <button onClick={() => setShowSelectorOpen(false)} className="text-[#6B7280] text-sm">Done</button>
-            </div>
-            <div className="overflow-y-auto flex-1 px-4 py-2">
-              <button
-                onClick={() => { setSelectedShow(null); setShowSelectorOpen(false); }}
-                className="w-full flex items-center justify-between py-3 border-b border-[#F3F4F6]"
-              >
-                <span className="text-[14px] font-semibold text-[#0A1628]">All Shows</span>
-                {!selectedShow && <span style={{ color: "#C9A84C" }}>✓</span>}
-              </button>
-              {allShowNames.map(([name, count]) => (
-                <button
-                  key={name}
-                  onClick={() => { setSelectedShow(name); setShowSelectorOpen(false); }}
-                  className="w-full flex items-center justify-between py-3 border-b border-[#F3F4F6]"
-                >
-                  <span className="text-[14px] text-[#0A1628]">{name}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[12px] text-[#6B7280]">{count} winners</span>
-                    {selectedShow === name && <span style={{ color: "#C9A84C" }}>✓</span>}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {drawerPost && (
         <WinnerDetailDrawer
