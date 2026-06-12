@@ -367,7 +367,7 @@ export default function WinnersPage() {
 
             {(selectedCategory !== "All Levels" || selectedState !== "All States" || selectedBreeder !== "All Breeders" || selectedYear || selectedShow || searchQuery) && (
               <button
-                onClick={() => { setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); setSelectedYear(null); setSelectedShow(null); setSearchQuery(""); }}
+                onClick={() => { setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); setSelectedYear(null); setSelectedShow(null); setSearchQuery(""); closeFilterMenus(); }}
                 className="shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold"
                 style={{ backgroundColor: "#FFF8E7", color: "#8B6914", border: "1px solid rgba(201,168,76,0.3)" }}
               >
@@ -375,6 +375,54 @@ export default function WinnersPage() {
               </button>
             )}
           </div>
+          {activeFilterPanel && (
+            <div data-filter-panel className="px-4 pb-3">
+              <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-lg overflow-hidden max-h-[260px] overflow-y-auto">
+                {activeFilterPanel === "category" && categoryOptions.map(cat => (
+                  <button key={cat} onClick={() => { setSelectedCategory(cat); closeFilterMenus(); }}
+                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
+                    style={{ borderBottom: "1px solid #F3F4F6" }}>
+                    <span className="text-[14px] font-medium text-[#0A1628]">{cat}</span>
+                    {selectedCategory === cat && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  </button>
+                ))}
+                {activeFilterPanel === "year" && (
+                  <>
+                    <button onClick={() => { setSelectedYear(null); closeFilterMenus(); }}
+                      className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
+                      style={{ borderBottom: "1px solid #F3F4F6" }}>
+                      <span className="text-[14px] font-medium text-[#0A1628]">All Years</span>
+                      {!selectedYear && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                    </button>
+                    {years.map(y => (
+                      <button key={y} onClick={() => { setSelectedYear(y); closeFilterMenus(); }}
+                        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
+                        style={{ borderBottom: "1px solid #F3F4F6" }}>
+                        <span className="text-[14px] font-medium text-[#0A1628]">{y}</span>
+                        {selectedYear === y && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                      </button>
+                    ))}
+                  </>
+                )}
+                {activeFilterPanel === "state" && availableStates.map(state => (
+                  <button key={state} onClick={() => { setSelectedState(state); closeFilterMenus(); }}
+                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
+                    style={{ borderBottom: "1px solid #F3F4F6" }}>
+                    <span className="text-[14px] font-medium text-[#0A1628]">{state}</span>
+                    {selectedState === state && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  </button>
+                ))}
+                {activeFilterPanel === "breeder" && availableBreeders.map(name => (
+                  <button key={name} onClick={() => { setSelectedBreeder(name); closeFilterMenus(); }}
+                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
+                    style={{ borderBottom: "1px solid #F3F4F6" }}>
+                    <span className="text-[14px] font-medium text-[#0A1628] truncate">{name}</span>
+                    {selectedBreeder === name && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5} className="shrink-0 ml-2"><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div>
