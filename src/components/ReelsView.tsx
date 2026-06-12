@@ -121,16 +121,16 @@ export function ReelsView() {
     return (
       <div className="flex flex-col items-center text-center px-6" style={{ paddingTop: 80 }}>
         <div style={{ fontSize: 56 }}>🎬</div>
-        <h3 className="font-bold mt-3 text-[18px]" style={{ color: "#0A1628" }}>No Clips Yet</h3>
+        <h3 className="font-bold mt-3 text-[18px]" style={{ color: "#0A1628" }}>No Reels Yet</h3>
         <p className="text-[#6B7280] text-[14px] mt-2 max-w-xs">
           Be the first to post a fitting video, walk-around, or show day moment.
         </p>
         <Link
-          to="/submit"
+          to="/submit?type=reel"
           className="inline-flex items-center justify-center font-bold active:scale-95 transition-transform mt-5"
           style={{ padding: "0 22px", height: 48, borderRadius: 24, fontSize: 15, backgroundColor: "#C9A84C", color: "#0A1628", boxShadow: "0 4px 12px rgba(201,168,76,0.35)" }}
         >
-          Post a Clip
+          Post a Reel
         </Link>
       </div>
     );
