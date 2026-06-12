@@ -548,6 +548,44 @@ export type Database = {
           },
         ]
       }
+      post_comments: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          mentioned_user_ids: string[] | null
+          post_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          mentioned_user_ids?: string[] | null
+          post_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          mentioned_user_ids?: string[] | null
+          post_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           caption: string | null
@@ -558,6 +596,7 @@ export type Database = {
           likes: number
           post_type: string
           posted_as_breeder_id: string | null
+          reposted_from_id: string | null
           show_on_feed: boolean
           status: string
           tagged_user_ids: string[]
@@ -574,6 +613,7 @@ export type Database = {
           likes?: number
           post_type?: string
           posted_as_breeder_id?: string | null
+          reposted_from_id?: string | null
           show_on_feed?: boolean
           status?: string
           tagged_user_ids?: string[]
@@ -590,6 +630,7 @@ export type Database = {
           likes?: number
           post_type?: string
           posted_as_breeder_id?: string | null
+          reposted_from_id?: string | null
           show_on_feed?: boolean
           status?: string
           tagged_user_ids?: string[]
@@ -603,6 +644,13 @@ export type Database = {
             columns: ["posted_as_breeder_id"]
             isOneToOne: false
             referencedRelation: "breeder_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_reposted_from_id_fkey"
+            columns: ["reposted_from_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
             referencedColumns: ["id"]
           },
         ]
