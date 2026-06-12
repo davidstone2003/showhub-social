@@ -320,6 +320,7 @@ export default function WinnersPage() {
           <div className="px-4 pt-2 pb-1">
             <SpeciesPills value={species} onChange={setSpecies} />
           </div>
+          <div className="relative">
           <div
             data-filter-row
             className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide"
