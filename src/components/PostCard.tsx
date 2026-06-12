@@ -14,6 +14,7 @@ import { useEmailVerification } from "@/hooks/useEmailVerification";
 import { VerifyEmailModal } from "@/components/VerifyEmailModal";
 import { WinnerImageViewer } from "@/components/winners/WinnerImageViewer";
 import { WinnerDetailDrawer } from "@/components/post/WinnerDetailDrawer";
+import { CommentSheet } from "@/components/post/CommentSheet";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -155,6 +156,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [showComments, setShowComments] = useState(false);
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
   const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
@@ -378,12 +380,35 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
             <Heart className={cn("w-4 h-4", liked && "fill-destructive text-destructive")} />
             <span>{likeCount}</span>
           </button>
-          <span className="flex items-center gap-1.5" style={{ fontSize: 13, color: "hsl(var(--muted-foreground))" }}>
-            <MessageCircle className="w-4 h-4" />
-            <span>{post.comments}</span>
-          </span>
           <button
-            onClick={(e) => { e.preventDefault(); }}
+            onClick={() => {
+              if (!user) { setShowAuthGate(true); return; }
+              setShowComments(true);
+            }}
+            className="flex items-center gap-1.5 hover:text-primary transition-colors"
+            style={{ fontSize: 13, color: "hsl(var(--muted-foreground))" }}
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span>{post.comments || 0}</span>
+          </button>
+          <button
+            onClick={async () => {
+              const shareUrl = `${window.location.origin}/post/${post.id}`;
+              const shareText = [
+                post.win_placing,
+                post.show_name,
+                post.breeder?.name ? `Bred by ${post.breeder.name}` : null,
+                (post as any).caption
+              ].filter(Boolean).join(" · ");
+              if (navigator.share) {
+                try {
+                  await navigator.share({ title: post.win_placing || "Backdrop Post", text: shareText, url: shareUrl });
+                } catch {}
+              } else {
+                await navigator.clipboard.writeText(shareUrl);
+                toast.success("Link copied to clipboard");
+              }
+            }}
             className="flex items-center gap-1.5 ml-auto hover:text-primary transition-colors"
             style={{ fontSize: 13, color: "hsl(var(--muted-foreground))" }}
             aria-label="Share"
@@ -394,6 +419,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
       </motion.article>
 
       <WinnerDetailDrawer post={post} open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <CommentSheet postId={(post as any).winner_id || post.id} open={showComments} onClose={() => setShowComments(false)} commentCount={post.comments || 0} />
 
       <AdminFlagModal open={showFlagModal} onOpenChange={setShowFlagModal} postId={post.id} postOwnerId={(post as any).user_id} onActionComplete={onModerated} />
       <AdminEditModal
@@ -409,6 +435,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           sired_by: (post as any).sired_by,
           dam: (post as any).dam,
           date: (post as any).date || post.created_at?.split("T")[0],
+          source_post_id: post.id,
         }}
         onSaved={onModerated}
       />
