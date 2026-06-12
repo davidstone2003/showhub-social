@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { Search, Trophy, Plus, List, LayoutGrid } from "lucide-react";
+import { Search, Trophy, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PostCard } from "@/components/PostCard";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton";
@@ -105,7 +105,8 @@ export default function WinnersPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [species, setSpecies] = useState<SpeciesPill>("All");
 
-  const [view, setView] = useState<"list" | "grid">("list");
+  const [section, setSection] = useState<"current" | "archive">("current");
+  const currentYear = new Date().getFullYear();
   const [selectedShow, setSelectedShow] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -278,28 +279,36 @@ export default function WinnersPage() {
             <>
               <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Winners</h1>
               <div className="flex items-center gap-2">
-                <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.15)", backgroundColor: "rgba(255,255,255,0.06)" }}>
-                  <button
-                    onClick={() => setView("list")}
-                    className="p-2 transition-colors"
-                    style={{ backgroundColor: view === "list" ? "rgba(201,168,76,0.25)" : "transparent" }}
-                  >
-                    <List className="w-4 h-4" style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)" }} />
-                  </button>
-                  <button
-                    onClick={() => setView("grid")}
-                    className="p-2 transition-colors"
-                    style={{ backgroundColor: view === "grid" ? "rgba(201,168,76,0.25)" : "transparent" }}
-                  >
-                    <LayoutGrid className="w-4 h-4" style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)" }} />
-                  </button>
-                </div>
                 <button onClick={() => setSearchOpen(true)} className="p-1.5">
                   <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
                 </button>
               </div>
             </>
           )}
+        </div>
+
+        {/* Section tabs */}
+        <div className="bg-white border-b border-[#E5E7EB] flex sticky top-[60px] z-20">
+          <button
+            onClick={() => setSection("current")}
+            className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
+            style={section === "current"
+              ? { borderColor: "#C9A84C", color: "#0A1628" }
+              : { borderColor: "transparent", color: "#9CA3AF" }
+            }
+          >
+            🏆 Current Season
+          </button>
+          <button
+            onClick={() => setSection("archive")}
+            className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
+            style={section === "archive"
+              ? { borderColor: "#C9A84C", color: "#0A1628" }
+              : { borderColor: "transparent", color: "#9CA3AF" }
+            }
+          >
+            📋 All Results
+          </button>
         </div>
 
         {/* Filter bar — sticky below dark header */}
