@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Plus, X } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { LiveStrip } from "@/components/LiveStrip";
 import { Feed } from "@/components/Feed";
 import { ReelsView } from "@/components/ReelsView";
 import { ReelsStrip } from "@/components/ReelsStrip";
+import { CreateButton } from "@/components/shared/CreateButton";
+import { X } from "lucide-react";
 
 const Index = () => {
   const [reelsOpen, setReelsOpen] = useState(false);
@@ -13,6 +13,21 @@ const Index = () => {
   return (
     <Layout showDiscovery={false}>
       <div style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
+        {/* Shared dark PageHeader band */}
+        <div
+          className="sticky top-0 z-20 px-4 flex items-center justify-between"
+          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Home</h1>
+          <CreateButton
+            label="Post"
+            menu={[
+              { label: "New post", to: "/submit" },
+              { label: "New reel", to: "/submit?type=reel" },
+            ]}
+          />
+        </div>
+
         <div className="max-w-2xl mx-auto w-full px-3 pb-24">
           <div className="-mt-2">
             <LiveStrip />
@@ -39,23 +54,6 @@ const Index = () => {
           </div>
         </div>
       )}
-
-      <Link
-        to="/submit"
-        aria-label="Post to Backdrop"
-        className="fixed z-40 flex items-center justify-center rounded-full active:scale-95 transition-transform"
-        style={{
-          width: 56,
-          height: 56,
-          right: 16,
-          bottom: 88,
-          backgroundColor: "#C9A84C",
-          color: "#0A1628",
-          boxShadow: "0 6px 16px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.15)",
-        }}
-      >
-        <Plus className="w-7 h-7" strokeWidth={2.5} />
-      </Link>
     </Layout>
   );
 };
