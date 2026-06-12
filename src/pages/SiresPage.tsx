@@ -73,6 +73,9 @@ const SiresPage = () => {
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"list" | "grid">("grid");
   const [species, setSpecies] = useState<SpeciesPill>("All");
+  const [selectedOwner, setSelectedOwner] = useState<string>("All Owners");
+  const [semenFilter, setSemenFilter] = useState<"All" | "Available">("All");
+  const [ownerOpen, setOwnerOpen] = useState(false);
 
   useEffect(() => {
     async function fetchSires() {
@@ -101,7 +104,6 @@ const SiresPage = () => {
 
       mapped.sort((a, b) => b.winCount - a.winCount || a.name.localeCompare(b.name));
 
-      // Merge seeded sires (avoid duplicates by name) so the page never looks empty.
       const existingNames = new Set(mapped.map((m) => m.name.toLowerCase()));
       const seedsToAdd = SEED_SIRES
         .filter((s) => !existingNames.has(s.name.toLowerCase()))
@@ -112,14 +114,33 @@ const SiresPage = () => {
     fetchSires();
   }, []);
 
+  useEffect(() => {
+    const handler = () => setOwnerOpen(false);
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, []);
+
+  const availableOwners = useMemo(() => {
+    const owners = sires.map((s) => s.breederName).filter(Boolean) as string[];
+    return ["All Owners", ...Array.from(new Set(owners)).sort()];
+  }, [sires]);
+
   const filtered = useMemo(() => {
-    const bySpecies = sires.filter((s) => matchesSpecies(species, s.breed, s.name));
-    if (!search.trim()) return bySpecies;
-    const q = search.toLowerCase();
-    return bySpecies.filter((s) =>
-      s.name.toLowerCase().includes(q) || (s.breederName ?? "").toLowerCase().includes(q)
-    );
-  }, [sires, search, species]);
+    let result = sires.filter((s) => matchesSpecies(species, s.breed, s.name));
+    if (selectedOwner !== "All Owners") {
+      result = result.filter((s) => s.breederName === selectedOwner);
+    }
+    if (semenFilter === "Available") {
+      result = result.filter((s) => s.semenAvailable);
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter((s) =>
+        s.name.toLowerCase().includes(q) || (s.breederName ?? "").toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [sires, search, species, selectedOwner, semenFilter]);
 
   const trending = useMemo(() => sires.filter((s) => s.winCount > 0).slice(0, 8), [sires]);
 
@@ -128,7 +149,7 @@ const SiresPage = () => {
       <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
         {/* Header */}
         <div
-          className="sticky top-0 z-10 px-4 flex items-center justify-between"
+          className="sticky top-0 z-20 px-4 flex items-center justify-between"
           style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
         >
           <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Sires</h1>
@@ -154,10 +175,62 @@ const SiresPage = () => {
           </div>
         </div>
 
-        {/* Dark chrome band: pills */}
-        <div style={{ backgroundColor: "#0A1628" }} className="pb-3">
-          <div className="px-4 pt-3">
-            <SpeciesPills value={species} onChange={setSpecies} appMode />
+        {/* Filter bar — light */}
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10">
+          <div className="px-4 pt-2 pb-1">
+            <SpeciesPills value={species} onChange={setSpecies} />
+          </div>
+          <div className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setSemenFilter((v) => (v === "All" ? "Available" : "All"))}
+              className="shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
+              style={semenFilter === "Available"
+                ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+            >
+              {semenFilter === "Available" ? "✓ Semen Available" : "Semen Available"}
+            </button>
+
+            <div className="relative shrink-0">
+              <button
+                onClick={() => setOwnerOpen((v) => !v)}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
+                style={selectedOwner !== "All Owners"
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+              >
+                {selectedOwner === "All Owners" ? "Owner" : selectedOwner}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              {ownerOpen && (
+                <div className="absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 180, maxHeight: 240, overflowY: "auto" }}>
+                  {availableOwners.map((name) => (
+                    <button key={name} onClick={() => { setSelectedOwner(name); setOwnerOpen(false); }}
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
+                      style={{ borderBottom: "1px solid #F3F4F6" }}>
+                      <span className="text-[13px] font-medium text-[#0A1628] truncate">{name}</span>
+                      {selectedOwner === name && (
+                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5} className="shrink-0 ml-2">
+                          <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {(selectedOwner !== "All Owners" || semenFilter !== "All" || search) && (
+              <button
+                onClick={() => { setSelectedOwner("All Owners"); setSemenFilter("All"); setSearch(""); }}
+                className="shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold"
+                style={{ backgroundColor: "#FFF8E7", color: "#8B6914", border: "1px solid rgba(201,168,76,0.3)" }}
+              >
+                Clear ×
+              </button>
+            )}
           </div>
         </div>
 
@@ -173,6 +246,7 @@ const SiresPage = () => {
               style={{ color: NAVY }}
             />
           </div>
+
 
           {/* Trending */}
           {!search && trending.length > 0 && (
