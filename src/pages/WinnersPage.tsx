@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { Search, Trophy, Plus } from "lucide-react";
+import { Search, Trophy } from "lucide-react";
+import { CreateButton } from "@/components/shared/CreateButton";
 import { supabase } from "@/integrations/supabase/client";
 import { PostCard } from "@/components/PostCard";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton";
@@ -283,11 +284,13 @@ export default function WinnersPage() {
             <>
               <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Winners</h1>
               <div className="flex items-center gap-2">
-                <button onClick={() => setSearchOpen(true)} className="p-1.5">
+                <button onClick={() => setSearchOpen(true)} className="p-1.5" aria-label="Search">
                   <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
                 </button>
+                <CreateButton to="/submit" label="Add win" />
               </div>
             </>
+
           )}
         </div>
 
@@ -557,23 +560,10 @@ export default function WinnersPage() {
         />
       )}
 
-      <Link
-        to="/submit"
-        aria-label="Post a Win"
-        className="fixed z-40 flex items-center justify-center rounded-full active:scale-95 transition-transform"
-        style={{
-          width: 56, height: 56,
-          right: 16, bottom: 80,
-          backgroundColor: "#C9A84C",
-          color: "#0A1628",
-          boxShadow: "0 8px 20px rgba(201,168,76,0.4)"
-        }}
-      >
-        <Plus className="w-7 h-7" strokeWidth={2.5} />
-      </Link>
     </Layout>
   );
 }
+
 
 function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: {
   group: { showName: string; year: number; rows: WinnerRow[] };
