@@ -279,9 +279,6 @@ export default function WinnersPage() {
                 <button onClick={() => setSearchOpen(true)} className="p-1.5">
                   <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
                 </button>
-                <button onClick={() => setShowSelectorOpen(true)} className="p-1.5">
-                  <SlidersHorizontal className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
-                </button>
               </div>
             </>
           )}
