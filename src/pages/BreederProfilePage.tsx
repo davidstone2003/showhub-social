@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Trophy, Dna, ShoppingBag, Play, MapPin, Phone, Mail, Globe, Lock } from "lucide-react";
 import { BreederHero } from "@/components/breeder/BreederHero";
 import { LockedSection } from "@/components/breeder/LockedSection";
+import PhotoViewer from "@/components/PhotoViewer";
+
 import { allDemoLambs } from "@/data/demoLambs";
 import type { Post } from "@/data/mock";
 
