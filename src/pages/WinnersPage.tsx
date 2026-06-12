@@ -287,81 +287,137 @@ export default function WinnersPage() {
           )}
         </div>
 
-        {/* Filters — light background, directly above content */}
+        {/* Filter bar — sticky below dark header */}
         <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10">
-          {/* Species pills */}
           <div className="px-4 pt-2 pb-1">
             <SpeciesPills value={species} onChange={setSpecies} />
           </div>
-
-          {/* Year pills + Filter button row */}
-          <div className="flex items-center gap-2 px-4 pb-2">
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide flex-1">
+          <div
+            className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Show Level dropdown */}
+            <div className="relative shrink-0">
               <button
-                onClick={() => setSelectedYear(null)}
-                className="shrink-0 rounded-full px-3 py-1 text-[12px] font-bold border transition-colors"
-                style={!selectedYear
-                  ? { backgroundColor: "#0A1628", color: "#FFFFFF", borderColor: "#0A1628" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
-                }
+                onClick={() => { setCategoryOpen(v => !v); setStateOpen(false); setBreederOpen(false); }}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
+                style={selectedCategory !== "All Levels"
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
               >
-                All Years
+                {selectedCategory}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
-              {years.map(y => (
-                <button
-                  key={y}
-                  onClick={() => setSelectedYear(selectedYear === y ? null : y)}
-                  className="shrink-0 rounded-full px-3 py-1 text-[12px] font-bold border transition-colors"
-                  style={selectedYear === y
-                    ? { backgroundColor: "#0A1628", color: "#FFFFFF", borderColor: "#0A1628" }
-                    : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
-                  }
-                >
-                  {y}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setShowSelectorOpen(true)}
-              className="shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-bold relative transition-colors"
-              style={selectedShow
-                ? { backgroundColor: "#0A1628", color: "#FFFFFF", borderColor: "#0A1628" }
-                : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
-              }
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-              Filters
-              {selectedShow && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] ml-0.5" />
+              {categoryOpen && (
+                <div className="absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 180 }}>
+                  {categoryOptions.map(cat => (
+                    <button key={cat} onClick={() => { setSelectedCategory(cat); setCategoryOpen(false); }}
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
+                      style={{ borderBottom: "1px solid #F3F4F6" }}>
+                      <span className="text-[13px] font-medium text-[#0A1628]">{cat}</span>
+                      {selectedCategory === cat && <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                    </button>
+                  ))}
+                </div>
               )}
-            </button>
-          </div>
-
-          {/* Active filter chips */}
-          {(selectedShow || searchQuery) && (
-            <div className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide">
-              {[
-                { val: selectedShow, clear: () => setSelectedShow(null) },
-                { val: searchQuery ? `"${searchQuery}"` : null, clear: () => setSearchQuery("") },
-              ].filter(f => f.val).map((f, i) => (
-                <span
-                  key={i}
-                  className="shrink-0 flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold"
-                  style={{ backgroundColor: "#FFFBF0", color: "#8B6914", border: "1px solid rgba(201,168,76,0.4)" }}
-                >
-                  {f.val}
-                  <button onClick={f.clear} className="ml-0.5 font-bold">×</button>
-                </span>
-              ))}
-              <button
-                onClick={() => { setSelectedShow(null); setSelectedYear(null); setSearchQuery(""); }}
-                className="shrink-0 text-[11px] font-bold"
-                style={{ color: "#C9A84C" }}
-              >
-                Clear all
-              </button>
             </div>
-          )}
+
+            {/* Year dropdown */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => {
+                  setStateOpen(false); setBreederOpen(false); setCategoryOpen(false);
+                  const el = document.getElementById("year-dropdown");
+                  if (el) el.classList.toggle("hidden");
+                }}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
+                style={selectedYear
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+              >
+                {selectedYear || "All Years"}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+              <div id="year-dropdown" className="hidden absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 130 }}>
+                <button onClick={() => { setSelectedYear(null); document.getElementById("year-dropdown")?.classList.add("hidden"); }}
+                  className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
+                  style={{ borderBottom: "1px solid #F3F4F6" }}>
+                  <span className="text-[13px] font-medium text-[#0A1628]">All Years</span>
+                  {!selectedYear && <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                </button>
+                {years.map(y => (
+                  <button key={y} onClick={() => { setSelectedYear(y); document.getElementById("year-dropdown")?.classList.add("hidden"); }}
+                    className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
+                    style={{ borderBottom: "1px solid #F3F4F6" }}>
+                    <span className="text-[13px] font-medium text-[#0A1628]">{y}</span>
+                    {selectedYear === y && <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* State dropdown */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => { setStateOpen(v => !v); setCategoryOpen(false); setBreederOpen(false); }}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
+                style={selectedState !== "All States"
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+              >
+                {selectedState}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+              {stateOpen && (
+                <div className="absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 140, maxHeight: 240, overflowY: "auto" }}>
+                  {availableStates.map(state => (
+                    <button key={state} onClick={() => { setSelectedState(state); setStateOpen(false); }}
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
+                      style={{ borderBottom: "1px solid #F3F4F6" }}>
+                      <span className="text-[13px] font-medium text-[#0A1628]">{state}</span>
+                      {selectedState === state && <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Breeder dropdown */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => { setBreederOpen(v => !v); setCategoryOpen(false); setStateOpen(false); }}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
+                style={selectedBreeder !== "All Breeders"
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+              >
+                {selectedBreeder === "All Breeders" ? "Breeder" : selectedBreeder}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+              {breederOpen && (
+                <div className="absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 180, maxHeight: 240, overflowY: "auto" }}>
+                  {availableBreeders.map(name => (
+                    <button key={name} onClick={() => { setSelectedBreeder(name); setBreederOpen(false); }}
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
+                      style={{ borderBottom: "1px solid #F3F4F6" }}>
+                      <span className="text-[13px] font-medium text-[#0A1628] truncate">{name}</span>
+                      {selectedBreeder === name && <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5} className="shrink-0 ml-2"><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {(selectedCategory !== "All Levels" || selectedState !== "All States" || selectedBreeder !== "All Breeders" || selectedYear || selectedShow || searchQuery) && (
+              <button
+                onClick={() => { setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); setSelectedYear(null); setSelectedShow(null); setSearchQuery(""); }}
+                className="shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold"
+                style={{ backgroundColor: "#FFF8E7", color: "#8B6914", border: "1px solid rgba(201,168,76,0.3)" }}
+              >
+                Clear ×
+              </button>
+            )}
+          </div>
         </div>
 
         <div>
