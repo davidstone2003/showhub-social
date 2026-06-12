@@ -61,6 +61,8 @@ export default function CreatePostPage() {
   const { user, profile } = useAuth();
   const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [isReel, setIsReel] = useState(searchParams.get("type") === "reel");
 
   const [category] = useState<PostCategory>(null); // unused but kept for compat
   const [media, setMedia] = useState<MediaFile[]>([]);
