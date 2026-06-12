@@ -256,6 +256,10 @@ export default function WinnersPage() {
     return result;
   }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery, selectedCategory, selectedState, selectedBreeder]);
 
+  const currentSeasonGroups = useMemo(() => {
+    return showGroups.filter(g => g.year >= currentYear - 1);
+  }, [showGroups, currentYear]);
+
   return (
     <Layout showDiscovery={false}>
       <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
