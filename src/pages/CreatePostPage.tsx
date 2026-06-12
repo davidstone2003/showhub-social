@@ -32,6 +32,9 @@ const WINNER_RESULTS = [
   "Class Winner",
   "Division Champion",
   "Reserve Division",
+  "2nd Overall",
+  "3rd Overall",
+  "4th Overall",
   "5th Overall",
   "Other",
 ];
