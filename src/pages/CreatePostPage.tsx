@@ -655,6 +655,38 @@ export default function CreatePostPage() {
           </div>
         )}
 
+        {/* Reel vs Feed toggle (only when a video is attached) */}
+        {media.some(m => m.type === "video") && (
+          <div className="px-4 pb-3">
+            <p className="text-[12px] font-bold mb-2" style={{ color: "#6B7280" }}>Post this video as:</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIsReel(false)}
+                className="flex-1 py-2 rounded-xl text-[12px] font-bold border"
+                style={!isReel
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
+                }
+              >
+                📱 Feed Post
+              </button>
+              <button
+                onClick={() => setIsReel(true)}
+                className="flex-1 py-2 rounded-xl text-[12px] font-bold border"
+                style={isReel
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
+                }
+              >
+                🎬 Reel
+              </button>
+            </div>
+            <p className="text-[11px] mt-1.5" style={{ color: "#9CA3AF" }}>
+              {isReel ? "Reels appear in the Reels tab and your profile" : "Feed posts appear in the main feed with your caption"}
+            </p>
+          </div>
+        )}
+
       </div>
 
 
