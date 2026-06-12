@@ -435,6 +435,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           sired_by: (post as any).sired_by,
           dam: (post as any).dam,
           date: (post as any).date || post.created_at?.split("T")[0],
+          source_post_id: post.id,
         }}
         onSaved={onModerated}
       />
