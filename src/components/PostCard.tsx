@@ -391,35 +391,67 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
             <MessageCircle className="w-4 h-4" />
             <span>{post.comments || 0}</span>
           </button>
-          <button
-            onClick={async () => {
-              const shareUrl = `${window.location.origin}/post/${post.id}`;
-              const shareText = [
-                post.win_placing,
-                post.show_name,
-                post.breeder?.name ? `Bred by ${post.breeder.name}` : null,
-                (post as any).caption
-              ].filter(Boolean).join(" · ");
-              if (navigator.share) {
-                try {
-                  await navigator.share({ title: post.win_placing || "Backdrop Post", text: shareText, url: shareUrl });
-                } catch {}
-              } else {
-                await navigator.clipboard.writeText(shareUrl);
-                toast.success("Link copied to clipboard");
-              }
-            }}
-            className="flex items-center gap-1.5 ml-auto hover:text-primary transition-colors"
-            style={{ fontSize: 13, color: "hsl(var(--muted-foreground))" }}
-            aria-label="Share"
-          >
-            <Share2 className="w-4 h-4" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="flex items-center gap-1.5 ml-auto hover:text-primary transition-colors"
+                style={{ fontSize: 13, color: "hsl(var(--muted-foreground))" }}
+                aria-label="Share"
+              >
+                <Share2 className="w-4 h-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuItem
+                onClick={async () => {
+                  if (!user) { setShowAuthGate(true); return; }
+                  try {
+                    const { error } = await supabase.from("posts").insert({
+                      user_id: user.id,
+                      caption: (post as any).caption || null,
+                      image_urls: (post as any).image_urls || (post.image && post.image !== "/placeholder.svg" ? [post.image] : []),
+                      video_url: (post as any).video_url || null,
+                      post_type: "general",
+                      status: "active",
+                      show_on_feed: true,
+                      reposted_from_id: (post as any).source_post_id || post.id,
+                    });
+                    if (error) throw error;
+                    toast.success("Reposted to your feed");
+                    onModerated?.();
+                  } catch (err: any) {
+                    toast.error("Couldn't repost", { description: err.message });
+                  }
+                }}
+              >
+                <Share2 className="w-3.5 h-3.5 mr-2" /> Repost
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={async () => {
+                  const shareUrl = `${window.location.origin}/post/${post.id}`;
+                  const shareText = [
+                    post.win_placing,
+                    post.show_name,
+                    post.breeder?.name ? `Bred by ${post.breeder.name}` : null,
+                    (post as any).caption
+                  ].filter(Boolean).join(" · ");
+                  if (navigator.share) {
+                    try { await navigator.share({ title: post.win_placing || "Backdrop Post", text: shareText, url: shareUrl }); } catch {}
+                  } else {
+                    await navigator.clipboard.writeText(shareUrl);
+                    toast.success("Link copied to clipboard");
+                  }
+                }}
+              >
+                <Share2 className="w-3.5 h-3.5 mr-2" /> Share link
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </motion.article>
 
       <WinnerDetailDrawer post={post} open={drawerOpen} onClose={() => setDrawerOpen(false)} />
-      <CommentSheet postId={(post as any).winner_id || post.id} open={showComments} onClose={() => setShowComments(false)} commentCount={post.comments || 0} />
+      <CommentSheet postId={(post as any).source_post_id || post.id} open={showComments} onClose={() => setShowComments(false)} commentCount={post.comments || 0} />
 
       <AdminFlagModal open={showFlagModal} onOpenChange={setShowFlagModal} postId={post.id} postOwnerId={(post as any).user_id} onActionComplete={onModerated} />
       <AdminEditModal
