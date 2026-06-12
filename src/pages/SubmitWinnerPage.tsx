@@ -240,7 +240,7 @@ export default function SubmitWinnerPage() {
           tags: [],
           image_urls: imageUrls,
           show_id: resolvedShowId,
-          date: format(new Date(), "yyyy-MM-dd"),
+          date: result.showDate || null,
           user_id: user?.id || null,
           posted_as_breeder_id: postedAsBreederId,
           post_type: postType,
