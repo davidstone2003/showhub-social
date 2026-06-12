@@ -393,6 +393,9 @@ export default function WinnersPage() {
               </button>
             )}
           </div>
+            {/* right-edge fade to signal more filters */}
+            <div className="pointer-events-none absolute top-0 right-0 bottom-0 w-8" style={{ background: "linear-gradient(to right, rgba(255,255,255,0), #FFFFFF)" }} />
+          </div>
           {activeFilterPanel && (
             <div data-filter-panel className="px-4 pb-3">
               <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-lg overflow-hidden max-h-[260px] overflow-y-auto">
