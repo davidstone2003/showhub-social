@@ -22,37 +22,78 @@ type Listing = {
   price: string;
   meta: string;
   category: Exclude<Category, "All">;
+  species?: string;
   image_url?: string;
 };
 
 const LISTINGS: Listing[] = [
-  { id: "1", title: "Hampshire Ram Lamb",   price: "$1,800", meta: "IA · Posted 2d ago", category: "Stock" },
+  { id: "1", title: "Hampshire Ram Lamb",   price: "$1,800", meta: "IA · Posted 2d ago", category: "Stock",         species: "Sheep" },
   { id: "2", title: "Show Feed — 50lb",     price: "$42",    meta: "OH · Posted 3d ago", category: "Nutrition" },
   { id: "3", title: "Hauling — Midwest",    price: "Quote",  meta: "KS · Service",       category: "Services" },
-  { id: "4", title: "Boer Doe Kid",         price: "$950",   meta: "TX · Posted 5d ago", category: "Stock" },
+  { id: "4", title: "Boer Doe Kid",         price: "$950",   meta: "TX · Posted 5d ago", category: "Stock",         species: "Goats" },
   { id: "5", title: "Grooming Spray Kit",   price: "$78",    meta: "IN · Posted 1d ago", category: "Show Supplies" },
   { id: "6", title: "Show Day Photography", price: "Quote",  meta: "WI · Service",       category: "Services" },
 ];
+
+function priceToNumber(p: string): number | null {
+  const m = p.match(/\$([0-9,]+)/);
+  if (!m) return null;
+  return parseInt(m[1].replace(/,/g, ""), 10);
+}
+
 
 export default function MarketPage() {
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [category, setCategory] = useState<Category>("All");
   const [view, setView] = useState<"list" | "grid">("list");
+  const [selectedState, setSelectedState] = useState<string>("All States");
+  const [selectedSpecies, setSelectedSpecies] = useState<string>("All");
+  const [priceRange, setPriceRange] = useState<"All" | "Under $500" | "$500-$2K" | "$2K-$5K" | "$5K+">("All");
+  const [stateOpen, setStateOpen] = useState(false);
+  const [speciesOpen, setSpeciesOpen] = useState(false);
+  const [priceOpen, setPriceOpen] = useState(false);
 
-  const stats = useMemo(() => ({
-    listings: LISTINGS.length,
-    sellers: 18,
-    states: 9,
-    categories: 4,
-  }), []);
+  useEffect(() => {
+    const handler = () => { setStateOpen(false); setSpeciesOpen(false); setPriceOpen(false); };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, []);
+
+  const marketStates = useMemo(() => {
+    const states = LISTINGS.map((l) => l.meta.match(/^([A-Z]{2})\s·/)?.[1]).filter(Boolean) as string[];
+    return ["All States", ...Array.from(new Set(states)).sort()];
+  }, []);
+
+  const speciesOptions = ["All", "Sheep", "Goats", "Cattle", "Pigs"];
+  const priceOptions = ["All", "Under $500", "$500-$2K", "$2K-$5K", "$5K+"];
 
   const filtered = useMemo(() => {
-    const byCat = category === "All" ? LISTINGS : LISTINGS.filter((l) => l.category === category);
-    if (!search.trim()) return byCat;
-    const q = search.toLowerCase();
-    return byCat.filter((l) => `${l.title} ${l.meta} ${l.category}`.toLowerCase().includes(q));
-  }, [search, category]);
+    let result = category === "All" ? LISTINGS : LISTINGS.filter((l) => l.category === category);
+    if (selectedState !== "All States") {
+      result = result.filter((l) => l.meta.startsWith(selectedState));
+    }
+    if (selectedSpecies !== "All") {
+      result = result.filter((l) => l.species === selectedSpecies);
+    }
+    if (priceRange !== "All") {
+      result = result.filter((l) => {
+        const n = priceToNumber(l.price);
+        if (n == null) return false;
+        if (priceRange === "Under $500") return n < 500;
+        if (priceRange === "$500-$2K") return n >= 500 && n < 2000;
+        if (priceRange === "$2K-$5K") return n >= 2000 && n < 5000;
+        if (priceRange === "$5K+") return n >= 5000;
+        return true;
+      });
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter((l) => `${l.title} ${l.meta} ${l.category}`.toLowerCase().includes(q));
+    }
+    return result;
+  }, [search, category, selectedState, selectedSpecies, priceRange]);
+
 
   return (
     <Layout showDiscovery={false}>
@@ -94,57 +135,153 @@ export default function MarketPage() {
           </div>
         </div>
 
-        {/* Dark chrome band: pills + optional search + stats */}
-        <div style={{ backgroundColor: "#0A1628" }} className="pb-4">
-          <div className="px-4 pt-3">
-            <div className="flex gap-1.5 overflow-x-auto scrollbar-hide" role="tablist" aria-label="Filter by category">
-              {CATEGORIES.map((c) => {
-                const active = category === c;
-                return (
-                  <button
-                    key={c}
-                    role="tab"
-                    aria-selected={active}
-                    onClick={() => setCategory(c)}
-                    className="h-8 shrink-0 rounded-full px-3.5 text-[12px] font-semibold leading-none whitespace-nowrap transition-colors"
-                    style={
-                      active
-                        ? { backgroundColor: "#C9A84C", color: "#0A1628", border: "1px solid #C9A84C" }
-                        : { backgroundColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", border: "1px solid transparent" }
-                    }
-                  >
-                    {c}
-                  </button>
-                );
-              })}
+        {/* Optional search */}
+        {searchOpen && (
+          <div className="px-4 py-2 bg-white border-b border-[#E5E7EB]">
+            <div className="flex items-center gap-2 bg-[#F3F4F6] rounded-xl px-3 py-2">
+              <Search className="w-4 h-4 text-[#9CA3AF] shrink-0" />
+              <input
+                autoFocus
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search listings, sellers, categories…"
+                className="flex-1 bg-transparent text-[14px] text-[#0A1628] outline-none placeholder:text-[#9CA3AF]"
+              />
+              {search && (
+                <button onClick={() => setSearch("")} className="text-[#9CA3AF] text-[18px] leading-none">×</button>
+              )}
             </div>
           </div>
+        )}
 
-          {searchOpen && (
-            <div className="px-4 pt-3">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "rgba(255,255,255,0.4)" }} />
-                <input
-                  autoFocus
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search listings, sellers, categories…"
-                  className="h-11 w-full rounded-full pl-11 pr-4 text-sm focus:outline-none"
-                  style={{ backgroundColor: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", color: "#FFFFFF" }}
-                />
-              </div>
-            </div>
-          )}
+        {/* Filter bar — light */}
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10">
+          {/* Category pills */}
+          <div className="flex gap-2 overflow-x-auto px-4 pt-2 pb-1 scrollbar-hide">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setCategory(cat)}
+                className="shrink-0 rounded-full px-3 py-1.5 border text-[12px] font-bold transition-colors"
+                style={category === cat
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
 
-          <div className="px-4 pt-4">
-            <div className="grid grid-cols-4 gap-2 rounded-2xl p-3" style={{ backgroundColor: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-              <Stat value={stats.listings} label="Listings" />
-              <Stat value={stats.sellers} label="Sellers" />
-              <Stat value={stats.states} label="States" />
-              <Stat value={stats.categories} label="Categories" />
+          {/* Dropdown filters row */}
+          <div className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide" onClick={(e) => e.stopPropagation()}>
+            {/* Species dropdown */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => { setSpeciesOpen((v) => !v); setStateOpen(false); setPriceOpen(false); }}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
+                style={selectedSpecies !== "All"
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+              >
+                {selectedSpecies === "All" ? "Species" : selectedSpecies}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              {speciesOpen && (
+                <div className="absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 140 }}>
+                  {speciesOptions.map((opt) => (
+                    <button key={opt} onClick={() => { setSelectedSpecies(opt); setSpeciesOpen(false); }}
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
+                      style={{ borderBottom: "1px solid #F3F4F6" }}>
+                      <span className="text-[13px] font-medium text-[#0A1628]">{opt}</span>
+                      {selectedSpecies === opt && (
+                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}>
+                          <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
+
+            {/* State dropdown */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => { setStateOpen((v) => !v); setSpeciesOpen(false); setPriceOpen(false); }}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
+                style={selectedState !== "All States"
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+              >
+                {selectedState}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              {stateOpen && (
+                <div className="absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 140, maxHeight: 240, overflowY: "auto" }}>
+                  {marketStates.map((state) => (
+                    <button key={state} onClick={() => { setSelectedState(state); setStateOpen(false); }}
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
+                      style={{ borderBottom: "1px solid #F3F4F6" }}>
+                      <span className="text-[13px] font-medium text-[#0A1628]">{state}</span>
+                      {selectedState === state && (
+                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}>
+                          <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Price dropdown */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => { setPriceOpen((v) => !v); setStateOpen(false); setSpeciesOpen(false); }}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
+                style={priceRange !== "All"
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+              >
+                {priceRange === "All" ? "Price" : priceRange}
+                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              {priceOpen && (
+                <div className="absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 140 }}>
+                  {priceOptions.map((opt) => (
+                    <button key={opt} onClick={() => { setPriceRange(opt as any); setPriceOpen(false); }}
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
+                      style={{ borderBottom: "1px solid #F3F4F6" }}>
+                      <span className="text-[13px] font-medium text-[#0A1628]">{opt}</span>
+                      {priceRange === opt && (
+                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}>
+                          <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {(selectedState !== "All States" || selectedSpecies !== "All" || priceRange !== "All" || category !== "All") && (
+              <button
+                onClick={() => { setSelectedState("All States"); setSelectedSpecies("All"); setPriceRange("All"); setCategory("All"); }}
+                className="shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold"
+                style={{ backgroundColor: "#FFF8E7", color: "#8B6914", border: "1px solid rgba(201,168,76,0.3)" }}
+              >
+                Clear ×
+              </button>
+            )}
           </div>
         </div>
+
 
 
 
