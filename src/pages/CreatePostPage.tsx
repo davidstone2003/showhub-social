@@ -311,6 +311,7 @@ export default function CreatePostPage() {
         user_id: user?.id || null, posted_as_breeder_id: postedAsBreederId,
         caption: generalCaption.trim() || null, image_urls: imageUrls, video_url: videoUrl,
         tags: species ? [species] : [], post_type: "general", show_on_feed: true,
+        is_reel: isReel && !!videoUrl,
         tagged_user_ids: taggedPeople.map(p => p.id),
       }).select("id").single();
       if (postError) throw postError;
