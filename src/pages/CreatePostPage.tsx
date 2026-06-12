@@ -651,21 +651,6 @@ export default function CreatePostPage() {
           </div>
         )}
 
-        {/* Inline Post button */}
-        <div className="px-4 pt-4 pb-2">
-          <button
-            onClick={handlePost}
-            disabled={submitting}
-            className={cn(
-              "w-full h-12 rounded-xl text-[16px] font-bold transition-opacity",
-              submitting && "opacity-40"
-            )}
-            style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
-          >
-            {submitting ? "Posting…" : "Post"}
-          </button>
-
-        </div>
       </div>
 
 
