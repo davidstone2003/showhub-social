@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { LiveStrip } from "@/components/LiveStrip";
 import { Feed } from "@/components/Feed";
 import { ReelsView } from "@/components/ReelsView";
+import { ReelsStrip } from "@/components/ReelsStrip";
 
 const Index = () => {
-  const [feedTab, setFeedTab] = useState<"feed" | "reels">("feed");
+  const [reelsOpen, setReelsOpen] = useState(false);
 
   return (
     <Layout showDiscovery={false}>
@@ -17,32 +18,27 @@ const Index = () => {
             <LiveStrip />
           </div>
 
-          <div className="flex gap-2 px-1 pt-2 pb-3">
-            <button
-              onClick={() => setFeedTab("feed")}
-              className="flex-1 py-2 rounded-full text-[14px] font-bold transition-colors"
-              style={feedTab === "feed"
-                ? { backgroundColor: "#0A1628", color: "#FFFFFF" }
-                : { backgroundColor: "#F3F4F6", color: "#6B7280" }
-              }
-            >
-              Feed
-            </button>
-            <button
-              onClick={() => setFeedTab("reels")}
-              className="flex-1 py-2 rounded-full text-[14px] font-bold transition-colors"
-              style={feedTab === "reels"
-                ? { backgroundColor: "#0A1628", color: "#FFFFFF" }
-                : { backgroundColor: "#F3F4F6", color: "#6B7280" }
-              }
-            >
-              🎬 Reels
-            </button>
-          </div>
+          <ReelsStrip onOpen={() => setReelsOpen(true)} />
 
-          {feedTab === "feed" ? <Feed /> : <ReelsView />}
+          <Feed />
         </div>
       </div>
+
+      {reelsOpen && (
+        <div className="fixed inset-0 z-50 bg-black">
+          <button
+            onClick={() => setReelsOpen(false)}
+            aria-label="Close reels"
+            className="absolute top-3 left-3 z-[60] w-10 h-10 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: "rgba(0,0,0,0.55)" }}
+          >
+            <X className="w-5 h-5 text-white" />
+          </button>
+          <div className="h-full w-full max-w-2xl mx-auto px-3">
+            <ReelsView />
+          </div>
+        </div>
+      )}
 
       <Link
         to="/submit"
