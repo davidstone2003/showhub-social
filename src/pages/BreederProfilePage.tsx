@@ -166,6 +166,26 @@ export default function BreederProfilePage() {
         <div className="max-w-2xl mx-auto px-4 py-5 space-y-6">
           {!isPaid && (
             <>
+              {isOwnProfile && (
+                <div
+                  className="p-4 rounded-2xl text-center"
+                  style={{ backgroundColor: "#FFFBF0", border: "1px solid rgba(201,168,76,0.3)" }}
+                >
+                  <p className="font-bold text-[16px]" style={{ color: "#0A1628" }}>
+                    Unlock Your Breeder Page
+                  </p>
+                  <p className="text-[13px] mt-1 mb-3" style={{ color: "#6B7280" }}>
+                    Show your winners, sires, and available animals in one place
+                  </p>
+                  <Link
+                    to="/pricing"
+                    className="inline-block rounded-full px-5 py-2 font-bold text-[14px]"
+                    style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+                  >
+                    Upgrade for $24.99/mo
+                  </Link>
+                </div>
+              )}
               {recentPosts.length > 0 && (
                 <BreederSection icon={Activity} title="Recent Posts">
                   {renderCards(recentPosts)}
@@ -177,6 +197,7 @@ export default function BreederProfilePage() {
               <LockedSection icon={ShoppingBag} title="Sales / Available" count={sales.length || 2} isOwner={isOwnProfile} />
             </>
           )}
+
 
           {isPaid && (
             <>

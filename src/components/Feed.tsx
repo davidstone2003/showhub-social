@@ -22,6 +22,7 @@ export function Feed() {
   const [dbPosts, setDbPosts] = useState<Post[]>([]);
   const [hiddenPostIds, setHiddenPostIds] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [featuredBreeder, setFeaturedBreeder] = useState<any>(null);
 
   const handleModerated = (postId?: string) => {
     if (postId) {
@@ -32,6 +33,15 @@ export function Feed() {
 
   useEffect(() => {
     async function fetchFeed() {
+      // Fetch one featured breeder for in-feed spotlight
+      const { data: fb } = await (supabase.from("breeder_profiles") as any)
+        .select("id, breeder_name, breeder_slug, logo_url, short_bio, location")
+        .eq("subscription_tier", "featured")
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      setFeaturedBreeder(fb || null);
+
       // 1. Fetch social posts
       const { data: postsData } = await (supabase.from("posts") as any)
         .select("*")
@@ -219,7 +229,57 @@ export function Feed() {
           </>
         ) : allPosts.length > 0 ? (
           allPosts.map((post, i) => (
-            <PostCard key={post.id} post={post} index={i} onModerated={handleModerated} />
+            <div key={post.id}>
+              <PostCard post={post} index={i} onModerated={handleModerated} />
+              {i > 0 && i % 20 === 0 && featuredBreeder && (
+                <Link
+                  to={`/breeder/${featuredBreeder.breeder_slug}`}
+                  className="mx-3 my-2 rounded-2xl overflow-hidden border border-[#E5E7EB] bg-white shadow-sm block"
+                >
+                  <div className="flex items-center gap-3 p-3">
+                    <div
+                      className="w-12 h-12 rounded-xl overflow-hidden shrink-0"
+                      style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}
+                    >
+                      {featuredBreeder.logo_url ? (
+                        <img src={featuredBreeder.logo_url} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <span
+                          className="w-full h-full flex items-center justify-center text-[16px] font-black"
+                          style={{ color: "#C9A84C" }}
+                        >
+                          {featuredBreeder.breeder_name?.charAt(0)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-bold text-[14px] text-[#0A1628] truncate">{featuredBreeder.breeder_name}</p>
+                        <span
+                          className="text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
+                          style={{ backgroundColor: "#FFFBF0", color: "#8B6914", border: "1px solid rgba(201,168,76,0.3)" }}
+                        >
+                          Featured
+                        </span>
+                      </div>
+                      {featuredBreeder.short_bio && (
+                        <p className="text-[12px] truncate mt-0.5" style={{ color: "#6B7280" }}>
+                          {featuredBreeder.short_bio}
+                        </p>
+                      )}
+                      {featuredBreeder.location && (
+                        <p className="text-[11px] mt-0.5" style={{ color: "#9CA3AF" }}>
+                          {featuredBreeder.location}
+                        </p>
+                      )}
+                    </div>
+                    <span className="text-[12px] font-bold shrink-0" style={{ color: "#C9A84C" }}>
+                      View →
+                    </span>
+                  </div>
+                </Link>
+              )}
+            </div>
           ))
         ) : (
           <div className="flex flex-col items-center text-center" style={{ padding: "80px 16px" }}>
