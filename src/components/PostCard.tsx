@@ -326,9 +326,16 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </div>
         )}
 
+        {/* Photos */}
+        {(post as any).video_url ? (
+          <FeedVideo src={(post as any).video_url} aspectRatio="4 / 3" />
+        ) : (
+          <PhotoGrid images={allImages} onTap={openViewer} />
+        )}
+
         {/* Winner info — plain text, no card */}
         {isWinner && (post.win_placing || post.win_title) && (
-          <div className="px-3 pb-1">
+          <div className="px-3 pb-1 pt-2">
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
@@ -359,14 +366,6 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
               )}
             </button>
           </div>
-        )}
-
-
-        {/* Photos */}
-        {(post as any).video_url ? (
-          <FeedVideo src={(post as any).video_url} aspectRatio="4 / 3" />
-        ) : (
-          <PhotoGrid images={allImages} onTap={openViewer} />
         )}
 
         {/* Engagement row */}
