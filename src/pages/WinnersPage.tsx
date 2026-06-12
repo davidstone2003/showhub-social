@@ -279,16 +279,20 @@ export default function WinnersPage() {
               <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Winners</h1>
               <div className="flex items-center gap-2">
                 <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.15)", backgroundColor: "rgba(255,255,255,0.06)" }}>
-                  {([["feed", List], ["results", AlignLeft], ["grid", LayoutGrid]] as const).map(([mode, Icon]) => (
-                    <button
-                      key={mode}
-                      onClick={() => setViewMode(mode)}
-                      className="p-2 transition-colors"
-                      style={{ backgroundColor: viewMode === mode ? "rgba(201,168,76,0.25)" : "transparent" }}
-                    >
-                      <Icon className="w-4 h-4" style={{ color: viewMode === mode ? "#C9A84C" : "rgba(255,255,255,0.5)" }} />
-                    </button>
-                  ))}
+                  <button
+                    onClick={() => setView("list")}
+                    className="p-2 transition-colors"
+                    style={{ backgroundColor: view === "list" ? "rgba(201,168,76,0.25)" : "transparent" }}
+                  >
+                    <List className="w-4 h-4" style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)" }} />
+                  </button>
+                  <button
+                    onClick={() => setView("grid")}
+                    className="p-2 transition-colors"
+                    style={{ backgroundColor: view === "grid" ? "rgba(201,168,76,0.25)" : "transparent" }}
+                  >
+                    <LayoutGrid className="w-4 h-4" style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)" }} />
+                  </button>
                 </div>
                 <button onClick={() => setSearchOpen(true)} className="p-1.5">
                   <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
