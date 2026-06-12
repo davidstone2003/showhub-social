@@ -370,9 +370,21 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                   Sired by <span style={{ fontWeight: 600, color: "#C9A84C" }}>{post.sired_by}</span>
                 </p>
               )}
+              {(post as any).tagged_user_ids?.length > 0 && (post as any).tagged_names?.length > 0 && (
+                <p style={{ fontSize: 13, color: "#6B7280", marginTop: 1 }}>
+                  With{" "}
+                  {((post as any).tagged_names as string[]).map((name, i, arr) => (
+                    <span key={i}>
+                      <span style={{ fontWeight: 600, color: "#0A1628" }}>{name}</span>
+                      {i < arr.length - 2 ? ", " : i === arr.length - 2 ? " and " : ""}
+                    </span>
+                  ))}
+                </p>
+              )}
             </button>
           </div>
         )}
+
 
         {/* Engagement row */}
         <div className="flex items-center gap-4 px-3 pb-3 pt-2 bg-white" style={{ borderTop: "1px solid #F3F4F6" }}>

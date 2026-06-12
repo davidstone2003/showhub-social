@@ -919,6 +919,21 @@ export default function CreatePostPage() {
             <FieldLabel>Placed By</FieldLabel>
             <Input value={placedBy} onChange={(e) => setPlacedBy(e.target.value)} placeholder="Placed by" className="h-11 rounded-lg" />
 
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[12px] font-bold uppercase tracking-wide text-[#5C6470]">Tag People</label>
+                {taggedPeople.length > 0 && (
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+                    {taggedPeople.length} tagged
+                  </span>
+                )}
+              </div>
+              <p className="text-[12px] text-[#5C6470] mb-2">Tag exhibitors, fitters, breeders or anyone involved</p>
+              <PeopleTagger tagged={taggedPeople} onChange={setTaggedPeople} />
+            </div>
+
+
+
 
 
             <FieldLabel>Sired By</FieldLabel>

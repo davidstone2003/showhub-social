@@ -65,9 +65,13 @@ export function Feed() {
         }
       }
 
-      // Collect all user/breeder IDs for profile lookups
+      // Collect all user/breeder IDs for profile lookups (including tagged users)
       const allItems = [...(postsData || []), ...(standaloneWinners || [])];
-      const userIds = [...new Set(allItems.filter((w: any) => w.user_id).map((w: any) => w.user_id as string))];
+      const taggedIds = (postsData || []).flatMap((p: any) => (p.tagged_user_ids || []) as string[]);
+      const userIds = [...new Set([
+        ...allItems.filter((w: any) => w.user_id).map((w: any) => w.user_id as string),
+        ...taggedIds,
+      ])];
       let profilesMap: Record<string, any> = {};
       if (userIds.length > 0) {
         const { data: profiles } = await supabase
@@ -78,6 +82,7 @@ export function Feed() {
           profilesMap = Object.fromEntries(profiles.map((p) => [p.id, p]));
         }
       }
+
 
       const breederIds = [...new Set(allItems.filter((w: any) => w.posted_as_breeder_id).map((w: any) => w.posted_as_breeder_id as string))];
       let breederProfilesMap: Record<string, any> = {};
@@ -123,6 +128,15 @@ export function Feed() {
         const breeder = resolveIdentity(p);
         const cards = winnerCardsMap[p.id] || [];
         const firstCard = cards[0];
+        const taggedUserIds = (p.tagged_user_ids || []) as string[];
+        const taggedNames = taggedUserIds
+          .map((uid) => {
+            const pr = profilesMap[uid];
+            if (!pr) return null;
+            const full = [pr.first_name, pr.last_name].filter(Boolean).join(" ");
+            return full || pr.display_name || pr.username || null;
+          })
+          .filter(Boolean) as string[];
 
         mapped.push({
           id: p.id,
@@ -147,8 +161,11 @@ export function Feed() {
           user_id: p.user_id,
           status: p.status,
           winner_id: firstCard?.id || null,
-        });
+          tagged_user_ids: taggedUserIds,
+          tagged_names: taggedNames,
+        } as any);
       }
+
 
       // Map standalone winners (legacy)
       for (const w of standaloneWinners || []) {

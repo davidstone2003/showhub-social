@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { PeopleTagger, type TaggedPerson } from "@/components/post/PeopleTagger";
 
 interface AdminEditModalProps {
   open: boolean;
@@ -21,6 +22,7 @@ interface AdminEditModalProps {
     dam?: string | null;
     date?: string | null;
     source_post_id?: string | null;
+    tagged_people?: any[];
   };
   onSaved?: () => void;
 }
@@ -36,6 +38,14 @@ export function AdminEditModal({ open, onOpenChange, post, onSaved }: AdminEditM
   const [dam, setDam] = useState(post.dam || "");
   const [date, setDate] = useState(post.date || "");
   const [saving, setSaving] = useState(false);
+  const [taggedPeople, setTaggedPeople] = useState<TaggedPerson[]>(
+    ((post as any).tagged_people || []).map((p: any) => ({
+      id: p.id || p.user_id,
+      name: p.name || p.display_name || "",
+      username: p.username || "",
+      logo_url: p.logo_url || null,
+    }))
+  );
 
   const handleSave = async () => {
     setSaving(true);
@@ -55,7 +65,10 @@ export function AdminEditModal({ open, onOpenChange, post, onSaved }: AdminEditM
       if ((post as any).source_post_id) {
         await supabase
           .from("posts")
-          .update({ caption: caption || null })
+          .update({
+            caption: caption || null,
+            tagged_user_ids: taggedPeople.map(p => p.id),
+          })
           .eq("id", (post as any).source_post_id);
       }
 
@@ -111,6 +124,18 @@ export function AdminEditModal({ open, onOpenChange, post, onSaved }: AdminEditM
           <div>
             <label className="text-xs font-medium text-muted-foreground">Caption</label>
             <Textarea value={caption} onChange={(e) => setCaption(e.target.value)} rows={3} className="resize-none" />
+          </div>
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Tag People</label>
+              {taggedPeople.length > 0 && (
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+                  {taggedPeople.length} tagged
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-muted-foreground mb-2">Tag exhibitors, fitters, breeders or anyone involved</p>
+            <PeopleTagger tagged={taggedPeople} onChange={setTaggedPeople} />
           </div>
           <div className="flex gap-2 pt-2">
             <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>Cancel</Button>
