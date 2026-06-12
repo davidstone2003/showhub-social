@@ -342,11 +342,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         {/* Winner info — plain text, no card */}
         {isWinner && (post.win_placing || post.win_title) && (
           <div className="px-3 pb-1 pt-2">
-            <button
-              type="button"
-              onClick={() => setDrawerOpen(true)}
-              className="w-full text-left"
-            >
+            <div className="w-full text-left">
               <p style={{ fontSize: 14, color: "#0A1628", lineHeight: 1.4 }}>
                 <span className="font-bold">{post.win_placing || post.win_title}</span>
                 {post.show_name && (
@@ -381,9 +377,10 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                   ))}
                 </p>
               )}
-            </button>
+            </div>
           </div>
         )}
+
 
 
         {/* Engagement row */}
