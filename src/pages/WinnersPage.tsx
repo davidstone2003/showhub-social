@@ -435,7 +435,7 @@ export default function WinnersPage() {
               </p>
               {(selectedShow || selectedYear || searchQuery) ? (
                 <button
-                  onClick={() => { setSelectedShow(null); setSelectedYear(null); setSearchQuery(""); }}
+                  onClick={() => { setSelectedShow(null); setSelectedYear(null); setSearchQuery(""); setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); }}
                   className="mt-4 rounded-full px-5 py-2 font-bold text-[14px]"
                   style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
                 >
