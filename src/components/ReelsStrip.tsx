@@ -78,19 +78,19 @@ export function ReelsStrip({ onOpen }: ReelsStripProps) {
           to="/submit?type=reel"
           className="shrink-0 snap-start relative rounded-2xl overflow-hidden flex flex-col items-center justify-end"
           style={{
-            width: 110,
-            height: 180,
+            width: 84,
+            height: 126,
             background: "linear-gradient(180deg, #1B3A6B 0%, #0A1628 100%)",
           }}
         >
           <div
-            className="absolute top-3 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full flex items-center justify-center border-2 border-white"
+            className="absolute top-2 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full flex items-center justify-center border-2 border-white"
             style={{ backgroundColor: "#C9A84C" }}
           >
-            <Plus className="w-5 h-5" strokeWidth={3} style={{ color: "#0A1628" }} />
+            <Plus className="w-3.5 h-3.5" strokeWidth={3} style={{ color: "#0A1628" }} />
           </div>
-          <div className="w-full text-center pb-2.5">
-            <p className="text-white text-[11px] font-bold leading-tight">Post a Reel</p>
+          <div className="w-full text-center pb-2">
+            <p className="text-white text-[10px] font-bold leading-tight">Post a Reel</p>
           </div>
         </Link>
 
@@ -99,7 +99,7 @@ export function ReelsStrip({ onOpen }: ReelsStripProps) {
               <div
                 key={i}
                 className="shrink-0 snap-start rounded-2xl bg-[#E5E7EB] animate-pulse"
-                style={{ width: 110, height: 180 }}
+                style={{ width: 84, height: 126 }}
               />
             ))
           : reels.map((r) => (
@@ -107,7 +107,7 @@ export function ReelsStrip({ onOpen }: ReelsStripProps) {
                 key={r.id}
                 onClick={() => onOpen?.(r.id)}
                 className="shrink-0 snap-start relative rounded-2xl overflow-hidden bg-black active:scale-[0.97] transition-transform"
-                style={{ width: 110, height: 180 }}
+                style={{ width: 84, height: 126 }}
               >
                 {r.poster ? (
                   <img src={r.poster} alt="" className="absolute inset-0 w-full h-full object-cover" />
@@ -131,23 +131,23 @@ export function ReelsStrip({ onOpen }: ReelsStripProps) {
                 />
                 {/* Avatar circle */}
                 <div
-                  className="absolute top-2 left-2 w-8 h-8 rounded-full overflow-hidden flex items-center justify-center border-2"
+                  className="absolute top-1.5 left-1.5 w-6 h-6 rounded-full overflow-hidden flex items-center justify-center border-2"
                   style={{ borderColor: "#C9A84C", background: "linear-gradient(135deg, #0A1628, #1B3A6B)" }}
                 >
                   {r.breeder_logo ? (
                     <img src={r.breeder_logo} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-[10px] font-bold text-[#C9A84C]">
+                    <span className="text-[9px] font-bold text-[#C9A84C]">
                       {r.breeder_name.charAt(0).toUpperCase()}
                     </span>
                   )}
                 </div>
                 {/* Play icon */}
-                <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/40 flex items-center justify-center">
-                  <Play className="w-3 h-3 text-white" fill="white" />
+                <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-black/40 flex items-center justify-center">
+                  <Play className="w-2.5 h-2.5 text-white" fill="white" />
                 </div>
                 {/* Name */}
-                <p className="absolute bottom-2 left-2 right-2 text-white text-[11px] font-bold leading-tight line-clamp-2 text-left">
+                <p className="absolute bottom-1.5 left-1.5 right-1.5 text-white text-[10px] font-bold leading-tight line-clamp-2 text-left">
                   {r.breeder_name}
                 </p>
               </button>
