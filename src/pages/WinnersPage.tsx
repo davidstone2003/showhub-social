@@ -580,7 +580,7 @@ export default function WinnersPage() {
 }
 
 function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: {
-  group: { showName: string; year: number; rows: WinnerRow[] };
+  group: { showName: string; year: number | null; rows: WinnerRow[] };
   onSelectPost: (post: Post) => void;
   profilesMap: Record<string, any>;
   breederProfilesMap: Record<string, any>;
