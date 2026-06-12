@@ -33,6 +33,15 @@ export function Feed() {
 
   useEffect(() => {
     async function fetchFeed() {
+      // Fetch one featured breeder for in-feed spotlight
+      const { data: fb } = await (supabase.from("breeder_profiles") as any)
+        .select("id, breeder_name, breeder_slug, logo_url, short_bio, location")
+        .eq("subscription_tier", "featured")
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      setFeaturedBreeder(fb || null);
+
       // 1. Fetch social posts
       const { data: postsData } = await (supabase.from("posts") as any)
         .select("*")
