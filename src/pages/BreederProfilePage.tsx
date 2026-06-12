@@ -217,17 +217,17 @@ export default function BreederProfilePage() {
           {isPaid && (
             <>
               <div className="flex gap-1 border-b border-border -mx-4 px-4 sticky top-0 bg-background z-10">
-                {(["posts", "winners", "sires", "forsale"] as const).map((t) => (
+                {(["posts", "winners", "sires", "videos", "forsale"] as const).map((t) => (
                   <button
                     key={t}
                     onClick={() => setTab(t)}
-                    className="flex-1 py-2.5 text-[13px] font-bold border-b-2 transition-colors"
+                    className="flex-1 py-2.5 text-[12px] font-bold border-b-2 transition-colors"
                     style={tab === t
                       ? { borderColor: "#C9A84C", color: "#0A1628" }
                       : { borderColor: "transparent", color: "#9CA3AF" }
                     }
                   >
-                    {t === "posts" ? "Posts" : t === "winners" ? `Winners (${winners.length})` : t === "sires" ? `Sires (${sires.length})` : `For Sale (${sales.length})`}
+                    {t === "posts" ? "Posts" : t === "winners" ? `Winners (${winners.length})` : t === "sires" ? `Sires (${sires.length})` : t === "videos" ? `Videos (${breederVideos.length})` : `For Sale (${sales.length})`}
                   </button>
                 ))}
               </div>
