@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Trophy, Dna, ShoppingBag, Play, MapPin, Phone, Mail, Globe, Lock } from "lucide-react";
 import { BreederHero } from "@/components/breeder/BreederHero";
 import { LockedSection } from "@/components/breeder/LockedSection";
+import PhotoViewer from "@/components/PhotoViewer";
+
 import { allDemoLambs } from "@/data/demoLambs";
 import type { Post } from "@/data/mock";
 
@@ -122,6 +124,8 @@ export default function BreederProfilePage() {
   );
 
   const [tab, setTab] = useState<"feed" | "about" | "winners" | "sires" | "forsale" | "videos">("feed");
+  const [winnerViewerIndex, setWinnerViewerIndex] = useState<number | null>(null);
+
 
   const { data: breederVideos = [] } = useQuery({
     queryKey: ["breeder-videos", profile?.id],
@@ -441,9 +445,11 @@ export default function BreederProfilePage() {
                     </span>
                   </div>
                   <div className="grid grid-cols-3 gap-0.5">
-                    {winners.map((w) => (
+                    {winners.map((w, idx) => (
                       <button
                         key={w.id}
+                        type="button"
+                        onClick={() => w.image_urls?.[0] && setWinnerViewerIndex(idx)}
                         className="relative aspect-square overflow-hidden bg-[#F3F4F6] active:opacity-80"
                       >
                         {w.image_urls?.[0] ? (
@@ -466,6 +472,15 @@ export default function BreederProfilePage() {
                       </button>
                     ))}
                   </div>
+                  <PhotoViewer
+                    images={winners.map((w) => w.image_urls?.[0] || "").filter(Boolean)}
+                    initialIndex={winnerViewerIndex ?? 0}
+                    isOpen={winnerViewerIndex !== null}
+                    onClose={() => setWinnerViewerIndex(null)}
+                    placement={winnerViewerIndex !== null ? winners[winnerViewerIndex]?.win_placing || undefined : undefined}
+                    caption={winnerViewerIndex !== null ? [winners[winnerViewerIndex]?.show_name, winners[winnerViewerIndex]?.shown_by].filter(Boolean).join(" • ") : undefined}
+                  />
+
                 </>
               )}
             </div>
