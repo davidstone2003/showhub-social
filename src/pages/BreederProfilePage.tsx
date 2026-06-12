@@ -126,7 +126,7 @@ export default function BreederProfilePage() {
     [breederName]
   );
 
-  const [tab, setTab] = useState<"posts" | "lambs" | "results">("posts");
+  const [tab, setTab] = useState<"posts" | "winners" | "sires" | "forsale">("posts");
 
   const renderCards = (items: WinnerRow[]) =>
     items.map((post, i) => <PostCard key={post.id} post={toPost(post, profile)} index={i} />);
