@@ -22,17 +22,25 @@ type Listing = {
   price: string;
   meta: string;
   category: Exclude<Category, "All">;
+  species?: string;
   image_url?: string;
 };
 
 const LISTINGS: Listing[] = [
-  { id: "1", title: "Hampshire Ram Lamb",   price: "$1,800", meta: "IA · Posted 2d ago", category: "Stock" },
+  { id: "1", title: "Hampshire Ram Lamb",   price: "$1,800", meta: "IA · Posted 2d ago", category: "Stock",         species: "Sheep" },
   { id: "2", title: "Show Feed — 50lb",     price: "$42",    meta: "OH · Posted 3d ago", category: "Nutrition" },
   { id: "3", title: "Hauling — Midwest",    price: "Quote",  meta: "KS · Service",       category: "Services" },
-  { id: "4", title: "Boer Doe Kid",         price: "$950",   meta: "TX · Posted 5d ago", category: "Stock" },
+  { id: "4", title: "Boer Doe Kid",         price: "$950",   meta: "TX · Posted 5d ago", category: "Stock",         species: "Goats" },
   { id: "5", title: "Grooming Spray Kit",   price: "$78",    meta: "IN · Posted 1d ago", category: "Show Supplies" },
   { id: "6", title: "Show Day Photography", price: "Quote",  meta: "WI · Service",       category: "Services" },
 ];
+
+function priceToNumber(p: string): number | null {
+  const m = p.match(/\$([0-9,]+)/);
+  if (!m) return null;
+  return parseInt(m[1].replace(/,/g, ""), 10);
+}
+
 
 export default function MarketPage() {
   const [search, setSearch] = useState("");
