@@ -79,17 +79,17 @@ export function ResultBlock({ result, index, total, onChange, onRemove, defaultE
             value={result.shownBy}
             onChange={(name) => onChange({ ...result, shownBy: name })}
           />
-          <Input
+          <AutocompleteInput
+            table="breeders_lookup"
             placeholder="Placed by"
             value={result.placedBy}
-            onChange={(e) => onChange({ ...result, placedBy: e.target.value })}
-            className="rounded-xl bg-card border-border h-11 text-sm"
+            onChange={(display) => onChange({ ...result, placedBy: display })}
           />
-          <Input
+          <AutocompleteInput
+            table="breeders_lookup"
             placeholder="Bred by"
             value={result.bredBy}
-            onChange={(e) => onChange({ ...result, bredBy: e.target.value })}
-            className="rounded-xl bg-card border-border h-11 text-sm"
+            onChange={(display) => onChange({ ...result, bredBy: display })}
           />
         </div>
       )}
