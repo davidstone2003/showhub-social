@@ -244,48 +244,82 @@ export default function WinnersPage() {
           )}
         </div>
 
-        {/* Species pills */}
-        <div className="px-4 pt-3 pb-3" style={{ backgroundColor: "#0A1628" }}>
-          <SpeciesPills value={species} onChange={setSpecies} appMode />
-        </div>
+        {/* Filters — light background, directly above content */}
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10">
+          {/* Species pills */}
+          <div className="px-4 pt-2 pb-1">
+            <SpeciesPills value={species} onChange={setSpecies} />
+          </div>
 
-        {/* Year filter */}
-        {years.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto px-4 pb-3 scrollbar-hide" style={{ backgroundColor: "#0A1628" }}>
-            <button
-              onClick={() => setSelectedYear(null)}
-              className="shrink-0 rounded-full px-3 py-1 text-[12px] font-bold transition-colors"
-              style={!selectedYear ? { backgroundColor: "#C9A84C", color: "#0A1628" } : { backgroundColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)" }}
-            >
-              All Years
-            </button>
-            {years.map(y => (
+          {/* Year pills + Filter button row */}
+          <div className="flex items-center gap-2 px-4 pb-2">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide flex-1">
               <button
-                key={y}
-                onClick={() => setSelectedYear(selectedYear === y ? null : y)}
-                className="shrink-0 rounded-full px-3 py-1 text-[12px] font-bold transition-colors"
-                style={selectedYear === y ? { backgroundColor: "#C9A84C", color: "#0A1628" } : { backgroundColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)" }}
+                onClick={() => setSelectedYear(null)}
+                className="shrink-0 rounded-full px-3 py-1 text-[12px] font-bold border transition-colors"
+                style={!selectedYear
+                  ? { backgroundColor: "#0A1628", color: "#FFFFFF", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
+                }
               >
-                {y}
+                All Years
               </button>
-            ))}
-          </div>
-        )}
-
-        {/* Active filter summary */}
-        {(selectedShow || selectedYear || searchQuery) && (
-          <div className="flex items-center gap-2 px-4 py-2 bg-white border-b border-[#E5E7EB]">
-            <span className="text-[12px] text-[#6B7280]">
-              {[selectedShow, selectedYear?.toString(), searchQuery ? `"${searchQuery}"` : null].filter(Boolean).join(" · ")}
-            </span>
+              {years.map(y => (
+                <button
+                  key={y}
+                  onClick={() => setSelectedYear(selectedYear === y ? null : y)}
+                  className="shrink-0 rounded-full px-3 py-1 text-[12px] font-bold border transition-colors"
+                  style={selectedYear === y
+                    ? { backgroundColor: "#0A1628", color: "#FFFFFF", borderColor: "#0A1628" }
+                    : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
+                  }
+                >
+                  {y}
+                </button>
+              ))}
+            </div>
             <button
-              onClick={() => { setSelectedShow(null); setSelectedYear(null); setSearchQuery(""); }}
-              className="ml-auto text-[12px] font-bold text-[#C9A84C]"
+              onClick={() => setShowSelectorOpen(true)}
+              className="shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-bold relative transition-colors"
+              style={selectedShow
+                ? { backgroundColor: "#0A1628", color: "#FFFFFF", borderColor: "#0A1628" }
+                : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
+              }
             >
-              Clear
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              Filters
+              {selectedShow && (
+                <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] ml-0.5" />
+              )}
             </button>
           </div>
-        )}
+
+          {/* Active filter chips */}
+          {(selectedShow || searchQuery) && (
+            <div className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide">
+              {[
+                { val: selectedShow, clear: () => setSelectedShow(null) },
+                { val: searchQuery ? `"${searchQuery}"` : null, clear: () => setSearchQuery("") },
+              ].filter(f => f.val).map((f, i) => (
+                <span
+                  key={i}
+                  className="shrink-0 flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold"
+                  style={{ backgroundColor: "#FFFBF0", color: "#8B6914", border: "1px solid rgba(201,168,76,0.4)" }}
+                >
+                  {f.val}
+                  <button onClick={f.clear} className="ml-0.5 font-bold">×</button>
+                </span>
+              ))}
+              <button
+                onClick={() => { setSelectedShow(null); setSelectedYear(null); setSearchQuery(""); }}
+                className="shrink-0 text-[11px] font-bold"
+                style={{ color: "#C9A84C" }}
+              >
+                Clear all
+              </button>
+            </div>
+          )}
+        </div>
 
         <div>
           {loading ? (
