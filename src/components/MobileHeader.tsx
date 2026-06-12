@@ -17,6 +17,9 @@ const ROOT_ROUTES = new Set([
   "/dashboard",
 ]);
 
+// Routes that have their own page-level search; suppress the global search icon here
+const PAGES_WITH_OWN_SEARCH = new Set(["/winners", "/breeders", "/sires", "/sales", "/market"]);
+
 // Map of route patterns -> screen titles for the back-button header
 const TITLE_RULES: { match: (path: string) => boolean; title: string }[] = [
   { match: (p) => p === "/submit", title: "New Post" },
