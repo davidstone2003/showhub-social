@@ -144,9 +144,18 @@ function WinnerCard({ winner, index }: { winner: WinnerRecord; index: number }) 
           {winner.bred_by && <DetailLine label="Bred by" value={winner.bred_by} />}
         </div>
       </div>
+
+      <PhotoViewer
+        images={allImages}
+        isOpen={viewerOpen}
+        onClose={() => setViewerOpen(false)}
+        caption={[winner.show_name, winner.shown_by].filter(Boolean).join(" • ")}
+        placement={winner.win_placing || undefined}
+      />
     </motion.div>
   );
 }
+
 
 function DetailLine({ label, value, linkTo }: { label: string; value: string; linkTo?: string }) {
   return (
