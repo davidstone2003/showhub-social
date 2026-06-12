@@ -14,6 +14,7 @@ import { useEmailVerification } from "@/hooks/useEmailVerification";
 import { VerifyEmailModal } from "@/components/VerifyEmailModal";
 import { WinnerImageViewer } from "@/components/winners/WinnerImageViewer";
 import { WinnerDetailDrawer } from "@/components/post/WinnerDetailDrawer";
+import { CommentSheet } from "@/components/post/CommentSheet";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
