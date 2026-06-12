@@ -154,27 +154,57 @@ const SiresPage = () => {
           style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
         >
           <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Sires</h1>
-          <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.12)", backgroundColor: "rgba(255,255,255,0.06)" }}>
+          <div className="flex items-center gap-2">
             <button
-              type="button"
-              onClick={() => setView("list")}
-              aria-label="List view"
-              className="p-2 transition-colors"
-              style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "list" ? "rgba(255,255,255,0.08)" : "transparent" }}
+              onClick={() => setSearchOpen((v) => !v)}
+              className="p-1.5"
+              aria-label="Search"
             >
-              <ListIcon className="w-4 h-4" />
+              <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
             </button>
-            <button
-              type="button"
-              onClick={() => setView("grid")}
-              aria-label="Grid view"
-              className="p-2 transition-colors"
-              style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "grid" ? "rgba(255,255,255,0.08)" : "transparent" }}
-            >
-              <LayoutGrid className="w-4 h-4" />
-            </button>
+            <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.12)", backgroundColor: "rgba(255,255,255,0.06)" }}>
+              <button
+                type="button"
+                onClick={() => setView("list")}
+                aria-label="List view"
+                className="p-2 transition-colors"
+                style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "list" ? "rgba(255,255,255,0.08)" : "transparent" }}
+              >
+                <ListIcon className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("grid")}
+                aria-label="Grid view"
+                className="p-2 transition-colors"
+                style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "grid" ? "rgba(255,255,255,0.08)" : "transparent" }}
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+            </div>
+            <CreateButton to="/submit-sire" label="Add sire" />
           </div>
         </div>
+
+        {/* Inline search (collapsible) */}
+        {searchOpen && (
+          <div className="px-4 py-2 bg-white border-b border-[#E5E7EB]">
+            <div className="flex items-center gap-2 bg-[#F3F4F6] rounded-xl px-3 py-2">
+              <Search className="w-4 h-4 text-[#9CA3AF] shrink-0" />
+              <input
+                autoFocus
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search sires or breeders…"
+                className="flex-1 bg-transparent text-[14px] text-[#0A1628] outline-none placeholder:text-[#9CA3AF]"
+              />
+              {search && (
+                <button onClick={() => setSearch("")} className="text-[#9CA3AF] text-[18px] leading-none">×</button>
+              )}
+            </div>
+          </div>
+        )}
+
 
         {/* Filter bar — light */}
         <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10">
