@@ -30,11 +30,12 @@ export function ReelsView() {
     const fetchClips = async () => {
       const { data } = await (supabase.from("posts") as any)
         .select(
-          "id, video_url, caption, likes, comments, created_at, tags, posted_as_breeder_id, user_id"
+          "id, video_url, caption, likes, comments, created_at, tags, posted_as_breeder_id, user_id, is_reel"
         )
         .not("video_url", "is", null)
         .eq("status", "active")
         .eq("show_on_feed", true)
+        .order("is_reel", { ascending: false })
         .order("created_at", { ascending: false })
         .limit(30);
 
