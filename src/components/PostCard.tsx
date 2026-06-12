@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, MessageCircle, Share2, Flag, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { Heart, MessageCircle, Share2, Flag, MoreVertical, Pencil, Trash2, User, Trophy } from "lucide-react";
 import { FeedVideo } from "@/components/post/VideoPlayer";
 import { motion } from "framer-motion";
 import type { Post } from "@/data/mock";
@@ -416,6 +416,31 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
             <Share2 className="w-4 h-4" />
           </button>
         </div>
+
+        {/* Comment teaser — Instagram style */}
+        {post.comments > 0 && (
+          <div className="px-3 pb-2">
+            {post.comments > 2 && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (!user) { setShowAuthGate(true); return; }
+                  setShowComments(true);
+                }}
+                className="block text-[13px] font-semibold mb-1"
+                style={{ color: "#9CA3AF" }}
+              >
+                View all {post.comments} comments
+              </button>
+            )}
+            {(post as any).latest_comment_author && (post as any).latest_comment && (
+              <p className="text-[13px]" style={{ color: "#0A1628", lineHeight: 1.4 }}>
+                <span className="font-semibold">{(post as any).latest_comment_author}</span>{" "}
+                <span>{(post as any).latest_comment}</span>
+              </p>
+            )}
+          </div>
+        )}
       </motion.article>
 
       {showShareSheet && (
@@ -472,13 +497,47 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                     className="w-full flex items-center gap-4 py-3.5 border-b border-[#F3F4F6]"
                   >
                     <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#F0F4FF" }}>
-                      <svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                        <path d="M3 12L12 3L21 12V20C21 20.5523 20.5523 21 20 21H15V16H9V21H4C3.44772 21 3 20.5523 3 20V12Z" stroke="#0A1628" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+                      <User className="w-5 h-5" style={{ color: "#0A1628" }} />
                     </div>
                     <div className="text-left">
-                      <p className="font-semibold text-[15px] text-[#0A1628]">Share to Feed</p>
-                      <p className="text-[12px] text-[#9CA3AF]">Repost with your own caption</p>
+                      <p className="font-semibold text-[15px] text-[#0A1628]">Share to Your Profile</p>
+                      <p className="text-[12px] text-[#9CA3AF]">Add to your Backdrop profile page</p>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      if (!user) { setShowShareSheet(false); setShowAuthGate(true); return; }
+                      setSharing(true);
+                      try {
+                        const { error } = await (supabase.from("posts") as any).insert({
+                          user_id: user.id,
+                          caption: (post as any).caption || null,
+                          image_urls: (post as any).image_urls || (post.image && post.image !== "/placeholder.svg" ? [post.image] : []),
+                          video_url: (post as any).video_url || null,
+                          post_type: "general",
+                          status: "active",
+                          show_on_feed: false,
+                          show_on_breeder_page: true,
+                          reposted_from_id: (post as any).source_post_id || post.id,
+                        });
+                        if (error) throw error;
+                        toast.success("Added to your breeder page");
+                        setShowShareSheet(false);
+                      } catch (err: any) {
+                        toast.error("Couldn't add to breeder page", { description: err.message });
+                      } finally {
+                        setSharing(false);
+                      }
+                    }}
+                    className="w-full flex items-center gap-4 py-3.5 border-b border-[#F3F4F6]"
+                  >
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#FFF8E7" }}>
+                      <Trophy className="w-5 h-5" style={{ color: "#C9A84C" }} />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-semibold text-[15px] text-[#0A1628]">Add to Breeder Page</p>
+                      <p className="text-[12px] text-[#9CA3AF]">Show on your operation's profile</p>
                     </div>
                   </button>
 
@@ -585,7 +644,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                       if (!user) return;
                       setSharing(true);
                       try {
-                        const { error } = await supabase.from("posts").insert({
+                        const { error } = await (supabase.from("posts") as any).insert({
                           user_id: user.id,
                           caption: repostCaption.trim() || null,
                           image_urls: (post as any).image_urls || (post.image && post.image !== "/placeholder.svg" ? [post.image] : []),
@@ -593,6 +652,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                           post_type: "general",
                           status: "active",
                           show_on_feed: true,
+                          show_on_breeder_page: true,
                           reposted_from_id: (post as any).source_post_id || post.id,
                         });
                         if (error) throw error;
@@ -623,8 +683,8 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                     </span>
                   </div>
                   <div>
-                    <p className="font-semibold text-[14px] text-[#0A1628]">Posting to your feed</p>
-                    <p className="text-[12px] text-[#9CA3AF]">Visible to all Backdrop users</p>
+                    <p className="font-semibold text-[14px] text-[#0A1628]">Sharing to your profile</p>
+                    <p className="text-[12px] text-[#9CA3AF]">Visible on your Backdrop profile page</p>
                   </div>
                 </div>
 

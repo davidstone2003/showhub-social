@@ -1,10 +1,14 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { LiveStrip } from "@/components/LiveStrip";
 import { Feed } from "@/components/Feed";
+import { ClipsView } from "@/components/ClipsView";
 
 const Index = () => {
+  const [feedTab, setFeedTab] = useState<"feed" | "clips">("feed");
+
   return (
     <Layout showDiscovery={false}>
       <div style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
@@ -12,7 +16,31 @@ const Index = () => {
           <div className="-mt-2">
             <LiveStrip />
           </div>
-          <Feed />
+
+          <div className="flex gap-2 px-1 pt-2 pb-3">
+            <button
+              onClick={() => setFeedTab("feed")}
+              className="flex-1 py-2 rounded-full text-[14px] font-bold transition-colors"
+              style={feedTab === "feed"
+                ? { backgroundColor: "#0A1628", color: "#FFFFFF" }
+                : { backgroundColor: "#F3F4F6", color: "#6B7280" }
+              }
+            >
+              Feed
+            </button>
+            <button
+              onClick={() => setFeedTab("clips")}
+              className="flex-1 py-2 rounded-full text-[14px] font-bold transition-colors"
+              style={feedTab === "clips"
+                ? { backgroundColor: "#0A1628", color: "#FFFFFF" }
+                : { backgroundColor: "#F3F4F6", color: "#6B7280" }
+              }
+            >
+              🎬 Clips
+            </button>
+          </div>
+
+          {feedTab === "feed" ? <Feed /> : <ClipsView />}
         </div>
       </div>
 

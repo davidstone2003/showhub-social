@@ -96,7 +96,7 @@ export default function WinnersPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [species, setSpecies] = useState<SpeciesPill>("All");
 
-  const [viewMode, setViewMode] = useState<"feed" | "results" | "grid">("feed");
+  const [viewMode, setViewMode] = useState<"feed" | "results" | "grid">("results");
   const [selectedShow, setSelectedShow] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");

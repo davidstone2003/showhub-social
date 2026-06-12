@@ -71,7 +71,7 @@ const SiresPage = () => {
   const [sires, setSires] = useState<Sire[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [view, setView] = useState<"list" | "grid">("list");
+  const [view, setView] = useState<"list" | "grid">("grid");
   const [species, setSpecies] = useState<SpeciesPill>("All");
 
   useEffect(() => {
