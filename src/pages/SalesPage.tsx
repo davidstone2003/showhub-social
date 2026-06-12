@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
+import { CreateButton } from "@/components/shared/CreateButton";
 import { SCO_RECENT_SALES } from "@/data/scoRecentSales";
 
 /* ── Upcoming sales ── */
@@ -326,17 +327,19 @@ export default function SalesPage() {
           style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
         >
           <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Sales</h1>
-          <button className="p-1.5 rounded-lg transition-colors">
-            <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
-          </button>
-        </div>
-
-        {/* Species pills */}
-        <div style={{ backgroundColor: "#0A1628" }} className="pb-3">
-          <div className="px-4 pt-3">
-            <SpeciesPills value={species} onChange={setSpecies} appMode />
+          <div className="flex items-center gap-2">
+            <button className="p-1.5 rounded-lg transition-colors" aria-label="Search">
+              <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
+            </button>
+            <CreateButton to="/submit?type=sale" label="Add sale" />
           </div>
         </div>
+
+        {/* Species pills on WHITE band — shared chip style */}
+        <div className="bg-white border-b border-[#E5E7EB] px-4 py-2">
+          <SpeciesPills value={species} onChange={setSpecies} />
+        </div>
+
 
         {/* ─── 1. UPCOMING SALES ─── */}
         <div className="px-4 pt-6">
