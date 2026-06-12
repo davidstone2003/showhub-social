@@ -72,13 +72,6 @@ export function DesktopSidebar() {
               <LogOut className="w-4 h-4" />
               Sign Out
             </button>
-            <NavLink
-              to="/submit"
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-primary-foreground/10 text-primary-foreground text-sm font-semibold hover:bg-primary-foreground/20 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Add to Backdrop
-            </NavLink>
           </>
         ) : (
           <>
