@@ -307,6 +307,43 @@ export default function BreederProfilePage() {
                 )
               )}
 
+              {tab === "videos" && (
+                breederVideos.length === 0 ? (
+                  <div className="flex flex-col items-center py-16 px-4 text-center">
+                    <div style={{ fontSize: 40 }}>🎬</div>
+                    <p className="font-bold text-[17px] mt-2" style={{ color: "#0A1628" }}>No videos yet</p>
+                    <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>
+                      Post fitting videos, walk-arounds, and show day moments
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 gap-0.5">
+                    {breederVideos.map((v: any) => (
+                      <div key={v.id} className="relative aspect-square overflow-hidden bg-black">
+                        <video
+                          src={v.video_url}
+                          className="absolute inset-0 w-full h-full object-cover"
+                          muted
+                          playsInline
+                          preload="metadata"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div className="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center">
+                            <Play className="w-5 h-5 text-white" fill="white" />
+                          </div>
+                        </div>
+                        {v.caption && (
+                          <div className="absolute inset-x-0 bottom-0 p-1.5"
+                            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75), transparent)" }}>
+                            <p className="text-[9px] font-bold text-white truncate leading-tight">{v.caption}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )
+              )}
+
               {tab === "forsale" && (
                 sales.length === 0 ? (
                   <div className="flex flex-col items-center py-16 px-4 text-center">
