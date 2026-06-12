@@ -1,8 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { Search, Trophy } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { CreateButton } from "@/components/shared/CreateButton";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { FilterDropdown } from "@/components/shared/FilterDropdown";
+
 import { supabase } from "@/integrations/supabase/client";
 import { PostCard } from "@/components/PostCard";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton";
