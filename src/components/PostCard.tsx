@@ -157,6 +157,10 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const [viewerIndex, setViewerIndex] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [showShareSheet, setShowShareSheet] = useState(false);
+  const [repostCaption, setRepostCaption] = useState("");
+  const [showRepostComposer, setShowRepostComposer] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
   const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
@@ -391,64 +395,256 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
             <MessageCircle className="w-4 h-4" />
             <span>{post.comments || 0}</span>
           </button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="flex items-center gap-1.5 ml-auto hover:text-primary transition-colors"
-                style={{ fontSize: 13, color: "hsl(var(--muted-foreground))" }}
-                aria-label="Share"
-              >
-                <Share2 className="w-4 h-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-44">
-              <DropdownMenuItem
-                onClick={async () => {
-                  if (!user) { setShowAuthGate(true); return; }
-                  try {
-                    const { error } = await supabase.from("posts").insert({
-                      user_id: user.id,
-                      caption: (post as any).caption || null,
-                      image_urls: (post as any).image_urls || (post.image && post.image !== "/placeholder.svg" ? [post.image] : []),
-                      video_url: (post as any).video_url || null,
-                      post_type: "general",
-                      status: "active",
-                      show_on_feed: true,
-                      reposted_from_id: (post as any).source_post_id || post.id,
-                    });
-                    if (error) throw error;
-                    toast.success("Reposted to your feed");
-                    onModerated?.();
-                  } catch (err: any) {
-                    toast.error("Couldn't repost", { description: err.message });
-                  }
-                }}
-              >
-                <Share2 className="w-3.5 h-3.5 mr-2" /> Repost
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={async () => {
-                  const shareUrl = `${window.location.origin}/post/${post.id}`;
-                  const shareText = [
-                    post.win_placing,
-                    post.show_name,
-                    post.breeder?.name ? `Bred by ${post.breeder.name}` : null,
-                    (post as any).caption
-                  ].filter(Boolean).join(" · ");
-                  if (navigator.share) {
-                    try { await navigator.share({ title: post.win_placing || "Backdrop Post", text: shareText, url: shareUrl }); } catch {}
-                  } else {
-                    await navigator.clipboard.writeText(shareUrl);
-                    toast.success("Link copied to clipboard");
-                  }
-                }}
-              >
-                <Share2 className="w-3.5 h-3.5 mr-2" /> Share link
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <button
+            onClick={() => setShowShareSheet(true)}
+            className="flex items-center gap-1.5 ml-auto hover:text-primary transition-colors"
+            style={{ fontSize: 13, color: "hsl(var(--muted-foreground))" }}
+            aria-label="Share"
+          >
+            <Share2 className="w-4 h-4" />
+          </button>
         </div>
       </motion.article>
+
+      {showShareSheet && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col justify-end"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          onClick={() => { setShowShareSheet(false); setShowRepostComposer(false); setRepostCaption(""); }}
+        >
+          <div
+            className="bg-white rounded-t-2xl overflow-hidden"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex justify-center pt-2 pb-1">
+              <div className="w-10 h-1 rounded-full bg-[#E5E7EB]" />
+            </div>
+            {!showRepostComposer ? (
+              <>
+                <div className="flex items-center gap-3 px-4 py-3 border-b border-[#F3F4F6]">
+                  <div
+                    className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center shrink-0"
+                    style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}
+                  >
+                    {post.breeder?.logo && (post.breeder.logo as string).startsWith("http") ? (
+                      <img src={post.breeder.logo as string} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-[13px] font-bold text-[#C9A84C]">
+                        {(post.breeder?.name || "?").charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-[14px] text-[#0A1628] truncate">
+                      {post.win_placing || post.breeder?.name || "Post"}
+                    </p>
+                    <p className="text-[12px] text-[#9CA3AF] truncate">
+                      {post.show_name || (post as any).caption?.slice(0, 50) || ""}
+                    </p>
+                  </div>
+                  {post.image && post.image !== "/placeholder.svg" && (
+                    <img
+                      src={post.image}
+                      alt=""
+                      className="w-12 h-12 rounded-lg object-cover shrink-0"
+                    />
+                  )}
+                </div>
+
+                <div className="px-4 py-2">
+                  <button
+                    onClick={() => {
+                      if (!user) { setShowShareSheet(false); setShowAuthGate(true); return; }
+                      setShowRepostComposer(true);
+                    }}
+                    className="w-full flex items-center gap-4 py-3.5 border-b border-[#F3F4F6]"
+                  >
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#F0F4FF" }}>
+                      <svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                        <path d="M3 12L12 3L21 12V20C21 20.5523 20.5523 21 20 21H15V16H9V21H4C3.44772 21 3 20.5523 3 20V12Z" stroke="#0A1628" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <div className="text-left">
+                      <p className="font-semibold text-[15px] text-[#0A1628]">Share to Feed</p>
+                      <p className="text-[12px] text-[#9CA3AF]">Repost with your own caption</p>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      toast.info("Direct messaging coming soon");
+                      setShowShareSheet(false);
+                    }}
+                    className="w-full flex items-center gap-4 py-3.5 border-b border-[#F3F4F6]"
+                  >
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#F0FFF4" }}>
+                      <MessageCircle className="w-5 h-5" style={{ color: "#16A34A" }} />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-semibold text-[15px] text-[#0A1628]">Send as Message</p>
+                      <p className="text-[12px] text-[#9CA3AF]">Share privately with someone</p>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const shareUrl = `${window.location.origin}/post/${post.id}`;
+                      const text = [post.win_placing, post.show_name, post.breeder?.name].filter(Boolean).join(" · ");
+                      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(text)}`, "_blank");
+                      setShowShareSheet(false);
+                    }}
+                    className="w-full flex items-center gap-4 py-3.5 border-b border-[#F3F4F6]"
+                  >
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#EEF2FF" }}>
+                      <svg width={20} height={20} viewBox="0 0 24 24" fill="#1877F2">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      </svg>
+                    </div>
+                    <div className="text-left">
+                      <p className="font-semibold text-[15px] text-[#0A1628]">Share to Facebook</p>
+                      <p className="text-[12px] text-[#9CA3AF]">Post on your Facebook timeline</p>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      const shareUrl = `${window.location.origin}/post/${post.id}`;
+                      await navigator.clipboard.writeText(shareUrl);
+                      toast.success("Link copied to clipboard");
+                      setShowShareSheet(false);
+                    }}
+                    className="w-full flex items-center gap-4 py-3.5 border-b border-[#F3F4F6]"
+                  >
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#FFF8E7" }}>
+                      <svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                        <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="#C9A84C" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#C9A84C" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <div className="text-left">
+                      <p className="font-semibold text-[15px] text-[#0A1628]">Copy Link</p>
+                      <p className="text-[12px] text-[#9CA3AF]">Copy post link to clipboard</p>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      const shareUrl = `${window.location.origin}/post/${post.id}`;
+                      const shareText = [post.win_placing, post.show_name, post.breeder?.name ? `Bred by ${post.breeder.name}` : null].filter(Boolean).join(" · ");
+                      if (navigator.share) {
+                        try {
+                          await navigator.share({ title: "Backdrop Post", text: shareText, url: shareUrl });
+                        } catch {}
+                      }
+                      setShowShareSheet(false);
+                    }}
+                    className="w-full flex items-center gap-4 py-3.5"
+                  >
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#F0F4FF" }}>
+                      <Share2 className="w-5 h-5" style={{ color: "#6366F1" }} />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-semibold text-[15px] text-[#0A1628]">More Options</p>
+                      <p className="text-[12px] text-[#9CA3AF]">Share via text, email, or other apps</p>
+                    </div>
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => setShowShareSheet(false)}
+                  className="w-full py-4 font-semibold text-[15px] border-t border-[#E5E7EB]"
+                  style={{ color: "#6B7280" }}
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E7EB]">
+                  <button
+                    onClick={() => setShowRepostComposer(false)}
+                    className="text-[14px] text-[#6B7280]"
+                  >
+                    ← Back
+                  </button>
+                  <h3 className="font-bold text-[16px] text-[#0A1628]">Share to Feed</h3>
+                  <button
+                    onClick={async () => {
+                      if (!user) return;
+                      setSharing(true);
+                      try {
+                        const { error } = await supabase.from("posts").insert({
+                          user_id: user.id,
+                          caption: repostCaption.trim() || null,
+                          image_urls: (post as any).image_urls || (post.image && post.image !== "/placeholder.svg" ? [post.image] : []),
+                          video_url: (post as any).video_url || null,
+                          post_type: "general",
+                          status: "active",
+                          show_on_feed: true,
+                          reposted_from_id: (post as any).source_post_id || post.id,
+                        });
+                        if (error) throw error;
+                        toast.success("Reposted to your feed! 🎉");
+                        setShowShareSheet(false);
+                        setShowRepostComposer(false);
+                        setRepostCaption("");
+                        onModerated?.();
+                      } catch (err: any) {
+                        toast.error("Couldn't repost", { description: err.message });
+                      } finally {
+                        setSharing(false);
+                      }
+                    }}
+                    disabled={sharing}
+                    className="text-[14px] font-bold rounded-full px-4 py-1.5"
+                    style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+                  >
+                    {sharing ? "Posting..." : "Post"}
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center shrink-0"
+                    style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
+                    <span className="text-[14px] font-bold text-[#C9A84C]">
+                      {(user?.email || "?").charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[14px] text-[#0A1628]">Posting to your feed</p>
+                    <p className="text-[12px] text-[#9CA3AF]">Visible to all Backdrop users</p>
+                  </div>
+                </div>
+
+                <div className="px-4 pb-3">
+                  <textarea
+                    value={repostCaption}
+                    onChange={e => setRepostCaption(e.target.value)}
+                    placeholder="Say something about this post..."
+                    className="w-full text-[15px] text-[#0A1628] placeholder:text-[#9CA3AF] outline-none resize-none"
+                    rows={3}
+                    autoFocus
+                  />
+                </div>
+
+                <div className="mx-4 mb-4 rounded-xl border border-[#E5E7EB] overflow-hidden">
+                  {post.image && post.image !== "/placeholder.svg" && (
+                    <img src={post.image} alt="" className="w-full h-32 object-cover" />
+                  )}
+                  <div className="p-3 bg-[#F8F7F4]">
+                    <p className="font-semibold text-[13px] text-[#0A1628] truncate">
+                      {post.win_placing || post.breeder?.name || "Post"}
+                    </p>
+                    <p className="text-[12px] text-[#6B7280] truncate mt-0.5">
+                      {post.show_name || (post as any).caption?.slice(0, 60) || ""}
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <WinnerDetailDrawer post={post} open={drawerOpen} onClose={() => setDrawerOpen(false)} />
       <CommentSheet postId={(post as any).source_post_id || post.id} open={showComments} onClose={() => setShowComments(false)} commentCount={post.comments || 0} />
