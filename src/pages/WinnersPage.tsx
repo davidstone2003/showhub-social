@@ -201,6 +201,15 @@ export default function WinnersPage() {
     if (selectedShow) {
       filteredRows = filteredRows.filter(r => r.show_name === selectedShow);
     }
+    if (selectedCategory !== "All Levels") {
+      filteredRows = filteredRows.filter(r => detectShowCategory(r.show_name || "") === selectedCategory);
+    }
+    if (selectedState !== "All States") {
+      filteredRows = filteredRows.filter(r => r.show_name?.includes(`(${selectedState})`));
+    }
+    if (selectedBreeder !== "All Breeders") {
+      filteredRows = filteredRows.filter(r => r.bred_by === selectedBreeder);
+    }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       filteredRows = filteredRows.filter(r =>
