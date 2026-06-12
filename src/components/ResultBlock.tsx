@@ -115,6 +115,7 @@ export function createEmptyResult(): ResultData {
     id: crypto.randomUUID(),
     showName: "",
     showId: null,
+    showDate: "",
     winPlacing: "",
     shownBy: "",
     placedBy: "",
