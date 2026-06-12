@@ -1,9 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, Facebook, Download, Copy, FileJson, ChevronDown, ChevronUp, Plus } from "lucide-react";
-import { PostListingUpsell } from "@/components/upgrade/PostListingUpsell";
-import { SireSuggestion } from "@/components/SireSuggestion";
-import { Button } from "@/components/ui/button";
+import { Check, Facebook } from "lucide-react";
 import { toast } from "sonner";
 
 export interface WinnerRef {
@@ -40,28 +37,9 @@ function buildFacebookCaption(d: WinData): string {
   return lines.join("\n").trim();
 }
 
-function buildJsonExport(d: WinData): string {
-  return JSON.stringify({
-    show: d.showName || undefined,
-    placement: d.winPlacing || undefined,
-    shownBy: d.shownBy || undefined,
-    placedBy: d.placedBy || undefined,
-    sire: d.sireName || undefined,
-    dam: d.damName || undefined,
-    caption: d.caption || undefined,
-    images: d.imageUrls.length ? d.imageUrls : undefined,
-    createdAt: new Date().toISOString(),
-  }, null, 2);
-}
-
 export default function PostSuccessScreen({ data }: { data: WinData }) {
   const navigate = useNavigate();
-  const [exportOpen, setExportOpen] = useState(false);
-  const [sireStepDone, setSireStepDone] = useState(false);
   const fbCaption = buildFacebookCaption(data);
-
-  const winnersNeedingSire = (data.winnerRefs || []).filter(w => w.shownBy);
-  const showSireStep = winnersNeedingSire.length > 0 && !sireStepDone;
 
   const handleShareFacebook = async () => {
     try { await navigator.clipboard.writeText(fbCaption); } catch {}
@@ -84,16 +62,6 @@ export default function PostSuccessScreen({ data }: { data: WinData }) {
     toast.success("Caption copied to clipboard", { description: "Paste it into your Facebook post." });
   };
 
-  const handleCopyFacebook = async () => {
-    try { await navigator.clipboard.writeText(fbCaption); toast.success("Copied to clipboard"); }
-    catch { toast.error("Couldn't copy"); }
-  };
-
-  const handleCopyJson = async () => {
-    try { await navigator.clipboard.writeText(buildJsonExport(data)); toast.success("JSON copied to clipboard"); }
-    catch { toast.error("Couldn't copy"); }
-  };
-
   const handlePostAnother = () => {
     navigate("/submit", {
       state: {
@@ -107,80 +75,42 @@ export default function PostSuccessScreen({ data }: { data: WinData }) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
-      <div className="w-16 h-16 rounded-full bg-green-500/15 flex items-center justify-center mb-4">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6">
+      <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+        style={{ backgroundColor: "rgba(34,197,94,0.12)" }}>
         <Check className="w-8 h-8 text-green-500" strokeWidth={3} />
       </div>
-
-      <h1 className="text-xl font-bold text-foreground">Posted</h1>
-      <p className="text-sm text-muted-foreground mt-1 text-center">
-        {data.showName}
-        {data.shownBy ? ` — ${data.shownBy}` : ""}
-        {(data.resultCount ?? 1) > 1 ? ` (${data.resultCount} results)` : ""}
+      <h1 className="text-[22px] font-bold text-[#0A1628]">Posted!</h1>
+      <p className="text-[14px] text-[#6B7280] mt-1 text-center">
+        {data.showName ? `${data.showName}${data.shownBy ? ` — ${data.shownBy}` : ""}` : "Your post is live on Backdrop"}
       </p>
 
-      <div className="w-full max-w-xs mt-6 space-y-3">
-        {/* Sire suggestion step */}
-        {showSireStep && (
-          <SireSuggestion
-            winners={winnersNeedingSire}
-            postedAsBreederId={data.postedAsBreederId || null}
-            onComplete={() => setSireStepDone(true)}
-          />
-        )}
-
-        {/* Post Another */}
-        <Button
-          onClick={handlePostAnother}
-          variant="outline"
-          className="w-full h-12 rounded-xl text-base font-bold gap-2"
+      <div className="w-full max-w-xs mt-8 space-y-3">
+        <button
+          onClick={() => navigate("/")}
+          className="w-full h-12 rounded-xl text-[15px] font-bold"
+          style={{ backgroundColor: "#0A1628", color: "white" }}
         >
-          <Plus className="w-5 h-5" />
-          Post Another
-        </Button>
+          View Feed
+        </button>
 
-        <Button
+        <button
           onClick={handleShareFacebook}
-          className="w-full h-12 rounded-xl text-base font-bold gap-2.5"
-          style={{ backgroundColor: "#1877F2", color: "#fff" }}
+          className="w-full h-12 rounded-xl text-[15px] font-bold flex items-center justify-center gap-2.5"
+          style={{ backgroundColor: "#1877F2", color: "white" }}
         >
           <Facebook className="w-5 h-5" />
           Share to Facebook
-        </Button>
+        </button>
 
-        {/* Export section */}
-        <div className="bg-card border border-border rounded-xl overflow-hidden">
-          <button
-            onClick={() => setExportOpen(!exportOpen)}
-            className="w-full flex items-center justify-between px-4 py-3"
-          >
-            <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <Download className="w-4 h-4 text-muted-foreground" />
-              Export Post
-            </span>
-            {exportOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
-          </button>
-          {exportOpen && (
-            <div className="px-4 pb-3 space-y-2">
-              <div className="bg-muted/50 rounded-lg p-3">
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-2">Facebook Format</p>
-                <pre className="text-xs text-foreground whitespace-pre-wrap leading-relaxed font-sans">{fbCaption}</pre>
-                <Button variant="outline" size="sm" onClick={handleCopyFacebook} className="mt-2 w-full gap-1.5 text-xs">
-                  <Copy className="w-3.5 h-3.5" /> Copy Caption
-                </Button>
-              </div>
-              <Button variant="ghost" size="sm" onClick={handleCopyJson} className="w-full gap-1.5 text-xs text-muted-foreground">
-                <FileJson className="w-3.5 h-3.5" /> Copy as JSON
-              </Button>
-            </div>
-          )}
-        </div>
-        <PostListingUpsell />
+        <button
+          onClick={handlePostAnother}
+          className="w-full py-3 text-[14px] font-semibold text-center"
+          style={{ color: "#C9A84C" }}
+        >
+          + Post Another
+        </button>
       </div>
-
-      <button onClick={() => navigate("/")} className="mt-8 text-sm text-muted-foreground hover:text-foreground transition-colors">
-        Back to feed
-      </button>
     </div>
   );
 }
