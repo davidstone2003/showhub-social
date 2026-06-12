@@ -1,11 +1,14 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, BadgeCheck, MapPin, ChevronRight, LayoutGrid, List as ListIcon } from "lucide-react";
+import { BadgeCheck, ChevronRight, LayoutGrid, List as ListIcon } from "lucide-react";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { FilterDropdown } from "@/components/shared/FilterDropdown";
+
 import { Layout } from "@/components/Layout";
 import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
 import { useBreederDirectory, stateAbbr } from "@/hooks/useBreederDirectory";
 
-const NAVY = "#0A1628";
+const NAVY = "hsl(var(--primary))";
 
 function initials(name: string) {
   return name.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("");
@@ -33,11 +36,10 @@ function breederSpecies(b: any): string {
 
 export default function BreedersPage() {
   const [search, setSearch] = useState("");
-  const [searchOpen, setSearchOpen] = useState(false);
   const [species, setSpecies] = useState<SpeciesPill>("All");
   const [view, setView] = useState<"list" | "grid">("list");
   const [selectedState, setSelectedState] = useState<string>("All States");
-  const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
+
   const { data: breeders = [], isLoading } = useBreederDirectory();
 
   const availableStates = useMemo(() => {
@@ -64,100 +66,28 @@ export default function BreedersPage() {
   return (
     <Layout showDiscovery={false}>
       <div style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
-        {/* Dark header */}
-        <div
-          className="sticky top-0 z-20 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
-        >
-          <h1 className="text-[22px] font-bold text-white">Breeders</h1>
-          <div className="flex items-center gap-3">
-            <button onClick={() => setSearchOpen((v) => !v)} className="p-1.5" aria-label="Search">
-              <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
-            </button>
-            <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.15)" }}>
-              <button
-                onClick={() => setView("list")}
-                className="p-2"
-                style={{ backgroundColor: view === "list" ? "rgba(201,168,76,0.25)" : "transparent" }}
-                aria-label="List view"
-              >
-                <ListIcon className="w-4 h-4" style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)" }} />
-              </button>
-              <button
-                onClick={() => setView("grid")}
-                className="p-2"
-                style={{ backgroundColor: view === "grid" ? "rgba(201,168,76,0.25)" : "transparent" }}
-                aria-label="Grid view"
-              >
-                <LayoutGrid className="w-4 h-4" style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)" }} />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Search bar */}
-        {searchOpen && (
-          <div className="px-4 py-2 bg-white border-b border-[#E5E7EB]">
-            <div className="flex items-center gap-2 bg-[#F3F4F6] rounded-xl px-3 py-2">
-              <Search className="w-4 h-4 text-[#9CA3AF] shrink-0" />
-              <input
-                autoFocus
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name, farm, or location..."
-                className="flex-1 bg-transparent text-[14px] text-[#0A1628] outline-none placeholder:text-[#9CA3AF]"
-              />
-              {search && (
-                <button onClick={() => setSearch("")} className="text-[#9CA3AF] text-[18px] leading-none">×</button>
-              )}
-            </div>
-          </div>
-        )}
+        <PageHeader
+          title="Breeders"
+          searchPlaceholder="Search by name, farm, or location..."
+          searchValue={search}
+          onSearchChange={setSearch}
+          viewToggle={{ view, onViewChange: setView }}
+        />
 
         {/* Filters row */}
         <div className="bg-white border-b border-[#E5E7EB] px-4 py-2 flex items-center gap-2">
           <div className="flex-1 overflow-x-auto scrollbar-hide">
             <SpeciesPills value={species} onChange={setSpecies} />
           </div>
-          <div className="relative shrink-0">
-            <button
-              onClick={() => setStateDropdownOpen((v) => !v)}
-              className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
-              style={
-                selectedState !== "All States"
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
-              }
-            >
-              {selectedState}
-              <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            {stateDropdownOpen && (
-              <div
-                className="absolute right-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl overflow-hidden z-30"
-                style={{ minWidth: 140, maxHeight: 280, overflowY: "auto" }}
-              >
-                {availableStates.map((state) => (
-                  <button
-                    key={state}
-                    onClick={() => { setSelectedState(state); setStateDropdownOpen(false); }}
-                    className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4] transition-colors"
-                    style={{ borderBottom: "1px solid #F3F4F6" }}
-                  >
-                    <span className="text-[14px] font-medium text-[#0A1628]">{state}</span>
-                    {selectedState === state && (
-                      <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}>
-                        <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <FilterDropdown
+            label="State"
+            value={selectedState}
+            defaultValue="All States"
+            options={availableStates}
+            onChange={setSelectedState}
+          />
         </div>
+
 
         {/* Results count */}
         <div className="flex items-center justify-between px-4 py-2">
@@ -170,7 +100,7 @@ export default function BreedersPage() {
             <button
               onClick={() => { setSearch(""); setSelectedState("All States"); setSpecies("All"); }}
               className="text-[12px] font-bold"
-              style={{ color: "#C9A84C" }}
+              style={{ color: "hsl(var(--gold))" }}
             >
               Clear
             </button>
@@ -184,12 +114,12 @@ export default function BreedersPage() {
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center py-16 text-center px-8">
             <span className="text-4xl mb-3">🐑</span>
-            <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No breeders found</p>
+            <p className="font-bold text-[17px]" style={{ color: "hsl(var(--primary))" }}>No breeders found</p>
             <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>Try adjusting your filters</p>
             <button
               onClick={() => { setSearch(""); setSelectedState("All States"); setSpecies("All"); }}
               className="mt-4 rounded-full px-5 py-2 font-bold text-[14px]"
-              style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+              style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}
             >
               Clear Filters
             </button>
@@ -207,7 +137,7 @@ export default function BreedersPage() {
                 <div key={b.username}>
                   {showDivider && (
                     <div className="px-4 py-1.5 border-b border-[#F3F4F6]" style={{ backgroundColor: "#F8F7F4" }}>
-                      <span className="text-[12px] font-black" style={{ color: "#C9A84C" }}>{firstLetter}</span>
+                      <span className="text-[12px] font-black" style={{ color: "hsl(var(--gold))" }}>{firstLetter}</span>
                     </div>
                   )}
                   <Link
@@ -221,14 +151,14 @@ export default function BreedersPage() {
                       ) : (
                         <div
                           className="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-white text-[18px]"
-                          style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}
+                          style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, #1B3A6B 100%)" }}
                         >
                           {(b.display_name || b.username || "?").charAt(0).toUpperCase()}
                         </div>
                       )}
                       {(b.is_verified || b.subscription_tier === "breeder_page") && (
                         <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white flex items-center justify-center">
-                          <BadgeCheck className="w-4 h-4" style={{ color: "#C9A84C" }} />
+                          <BadgeCheck className="w-4 h-4" style={{ color: "hsl(var(--gold))" }} />
                         </div>
                       )}
                     </div>
@@ -237,7 +167,7 @@ export default function BreedersPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <p className="font-bold text-[15px] leading-tight truncate" style={{ color: "#0A1628" }}>
+                          <p className="font-bold text-[15px] leading-tight truncate" style={{ color: "hsl(var(--primary))" }}>
                             {b.display_name || b.username}
                           </p>
                           {b.farm_name && b.farm_name !== (b.display_name || b.username) && (
@@ -276,7 +206,7 @@ export default function BreedersPage() {
 
                       <div className="flex items-center gap-3 mt-2">
                         {b.win_count > 0 && (
-                          <span className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: "#C9A84C" }}>
+                          <span className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: "hsl(var(--gold))" }}>
                             🏆 {b.win_count} win{b.win_count !== 1 ? "s" : ""}
                           </span>
                         )}
@@ -303,7 +233,7 @@ export default function BreedersPage() {
             {/* Claim profile CTA */}
             <div className="mx-4 mt-4 mb-8 p-4 rounded-2xl text-center"
               style={{ backgroundColor: "#FFFBF0", border: "1px solid rgba(201,168,76,0.3)" }}>
-              <p className="font-bold text-[14px]" style={{ color: "#0A1628" }}>
+              <p className="font-bold text-[14px]" style={{ color: "hsl(var(--primary))" }}>
                 Don't see your operation?
               </p>
               <p className="text-[12px] mt-0.5 mb-3" style={{ color: "#6B7280" }}>
@@ -312,7 +242,7 @@ export default function BreedersPage() {
               <Link
                 to="/onboarding"
                 className="inline-block rounded-full px-5 py-2 text-[13px] font-bold"
-                style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+                style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}
               >
                 Claim Your Profile
               </Link>
@@ -335,7 +265,7 @@ export default function BreedersPage() {
                     />
                   ) : (
                     <div className="w-full aspect-square flex items-center justify-center"
-                      style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
+                      style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, #1B3A6B 100%)" }}>
                       <span className="text-3xl font-black" style={{ color: "rgba(201,168,76,0.4)" }}>
                         {(b.display_name || b.username || "?").charAt(0).toUpperCase()}
                       </span>
@@ -343,7 +273,7 @@ export default function BreedersPage() {
                   )}
                   {(b.is_verified || b.subscription_tier === "breeder_page") && (
                     <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 flex items-center justify-center shadow-sm">
-                      <BadgeCheck className="w-4 h-4" style={{ color: "#C9A84C" }} />
+                      <BadgeCheck className="w-4 h-4" style={{ color: "hsl(var(--gold))" }} />
                     </div>
                   )}
                   {b.lambs_available && (
@@ -356,7 +286,7 @@ export default function BreedersPage() {
                 </div>
 
                 <div className="p-2.5">
-                  <p className="font-bold text-[13px] truncate leading-tight" style={{ color: "#0A1628" }}>
+                  <p className="font-bold text-[13px] truncate leading-tight" style={{ color: "hsl(var(--primary))" }}>
                     {b.display_name || b.username}
                   </p>
                   {b.location && (
@@ -373,7 +303,7 @@ export default function BreedersPage() {
                     </div>
                   )}
                   {b.win_count > 0 && (
-                    <p className="text-[11px] font-semibold mt-1.5" style={{ color: "#C9A84C" }}>
+                    <p className="text-[11px] font-semibold mt-1.5" style={{ color: "hsl(var(--gold))" }}>
                       🏆 {b.win_count} win{b.win_count !== 1 ? "s" : ""}
                     </p>
                   )}

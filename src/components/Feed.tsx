@@ -239,14 +239,14 @@ export function Feed() {
                   <div className="flex items-center gap-3 p-3">
                     <div
                       className="w-12 h-12 rounded-xl overflow-hidden shrink-0"
-                      style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}
+                      style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, #1B3A6B 100%)" }}
                     >
                       {featuredBreeder.logo_url ? (
                         <img src={featuredBreeder.logo_url} alt="" className="w-full h-full object-cover" />
                       ) : (
                         <span
                           className="w-full h-full flex items-center justify-center text-[16px] font-black"
-                          style={{ color: "#C9A84C" }}
+                          style={{ color: "hsl(var(--gold))" }}
                         >
                           {featuredBreeder.breeder_name?.charAt(0)}
                         </span>
@@ -254,7 +254,7 @@ export function Feed() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <p className="font-bold text-[14px] text-[#0A1628] truncate">{featuredBreeder.breeder_name}</p>
+                        <p className="font-bold text-[14px] text-[hsl(var(--primary))] truncate">{featuredBreeder.breeder_name}</p>
                         <span
                           className="text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
                           style={{ backgroundColor: "#FFFBF0", color: "#8B6914", border: "1px solid rgba(201,168,76,0.3)" }}
@@ -273,7 +273,7 @@ export function Feed() {
                         </p>
                       )}
                     </div>
-                    <span className="text-[12px] font-bold shrink-0" style={{ color: "#C9A84C" }}>
+                    <span className="text-[12px] font-bold shrink-0" style={{ color: "hsl(var(--gold))" }}>
                       View →
                     </span>
                   </div>
@@ -301,8 +301,8 @@ export function Feed() {
                 height: 48,
                 borderRadius: 24,
                 fontSize: 15,
-                backgroundColor: "#C9A84C",
-                color: "#0A1628",
+                backgroundColor: "hsl(var(--gold))",
+                color: "hsl(var(--primary))",
                 boxShadow: "0 4px 12px rgba(201,168,76,0.35)",
               }}
             >

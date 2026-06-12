@@ -112,12 +112,12 @@ export function ReelsStrip({ onOpen }: ReelsStripProps) {
                 {/* Avatar circle */}
                 <div
                   className="absolute top-1.5 left-1.5 w-6 h-6 rounded-full overflow-hidden flex items-center justify-center border-2"
-                  style={{ borderColor: "#C9A84C", background: "linear-gradient(135deg, #0A1628, #1B3A6B)" }}
+                  style={{ borderColor: "hsl(var(--gold))", background: "linear-gradient(135deg, hsl(var(--primary)), #1B3A6B)" }}
                 >
                   {r.breeder_logo ? (
                     <img src={r.breeder_logo} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-[9px] font-bold text-[#C9A84C]">
+                    <span className="text-[9px] font-bold text-[hsl(var(--gold))]">
                       {r.breeder_name.charAt(0).toUpperCase()}
                     </span>
                   )}

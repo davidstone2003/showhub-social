@@ -6,8 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { SPECIES_OPTIONS } from "@/components/SpeciesPills";
 
-const NAVY = "#0A1628";
-const GOLD = "#C9A84C";
+const NAVY = "hsl(var(--primary))";
+const GOLD = "hsl(var(--gold))";
 
 export default function SubmitSirePage() {
   const nav = useNavigate();

@@ -17,8 +17,8 @@ function rsgPhoto(name: string): string | undefined {
   return RSG_PHOTO_BY_NAME.get(name.toLowerCase().trim());
 }
 
-const NAVY = "#0A1628";
-const GOLD = "#C9A84C";
+const NAVY = "hsl(var(--primary))";
+const GOLD = "hsl(var(--gold))";
 
 interface Sire {
   id: string;
@@ -152,7 +152,7 @@ const SiresPage = () => {
         {/* Header */}
         <div
           className="sticky top-0 z-20 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+          style={{ height: 60, backgroundColor: "hsl(var(--primary))", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
         >
           <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Sires</h1>
           <div className="flex items-center gap-2">
@@ -169,7 +169,7 @@ const SiresPage = () => {
                 onClick={() => setView("list")}
                 aria-label="List view"
                 className="p-2 transition-colors"
-                style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "list" ? "rgba(255,255,255,0.08)" : "transparent" }}
+                style={{ color: view === "list" ? "hsl(var(--gold))" : "rgba(255,255,255,0.5)", backgroundColor: view === "list" ? "rgba(255,255,255,0.08)" : "transparent" }}
               >
                 <ListIcon className="w-4 h-4" />
               </button>
@@ -178,7 +178,7 @@ const SiresPage = () => {
                 onClick={() => setView("grid")}
                 aria-label="Grid view"
                 className="p-2 transition-colors"
-                style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "grid" ? "rgba(255,255,255,0.08)" : "transparent" }}
+                style={{ color: view === "grid" ? "hsl(var(--gold))" : "rgba(255,255,255,0.5)", backgroundColor: view === "grid" ? "rgba(255,255,255,0.08)" : "transparent" }}
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
@@ -197,7 +197,7 @@ const SiresPage = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search sires or breeders…"
-                className="flex-1 bg-transparent text-[14px] text-[#0A1628] outline-none placeholder:text-[#9CA3AF]"
+                className="flex-1 bg-transparent text-[14px] text-[hsl(var(--primary))] outline-none placeholder:text-[#9CA3AF]"
               />
               {search && (
                 <button onClick={() => setSearch("")} className="text-[#9CA3AF] text-[18px] leading-none">×</button>
@@ -217,7 +217,7 @@ const SiresPage = () => {
               onClick={() => setSemenFilter((v) => (v === "All" ? "Available" : "All"))}
               className="shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
               style={semenFilter === "Available"
-                ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
                 : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
             >
               {semenFilter === "Available" ? "✓ Semen Available" : "Semen Available"}
@@ -228,7 +228,7 @@ const SiresPage = () => {
                 onClick={() => setOwnerOpen((v) => !v)}
                 className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
                 style={selectedOwner !== "All Owners"
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
                   : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
               >
                 {selectedOwner === "All Owners" ? "Owner" : selectedOwner}
@@ -242,9 +242,9 @@ const SiresPage = () => {
                     <button key={name} onClick={() => { setSelectedOwner(name); setOwnerOpen(false); }}
                       className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
                       style={{ borderBottom: "1px solid #F3F4F6" }}>
-                      <span className="text-[13px] font-medium text-[#0A1628] truncate">{name}</span>
+                      <span className="text-[13px] font-medium text-[hsl(var(--primary))] truncate">{name}</span>
                       {selectedOwner === name && (
-                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5} className="shrink-0 ml-2">
+                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5} className="shrink-0 ml-2">
                           <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       )}

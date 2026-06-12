@@ -32,7 +32,7 @@ export function CreateButton({ to, label, menu }: CreateButtonProps) {
 
   const cls =
     "inline-flex items-center gap-1 rounded-full h-8 pl-2.5 pr-3 text-[12px] font-bold active:scale-95 transition-transform whitespace-nowrap";
-  const style = { backgroundColor: "#C9A84C", color: "#0A1628" } as const;
+  const style = { backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" } as const;
 
   const inner = (
     <>
@@ -63,7 +63,7 @@ export function CreateButton({ to, label, menu }: CreateButtonProps) {
                 key={m.to}
                 to={m.to}
                 onClick={() => setOpen(false)}
-                className="block px-4 py-2.5 text-[13px] font-semibold text-[#0A1628] hover:bg-[#F8F7F4]"
+                className="block px-4 py-2.5 text-[13px] font-semibold text-[hsl(var(--primary))] hover:bg-[#F8F7F4]"
                 style={{ borderBottom: "1px solid #F3F4F6" }}
               >
                 {m.label}

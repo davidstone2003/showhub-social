@@ -8,8 +8,10 @@
   :root {
     /* Warm off-white #F8F7F4 */
     --background: 45 20% 97%;
-    /* Deep navy #0A1628 */
-    --foreground: 217 62% 10%;
+    /* Body text: deep navy for readability */
+    --foreground: 217 62% 14%;
+
+
 
     --card: 0 0% 100%;
     --card-foreground: 217 62% 10%;
@@ -69,32 +71,8 @@
   }
 }
 
-  /* ============================================================
-     APP MODE — dark theme scope for Winners/Sales/Breeders/Sires/Market
-     Apply by adding className="app-mode" to a page wrapper.
-     ============================================================ */
-  .app-mode {
-    /* page bg #0A1628 */
-    --background: 217 62% 10%;
-    /* primary text white */
-    --foreground: 0 0% 100%;
-    /* cards #141E2E */
-    --card: 217 38% 13%;
-    --card-foreground: 0 0% 100%;
-    --popover: 217 38% 13%;
-    --popover-foreground: 0 0% 100%;
-    /* muted surfaces / muted text */
-    --muted: 217 30% 18%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 217 30% 18%;
-    --accent-foreground: 0 0% 100%;
-    /* borders @ rgba(255,255,255,0.08) ≈ very dark blue */
-    --border: 217 38% 22%;
-    --input: 217 38% 22%;
-    --divider-soft: 217 38% 18%;
-    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3);
-  }
-  .app-mode { background-color: #0A1628; color: #FFFFFF; }
+
+
 
 @layer base {
   * {

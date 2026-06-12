@@ -508,11 +508,11 @@ export default function CreatePostPage() {
           <button
             onClick={() => navigate(-1)}
             className="text-[15px] font-medium"
-            style={{ color: "#0A1628" }}
+            style={{ color: "hsl(var(--primary))" }}
           >
             Cancel
           </button>
-          <h1 className="flex-1 text-center text-[17px] font-bold" style={{ color: "#0A1628" }}>
+          <h1 className="flex-1 text-center text-[17px] font-bold" style={{ color: "hsl(var(--primary))" }}>
             Backdrop
           </h1>
           <button
@@ -522,7 +522,7 @@ export default function CreatePostPage() {
               "px-5 h-9 rounded-full text-[14px] font-bold transition-opacity",
               submitting && "opacity-40"
             )}
-            style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+            style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}
           >
             {submitting ? "Posting…" : "Post"}
           </button>
@@ -532,15 +532,15 @@ export default function CreatePostPage() {
         {/* Identity row */}
         <div className="flex items-center gap-3 px-4 py-3">
           <div className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0"
-            style={{ background: avatarUrl ? "transparent" : "linear-gradient(135deg, #0A1628, #1a2a44)" }}>
+            style={{ background: avatarUrl ? "transparent" : "linear-gradient(135deg, hsl(var(--primary)), #1a2a44)" }}>
             {avatarUrl ? (
               <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
             ) : (
-              <span className="text-[#C9A84C] font-bold text-xl">{initials}</span>
+              <span className="text-[hsl(var(--gold))] font-bold text-xl">{initials}</span>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-bold text-[16px] truncate" style={{ color: "#0A1628" }}>{displayName}</div>
+            <div className="font-bold text-[16px] truncate" style={{ color: "hsl(var(--primary))" }}>{displayName}</div>
             {user && (
               <button
                 onClick={() => setShowIdentitySheet(true)}
@@ -551,16 +551,16 @@ export default function CreatePostPage() {
               </button>
             )}
             {!user && (
-              <Link to="/auth" className="text-[13px] text-[#C9A84C] font-medium">Sign in to post</Link>
+              <Link to="/auth" className="text-[13px] text-[hsl(var(--gold))] font-medium">Sign in to post</Link>
             )}
           </div>
         </div>
 
         {/* Winner summary chip (when filled) */}
         {winnerHasData && (
-          <div className="mx-4 mb-2 flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: "#C9A84C15", border: "1px solid #C9A84C40" }}>
-            <Trophy className="w-4 h-4" style={{ color: "#C9A84C" }} />
-            <div className="flex-1 min-w-0 text-[13px] truncate" style={{ color: "#0A1628" }}>
+          <div className="mx-4 mb-2 flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: "hsl(var(--gold))15", border: "1px solid hsl(var(--gold))40" }}>
+            <Trophy className="w-4 h-4" style={{ color: "hsl(var(--gold))" }} />
+            <div className="flex-1 min-w-0 text-[13px] truncate" style={{ color: "hsl(var(--primary))" }}>
               <span className="font-semibold">{effectiveResult || "Result"}</span>
               {showName && <span className="text-[#5C6470]"> · {showName}</span>}
               {placedBy && <span className="text-[#5C6470]"> · Placed by {placedBy}</span>}
@@ -572,7 +572,7 @@ export default function CreatePostPage() {
 
         {/* Species chip (when selected) */}
         {species && (
-          <div className="mx-4 mb-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium" style={{ backgroundColor: "#C9A84C15", color: "#8B6914", border: "1px solid #C9A84C40" }}>
+          <div className="mx-4 mb-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium" style={{ backgroundColor: "hsl(var(--gold))15", color: "#8B6914", border: "1px solid hsl(var(--gold))40" }}>
             <Leaf className="w-3.5 h-3.5" />
             {species}
             <button onClick={() => setSpecies("")}><X className="w-3.5 h-3.5" /></button>
@@ -587,7 +587,7 @@ export default function CreatePostPage() {
               <div
                 key={person.id}
                 className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-medium"
-                style={{ backgroundColor: "#C9A84C15", color: "#8B6914", border: "1px solid #C9A84C40" }}
+                style={{ backgroundColor: "hsl(var(--gold))15", color: "#8B6914", border: "1px solid hsl(var(--gold))40" }}
               >
                 {person.name}
                 <button onClick={() => setTaggedPeople(prev => prev.filter(p => p.id !== person.id))}>
@@ -598,7 +598,7 @@ export default function CreatePostPage() {
             <button
               onClick={() => setShowTagSheet(true)}
               className="text-[12px] font-semibold"
-              style={{ color: "#C9A84C" }}
+              style={{ color: "hsl(var(--gold))" }}
             >
               + Add more
             </button>
@@ -613,7 +613,7 @@ export default function CreatePostPage() {
             onChange={(e) => setGeneralCaption(e.target.value)}
             placeholder="What's happening in your program? Share a win, sale, update, or anything on your mind…"
             className="w-full resize-none border-0 outline-none bg-transparent placeholder:text-[#9CA3AF]"
-            style={{ fontSize: "17px", lineHeight: 1.5, color: "#0A1628", minHeight: "120px", whiteSpace: "pre-wrap" }}
+            style={{ fontSize: "17px", lineHeight: 1.5, color: "hsl(var(--primary))", minHeight: "120px", whiteSpace: "pre-wrap" }}
           />
         </div>
 
@@ -664,7 +664,7 @@ export default function CreatePostPage() {
                 onClick={() => setIsReel(false)}
                 className="flex-1 py-2 rounded-xl text-[12px] font-bold border"
                 style={!isReel
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
                   : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
                 }
               >
@@ -674,7 +674,7 @@ export default function CreatePostPage() {
                 onClick={() => setIsReel(true)}
                 className="flex-1 py-2 rounded-xl text-[12px] font-bold border"
                 style={isReel
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
                   : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
                 }
               >
@@ -768,9 +768,9 @@ export default function CreatePostPage() {
                   onClick={() => setSpecies(selected ? "" : s)}
                   className="h-14 rounded-full font-semibold text-[15px] transition-all"
                   style={{
-                    backgroundColor: selected ? "#C9A84C" : "#F3F4F6",
-                    color: selected ? "#0A1628" : "#0A1628",
-                    border: selected ? "1px solid #C9A84C" : "1px solid #E5E7EB",
+                    backgroundColor: selected ? "hsl(var(--gold))" : "#F3F4F6",
+                    color: selected ? "hsl(var(--primary))" : "hsl(var(--primary))",
+                    border: selected ? "1px solid hsl(var(--gold))" : "1px solid #E5E7EB",
                   }}
                 >
                   {s}
@@ -778,7 +778,7 @@ export default function CreatePostPage() {
               );
             })}
           </div>
-          <Button onClick={() => setShowSpeciesSheet(false)} className="w-full h-12 rounded-xl font-bold" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>Done</Button>
+          <Button onClick={() => setShowSpeciesSheet(false)} className="w-full h-12 rounded-xl font-bold" style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}>Done</Button>
         </BottomSheet>
       )}
 
@@ -790,11 +790,11 @@ export default function CreatePostPage() {
               onClick={() => { setShowMoreSheet(false); setShowSmartUpload(true); }}
               className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#F8F7F4] hover:bg-[#EFEDE8] transition-colors text-left"
             >
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#C9A84C20" }}>
-                <Sparkles className="w-5 h-5" style={{ color: "#C9A84C" }} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "hsl(var(--gold))20" }}>
+                <Sparkles className="w-5 h-5" style={{ color: "hsl(var(--gold))" }} />
               </div>
               <div className="flex-1">
-                <div className="font-semibold text-[15px]" style={{ color: "#0A1628" }}>Smart Upload</div>
+                <div className="font-semibold text-[15px]" style={{ color: "hsl(var(--primary))" }}>Smart Upload</div>
                 <div className="text-[13px] text-[#5C6470]">AI reads your photo or text and fills details</div>
               </div>
             </button>
@@ -802,11 +802,11 @@ export default function CreatePostPage() {
               onClick={() => { setShowMoreSheet(false); videoInputRef.current?.click(); }}
               className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#F8F7F4] hover:bg-[#EFEDE8] transition-colors text-left"
             >
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#C9A84C20" }}>
-                <VideoIcon className="w-5 h-5" style={{ color: "#C9A84C" }} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "hsl(var(--gold))20" }}>
+                <VideoIcon className="w-5 h-5" style={{ color: "hsl(var(--gold))" }} />
               </div>
               <div className="flex-1">
-                <div className="font-semibold text-[15px]" style={{ color: "#0A1628" }}>Add Video</div>
+                <div className="font-semibold text-[15px]" style={{ color: "hsl(var(--primary))" }}>Add Video</div>
                 <div className="text-[13px] text-[#5C6470]">Upload a video to your post</div>
               </div>
             </button>
@@ -814,14 +814,14 @@ export default function CreatePostPage() {
               onClick={() => { setShowMoreSheet(false); setShowTagSheet(true); }}
               className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#F8F7F4] hover:bg-[#EFEDE8] transition-colors text-left"
             >
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#C9A84C20" }}>
-                <Users className="w-5 h-5" style={{ color: "#C9A84C" }} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "hsl(var(--gold))20" }}>
+                <Users className="w-5 h-5" style={{ color: "hsl(var(--gold))" }} />
               </div>
               <div className="flex-1">
-                <div className="font-semibold text-[15px] flex items-center gap-2" style={{ color: "#0A1628" }}>
+                <div className="font-semibold text-[15px] flex items-center gap-2" style={{ color: "hsl(var(--primary))" }}>
                   Tag People
                   {taggedPeople.length > 0 && (
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}>
                       {taggedPeople.length} tagged
                     </span>
                   )}
@@ -833,14 +833,14 @@ export default function CreatePostPage() {
               onClick={() => { setShowMoreSheet(false); setShowSpeciesSheet(true); }}
               className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#F8F7F4] hover:bg-[#EFEDE8] transition-colors text-left"
             >
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#C9A84C20" }}>
-                <Leaf className="w-5 h-5" style={{ color: "#C9A84C" }} />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "hsl(var(--gold))20" }}>
+                <Leaf className="w-5 h-5" style={{ color: "hsl(var(--gold))" }} />
               </div>
               <div className="flex-1">
-                <div className="font-semibold text-[15px] flex items-center gap-2" style={{ color: "#0A1628" }}>
+                <div className="font-semibold text-[15px] flex items-center gap-2" style={{ color: "hsl(var(--primary))" }}>
                   Species
                   {species && (
-                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: "#C9A84C20", color: "#8B6914" }}>
+                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: "hsl(var(--gold))20", color: "#8B6914" }}>
                       {species}
                     </span>
                   )}
@@ -862,7 +862,7 @@ export default function CreatePostPage() {
           <Button
             onClick={() => setShowTagSheet(false)}
             className="w-full h-12 rounded-xl font-bold mt-4"
-            style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+            style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}
           >
             Done {taggedPeople.length > 0 ? `(${taggedPeople.length} tagged)` : ""}
           </Button>
@@ -884,9 +884,9 @@ export default function CreatePostPage() {
                       onClick={() => setResultTitle(sel ? "" : r)}
                       className="shrink-0 rounded-full px-3 py-2 text-[13px] font-semibold transition-all border"
                       style={{
-                        backgroundColor: sel ? "#C9A84C" : "white",
-                        color: "#0A1628",
-                        borderColor: sel ? "#C9A84C" : "#E5E7EB",
+                        backgroundColor: sel ? "hsl(var(--gold))" : "white",
+                        color: "hsl(var(--primary))",
+                        borderColor: sel ? "hsl(var(--gold))" : "#E5E7EB",
                       }}
                     >
                       {r}
@@ -935,7 +935,7 @@ export default function CreatePostPage() {
                     toast.success("Saved as default breeder name");
                   }}
                   className="text-[11px] font-semibold"
-                  style={{ color: "#C9A84C" }}
+                  style={{ color: "hsl(var(--gold))" }}
                 >
                   Save as my default
                 </button>
@@ -954,7 +954,7 @@ export default function CreatePostPage() {
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-[12px] font-bold uppercase tracking-wide text-[#5C6470]">Tag People</label>
                 {taggedPeople.length > 0 && (
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}>
                     {taggedPeople.length} tagged
                   </span>
                 )}
@@ -987,9 +987,9 @@ export default function CreatePostPage() {
                     onClick={() => setSpecies(sel ? "" : s)}
                     className="px-4 h-10 rounded-full text-[13px] font-semibold"
                     style={{
-                      backgroundColor: sel ? "#C9A84C" : "#F3F4F6",
-                      color: "#0A1628",
-                      border: sel ? "1px solid #C9A84C" : "1px solid #E5E7EB",
+                      backgroundColor: sel ? "hsl(var(--gold))" : "#F3F4F6",
+                      color: "hsl(var(--primary))",
+                      border: sel ? "1px solid hsl(var(--gold))" : "1px solid #E5E7EB",
                     }}
                   >
                     {s}
@@ -1015,7 +1015,7 @@ export default function CreatePostPage() {
               <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add any extra notes or let AI write your caption above…" className="rounded-lg min-h-[80px]" />
             </div>
 
-            <Button onClick={() => setShowWinnerPanel(false)} className="w-full h-12 rounded-xl font-bold mt-2" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+            <Button onClick={() => setShowWinnerPanel(false)} className="w-full h-12 rounded-xl font-bold mt-2" style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}>
               Done
             </Button>
           </div>
@@ -1035,13 +1035,13 @@ export default function CreatePostPage() {
       {showPasteCaption && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 w-full max-w-md shadow-lg space-y-3">
-            <h3 className="text-base font-bold flex items-center gap-2" style={{ color: "#0A1628" }}>
-              <ClipboardPaste className="w-4 h-4" style={{ color: "#C9A84C" }} /> Paste Text
+            <h3 className="text-base font-bold flex items-center gap-2" style={{ color: "hsl(var(--primary))" }}>
+              <ClipboardPaste className="w-4 h-4" style={{ color: "hsl(var(--gold))" }} /> Paste Text
             </h3>
             <Textarea placeholder="Paste your Facebook or Instagram caption here…" value={pasteText} onChange={(e) => setPasteText(e.target.value)} className="rounded-xl text-sm min-h-[120px] resize-none" autoFocus />
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => { setShowPasteCaption(false); setPasteText(""); }} className="flex-1 h-11 rounded-xl">Cancel</Button>
-              <Button onClick={handlePasteCaption} disabled={!pasteText.trim() || submitting} className="flex-1 h-11 rounded-xl font-semibold gap-2" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+              <Button onClick={handlePasteCaption} disabled={!pasteText.trim() || submitting} className="flex-1 h-11 rounded-xl font-semibold gap-2" style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}>
                 <Sparkles className="w-4 h-4" /> {submitting ? "Parsing…" : "Auto Fill"}
               </Button>
             </div>
@@ -1060,14 +1060,14 @@ function ToolbarIcon({ icon: Icon, onClick, active, gold, badge }: {
       onClick={onClick}
       className="relative w-11 h-11 rounded-full flex items-center justify-center transition-colors"
       style={{
-        backgroundColor: gold ? "#C9A84C" : active ? "#C9A84C" : "transparent",
+        backgroundColor: gold ? "hsl(var(--gold))" : active ? "hsl(var(--gold))" : "transparent",
       }}
     >
-      <Icon className="w-[22px] h-[22px]" style={{ color: "#0A1628" }} />
+      <Icon className="w-[22px] h-[22px]" style={{ color: "hsl(var(--primary))" }} />
       {badge && (
         <span
           className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full"
-          style={{ backgroundColor: "#C9A84C", border: "2px solid white" }}
+          style={{ backgroundColor: "hsl(var(--gold))", border: "2px solid white" }}
         />
       )}
     </button>
@@ -1091,9 +1091,9 @@ function BottomSheet({ children, onClose, title, tall }: { children: React.React
         <div className="mx-auto h-1 w-10 rounded-full bg-[#E5E7EB] mb-3" />
         {title && (
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-[17px] font-bold" style={{ color: "#0A1628" }}>{title}</h3>
+            <h3 className="text-[17px] font-bold" style={{ color: "hsl(var(--primary))" }}>{title}</h3>
             <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F3F4F6]">
-              <X className="w-5 h-5" style={{ color: "#0A1628" }} />
+              <X className="w-5 h-5" style={{ color: "hsl(var(--primary))" }} />
             </button>
           </div>
         )}

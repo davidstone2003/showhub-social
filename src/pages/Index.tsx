@@ -5,6 +5,7 @@ import { Feed } from "@/components/Feed";
 import { ReelsView } from "@/components/ReelsView";
 import { ReelsStrip } from "@/components/ReelsStrip";
 import { CreateButton } from "@/components/shared/CreateButton";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { X } from "lucide-react";
 
 const Index = () => {
@@ -13,20 +14,19 @@ const Index = () => {
   return (
     <Layout showDiscovery={false}>
       <div style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
-        {/* Shared dark PageHeader band */}
-        <div
-          className="sticky top-0 z-20 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
-        >
-          <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Home</h1>
-          <CreateButton
-            label="Post"
-            menu={[
-              { label: "New post", to: "/submit" },
-              { label: "New reel", to: "/submit?type=reel" },
-            ]}
-          />
-        </div>
+        <PageHeader
+          title="Home"
+          createButton={
+            <CreateButton
+              label="Post"
+              menu={[
+                { label: "New post", to: "/submit" },
+                { label: "New reel", to: "/submit?type=reel" },
+              ]}
+            />
+          }
+        />
+
 
         <div className="max-w-2xl mx-auto w-full px-3 pb-24">
           <div className="-mt-2">

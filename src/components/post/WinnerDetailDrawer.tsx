@@ -18,7 +18,7 @@ function Chip({ icon: Icon, label, tappable, onClick }: { icon: any; label: stri
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm transition-colors ${tappable ? "bg-[#C9A84C]/12 text-[#8B6914] border border-[#C9A84C]/30" : "bg-white text-[#0A1628] border border-[#E5E7EB]"}`}
+      className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm transition-colors ${tappable ? "bg-[hsl(var(--gold))]/12 text-[#8B6914] border border-[hsl(var(--gold))]/30" : "bg-white text-[hsl(var(--primary))] border border-[#E5E7EB]"}`}
       disabled={!tappable}
     >
       <Icon className="w-3.5 h-3.5" />
@@ -99,14 +99,14 @@ export function WinnerDetailDrawer({ post, open, onClose }: WinnerDetailDrawerPr
   return (
     <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
       <DrawerContent className="border-t-0 rounded-t-2xl" style={{ backgroundColor: "#F8F6F1", borderTop: "1px solid #E5E7EB" }}>
-        <div className="mx-auto mt-2 mb-3 h-1 w-10 rounded-full bg-[#0A1628]/15" />
+        <div className="mx-auto mt-2 mb-3 h-1 w-10 rounded-full bg-[hsl(var(--primary))]/15" />
         <div className="px-5 pt-1 pb-6 max-h-[45vh] overflow-y-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold" style={{ color: "#0A1628" }}>Details</h3>
+            <h3 className="text-base font-bold" style={{ color: "hsl(var(--primary))" }}>Details</h3>
             <DrawerClose asChild>
               <button className="p-1 rounded-full hover:bg-black/5">
-                <X className="w-4 h-4" style={{ color: "#0A1628" }} />
+                <X className="w-4 h-4" style={{ color: "hsl(var(--primary))" }} />
               </button>
             </DrawerClose>
           </div>
@@ -126,7 +126,7 @@ export function WinnerDetailDrawer({ post, open, onClose }: WinnerDetailDrawerPr
           <Button
             onClick={handleShare}
             className="w-full h-11 rounded-xl mt-5 font-bold gap-2"
-            style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+            style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}
           >
             <Share2 className="w-4 h-4" />
             Share
@@ -136,7 +136,7 @@ export function WinnerDetailDrawer({ post, open, onClose }: WinnerDetailDrawerPr
           <Button
             onClick={handlePostToWinners}
             className="w-full h-11 rounded-xl mt-2 font-bold gap-2"
-            style={{ backgroundColor: "#0A1628", color: "#FFFFFF" }}
+            style={{ backgroundColor: "hsl(var(--primary))", color: "#FFFFFF" }}
           >
             <Trophy className="w-4 h-4" />
             Add to Winners Archive
