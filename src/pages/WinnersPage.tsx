@@ -211,7 +211,7 @@ export default function WinnersPage() {
       matchesSpecies(species, r.species, r.show_name, r.title, r.caption, (r.tags || []).join(" "))
     );
     if (selectedYear) {
-      filteredRows = filteredRows.filter(r => new Date(r.date || r.created_at).getFullYear() === selectedYear);
+      filteredRows = filteredRows.filter(r => r.date && new Date(r.date).getFullYear() === selectedYear);
     }
     if (selectedShow) {
       filteredRows = filteredRows.filter(r => r.show_name === selectedShow);
