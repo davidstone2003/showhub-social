@@ -125,7 +125,7 @@ export function SireSuggestion({ winners, postedAsBreederId, onComplete }: SireS
         await supabase
           .from("exhibitor_animal_context")
           .update({
-            sire_name: sireName.trim(),
+            sire_name: canonicalSireName,
             sire_id: resolvedSireId,
             dam_name: damName.trim() || null,
             show_name: current.showName,
