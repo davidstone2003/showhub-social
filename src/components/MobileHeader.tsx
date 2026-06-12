@@ -17,6 +17,9 @@ const ROOT_ROUTES = new Set([
   "/dashboard",
 ]);
 
+// Routes that have their own page-level search; suppress the global search icon here
+const PAGES_WITH_OWN_SEARCH = new Set(["/winners", "/breeders", "/sires", "/sales", "/market"]);
+
 // Map of route patterns -> screen titles for the back-button header
 const TITLE_RULES: { match: (path: string) => boolean; title: string }[] = [
   { match: (p) => p === "/submit", title: "New Post" },
@@ -68,7 +71,7 @@ export function MobileHeader() {
         )}
 
         <div className="flex items-center gap-2">
-          {isRoot && (
+          {isRoot && !PAGES_WITH_OWN_SEARCH.has(pathname) && (
             <button className="p-2 rounded-lg hover:bg-muted transition-colors" aria-label="Search">
               <Search className="w-5 h-5 text-muted-foreground" />
             </button>

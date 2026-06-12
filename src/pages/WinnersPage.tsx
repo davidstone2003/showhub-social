@@ -257,7 +257,7 @@ export default function WinnersPage() {
   }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery, selectedCategory, selectedState, selectedBreeder]);
 
   const currentSeasonGroups = useMemo(() => {
-    return showGroups.filter(g => g.year >= currentYear - 1);
+    return showGroups.filter(g => g.year >= currentYear);
   }, [showGroups, currentYear]);
 
   return (
@@ -320,6 +320,7 @@ export default function WinnersPage() {
           <div className="px-4 pt-2 pb-1">
             <SpeciesPills value={species} onChange={setSpecies} />
           </div>
+          <div className="relative">
           <div
             data-filter-row
             className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide"
@@ -391,6 +392,9 @@ export default function WinnersPage() {
                 Clear ×
               </button>
             )}
+          </div>
+            {/* right-edge fade to signal more filters */}
+            <div className="pointer-events-none absolute top-0 right-0 bottom-0 w-8" style={{ background: "linear-gradient(to right, rgba(255,255,255,0), #FFFFFF)" }} />
           </div>
           {activeFilterPanel && (
             <div data-filter-panel className="px-4 pb-3">
