@@ -65,7 +65,7 @@ export default function MarketPage() {
     return ["All States", ...Array.from(new Set(states)).sort()];
   }, []);
 
-  const speciesOptions = ["All", "Sheep", "Goats", "Cattle", "Pigs"];
+  const speciesOptions = ["All", "Cattle", "Sheep", "Goats", "Pigs"];
   const priceOptions = ["All", "Under $500", "$500-$2K", "$2K-$5K", "$5K+"];
 
   const filtered = useMemo(() => {
