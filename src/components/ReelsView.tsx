@@ -17,7 +17,7 @@ interface Clip {
   species: string | null;
 }
 
-export function ClipsView() {
+export function ReelsView() {
   const [clips, setClips] = useState<Clip[]>([]);
   const [loading, setLoading] = useState(true);
   const [muted, setMuted] = useState(true);
