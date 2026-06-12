@@ -126,7 +126,22 @@ export default function BreederProfilePage() {
     [breederName]
   );
 
-  const [tab, setTab] = useState<"posts" | "winners" | "sires" | "forsale">("posts");
+  const [tab, setTab] = useState<"posts" | "winners" | "sires" | "videos" | "forsale">("posts");
+
+  const { data: breederVideos = [] } = useQuery({
+    queryKey: ["breeder-videos", profile?.id],
+    queryFn: async () => {
+      const { data } = await (supabase.from("posts") as any)
+        .select("id, video_url, caption, created_at")
+        .or(`user_id.eq.${profile!.id},posted_as_breeder_id.eq.${profile!.id}`)
+        .not("video_url", "is", null)
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      return (data || []) as any[];
+    },
+    enabled: !!profile?.id,
+  });
 
   const renderCards = (items: WinnerRow[]) =>
     items.map((post, i) => <PostCard key={post.id} post={toPost(post, profile)} index={i} />);
