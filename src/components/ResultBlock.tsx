@@ -9,6 +9,7 @@ export interface ResultData {
   id: string;
   showName: string;
   showId: string | null;
+  showDate: string; // YYYY-MM-DD or "" (optional)
   winPlacing: string;
   shownBy: string;
   placedBy: string;
