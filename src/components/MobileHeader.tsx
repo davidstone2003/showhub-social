@@ -1,4 +1,4 @@
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Link, useLocation, useMatch } from "react-router-dom";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
