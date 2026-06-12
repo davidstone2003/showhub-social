@@ -88,6 +88,15 @@ function winnerToPost(row: WinnerRow, profilesMap: Record<string, any>, breederP
   };
 }
 
+function detectShowCategory(showName: string): string {
+  const n = (showName || "").toLowerCase();
+  if (["national","american royal","houston livestock","san antonio","denver","fort worth","arizona national","oklahoma youth expo","oye","naile","world","supreme","major","nugget","exchange","the show reno","wde","louisville","kansas city"].some(k => n.includes(k))) return "National / Major";
+  if (["state fair","state show","state livestock","ohio state","indiana state","texas state","colorado state","california state","michigan state","illinois state","kansas state","iowa state","missouri state"].some(k => n.includes(k))) return "State Fair";
+  if (["jackpot","classic","invitational","open show","revival","exposure","showcase","brand sale","elite","premier","palooza","showdown","challenge","series","qualifier","bid board","stock show"].some(k => n.includes(k))) return "Jackpot";
+  if (["county","district","regional","local","4h","ffa","chapter","club","young farmer","junior livestock"].some(k => n.includes(k))) return "County / Local";
+  return "Jackpot";
+}
+
 export default function WinnersPage() {
   const [rows, setRows] = useState<WinnerRow[]>([]);
   const [profilesMap, setProfilesMap] = useState<Record<string, any>>({});
