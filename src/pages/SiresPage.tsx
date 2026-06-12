@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Search, LayoutGrid, List as ListIcon, Flame, Plus } from "lucide-react";
+import { CreateButton } from "@/components/shared/CreateButton";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
 import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
