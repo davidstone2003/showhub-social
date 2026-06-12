@@ -8,7 +8,9 @@ const COMMON_RESULTS = [
   "Reserve Grand Champion",
   "Champion",
   "Reserve Champion",
+  "2nd Overall",
   "3rd Overall",
+  "4th Overall",
   "Top 5",
   "Top 10",
 ];
