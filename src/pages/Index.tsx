@@ -16,7 +16,7 @@ const Index = () => {
         {/* Shared dark PageHeader band */}
         <div
           className="sticky top-0 z-20 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+          style={{ height: 60, backgroundColor: "hsl(var(--primary))", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
         >
           <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Home</h1>
           <CreateButton

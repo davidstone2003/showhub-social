@@ -5,7 +5,7 @@ import { Layout } from "@/components/Layout";
 import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
 import { useBreederDirectory, stateAbbr } from "@/hooks/useBreederDirectory";
 
-const NAVY = "#0A1628";
+const NAVY = "hsl(var(--primary))";
 
 function initials(name: string) {
   return name.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("");
@@ -67,7 +67,7 @@ export default function BreedersPage() {
         {/* Dark header */}
         <div
           className="sticky top-0 z-20 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+          style={{ height: 60, backgroundColor: "hsl(var(--primary))", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
         >
           <h1 className="text-[22px] font-bold text-white">Breeders</h1>
           <div className="flex items-center gap-3">
@@ -81,7 +81,7 @@ export default function BreedersPage() {
                 style={{ backgroundColor: view === "list" ? "rgba(201,168,76,0.25)" : "transparent" }}
                 aria-label="List view"
               >
-                <ListIcon className="w-4 h-4" style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)" }} />
+                <ListIcon className="w-4 h-4" style={{ color: view === "list" ? "hsl(var(--gold))" : "rgba(255,255,255,0.5)" }} />
               </button>
               <button
                 onClick={() => setView("grid")}
@@ -89,7 +89,7 @@ export default function BreedersPage() {
                 style={{ backgroundColor: view === "grid" ? "rgba(201,168,76,0.25)" : "transparent" }}
                 aria-label="Grid view"
               >
-                <LayoutGrid className="w-4 h-4" style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)" }} />
+                <LayoutGrid className="w-4 h-4" style={{ color: view === "grid" ? "hsl(var(--gold))" : "rgba(255,255,255,0.5)" }} />
               </button>
             </div>
           </div>
@@ -105,7 +105,7 @@ export default function BreedersPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by name, farm, or location..."
-                className="flex-1 bg-transparent text-[14px] text-[#0A1628] outline-none placeholder:text-[#9CA3AF]"
+                className="flex-1 bg-transparent text-[14px] text-[hsl(var(--primary))] outline-none placeholder:text-[#9CA3AF]"
               />
               {search && (
                 <button onClick={() => setSearch("")} className="text-[#9CA3AF] text-[18px] leading-none">×</button>
@@ -125,7 +125,7 @@ export default function BreedersPage() {
               className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
               style={
                 selectedState !== "All States"
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
                   : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
               }
             >
@@ -146,9 +146,9 @@ export default function BreedersPage() {
                     className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4] transition-colors"
                     style={{ borderBottom: "1px solid #F3F4F6" }}
                   >
-                    <span className="text-[14px] font-medium text-[#0A1628]">{state}</span>
+                    <span className="text-[14px] font-medium text-[hsl(var(--primary))]">{state}</span>
                     {selectedState === state && (
-                      <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}>
+                      <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5}>
                         <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     )}
@@ -170,7 +170,7 @@ export default function BreedersPage() {
             <button
               onClick={() => { setSearch(""); setSelectedState("All States"); setSpecies("All"); }}
               className="text-[12px] font-bold"
-              style={{ color: "#C9A84C" }}
+              style={{ color: "hsl(var(--gold))" }}
             >
               Clear
             </button>
@@ -184,12 +184,12 @@ export default function BreedersPage() {
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center py-16 text-center px-8">
             <span className="text-4xl mb-3">🐑</span>
-            <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No breeders found</p>
+            <p className="font-bold text-[17px]" style={{ color: "hsl(var(--primary))" }}>No breeders found</p>
             <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>Try adjusting your filters</p>
             <button
               onClick={() => { setSearch(""); setSelectedState("All States"); setSpecies("All"); }}
               className="mt-4 rounded-full px-5 py-2 font-bold text-[14px]"
-              style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+              style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}
             >
               Clear Filters
             </button>
@@ -207,7 +207,7 @@ export default function BreedersPage() {
                 <div key={b.username}>
                   {showDivider && (
                     <div className="px-4 py-1.5 border-b border-[#F3F4F6]" style={{ backgroundColor: "#F8F7F4" }}>
-                      <span className="text-[12px] font-black" style={{ color: "#C9A84C" }}>{firstLetter}</span>
+                      <span className="text-[12px] font-black" style={{ color: "hsl(var(--gold))" }}>{firstLetter}</span>
                     </div>
                   )}
                   <Link
@@ -221,14 +221,14 @@ export default function BreedersPage() {
                       ) : (
                         <div
                           className="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-white text-[18px]"
-                          style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}
+                          style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, #1B3A6B 100%)" }}
                         >
                           {(b.display_name || b.username || "?").charAt(0).toUpperCase()}
                         </div>
                       )}
                       {(b.is_verified || b.subscription_tier === "breeder_page") && (
                         <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white flex items-center justify-center">
-                          <BadgeCheck className="w-4 h-4" style={{ color: "#C9A84C" }} />
+                          <BadgeCheck className="w-4 h-4" style={{ color: "hsl(var(--gold))" }} />
                         </div>
                       )}
                     </div>
@@ -237,7 +237,7 @@ export default function BreedersPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <p className="font-bold text-[15px] leading-tight truncate" style={{ color: "#0A1628" }}>
+                          <p className="font-bold text-[15px] leading-tight truncate" style={{ color: "hsl(var(--primary))" }}>
                             {b.display_name || b.username}
                           </p>
                           {b.farm_name && b.farm_name !== (b.display_name || b.username) && (
@@ -276,7 +276,7 @@ export default function BreedersPage() {
 
                       <div className="flex items-center gap-3 mt-2">
                         {b.win_count > 0 && (
-                          <span className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: "#C9A84C" }}>
+                          <span className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: "hsl(var(--gold))" }}>
                             🏆 {b.win_count} win{b.win_count !== 1 ? "s" : ""}
                           </span>
                         )}
@@ -303,7 +303,7 @@ export default function BreedersPage() {
             {/* Claim profile CTA */}
             <div className="mx-4 mt-4 mb-8 p-4 rounded-2xl text-center"
               style={{ backgroundColor: "#FFFBF0", border: "1px solid rgba(201,168,76,0.3)" }}>
-              <p className="font-bold text-[14px]" style={{ color: "#0A1628" }}>
+              <p className="font-bold text-[14px]" style={{ color: "hsl(var(--primary))" }}>
                 Don't see your operation?
               </p>
               <p className="text-[12px] mt-0.5 mb-3" style={{ color: "#6B7280" }}>
@@ -312,7 +312,7 @@ export default function BreedersPage() {
               <Link
                 to="/onboarding"
                 className="inline-block rounded-full px-5 py-2 text-[13px] font-bold"
-                style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+                style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}
               >
                 Claim Your Profile
               </Link>
@@ -335,7 +335,7 @@ export default function BreedersPage() {
                     />
                   ) : (
                     <div className="w-full aspect-square flex items-center justify-center"
-                      style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
+                      style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, #1B3A6B 100%)" }}>
                       <span className="text-3xl font-black" style={{ color: "rgba(201,168,76,0.4)" }}>
                         {(b.display_name || b.username || "?").charAt(0).toUpperCase()}
                       </span>
@@ -343,7 +343,7 @@ export default function BreedersPage() {
                   )}
                   {(b.is_verified || b.subscription_tier === "breeder_page") && (
                     <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 flex items-center justify-center shadow-sm">
-                      <BadgeCheck className="w-4 h-4" style={{ color: "#C9A84C" }} />
+                      <BadgeCheck className="w-4 h-4" style={{ color: "hsl(var(--gold))" }} />
                     </div>
                   )}
                   {b.lambs_available && (
@@ -356,7 +356,7 @@ export default function BreedersPage() {
                 </div>
 
                 <div className="p-2.5">
-                  <p className="font-bold text-[13px] truncate leading-tight" style={{ color: "#0A1628" }}>
+                  <p className="font-bold text-[13px] truncate leading-tight" style={{ color: "hsl(var(--primary))" }}>
                     {b.display_name || b.username}
                   </p>
                   {b.location && (
@@ -373,7 +373,7 @@ export default function BreedersPage() {
                     </div>
                   )}
                   {b.win_count > 0 && (
-                    <p className="text-[11px] font-semibold mt-1.5" style={{ color: "#C9A84C" }}>
+                    <p className="text-[11px] font-semibold mt-1.5" style={{ color: "hsl(var(--gold))" }}>
                       🏆 {b.win_count} win{b.win_count !== 1 ? "s" : ""}
                     </p>
                   )}

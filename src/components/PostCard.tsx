@@ -34,11 +34,11 @@ interface PostCardProps {
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function accentForPlacing(placing?: string | null): string {
-  if (!placing) return "#C9A84C";
-  if (/grand\s*champ/i.test(placing) && !/reserve/i.test(placing)) return "#C9A84C";
+  if (!placing) return "hsl(var(--gold))";
+  if (/grand\s*champ/i.test(placing) && !/reserve/i.test(placing)) return "hsl(var(--gold))";
   if (/reserve/i.test(placing)) return "#A8A9AD";
   if (/class\s*winner/i.test(placing)) return "#4A7C59";
-  return "#C9A84C";
+  return "hsl(var(--gold))";
 }
 
 function PhotoGrid({ images, onTap }: { images: string[]; onTap: (index: number) => void }) {
@@ -292,7 +292,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         <div className="flex items-center gap-2.5 px-3 pt-3 pb-2">
           <div
             className="flex items-center justify-center rounded-full overflow-hidden flex-shrink-0"
-            style={{ width: 38, height: 38, backgroundColor: "#0A1628" }}
+            style={{ width: 38, height: 38, backgroundColor: "hsl(var(--primary))" }}
           >
             {breederLogo && typeof breederLogo === "string" && breederLogo.startsWith("http") ? (
               <img src={breederLogo} alt="" className="h-full w-full object-cover" />
@@ -308,12 +308,12 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                 to={`/breeder/${breederSlug}`}
                 onClick={(e) => e.stopPropagation()}
                 className="font-bold text-[14px] leading-tight block"
-                style={{ color: "#0A1628" }}
+                style={{ color: "hsl(var(--primary))" }}
               >
                 {breederName}
               </Link>
             ) : (
-              <span className="font-bold text-[14px] leading-tight block" style={{ color: "#0A1628" }}>
+              <span className="font-bold text-[14px] leading-tight block" style={{ color: "hsl(var(--primary))" }}>
                 {breederName}
               </span>
             )}
@@ -343,7 +343,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         {isWinner && (post.win_placing || post.win_title) && (
           <div className="px-3 pb-1 pt-2">
             <div className="w-full text-left">
-              <p style={{ fontSize: 14, color: "#0A1628", lineHeight: 1.4 }}>
+              <p style={{ fontSize: 14, color: "hsl(var(--primary))", lineHeight: 1.4 }}>
                 <span className="font-bold">{post.win_placing || post.win_title}</span>
                 {post.show_name && (
                   <span style={{ color: "#6B7280", fontWeight: 400 }}>
@@ -353,17 +353,17 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
               </p>
               {post.breeder?.name && (
                 <p style={{ fontSize: 13, color: "#6B7280", marginTop: 1 }}>
-                  Bred by <span style={{ fontWeight: 600, color: "#0A1628" }}>{post.breeder.name}</span>
+                  Bred by <span style={{ fontWeight: 600, color: "hsl(var(--primary))" }}>{post.breeder.name}</span>
                 </p>
               )}
               {(post as any).placed_by && (
                 <p style={{ fontSize: 13, color: "#6B7280", marginTop: 1 }}>
-                  Placed by <span style={{ fontWeight: 600, color: "#0A1628" }}>{(post as any).placed_by}</span>
+                  Placed by <span style={{ fontWeight: 600, color: "hsl(var(--primary))" }}>{(post as any).placed_by}</span>
                 </p>
               )}
               {post.sired_by && (
                 <p style={{ fontSize: 13, color: "#6B7280", marginTop: 1 }}>
-                  Sired by <span style={{ fontWeight: 600, color: "#C9A84C" }}>{post.sired_by}</span>
+                  Sired by <span style={{ fontWeight: 600, color: "hsl(var(--gold))" }}>{post.sired_by}</span>
                 </p>
               )}
               {(post as any).tagged_user_ids?.length > 0 && (post as any).tagged_names?.length > 0 && (
@@ -371,7 +371,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                   With{" "}
                   {((post as any).tagged_names as string[]).map((name, i, arr) => (
                     <span key={i}>
-                      <span style={{ fontWeight: 600, color: "#0A1628" }}>{name}</span>
+                      <span style={{ fontWeight: 600, color: "hsl(var(--primary))" }}>{name}</span>
                       {i < arr.length - 2 ? ", " : i === arr.length - 2 ? " and " : ""}
                     </span>
                   ))}
@@ -431,7 +431,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
               </button>
             )}
             {(post as any).latest_comment_author && (post as any).latest_comment && (
-              <p className="text-[13px]" style={{ color: "#0A1628", lineHeight: 1.4 }}>
+              <p className="text-[13px]" style={{ color: "hsl(var(--primary))", lineHeight: 1.4 }}>
                 <span className="font-semibold">{(post as any).latest_comment_author}</span>{" "}
                 <span>{(post as any).latest_comment}</span>
               </p>
@@ -458,18 +458,18 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                 <div className="flex items-center gap-3 px-4 py-3 border-b border-[#F3F4F6]">
                   <div
                     className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center shrink-0"
-                    style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}
+                    style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, #1B3A6B 100%)" }}
                   >
                     {post.breeder?.logo && (post.breeder.logo as string).startsWith("http") ? (
                       <img src={post.breeder.logo as string} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-[13px] font-bold text-[#C9A84C]">
+                      <span className="text-[13px] font-bold text-[hsl(var(--gold))]">
                         {(post.breeder?.name || "?").charAt(0).toUpperCase()}
                       </span>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-[14px] text-[#0A1628] truncate">
+                    <p className="font-semibold text-[14px] text-[hsl(var(--primary))] truncate">
                       {post.win_placing || post.breeder?.name || "Post"}
                     </p>
                     <p className="text-[12px] text-[#9CA3AF] truncate">
@@ -494,10 +494,10 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                     className="w-full flex items-center gap-4 py-3.5 border-b border-[#F3F4F6]"
                   >
                     <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#F0F4FF" }}>
-                      <User className="w-5 h-5" style={{ color: "#0A1628" }} />
+                      <User className="w-5 h-5" style={{ color: "hsl(var(--primary))" }} />
                     </div>
                     <div className="text-left">
-                      <p className="font-semibold text-[15px] text-[#0A1628]">Share to Your Profile</p>
+                      <p className="font-semibold text-[15px] text-[hsl(var(--primary))]">Share to Your Profile</p>
                       <p className="text-[12px] text-[#9CA3AF]">Add to your Backdrop profile page</p>
                     </div>
                   </button>
@@ -530,10 +530,10 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                     className="w-full flex items-center gap-4 py-3.5 border-b border-[#F3F4F6]"
                   >
                     <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#FFF8E7" }}>
-                      <Trophy className="w-5 h-5" style={{ color: "#C9A84C" }} />
+                      <Trophy className="w-5 h-5" style={{ color: "hsl(var(--gold))" }} />
                     </div>
                     <div className="text-left">
-                      <p className="font-semibold text-[15px] text-[#0A1628]">Add to Breeder Page</p>
+                      <p className="font-semibold text-[15px] text-[hsl(var(--primary))]">Add to Breeder Page</p>
                       <p className="text-[12px] text-[#9CA3AF]">Show on your operation's profile</p>
                     </div>
                   </button>
@@ -549,7 +549,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                       <MessageCircle className="w-5 h-5" style={{ color: "#16A34A" }} />
                     </div>
                     <div className="text-left">
-                      <p className="font-semibold text-[15px] text-[#0A1628]">Send as Message</p>
+                      <p className="font-semibold text-[15px] text-[hsl(var(--primary))]">Send as Message</p>
                       <p className="text-[12px] text-[#9CA3AF]">Share privately with someone</p>
                     </div>
                   </button>
@@ -569,7 +569,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                       </svg>
                     </div>
                     <div className="text-left">
-                      <p className="font-semibold text-[15px] text-[#0A1628]">Share to Facebook</p>
+                      <p className="font-semibold text-[15px] text-[hsl(var(--primary))]">Share to Facebook</p>
                       <p className="text-[12px] text-[#9CA3AF]">Post on your Facebook timeline</p>
                     </div>
                   </button>
@@ -585,12 +585,12 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                   >
                     <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#FFF8E7" }}>
                       <svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                        <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="#C9A84C" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#C9A84C" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="hsl(var(--gold))" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="hsl(var(--gold))" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </div>
                     <div className="text-left">
-                      <p className="font-semibold text-[15px] text-[#0A1628]">Copy Link</p>
+                      <p className="font-semibold text-[15px] text-[hsl(var(--primary))]">Copy Link</p>
                       <p className="text-[12px] text-[#9CA3AF]">Copy post link to clipboard</p>
                     </div>
                   </button>
@@ -612,7 +612,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                       <Share2 className="w-5 h-5" style={{ color: "#6366F1" }} />
                     </div>
                     <div className="text-left">
-                      <p className="font-semibold text-[15px] text-[#0A1628]">More Options</p>
+                      <p className="font-semibold text-[15px] text-[hsl(var(--primary))]">More Options</p>
                       <p className="text-[12px] text-[#9CA3AF]">Share via text, email, or other apps</p>
                     </div>
                   </button>
@@ -635,7 +635,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                   >
                     ← Back
                   </button>
-                  <h3 className="font-bold text-[16px] text-[#0A1628]">Share to Feed</h3>
+                  <h3 className="font-bold text-[16px] text-[hsl(var(--primary))]">Share to Feed</h3>
                   <button
                     onClick={async () => {
                       if (!user) return;
@@ -666,7 +666,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                     }}
                     disabled={sharing}
                     className="text-[14px] font-bold rounded-full px-4 py-1.5"
-                    style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+                    style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}
                   >
                     {sharing ? "Posting..." : "Post"}
                   </button>
@@ -674,13 +674,13 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
 
                 <div className="flex items-center gap-3 px-4 py-3">
                   <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center shrink-0"
-                    style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
-                    <span className="text-[14px] font-bold text-[#C9A84C]">
+                    style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, #1B3A6B 100%)" }}>
+                    <span className="text-[14px] font-bold text-[hsl(var(--gold))]">
                       {(user?.email || "?").charAt(0).toUpperCase()}
                     </span>
                   </div>
                   <div>
-                    <p className="font-semibold text-[14px] text-[#0A1628]">Sharing to your profile</p>
+                    <p className="font-semibold text-[14px] text-[hsl(var(--primary))]">Sharing to your profile</p>
                     <p className="text-[12px] text-[#9CA3AF]">Visible on your Backdrop profile page</p>
                   </div>
                 </div>
@@ -690,7 +690,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                     value={repostCaption}
                     onChange={e => setRepostCaption(e.target.value)}
                     placeholder="Say something about this post..."
-                    className="w-full text-[15px] text-[#0A1628] placeholder:text-[#9CA3AF] outline-none resize-none"
+                    className="w-full text-[15px] text-[hsl(var(--primary))] placeholder:text-[#9CA3AF] outline-none resize-none"
                     rows={3}
                     autoFocus
                   />
@@ -701,7 +701,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                     <img src={post.image} alt="" className="w-full h-32 object-cover" />
                   )}
                   <div className="p-3 bg-[#F8F7F4]">
-                    <p className="font-semibold text-[13px] text-[#0A1628] truncate">
+                    <p className="font-semibold text-[13px] text-[hsl(var(--primary))] truncate">
                       {post.win_placing || post.breeder?.name || "Post"}
                     </p>
                     <p className="text-[12px] text-[#6B7280] truncate mt-0.5">

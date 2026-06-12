@@ -58,11 +58,11 @@ export function SortFilterSheet({ open, onClose, sort, onSortChange, filters, on
                 key={o.value}
                 onClick={() => onSortChange(o.value)}
                 className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm transition-colors ${
-                  active ? "bg-[#C9A84C]/15 text-white" : "text-white/80 hover:bg-white/5"
+                  active ? "bg-[hsl(var(--gold))]/15 text-white" : "text-white/80 hover:bg-white/5"
                 }`}
               >
                 <span className="font-semibold">{o.label}</span>
-                {active && <Check className="h-4 w-4 text-[#C9A84C]" strokeWidth={3} />}
+                {active && <Check className="h-4 w-4 text-[hsl(var(--gold))]" strokeWidth={3} />}
               </button>
             );
           })}
@@ -79,7 +79,7 @@ export function SortFilterSheet({ open, onClose, sort, onSortChange, filters, on
               >
                 <span className="font-semibold">{f.label}</span>
                 <span
-                  className={`relative h-6 w-10 rounded-full transition-colors ${on ? "bg-[#C9A84C]" : "bg-white/15"}`}
+                  className={`relative h-6 w-10 rounded-full transition-colors ${on ? "bg-[hsl(var(--gold))]" : "bg-white/15"}`}
                 >
                   <span
                     className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${
@@ -100,7 +100,7 @@ export function SortFilterSheet({ open, onClose, sort, onSortChange, filters, on
 
         <button
           onClick={onClose}
-          className="mt-6 w-full rounded-full bg-[#C9A84C] py-3 text-sm font-bold text-black hover:bg-[#d4b558] transition-colors"
+          className="mt-6 w-full rounded-full bg-[hsl(var(--gold))] py-3 text-sm font-bold text-black hover:bg-[#d4b558] transition-colors"
         >
           Apply
         </button>

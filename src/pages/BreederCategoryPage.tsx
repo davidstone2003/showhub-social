@@ -54,7 +54,7 @@ export default function BreederCategoryPage() {
 
   return (
     <Layout showDiscovery={false}>
-      <div className="min-h-screen bg-[#0A1628] text-white">
+      <div className="min-h-screen bg-[hsl(var(--primary))] text-white">
         <section className="border-b border-white/5">
           <div className="mx-auto max-w-6xl px-4 pt-6 pb-5">
             <DirectoryBreadcrumb
@@ -80,7 +80,7 @@ export default function BreederCategoryPage() {
                 <SlidersHorizontal className="h-3 w-3" />
                 Sort & Filter
                 {filters.activeCount > 0 && (
-                  <span className="rounded-full bg-[#C9A84C] px-1.5 text-[9px] font-bold text-black">
+                  <span className="rounded-full bg-[hsl(var(--gold))] px-1.5 text-[9px] font-bold text-black">
                     {filters.activeCount}
                   </span>
                 )}
@@ -90,7 +90,7 @@ export default function BreederCategoryPage() {
             {activeFilterLabels.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {activeFilterLabels.map((l) => (
-                  <span key={l} className="rounded-full bg-[#C9A84C]/15 px-2.5 py-0.5 text-[10px] font-semibold text-[#C9A84C]">
+                  <span key={l} className="rounded-full bg-[hsl(var(--gold))]/15 px-2.5 py-0.5 text-[10px] font-semibold text-[hsl(var(--gold))]">
                     {l}
                   </span>
                 ))}
@@ -111,7 +111,7 @@ export default function BreederCategoryPage() {
                 onClick={() =>
                   filters.setFilters({ myState: false, verified: false, available: false, semen: false, highSales: false })
                 }
-                className="mt-3 text-[#C9A84C] text-sm font-semibold hover:underline"
+                className="mt-3 text-[hsl(var(--gold))] text-sm font-semibold hover:underline"
               >
                 Reset Filters
               </button>
@@ -121,7 +121,7 @@ export default function BreederCategoryPage() {
               {filters.sort === "alpha" ? (
                 groupByLetter(filtered).map(([letter, items]) => (
                   <div key={letter}>
-                    <p className="sticky top-12 z-10 -mx-1 mb-2 px-1 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-[#C9A84C] bg-[#0A1628]/90 backdrop-blur-sm">
+                    <p className="sticky top-12 z-10 -mx-1 mb-2 px-1 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-[hsl(var(--gold))] bg-[hsl(var(--primary))]/90 backdrop-blur-sm">
                       {letter}
                     </p>
                     <div className="space-y-2">

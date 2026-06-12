@@ -14,7 +14,7 @@ export function DirectoryBreadcrumb({ items }: { items: Crumb[] }) {
         return (
           <span key={i} className="flex items-center gap-1">
             {c.to && !last ? (
-              <Link to={c.to} className="hover:text-[#C9A84C] transition-colors">{c.label}</Link>
+              <Link to={c.to} className="hover:text-[hsl(var(--gold))] transition-colors">{c.label}</Link>
             ) : (
               <span className={last ? "text-white" : ""}>{c.label}</span>
             )}

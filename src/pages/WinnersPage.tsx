@@ -267,7 +267,7 @@ export default function WinnersPage() {
         {/* Header */}
         <div
           className="sticky top-0 z-10 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+          style={{ height: 60, backgroundColor: "hsl(var(--primary))", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
         >
           {searchOpen ? (
             <div className="flex items-center gap-2 w-full">
@@ -300,7 +300,7 @@ export default function WinnersPage() {
             onClick={() => setSection("current")}
             className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
             style={section === "current"
-              ? { borderColor: "#C9A84C", color: "#0A1628" }
+              ? { borderColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }
               : { borderColor: "transparent", color: "#9CA3AF" }
             }
           >
@@ -310,7 +310,7 @@ export default function WinnersPage() {
             onClick={() => setSection("archive")}
             className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
             style={section === "archive"
-              ? { borderColor: "#C9A84C", color: "#0A1628" }
+              ? { borderColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }
               : { borderColor: "transparent", color: "#9CA3AF" }
             }
           >
@@ -333,7 +333,7 @@ export default function WinnersPage() {
                 onClick={() => { setCategoryOpen(v => !v); setYearOpen(false); setStateOpen(false); setBreederOpen(false); }}
                 className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
                 style={selectedCategory !== "All Levels"
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
                   : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
               >
                 {selectedCategory}
@@ -349,7 +349,7 @@ export default function WinnersPage() {
                 }}
                 className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
                 style={selectedYear
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
                   : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
               >
                 {selectedYear || "All Years"}
@@ -363,7 +363,7 @@ export default function WinnersPage() {
                 onClick={() => { setStateOpen(v => !v); setCategoryOpen(false); setYearOpen(false); setBreederOpen(false); }}
                 className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
                 style={selectedState !== "All States"
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
                   : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
               >
                 {selectedState}
@@ -377,7 +377,7 @@ export default function WinnersPage() {
                 onClick={() => { setBreederOpen(v => !v); setCategoryOpen(false); setYearOpen(false); setStateOpen(false); }}
                 className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
                 style={selectedBreeder !== "All Breeders"
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  ? { backgroundColor: "hsl(var(--primary))", color: "white", borderColor: "hsl(var(--primary))" }
                   : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
               >
                 {selectedBreeder === "All Breeders" ? "Breeder" : selectedBreeder}
@@ -402,8 +402,8 @@ export default function WinnersPage() {
                   <button key={cat} onClick={() => { setSelectedCategory(cat); closeFilterMenus(); }}
                     className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
                     style={{ borderBottom: "1px solid #F3F4F6" }}>
-                    <span className="text-[14px] font-medium text-[#0A1628]">{cat}</span>
-                    {selectedCategory === cat && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                    <span className="text-[14px] font-medium text-[hsl(var(--primary))]">{cat}</span>
+                    {selectedCategory === cat && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                   </button>
                 ))}
                 {activeFilterPanel === "year" && (
@@ -411,15 +411,15 @@ export default function WinnersPage() {
                     <button onClick={() => { setSelectedYear(null); closeFilterMenus(); }}
                       className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
                       style={{ borderBottom: "1px solid #F3F4F6" }}>
-                      <span className="text-[14px] font-medium text-[#0A1628]">All Years</span>
-                      {!selectedYear && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                      <span className="text-[14px] font-medium text-[hsl(var(--primary))]">All Years</span>
+                      {!selectedYear && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                     </button>
                     {years.map(y => (
                       <button key={y} onClick={() => { setSelectedYear(y); closeFilterMenus(); }}
                         className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
                         style={{ borderBottom: "1px solid #F3F4F6" }}>
-                        <span className="text-[14px] font-medium text-[#0A1628]">{y}</span>
-                        {selectedYear === y && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                        <span className="text-[14px] font-medium text-[hsl(var(--primary))]">{y}</span>
+                        {selectedYear === y && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                       </button>
                     ))}
                   </>
@@ -428,16 +428,16 @@ export default function WinnersPage() {
                   <button key={state} onClick={() => { setSelectedState(state); closeFilterMenus(); }}
                     className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
                     style={{ borderBottom: "1px solid #F3F4F6" }}>
-                    <span className="text-[14px] font-medium text-[#0A1628]">{state}</span>
-                    {selectedState === state && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                    <span className="text-[14px] font-medium text-[hsl(var(--primary))]">{state}</span>
+                    {selectedState === state && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                   </button>
                 ))}
                 {activeFilterPanel === "breeder" && availableBreeders.map(name => (
                   <button key={name} onClick={() => { setSelectedBreeder(name); closeFilterMenus(); }}
                     className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
                     style={{ borderBottom: "1px solid #F3F4F6" }}>
-                    <span className="text-[14px] font-medium text-[#0A1628] truncate">{name}</span>
-                    {selectedBreeder === name && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5} className="shrink-0 ml-2"><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                    <span className="text-[14px] font-medium text-[hsl(var(--primary))] truncate">{name}</span>
+                    {selectedBreeder === name && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--gold))" strokeWidth={2.5} className="shrink-0 ml-2"><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                   </button>
                 ))}
               </div>
@@ -456,20 +456,20 @@ export default function WinnersPage() {
             <div className="px-4 pt-3 pb-24 flex flex-col gap-6">
               {currentSeasonGroups.length === 0 ? (
                 <div className="flex flex-col items-center py-16 text-center">
-                  <Trophy className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
-                  <p className="font-bold text-[18px]" style={{ color: "#0A1628" }}>No results yet this season</p>
+                  <Trophy className="w-12 h-12 mb-3" style={{ color: "hsl(var(--gold))" }} />
+                  <p className="font-bold text-[18px]" style={{ color: "hsl(var(--primary))" }}>No results yet this season</p>
                   <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>Post your wins to build the record</p>
                   <Link to="/submit"
                     className="mt-4 rounded-full px-5 py-2.5 font-bold text-[14px]"
-                    style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+                    style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}>
                     Post a Win
                   </Link>
                 </div>
               ) : (
                 currentSeasonGroups.map(group => (
                   <div key={group.showName + group.year}>
-                    <div className="mb-3 pb-2 border-b-2 border-[#C9A84C]">
-                      <h2 className="font-bold text-[17px]" style={{ color: "#0A1628" }}>{group.showName}</h2>
+                    <div className="mb-3 pb-2 border-b-2 border-[hsl(var(--gold))]">
+                      <h2 className="font-bold text-[17px]" style={{ color: "hsl(var(--primary))" }}>{group.showName}</h2>
                       {!group.showName.includes(String(group.year)) && (
                         <p className="text-[12px] mt-0.5" style={{ color: "#9CA3AF" }}>{group.year}</p>
                       )}
@@ -490,7 +490,7 @@ export default function WinnersPage() {
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center"
-                                style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
+                                style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, #1B3A6B 100%)" }}>
                                 <span className="text-2xl font-black" style={{ color: "rgba(201,168,76,0.3)" }}>
                                   {group.showName.charAt(0)}
                                 </span>
@@ -498,10 +498,10 @@ export default function WinnersPage() {
                             )}
                           </div>
                           <div className="p-2.5">
-                            <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: "#C9A84C" }}>
+                            <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: "hsl(var(--gold))" }}>
                               {r.win_placing || "Winner"}
                             </p>
-                            <p className="text-[13px] font-bold truncate mt-0.5" style={{ color: "#0A1628" }}>
+                            <p className="text-[13px] font-bold truncate mt-0.5" style={{ color: "hsl(var(--primary))" }}>
                               {r.shown_by || "—"}
                             </p>
                             {r.bred_by && (
@@ -510,7 +510,7 @@ export default function WinnersPage() {
                               </p>
                             )}
                             {r.sired_by && (
-                              <p className="text-[11px] truncate mt-0.5" style={{ color: "#C9A84C" }}>
+                              <p className="text-[11px] truncate mt-0.5" style={{ color: "hsl(var(--gold))" }}>
                                 {r.sired_by}
                               </p>
                             )}
@@ -526,11 +526,11 @@ export default function WinnersPage() {
             <div className="px-4 pt-3 pb-24 flex flex-col gap-2">
               {showGroups.length === 0 ? (
                 <div className="flex flex-col items-center py-16 text-center">
-                  <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No results found</p>
+                  <p className="font-bold text-[17px]" style={{ color: "hsl(var(--primary))" }}>No results found</p>
                   <button
                     onClick={() => { setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); setSelectedYear(null); setSearchQuery(""); }}
                     className="mt-4 rounded-full px-5 py-2 font-bold text-[14px]"
-                    style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+                    style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }}>
                     Clear Filters
                   </button>
                 </div>
@@ -585,7 +585,7 @@ function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: 
             <img src={topWinner.image_urls[0]} alt="" className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
+              style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, #1B3A6B 100%)" }}>
               <span className="text-[10px] font-black text-white/30">
                 {group.showName.charAt(0)}
               </span>
@@ -593,7 +593,7 @@ function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: 
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-[14px] leading-snug text-[#0A1628] truncate">
+          <p className="font-bold text-[14px] leading-snug text-[hsl(var(--primary))] truncate">
             {group.showName}
           </p>
           <p className="text-[12px] text-[#9CA3AF] mt-0.5">
@@ -601,7 +601,7 @@ function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: 
             {!group.showName.includes(String(group.year)) ? ` · ${group.year}` : ""}
           </p>
           {topWinner?.win_placing && (
-            <p className="text-[11px] font-bold mt-0.5 truncate" style={{ color: "#C9A84C" }}>
+            <p className="text-[11px] font-bold mt-0.5 truncate" style={{ color: "hsl(var(--gold))" }}>
               {topWinner.win_placing}
               {topWinner.shown_by ? ` · ${topWinner.shown_by}` : ""}
             </p>
@@ -629,14 +629,14 @@ function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: 
                 {r.image_urls?.[0] ? (
                   <img src={r.image_urls[0]} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }} />
+                  <div className="w-full h-full" style={{ background: "linear-gradient(135deg, hsl(var(--primary)) 0%, #1B3A6B 100%)" }} />
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-[11px] uppercase tracking-wider truncate" style={{ color: "#C9A84C" }}>
+                <p className="font-bold text-[11px] uppercase tracking-wider truncate" style={{ color: "hsl(var(--gold))" }}>
                   {r.win_placing || "Winner"}
                 </p>
-                <p className="font-semibold text-[13px] truncate text-[#0A1628] mt-0.5">
+                <p className="font-semibold text-[13px] truncate text-[hsl(var(--primary))] mt-0.5">
                   {r.shown_by || r.bred_by || "—"}
                 </p>
                 {r.sired_by && (

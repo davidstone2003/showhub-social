@@ -10,7 +10,7 @@ const navItems = [
   { icon: ShoppingBag, label: "Market", to: "/market" },
 ];
 
-const ACTIVE = "#C9A84C";
+const ACTIVE = "hsl(var(--gold))";
 const INACTIVE = "rgba(255,255,255,0.4)";
 
 export function MobileNav() {
@@ -18,7 +18,7 @@ export function MobileNav() {
     <nav
       className="lg:hidden fixed bottom-0 left-0 right-0 z-50"
       style={{
-        backgroundColor: "#0A1628",
+        backgroundColor: "hsl(var(--primary))",
         borderTop: "1px solid rgba(255,255,255,0.08)",
       }}
     >

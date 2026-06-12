@@ -324,7 +324,7 @@ export default function SalesPage() {
         {/* Header */}
         <div
           className="sticky top-0 z-10 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+          style={{ height: 60, backgroundColor: "hsl(var(--primary))", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
         >
           <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Sales</h1>
           <div className="flex items-center gap-2">
@@ -360,8 +360,8 @@ export default function SalesPage() {
                     className="shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold"
                     style={
                       s.link
-                        ? { backgroundColor: "#0A1628", color: "#FFFFFF" }
-                        : { backgroundColor: "#C9A84C", color: "#0A1628" }
+                        ? { backgroundColor: "hsl(var(--primary))", color: "#FFFFFF" }
+                        : { backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))" }
                     }
                   >
                     {s.link ? "View" : "Remind"}
@@ -483,7 +483,7 @@ function SaleResultCard({ sale, onSellerClick }: { sale: SaleResult; onSellerCli
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold"
-            style={{ backgroundColor: "#0A1628", color: "#FFFFFF" }}
+            style={{ backgroundColor: "hsl(var(--primary))", color: "#FFFFFF" }}
           >
             View
           </a>

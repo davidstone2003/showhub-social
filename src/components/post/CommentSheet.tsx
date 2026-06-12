@@ -186,7 +186,7 @@ export function CommentSheet({ postId, open, onClose, commentCount }: CommentShe
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
       <SheetContent side="bottom" className="h-[80vh] rounded-t-2xl p-0 flex flex-col">
         <SheetHeader className="px-4 py-3 border-b border-[#E5E7EB]">
-          <SheetTitle className="text-[16px] font-bold text-[#0A1628]">
+          <SheetTitle className="text-[16px] font-bold text-[hsl(var(--primary))]">
             {comments.length || commentCount} {(comments.length || commentCount) === 1 ? "Comment" : "Comments"}
           </SheetTitle>
         </SheetHeader>
@@ -196,8 +196,8 @@ export function CommentSheet({ postId, open, onClose, commentCount }: CommentShe
             <div className="py-10 text-center text-[13px] text-[#6B7280]">Loading…</div>
           ) : comments.length === 0 ? (
             <div className="flex flex-col items-center justify-center text-center py-16">
-              <MessageCircle className="w-9 h-9 text-[#C9A84C] mb-2" />
-              <p className="text-[14px] font-semibold text-[#0A1628]">No comments yet</p>
+              <MessageCircle className="w-9 h-9 text-[hsl(var(--gold))] mb-2" />
+              <p className="text-[14px] font-semibold text-[hsl(var(--primary))]">No comments yet</p>
               <p className="text-[12px] text-[#6B7280] mt-1">Be the first to say something.</p>
             </div>
           ) : (
@@ -208,7 +208,7 @@ export function CommentSheet({ postId, open, onClose, commentCount }: CommentShe
                 const canDelete = isAdmin || (user && user.id === c.user_id);
                 return (
                   <li key={c.id} className="flex gap-2.5 items-start">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden flex items-center justify-center" style={{ backgroundColor: "#0A1628" }}>
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden flex items-center justify-center" style={{ backgroundColor: "hsl(var(--primary))" }}>
                       {c.author?.logo_url ? (
                         <img src={c.author.logo_url} alt="" className="w-full h-full object-cover" />
                       ) : (
@@ -218,13 +218,13 @@ export function CommentSheet({ postId, open, onClose, commentCount }: CommentShe
                     <div className="flex-1 min-w-0">
                       <div className="bg-[#F3F4F6] rounded-2xl px-3 py-2">
                         {c.author?.username ? (
-                          <Link to={`/breeder/${c.author.username}`} className="block text-[13px] font-bold text-[#0A1628] leading-tight">
+                          <Link to={`/breeder/${c.author.username}`} className="block text-[13px] font-bold text-[hsl(var(--primary))] leading-tight">
                             {name}
                           </Link>
                         ) : (
-                          <span className="block text-[13px] font-bold text-[#0A1628] leading-tight">{name}</span>
+                          <span className="block text-[13px] font-bold text-[hsl(var(--primary))] leading-tight">{name}</span>
                         )}
-                        <p className="text-[14px] text-[#0A1628] leading-snug mt-0.5 whitespace-pre-wrap break-words">
+                        <p className="text-[14px] text-[hsl(var(--primary))] leading-snug mt-0.5 whitespace-pre-wrap break-words">
                           {renderBodyWithMentions(c.body)}
                         </p>
                       </div>
@@ -253,11 +253,11 @@ export function CommentSheet({ postId, open, onClose, commentCount }: CommentShe
                 onClick={() => insertMention(p)}
                 className="w-full flex items-center gap-2 px-3 py-2 hover:bg-[#F3F4F6] text-left"
               >
-                <div className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center" style={{ backgroundColor: "#0A1628" }}>
+                <div className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center" style={{ backgroundColor: "hsl(var(--primary))" }}>
                   {p.logo_url ? <img src={p.logo_url} alt="" className="w-full h-full object-cover" /> : <span className="text-white text-[12px]">{(p.display_name || p.username || "U").charAt(0).toUpperCase()}</span>}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-semibold text-[#0A1628] truncate">{p.display_name || p.username}</p>
+                  <p className="text-[13px] font-semibold text-[hsl(var(--primary))] truncate">{p.display_name || p.username}</p>
                   {p.username && <p className="text-[11px] text-[#6B7280] truncate">@{p.username}</p>}
                 </div>
               </button>
@@ -276,13 +276,13 @@ export function CommentSheet({ postId, open, onClose, commentCount }: CommentShe
             rows={1}
             placeholder={user ? "Write a comment… use @ to tag" : "Sign in to comment"}
             disabled={!user || submitting}
-            className="flex-1 resize-none rounded-2xl border border-[#E5E7EB] bg-[#F3F4F6] px-3 py-2 text-[14px] focus:outline-none focus:border-[#C9A84C] max-h-32"
+            className="flex-1 resize-none rounded-2xl border border-[#E5E7EB] bg-[#F3F4F6] px-3 py-2 text-[14px] focus:outline-none focus:border-[hsl(var(--gold))] max-h-32"
           />
           <Button
             onClick={handleSubmit}
             disabled={!user || submitting || !text.trim()}
             size="icon"
-            className="rounded-full bg-[#1A2A44] hover:bg-[#0A1628] flex-shrink-0"
+            className="rounded-full bg-[#1A2A44] hover:bg-[hsl(var(--primary))] flex-shrink-0"
           >
             <Send className="w-4 h-4" />
           </Button>

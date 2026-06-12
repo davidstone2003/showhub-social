@@ -27,7 +27,7 @@ export const TIERS = {
       "Follower analytics",
       "Email followers",
     ],
-    color: "#C9A84C",
+    color: "hsl(var(--gold))",
   },
   featured: {
     name: "Featured",
@@ -40,7 +40,7 @@ export const TIERS = {
       "Homepage spotlight",
       "Priority search results",
     ],
-    color: "#0A1628",
+    color: "hsl(var(--primary))",
   },
 } as const;
 

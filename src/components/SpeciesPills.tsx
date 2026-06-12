@@ -19,7 +19,7 @@ export function SpeciesPills({ value, onChange, className = "", appMode = false 
         const active = value === option;
         const style = appMode
           ? active
-            ? { backgroundColor: "#C9A84C", color: "#0A1628", border: "1px solid #C9A84C" }
+            ? { backgroundColor: "hsl(var(--gold))", color: "hsl(var(--primary))", border: "1px solid hsl(var(--gold))" }
             : { backgroundColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", border: "1px solid transparent" }
           : active
             ? { backgroundColor: "#1B3A6B", color: "#FFFFFF", border: "1px solid #1B3A6B" }

@@ -13,14 +13,14 @@ export default function PricingPage() {
       <div style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
         <div
           className="sticky top-0 z-10 px-4 flex items-center"
-          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+          style={{ height: 60, backgroundColor: "hsl(var(--primary))", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
         >
           <h1 className="text-[22px] font-bold text-white">Upgrade</h1>
         </div>
 
         <div className="px-4 pt-6 pb-24">
           <div className="text-center mb-6">
-            <h2 className="font-black text-[24px]" style={{ color: "#0A1628" }}>
+            <h2 className="font-black text-[24px]" style={{ color: "hsl(var(--primary))" }}>
               Build Your Backdrop
             </h2>
             <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>
@@ -42,7 +42,7 @@ export default function PricingPage() {
                 <div
                   className="px-4 pt-4 pb-3"
                   style={{
-                    backgroundColor: key === "featured" ? "#0A1628" : key === "breeder" ? "#FFFBF0" : "white",
+                    backgroundColor: key === "featured" ? "hsl(var(--primary))" : key === "breeder" ? "#FFFBF0" : "white",
                   }}
                 >
                   <div className="flex items-center justify-between">
@@ -55,7 +55,7 @@ export default function PricingPage() {
                       </p>
                       <p
                         className="font-black text-[28px] mt-0.5"
-                        style={{ color: key === "featured" ? "white" : "#0A1628" }}
+                        style={{ color: key === "featured" ? "white" : "hsl(var(--primary))" }}
                       >
                         {tier.price === 0 ? "Free" : `$${tier.price}`}
                         {tier.price > 0 && (
@@ -71,7 +71,7 @@ export default function PricingPage() {
                     {currentTier === key && (
                       <span
                         className="rounded-full px-3 py-1 text-[11px] font-bold"
-                        style={{ backgroundColor: tier.color, color: key === "free" ? "white" : "#0A1628" }}
+                        style={{ backgroundColor: tier.color, color: key === "free" ? "white" : "hsl(var(--primary))" }}
                       >
                         Current Plan
                       </span>
@@ -93,7 +93,7 @@ export default function PricingPage() {
                       >
                         <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                      <span className="text-[13px]" style={{ color: "#0A1628" }}>
+                      <span className="text-[13px]" style={{ color: "hsl(var(--primary))" }}>
                         {f}
                       </span>
                     </div>
@@ -105,7 +105,7 @@ export default function PricingPage() {
                     <button
                       onClick={() => navigate("/onboarding")}
                       className="w-full h-11 rounded-xl font-bold text-[14px]"
-                      style={{ backgroundColor: tier.color, color: key === "featured" ? "white" : "#0A1628" }}
+                      style={{ backgroundColor: tier.color, color: key === "featured" ? "white" : "hsl(var(--primary))" }}
                     >
                       Upgrade to {tier.name}
                     </button>
