@@ -20,6 +20,7 @@ interface AdminEditModalProps {
     sired_by?: string | null;
     dam?: string | null;
     date?: string | null;
+    source_post_id?: string | null;
   };
   onSaved?: () => void;
 }
