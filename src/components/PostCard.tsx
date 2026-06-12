@@ -451,7 +451,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
       </motion.article>
 
       <WinnerDetailDrawer post={post} open={drawerOpen} onClose={() => setDrawerOpen(false)} />
-      <CommentSheet postId={(post as any).winner_id || post.id} open={showComments} onClose={() => setShowComments(false)} commentCount={post.comments || 0} />
+      <CommentSheet postId={(post as any).source_post_id || post.id} open={showComments} onClose={() => setShowComments(false)} commentCount={post.comments || 0} />
 
       <AdminFlagModal open={showFlagModal} onOpenChange={setShowFlagModal} postId={post.id} postOwnerId={(post as any).user_id} onActionComplete={onModerated} />
       <AdminEditModal
