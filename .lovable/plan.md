@@ -1,47 +1,56 @@
-Apply 8 consistency fixes across the app. Each fix is scoped, mostly presentational, with one new submission form.
+# Global UI Consistency Refactor
 
-## Fix 1 — Species labels: All | Sheep | Goats | Cattle | Pigs
-Audit and replace any remaining legacy labels ("Hair", "Hogs", etc.) across:
-- `SpeciesPills` (already correct — verify)
-- `breederTaxonomy.ts` species tiles (already correct)
-- `BreedersPage`, `BreederCategoryPage`, `SpeciesHubPage`, any pill/filter row
-Goal: identical ordering and wording everywhere.
+Consolidate the app onto one shared layout system across Home, Winners, Sales, Breeders, Sires, and Market. Preserve current brand (navy #0A1628 / #1B2A4A, gold #C9A84C, cream #F8F7F4). No routing, data, or backend changes.
 
-## Fix 2 — Sires page
-- Replace empty state with: headline "Sires Coming Soon", subline, and a "Submit a Sire" button.
-- New route `/submit-sire` with a simple form (Sire Name, Breed, Owner/Operation, Semen Available, Species) writing to a new `sire_submissions` table.
-- Seed 6 sire cards (Good Life, Chick Magnet, Pipas, Common Ground, On The Rocks, Smoke Bomb) shown as fallback when DB is empty; each: name, "Sheep" breed tag, green "SEMEN" badge, monogram avatar.
+## New shared components
 
-## Fix 3 — Sales empty state
-- Replace "Source not yet updated" with "Results update daily at 6:00 AM CT" + last-updated timestamp.
-- Add 3 seeded fallback sale-result cards so the page never looks empty.
+Create under `src/components/shared/`:
 
-## Fix 4 — Breeders page hero
-- Remove dark navy hero background.
-- Light background `#F8F7F4`, navy `#0A1628` text, gold stat numbers, same search bar.
+1. **`PageHeader.tsx`** — dark navy band beneath the top app bar.
+   - Props: `title`, `view?`, `onViewChange?`, `createButton?: ReactNode`, `onSearch?: (q: string) => void`, `searchPlaceholder?`.
+   - Layout: title left; right cluster in fixed order — Search icon (expands inline within the band, collapses on blur/empty + Esc), optional List/Grid toggle, optional CreateButton slot.
+   - Height ~56px, sticky under top app bar where pages already sticky-stack.
 
-## Fix 5 — Remind button color
-- Upcoming sale "Remind" buttons: gold `#C9A84C` bg, navy `#0A1628` text.
+2. **`FilterBar.tsx`** — white band directly under PageHeader.
+   - Row 1 slot: chip row (species OR Market category chips). Uses a single `Chip` style: inactive = white pill + navy outline + navy text; active = solid navy + white text. Removes gold-active variant.
+   - Row 2 slot: dropdowns. Enforces max 3 visible; if more passed, renders first 2 + a "Filters" button that opens a bottom sheet (shadcn `Sheet` side=bottom) listing all remaining filters with an Apply action.
+   - Exports `FilterChip`, `FilterDropdown` subcomponents so each page wires its own options.
 
-## Fix 6 — Bottom nav contrast
-- Active: gold `#C9A84C`, bold.
-- Inactive: `#9CA3AF`, regular.
-- Update `MobileNav`.
+3. **`CreateButton.tsx`** — compact gold pill with `+` icon + label.
+   - Hidden when `useAuth()` user is null. No disabled state for logged-out.
+   - Collapses to icon-only at <360px via responsive class.
+   - Accepts `to` (Link) OR `onClick` (menu). For Home, renders a popover menu (New post / New reel).
 
-## Fix 7 — Species pill styling (universal)
-- Active: solid navy `#1B3A6B` fill, white text, no border.
-- Inactive: white fill, navy text, 1px navy border.
-- Update `SpeciesPills` once; all pages inherit.
+4. **`shared/Card.tsx`** — base card: `rounded-xl border border-border bg-card shadow-[var(--shadow-card)]`, padding tokens, image aspect-ratio helper. Winner/sale/sire/market list cards re-use it.
 
-## Fix 8 — Page headers
-- White bg, page title 28px bold navy, action icons right.
-- Apply to Winners, Sales, Sires, Breeders, Repo, Market headers.
-- Exception: Home feed keeps current header.
+5. **`shared/SectionLabel.tsx`** — uppercase tracked-wider 12px gray label for result counts and section headers. One style: `text-[12px] font-bold uppercase tracking-wider text-muted-foreground`.
 
-## Technical
-- Migration: `sire_submissions` table (sire_name, breed, owner, semen_available, species, submitted_by, created_at) with RLS + grants. Authenticated users insert; service_role full; admins read.
-- Add `/submit-sire` route + page.
-- Hardcoded hex values used here are translated to the existing semantic tokens in `index.css` where possible; only introduce new tokens if the existing palette can't express them.
+## Per-page changes
+
+- **Home (`src/pages/Index.tsx`)**: Add `<PageHeader title="Home" createButton={<CreateButton menu />}>`. Delete floating gold `+` FAB. Delete the "Post a Reel" tile from `ReelsStrip` (leave existing reel thumbnails). Verify bottom nav uses dark navy variant — adjust `MobileNav` so it does not lighten on `/` route.
+- **WinnersPage**: PageHeader (title "Winners", CreateButton "+ Add win" → `/submit`). Move season tabs above FilterBar, restyle to gold-underline. FilterBar: species row + 2 dropdowns (Level, Year) + Filters sheet for State + Breeder. Remove its own FAB.
+- **SalesPage**: PageHeader (title "Sales", CreateButton "+ Add sale"). FilterBar with species chips on WHITE band — fix existing dark band chips. Use shared chip style (no gold active).
+- **BreedersPage**: PageHeader (title "Breeders", grid/list toggle, no CreateButton). FilterBar with species + ≤3 dropdowns.
+- **SiresPage**: PageHeader (title "Sires", grid/list toggle, "+ Add sire" CreateButton). Remove inline `Search` input from body and the "+ Submit" button next to "All Sires". FilterBar with species + Owner + Semen Available (2 dropdowns + chip toggle fits within 3).
+- **MarketPage**: PageHeader (title "Market", grid/list toggle, "+ Post listing"). FilterBar: Row 1 = Stock / Nutrition / Show Supplies / Services chips (shared style). Row 2 = Species, State, Price. Remove floating "+ Post a Listing" pill.
+
+## Deletions / removals
+
+- Floating `+` FAB block in `src/pages/Index.tsx`.
+- Floating create pill in `src/pages/MarketPage.tsx`.
+- Inline `+ Submit` Link in SiresPage catalog header.
+- Standalone search `<input>` block in SiresPage body.
+- "Post a Reel" tile in `src/components/ReelsStrip.tsx`.
+- Any per-page FABs found in Winners/Sales.
+
+## Bottom nav fix
+
+Audit `MobileNav.tsx` — ensure background is always navy `#0A1628`, active = gold `#C9A84C`, inactive = `#6B7280`. Remove any route-based theming. Confirm Home uses identical instance.
+
+## Acceptance verification
+
+After edits: open `/`, `/winners`, `/sales`, `/breeders`, `/sires`, `/market` in preview at 390px viewport, screenshot each, and confirm checklist (no FABs, identical header, chip parity, ≤3 dropdowns, dark nav on Home).
 
 ## Out of scope
-Authentication/profiles work (offered as follow-up).
+
+- No routing changes, no schema or query changes, no copy changes beyond create-button labels, no new brand colors.
