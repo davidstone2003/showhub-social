@@ -128,6 +128,15 @@ export function Feed() {
         const breeder = resolveIdentity(p);
         const cards = winnerCardsMap[p.id] || [];
         const firstCard = cards[0];
+        const taggedUserIds = (p.tagged_user_ids || []) as string[];
+        const taggedNames = taggedUserIds
+          .map((uid) => {
+            const pr = profilesMap[uid];
+            if (!pr) return null;
+            const full = [pr.first_name, pr.last_name].filter(Boolean).join(" ");
+            return full || pr.display_name || pr.username || null;
+          })
+          .filter(Boolean) as string[];
 
         mapped.push({
           id: p.id,
@@ -152,8 +161,11 @@ export function Feed() {
           user_id: p.user_id,
           status: p.status,
           winner_id: firstCard?.id || null,
-        });
+          tagged_user_ids: taggedUserIds,
+          tagged_names: taggedNames,
+        } as any);
       }
+
 
       // Map standalone winners (legacy)
       for (const w of standaloneWinners || []) {
