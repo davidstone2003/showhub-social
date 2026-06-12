@@ -126,7 +126,7 @@ export default function BreederProfilePage() {
     [breederName]
   );
 
-  const [tab, setTab] = useState<"posts" | "lambs" | "results">("posts");
+  const [tab, setTab] = useState<"posts" | "winners" | "sires" | "forsale">("posts");
 
   const renderCards = (items: WinnerRow[]) =>
     items.map((post, i) => <PostCard key={post.id} post={toPost(post, profile)} index={i} />);
@@ -181,18 +181,17 @@ export default function BreederProfilePage() {
           {isPaid && (
             <>
               <div className="flex gap-1 border-b border-border -mx-4 px-4 sticky top-0 bg-background z-10">
-
-                {(["posts", "lambs", "results"] as const).map((t) => (
+                {(["posts", "winners", "sires", "forsale"] as const).map((t) => (
                   <button
                     key={t}
                     onClick={() => setTab(t)}
-                    className={`px-4 py-2.5 text-sm font-semibold capitalize transition-colors border-b-2 -mb-px ${
-                      tab === t
-                        ? "border-primary text-primary"
-                        : "border-transparent text-muted-foreground hover:text-foreground"
-                    }`}
+                    className="flex-1 py-2.5 text-[13px] font-bold border-b-2 transition-colors"
+                    style={tab === t
+                      ? { borderColor: "#C9A84C", color: "#0A1628" }
+                      : { borderColor: "transparent", color: "#9CA3AF" }
+                    }
                   >
-                    {t === "posts" ? "Sires & Posts" : t === "lambs" ? `Lambs (${lambs.length})` : `Results (${winners.length})`}
+                    {t === "posts" ? "Posts" : t === "winners" ? `Winners (${winners.length})` : t === "sires" ? `Sires (${sires.length})` : `For Sale (${sales.length})`}
                   </button>
                 ))}
               </div>
@@ -202,49 +201,17 @@ export default function BreederProfilePage() {
                   {featured.length > 0 && (
                     <BreederSection icon={Star} title="Featured">{renderCards(featured)}</BreederSection>
                   )}
-                  {sires.length > 0 && (
-                    <BreederSection icon={Dna} title="Sires">{renderCards(sires)}</BreederSection>
-                  )}
-                  {donors.length > 0 && (
-                    <BreederSection icon={Dna} title="Donors / Genetics">{renderCards(donors)}</BreederSection>
-                  )}
-                  {sales.length > 0 && (
-                    <BreederSection icon={ShoppingBag} title="Available / For Sale">{renderCards(sales)}</BreederSection>
-                  )}
-                  {recentPosts.length > 0 && (
+                  {recentPosts.length > 0 ? (
                     <BreederSection icon={Activity} title="Recent Activity">
-                      {renderCards(recentPosts.slice(0, 5))}
+                      {renderCards(recentPosts)}
                     </BreederSection>
+                  ) : (
+                    <div className="text-center py-12 text-sm text-muted-foreground">No posts yet</div>
                   )}
                 </>
               )}
 
-              {tab === "lambs" && (
-                <BreederSection icon={Dna} title="Registered Lambs">
-                  {lambs.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No lambs registered yet.</p>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-3">
-                      {lambs.map((l) => (
-                        <Link
-                          key={l.tag}
-                          to={`/lamb/${l.tag}`}
-                          className="block bg-card border border-border rounded-xl p-3 hover:shadow-sm transition-shadow"
-                        >
-                          <div className="text-xs text-muted-foreground">Tag #{l.tag}</div>
-                          <div className="text-sm font-bold mt-0.5">{l.sex} • {l.breed}</div>
-                          <div className="text-[11px] text-muted-foreground mt-1">Sire: {l.sireName}</div>
-                          {l.forSale && l.price && (
-                            <div className="text-[11px] font-semibold text-primary mt-1">${l.price.toLocaleString()}</div>
-                          )}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </BreederSection>
-              )}
-
-              {tab === "results" && (
+              {tab === "winners" && (
                 winners.length === 0 ? (
                   <div className="flex flex-col items-center py-16 px-4 text-center">
                     <Trophy className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
@@ -292,6 +259,29 @@ export default function BreederProfilePage() {
                   </>
                 )
               )}
+
+              {tab === "sires" && (
+                sires.length === 0 ? (
+                  <div className="flex flex-col items-center py-16 px-4 text-center">
+                    <Dna className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
+                    <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No sires yet</p>
+                  </div>
+                ) : (
+                  <BreederSection icon={Dna} title="Sires">{renderCards(sires)}</BreederSection>
+                )
+              )}
+
+              {tab === "forsale" && (
+                sales.length === 0 ? (
+                  <div className="flex flex-col items-center py-16 px-4 text-center">
+                    <ShoppingBag className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
+                    <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>Nothing for sale right now</p>
+                  </div>
+                ) : (
+                  <BreederSection icon={ShoppingBag} title="Available / For Sale">{renderCards(sales)}</BreederSection>
+                )
+              )}
+
 
             </>
           )}
