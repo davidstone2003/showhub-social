@@ -1098,7 +1098,8 @@ export type Database = {
           comments: number
           created_at: string
           dam: string | null
-          date: string
+          date: string | null
+          date_assumed: boolean
           id: string
           image_urls: string[] | null
           is_featured: boolean
@@ -1130,7 +1131,8 @@ export type Database = {
           comments?: number
           created_at?: string
           dam?: string | null
-          date?: string
+          date?: string | null
+          date_assumed?: boolean
           id?: string
           image_urls?: string[] | null
           is_featured?: boolean
@@ -1162,7 +1164,8 @@ export type Database = {
           comments?: number
           created_at?: string
           dam?: string | null
-          date?: string
+          date?: string | null
+          date_assumed?: boolean
           id?: string
           image_urls?: string[] | null
           is_featured?: boolean
