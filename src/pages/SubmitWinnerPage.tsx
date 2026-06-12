@@ -214,7 +214,8 @@ export default function SubmitWinnerPage() {
       const winnerRefs: WinnerRef[] = [];
       
       for (const result of validResults) {
-        const resolvedShowId = await ensureLookupEntry("shows", result.showName, result.showId);
+        const showResolved = await ensureLookupEntry("shows", result.showName, result.showId);
+        const resolvedShowId = showResolved.id;
 
         // Auto-fill sire from context if not provided
         let autoSireName = result.sireName.trim();
@@ -238,9 +239,14 @@ export default function SubmitWinnerPage() {
           }
         }
 
-        const resolvedSireId = autoSireName
-          ? await ensureLookupEntry("sires_lookup", autoSireName, autoSireId)
-          : null;
+        let resolvedSireId: string | null = null;
+        let canonicalSireName = autoSireName;
+        if (autoSireName) {
+          const sireResolved = await ensureLookupEntry("sires_lookup", autoSireName, autoSireId);
+          resolvedSireId = sireResolved.id;
+          // Snap to the canonical spelling so winners link cleanly
+          if (sireResolved.name) canonicalSireName = sireResolved.name;
+        }
 
         const title = result.winPlacing.trim()
           ? `${result.winPlacing.trim()} — ${result.showName.trim()}`
@@ -253,7 +259,7 @@ export default function SubmitWinnerPage() {
           shown_by: result.shownBy.trim(),
           placed_by: result.placedBy.trim() || null,
           bred_by: result.bredBy.trim() || null,
-          sired_by: autoSireName || null,
+          sired_by: canonicalSireName || null,
           sire_id: resolvedSireId,
           dam: autoDamName || null,
           win_placing: result.winPlacing.trim() || null,
