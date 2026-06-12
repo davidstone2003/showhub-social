@@ -561,3 +561,94 @@ export default function WinnersPage() {
     </Layout>
   );
 }
+
+function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: {
+  group: { showName: string; year: number; rows: WinnerRow[] };
+  onSelectPost: (post: Post) => void;
+  profilesMap: Record<string, any>;
+  breederProfilesMap: Record<string, any>;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const topWinner = group.rows[0];
+
+  return (
+    <div className="rounded-xl bg-white border border-[#E5E7EB] overflow-hidden shadow-sm">
+      <button
+        onClick={() => setExpanded(v => !v)}
+        className="w-full flex items-center gap-3 px-4 py-3 text-left"
+      >
+        <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0 bg-[#F3F4F6]">
+          {topWinner?.image_urls?.[0] ? (
+            <img src={topWinner.image_urls[0]} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center"
+              style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
+              <span className="text-[10px] font-black text-white/30">
+                {group.showName.charAt(0)}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-[14px] leading-snug text-[#0A1628] truncate">
+            {group.showName}
+          </p>
+          <p className="text-[12px] text-[#9CA3AF] mt-0.5">
+            {group.rows.length} winner{group.rows.length !== 1 ? "s" : ""}
+            {!group.showName.includes(String(group.year)) ? ` · ${group.year}` : ""}
+          </p>
+          {topWinner?.win_placing && (
+            <p className="text-[11px] font-bold mt-0.5 truncate" style={{ color: "#C9A84C" }}>
+              {topWinner.win_placing}
+              {topWinner.shown_by ? ` · ${topWinner.shown_by}` : ""}
+            </p>
+          )}
+        </div>
+        <svg
+          width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth={2}
+          className="shrink-0 transition-transform"
+          style={{ transform: expanded ? "rotate(180deg)" : "rotate(0deg)" }}
+        >
+          <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+
+      {expanded && (
+        <div className="border-t border-[#F3F4F6]">
+          {group.rows.map((r, i) => (
+            <button
+              key={r.id}
+              onClick={() => onSelectPost(winnerToPost(r, profilesMap, breederProfilesMap))}
+              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#F8F7F4] transition-colors"
+              style={{ borderBottom: i < group.rows.length - 1 ? "1px solid #F3F4F6" : "none" }}
+            >
+              <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-[#F3F4F6]">
+                {r.image_urls?.[0] ? (
+                  <img src={r.image_urls[0]} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }} />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-[11px] uppercase tracking-wider truncate" style={{ color: "#C9A84C" }}>
+                  {r.win_placing || "Winner"}
+                </p>
+                <p className="font-semibold text-[13px] truncate text-[#0A1628] mt-0.5">
+                  {r.shown_by || r.bred_by || "—"}
+                </p>
+                {r.sired_by && (
+                  <p className="text-[11px] truncate" style={{ color: "#6B7280" }}>
+                    Sired by {r.sired_by}
+                  </p>
+                )}
+              </div>
+              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth={2} className="shrink-0">
+                <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
