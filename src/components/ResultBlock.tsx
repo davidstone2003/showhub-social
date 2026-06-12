@@ -9,6 +9,7 @@ export interface ResultData {
   id: string;
   showName: string;
   showId: string | null;
+  showDate: string; // YYYY-MM-DD or "" (optional)
   winPlacing: string;
   shownBy: string;
   placedBy: string;
@@ -75,6 +76,18 @@ export function ResultBlock({ result, index, total, onChange, onRemove, defaultE
             onChange={(e) => onChange({ ...result, winPlacing: e.target.value })}
             className="rounded-xl bg-card border-border h-11 text-sm"
           />
+          <div>
+            <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide block mb-1">
+              Show date <span className="text-muted-foreground/60 normal-case font-normal">(optional)</span>
+            </label>
+            <Input
+              type="month"
+              value={result.showDate ? result.showDate.slice(0, 7) : ""}
+              max={new Date().toISOString().slice(0, 7)}
+              onChange={(e) => onChange({ ...result, showDate: e.target.value ? `${e.target.value}-01` : "" })}
+              className="rounded-xl bg-card border-border h-11 text-sm"
+            />
+          </div>
           <ExhibitorPicker
             value={result.shownBy}
             onChange={(name) => onChange({ ...result, shownBy: name })}
@@ -102,6 +115,7 @@ export function createEmptyResult(): ResultData {
     id: crypto.randomUUID(),
     showName: "",
     showId: null,
+    showDate: "",
     winPlacing: "",
     shownBy: "",
     placedBy: "",

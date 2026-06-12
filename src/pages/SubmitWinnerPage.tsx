@@ -24,26 +24,47 @@ import type { ResultData } from "@/components/ResultBlock";
 type ImageFile = { file: File; preview: string };
 
 /* ── helpers ── */
+const normalizeName = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+// Resolves a free-text name to a lookup row. Returns the canonical { id, name }
+// so callers can persist the canonical spelling (snaps "Ridetime" → "Ride Time").
 const ensureLookupEntry = async (
   table: "shows" | "sires_lookup" | "breeders_lookup",
   displayText: string,
   existingId: string | null
-): Promise<string | null> => {
-  if (!displayText.trim()) return null;
-  if (existingId) return existingId;
-  const { data: existing } = await supabase
+): Promise<{ id: string | null; name: string }> => {
+  const trimmed = displayText.trim();
+  if (!trimmed) return { id: null, name: "" };
+  if (existingId) return { id: existingId, name: trimmed };
+
+  // Exact (case-insensitive) match first
+  const { data: exact } = await supabase
     .from(table)
-    .select("id")
-    .ilike("name", displayText.trim())
+    .select("id, name")
+    .ilike("name", trimmed)
     .limit(1);
-  if (existing && existing.length > 0) return existing[0].id;
+  if (exact && exact.length > 0) return { id: exact[0].id, name: exact[0].name };
+
+  // For sires, also try a normalized (space/punctuation-insensitive) match
+  if (table === "sires_lookup") {
+    const needle = normalizeName(trimmed);
+    if (needle.length >= 3) {
+      const { data: pool } = await supabase
+        .from(table)
+        .select("id, name")
+        .limit(500);
+      const hit = (pool || []).find((r: any) => normalizeName(r.name) === needle);
+      if (hit) return { id: hit.id, name: hit.name };
+    }
+  }
+
   const { data: inserted, error } = await supabase
     .from(table)
-    .insert({ name: displayText.trim() })
-    .select("id")
+    .insert({ name: trimmed })
+    .select("id, name")
     .single();
-  if (error || !inserted) return null;
-  return inserted.id;
+  if (error || !inserted) return { id: null, name: trimmed };
+  return { id: inserted.id, name: inserted.name };
 };
 
 /* ── page ── */
@@ -193,7 +214,8 @@ export default function SubmitWinnerPage() {
       const winnerRefs: WinnerRef[] = [];
       
       for (const result of validResults) {
-        const resolvedShowId = await ensureLookupEntry("shows", result.showName, result.showId);
+        const showResolved = await ensureLookupEntry("shows", result.showName, result.showId);
+        const resolvedShowId = showResolved.id;
 
         // Auto-fill sire from context if not provided
         let autoSireName = result.sireName.trim();
@@ -217,9 +239,14 @@ export default function SubmitWinnerPage() {
           }
         }
 
-        const resolvedSireId = autoSireName
-          ? await ensureLookupEntry("sires_lookup", autoSireName, autoSireId)
-          : null;
+        let resolvedSireId: string | null = null;
+        let canonicalSireName = autoSireName;
+        if (autoSireName) {
+          const sireResolved = await ensureLookupEntry("sires_lookup", autoSireName, autoSireId);
+          resolvedSireId = sireResolved.id;
+          // Snap to the canonical spelling so winners link cleanly
+          if (sireResolved.name) canonicalSireName = sireResolved.name;
+        }
 
         const title = result.winPlacing.trim()
           ? `${result.winPlacing.trim()} — ${result.showName.trim()}`
@@ -232,7 +259,7 @@ export default function SubmitWinnerPage() {
           shown_by: result.shownBy.trim(),
           placed_by: result.placedBy.trim() || null,
           bred_by: result.bredBy.trim() || null,
-          sired_by: autoSireName || null,
+          sired_by: canonicalSireName || null,
           sire_id: resolvedSireId,
           dam: autoDamName || null,
           win_placing: result.winPlacing.trim() || null,
@@ -240,7 +267,7 @@ export default function SubmitWinnerPage() {
           tags: [],
           image_urls: imageUrls,
           show_id: resolvedShowId,
-          date: format(new Date(), "yyyy-MM-dd"),
+          date: result.showDate || null,
           user_id: user?.id || null,
           posted_as_breeder_id: postedAsBreederId,
           post_type: postType,

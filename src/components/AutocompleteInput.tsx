@@ -33,6 +33,22 @@ export function AutocompleteInput({
   useEffect(() => {
     const timeout = setTimeout(async () => {
       setLoading(true);
+      // For sire names we widen the query and match ignoring spaces/punctuation
+      // so "Ridetime" finds the canonical "Ride Time".
+      if (table === "sires_lookup" && value && value.length >= 1) {
+        const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+        const needle = norm(value);
+        const { data } = await supabase
+          .from(table)
+          .select("id, name")
+          .limit(200);
+        const matches = ((data as AutocompleteResult[]) || [])
+          .filter((r) => norm(r.name).includes(needle))
+          .slice(0, 8);
+        setSuggestions(matches);
+        setLoading(false);
+        return;
+      }
       let query = supabase.from(table).select("id, name").limit(8);
       if (value && value.length >= 1) {
         query = query.ilike("name", `%${value}%`);

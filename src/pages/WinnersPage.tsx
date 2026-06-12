@@ -163,7 +163,7 @@ export default function WinnersPage() {
   }, [refreshKey]);
 
   const years = useMemo(() => {
-    const ys = [...new Set(rows.map(r => new Date(r.date || r.created_at).getFullYear()))];
+    const ys = [...new Set(rows.filter(r => r.date).map(r => new Date(r.date).getFullYear()))];
     return ys.sort((a, b) => b - a);
   }, [rows]);
 
@@ -211,7 +211,7 @@ export default function WinnersPage() {
       matchesSpecies(species, r.species, r.show_name, r.title, r.caption, (r.tags || []).join(" "))
     );
     if (selectedYear) {
-      filteredRows = filteredRows.filter(r => new Date(r.date || r.created_at).getFullYear() === selectedYear);
+      filteredRows = filteredRows.filter(r => r.date && new Date(r.date).getFullYear() === selectedYear);
     }
     if (selectedShow) {
       filteredRows = filteredRows.filter(r => r.show_name === selectedShow);
@@ -241,10 +241,10 @@ export default function WinnersPage() {
       if (!grouped.has(key)) grouped.set(key, []);
       grouped.get(key)!.push(r);
     }
-    const result: { showName: string; year: number; posts: Post[]; rows: WinnerRow[] }[] = [];
+    const result: { showName: string; year: number | null; posts: Post[]; rows: WinnerRow[] }[] = [];
     for (const [, winners] of grouped) {
       const ref = winners[0];
-      const year = new Date(ref.date || ref.created_at).getFullYear();
+      const year = ref.date ? new Date(ref.date).getFullYear() : null;
       result.push({
         showName: ref.show_name,
         year,
@@ -252,12 +252,12 @@ export default function WinnersPage() {
         rows: winners,
       });
     }
-    result.sort((a, b) => b.year - a.year || a.showName.localeCompare(b.showName));
+    result.sort((a, b) => (b.year ?? -1) - (a.year ?? -1) || a.showName.localeCompare(b.showName));
     return result;
   }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery, selectedCategory, selectedState, selectedBreeder]);
 
   const currentSeasonGroups = useMemo(() => {
-    return showGroups.filter(g => g.year >= currentYear);
+    return showGroups.filter(g => g.year !== null && g.year >= currentYear);
   }, [showGroups, currentYear]);
 
   return (
@@ -471,7 +471,7 @@ export default function WinnersPage() {
                   <div key={group.showName + group.year}>
                     <div className="mb-3 pb-2 border-b-2 border-[#C9A84C]">
                       <h2 className="font-bold text-[17px]" style={{ color: "#0A1628" }}>{group.showName}</h2>
-                      {!group.showName.includes(String(group.year)) && (
+                      {group.year !== null && !group.showName.includes(String(group.year)) && (
                         <p className="text-[12px] mt-0.5" style={{ color: "#9CA3AF" }}>{group.year}</p>
                       )}
                     </div>
@@ -580,7 +580,7 @@ export default function WinnersPage() {
 }
 
 function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: {
-  group: { showName: string; year: number; rows: WinnerRow[] };
+  group: { showName: string; year: number | null; rows: WinnerRow[] };
   onSelectPost: (post: Post) => void;
   profilesMap: Record<string, any>;
   breederProfilesMap: Record<string, any>;
@@ -612,7 +612,7 @@ function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: 
           </p>
           <p className="text-[12px] text-[#9CA3AF] mt-0.5">
             {group.rows.length} winner{group.rows.length !== 1 ? "s" : ""}
-            {!group.showName.includes(String(group.year)) ? ` · ${group.year}` : ""}
+            {group.year !== null && !group.showName.includes(String(group.year)) ? ` · ${group.year}` : ""}
           </p>
           {topWinner?.win_placing && (
             <p className="text-[11px] font-bold mt-0.5 truncate" style={{ color: "#C9A84C" }}>

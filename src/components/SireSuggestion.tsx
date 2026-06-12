@@ -67,30 +67,46 @@ export function SireSuggestion({ winners, postedAsBreederId, onComplete }: SireS
   const handleConfirm = async () => {
     if (!current || !sireName.trim()) return;
 
-    // Resolve sire ID
+    const normalizeName = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+    // Resolve sire ID — and snap to canonical spelling if a normalized match exists
     let resolvedSireId = sireId;
-    if (sireName.trim() && !resolvedSireId) {
-      const { data: existing } = await supabase
+    let canonicalSireName = sireName.trim();
+    if (!resolvedSireId) {
+      const { data: exact } = await supabase
         .from("sires_lookup")
-        .select("id")
-        .ilike("name", sireName.trim())
+        .select("id, name")
+        .ilike("name", canonicalSireName)
         .limit(1);
-      if (existing && existing.length > 0) {
-        resolvedSireId = existing[0].id;
+      if (exact && exact.length > 0) {
+        resolvedSireId = exact[0].id;
+        canonicalSireName = exact[0].name;
       } else {
-        const { data: inserted } = await supabase
-          .from("sires_lookup")
-          .insert({ name: sireName.trim() })
-          .select("id")
-          .single();
-        resolvedSireId = inserted?.id || null;
+        const needle = normalizeName(canonicalSireName);
+        if (needle.length >= 3) {
+          const { data: pool } = await supabase.from("sires_lookup").select("id, name").limit(500);
+          const hit = (pool || []).find((r: any) => normalizeName(r.name) === needle);
+          if (hit) {
+            resolvedSireId = hit.id;
+            canonicalSireName = hit.name;
+          }
+        }
+        if (!resolvedSireId) {
+          const { data: inserted } = await supabase
+            .from("sires_lookup")
+            .insert({ name: canonicalSireName })
+            .select("id, name")
+            .single();
+          resolvedSireId = inserted?.id || null;
+          if (inserted?.name) canonicalSireName = inserted.name;
+        }
       }
     }
 
     // Update the winner card
     await (supabase.from("winners") as any)
       .update({
-        sired_by: sireName.trim() || null,
+        sired_by: canonicalSireName || null,
         sire_id: resolvedSireId,
         dam: damName.trim() || null,
       })
@@ -109,7 +125,7 @@ export function SireSuggestion({ winners, postedAsBreederId, onComplete }: SireS
         await supabase
           .from("exhibitor_animal_context")
           .update({
-            sire_name: sireName.trim(),
+            sire_name: canonicalSireName,
             sire_id: resolvedSireId,
             dam_name: damName.trim() || null,
             show_name: current.showName,
@@ -123,7 +139,7 @@ export function SireSuggestion({ winners, postedAsBreederId, onComplete }: SireS
         await supabase.from("exhibitor_animal_context").insert({
           user_id: user.id,
           exhibitor_name: current.shownBy,
-          sire_name: sireName.trim(),
+          sire_name: canonicalSireName,
           sire_id: resolvedSireId,
           dam_name: damName.trim() || null,
           show_name: current.showName,

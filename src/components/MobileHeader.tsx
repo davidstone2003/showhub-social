@@ -1,4 +1,4 @@
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Link, useLocation, useMatch } from "react-router-dom";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
@@ -71,11 +71,7 @@ export function MobileHeader() {
         )}
 
         <div className="flex items-center gap-2">
-          {isRoot && !PAGES_WITH_OWN_SEARCH.has(pathname) && (
-            <button className="p-2 rounded-lg hover:bg-muted transition-colors" aria-label="Search">
-              <Search className="w-5 h-5 text-muted-foreground" />
-            </button>
-          )}
+          {/* Global search intentionally omitted until search overlay ships */}
 
           {user ? (
             <>
