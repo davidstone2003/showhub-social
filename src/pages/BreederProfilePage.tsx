@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Layout } from "@/components/Layout";
 import { PostCard } from "@/components/PostCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Trophy, Dna, ShoppingBag, Star, Activity } from "lucide-react";
+import { Trophy, Dna, ShoppingBag, Star, Activity, Play } from "lucide-react";
 import { BreederHero } from "@/components/breeder/BreederHero";
 import { BreederSection } from "@/components/breeder/BreederSection";
 import { LockedSection } from "@/components/breeder/LockedSection";
@@ -126,7 +126,22 @@ export default function BreederProfilePage() {
     [breederName]
   );
 
-  const [tab, setTab] = useState<"posts" | "winners" | "sires" | "forsale">("posts");
+  const [tab, setTab] = useState<"posts" | "winners" | "sires" | "videos" | "forsale">("posts");
+
+  const { data: breederVideos = [] } = useQuery({
+    queryKey: ["breeder-videos", profile?.id],
+    queryFn: async () => {
+      const { data } = await (supabase.from("posts") as any)
+        .select("id, video_url, caption, created_at")
+        .or(`user_id.eq.${profile!.id},posted_as_breeder_id.eq.${profile!.id}`)
+        .not("video_url", "is", null)
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      return (data || []) as any[];
+    },
+    enabled: !!profile?.id,
+  });
 
   const renderCards = (items: WinnerRow[]) =>
     items.map((post, i) => <PostCard key={post.id} post={toPost(post, profile)} index={i} />);
@@ -202,17 +217,17 @@ export default function BreederProfilePage() {
           {isPaid && (
             <>
               <div className="flex gap-1 border-b border-border -mx-4 px-4 sticky top-0 bg-background z-10">
-                {(["posts", "winners", "sires", "forsale"] as const).map((t) => (
+                {(["posts", "winners", "sires", "videos", "forsale"] as const).map((t) => (
                   <button
                     key={t}
                     onClick={() => setTab(t)}
-                    className="flex-1 py-2.5 text-[13px] font-bold border-b-2 transition-colors"
+                    className="flex-1 py-2.5 text-[12px] font-bold border-b-2 transition-colors"
                     style={tab === t
                       ? { borderColor: "#C9A84C", color: "#0A1628" }
                       : { borderColor: "transparent", color: "#9CA3AF" }
                     }
                   >
-                    {t === "posts" ? "Posts" : t === "winners" ? `Winners (${winners.length})` : t === "sires" ? `Sires (${sires.length})` : `For Sale (${sales.length})`}
+                    {t === "posts" ? "Posts" : t === "winners" ? `Winners (${winners.length})` : t === "sires" ? `Sires (${sires.length})` : t === "videos" ? `Videos (${breederVideos.length})` : `For Sale (${sales.length})`}
                   </button>
                 ))}
               </div>
@@ -289,6 +304,43 @@ export default function BreederProfilePage() {
                   </div>
                 ) : (
                   <BreederSection icon={Dna} title="Sires">{renderCards(sires)}</BreederSection>
+                )
+              )}
+
+              {tab === "videos" && (
+                breederVideos.length === 0 ? (
+                  <div className="flex flex-col items-center py-16 px-4 text-center">
+                    <div style={{ fontSize: 40 }}>🎬</div>
+                    <p className="font-bold text-[17px] mt-2" style={{ color: "#0A1628" }}>No videos yet</p>
+                    <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>
+                      Post fitting videos, walk-arounds, and show day moments
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 gap-0.5">
+                    {breederVideos.map((v: any) => (
+                      <div key={v.id} className="relative aspect-square overflow-hidden bg-black">
+                        <video
+                          src={v.video_url}
+                          className="absolute inset-0 w-full h-full object-cover"
+                          muted
+                          playsInline
+                          preload="metadata"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div className="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center">
+                            <Play className="w-5 h-5 text-white" fill="white" />
+                          </div>
+                        </div>
+                        {v.caption && (
+                          <div className="absolute inset-x-0 bottom-0 p-1.5"
+                            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75), transparent)" }}>
+                            <p className="text-[9px] font-bold text-white truncate leading-tight">{v.caption}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 )
               )}
 

@@ -593,6 +593,7 @@ export type Database = {
           created_at: string
           id: string
           image_urls: string[] | null
+          is_reel: boolean
           likes: number
           post_type: string
           posted_as_breeder_id: string | null
@@ -610,6 +611,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_urls?: string[] | null
+          is_reel?: boolean
           likes?: number
           post_type?: string
           posted_as_breeder_id?: string | null
@@ -627,6 +629,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_urls?: string[] | null
+          is_reel?: boolean
           likes?: number
           post_type?: string
           posted_as_breeder_id?: string | null

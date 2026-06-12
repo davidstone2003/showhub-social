@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,6 +61,8 @@ export default function CreatePostPage() {
   const { user, profile } = useAuth();
   const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [isReel, setIsReel] = useState(searchParams.get("type") === "reel");
 
   const [category] = useState<PostCategory>(null); // unused but kept for compat
   const [media, setMedia] = useState<MediaFile[]>([]);
@@ -234,6 +236,7 @@ export default function CreatePostPage() {
         user_id: user?.id || null, posted_as_breeder_id: postedAsBreederId,
         caption: (notes.trim() || generalCaption.trim()) || null, image_urls: imageUrls, video_url: videoUrl,
         tags: species ? [species] : [], post_type: "winner", show_on_feed: true,
+        is_reel: isReel && !!videoUrl,
         tagged_user_ids: taggedPeople.map(p => p.id),
       }).select("id").single();
       if (postError) throw postError;
@@ -308,6 +311,7 @@ export default function CreatePostPage() {
         user_id: user?.id || null, posted_as_breeder_id: postedAsBreederId,
         caption: generalCaption.trim() || null, image_urls: imageUrls, video_url: videoUrl,
         tags: species ? [species] : [], post_type: "general", show_on_feed: true,
+        is_reel: isReel && !!videoUrl,
         tagged_user_ids: taggedPeople.map(p => p.id),
       }).select("id").single();
       if (postError) throw postError;
@@ -648,6 +652,38 @@ export default function CreatePostPage() {
                 </button>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Reel vs Feed toggle (only when a video is attached) */}
+        {media.some(m => m.type === "video") && (
+          <div className="px-4 pb-3">
+            <p className="text-[12px] font-bold mb-2" style={{ color: "#6B7280" }}>Post this video as:</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIsReel(false)}
+                className="flex-1 py-2 rounded-xl text-[12px] font-bold border"
+                style={!isReel
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
+                }
+              >
+                📱 Feed Post
+              </button>
+              <button
+                onClick={() => setIsReel(true)}
+                className="flex-1 py-2 rounded-xl text-[12px] font-bold border"
+                style={isReel
+                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
+                }
+              >
+                🎬 Reel
+              </button>
+            </div>
+            <p className="text-[11px] mt-1.5" style={{ color: "#9CA3AF" }}>
+              {isReel ? "Reels appear in the Reels tab and your profile" : "Feed posts appear in the main feed with your caption"}
+            </p>
           </div>
         )}
 

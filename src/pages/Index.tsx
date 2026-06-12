@@ -4,10 +4,10 @@ import { Plus } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { LiveStrip } from "@/components/LiveStrip";
 import { Feed } from "@/components/Feed";
-import { ClipsView } from "@/components/ClipsView";
+import { ReelsView } from "@/components/ReelsView";
 
 const Index = () => {
-  const [feedTab, setFeedTab] = useState<"feed" | "clips">("feed");
+  const [feedTab, setFeedTab] = useState<"feed" | "reels">("feed");
 
   return (
     <Layout showDiscovery={false}>
@@ -29,22 +29,21 @@ const Index = () => {
               Feed
             </button>
             <button
-              onClick={() => setFeedTab("clips")}
+              onClick={() => setFeedTab("reels")}
               className="flex-1 py-2 rounded-full text-[14px] font-bold transition-colors"
-              style={feedTab === "clips"
+              style={feedTab === "reels"
                 ? { backgroundColor: "#0A1628", color: "#FFFFFF" }
                 : { backgroundColor: "#F3F4F6", color: "#6B7280" }
               }
             >
-              🎬 Clips
+              🎬 Reels
             </button>
           </div>
 
-          {feedTab === "feed" ? <Feed /> : <ClipsView />}
+          {feedTab === "feed" ? <Feed /> : <ReelsView />}
         </div>
       </div>
 
-      {/* Floating action button */}
       <Link
         to="/submit"
         aria-label="Post to Backdrop"
