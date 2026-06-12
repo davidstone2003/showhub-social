@@ -239,7 +239,7 @@ export default function WinnersPage() {
     }
     result.sort((a, b) => b.year - a.year || a.showName.localeCompare(b.showName));
     return result;
-  }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery]);
+  }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery, selectedCategory, selectedState, selectedBreeder]);
 
   return (
     <Layout showDiscovery={false}>
