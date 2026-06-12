@@ -11,16 +11,13 @@ const navItems = [
 ];
 
 const ACTIVE = "hsl(var(--gold))";
-const INACTIVE = "rgba(255,255,255,0.4)";
+const INACTIVE = "rgba(255,255,255,0.55)";
 
 export function MobileNav() {
   return (
     <nav
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-50"
-      style={{
-        backgroundColor: "hsl(var(--primary))",
-        borderTop: "1px solid rgba(255,255,255,0.08)",
-      }}
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-primary"
+      style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
     >
       <div className="flex items-center justify-around py-1.5 px-1 safe-area-pb">
         {navItems.map((item) => (
