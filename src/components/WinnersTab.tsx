@@ -87,9 +87,11 @@ export function WinnersTab({ showId }: WinnersTabProps) {
 
 function WinnerCard({ winner, index }: { winner: WinnerRecord; index: number }) {
   const [imgFailed, setImgFailed] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
   const image = imgFailed ? "/placeholder.svg" : (winner.image_urls?.[0] || "/placeholder.svg");
   const year = new Date(winner.date || winner.created_at).getFullYear();
   const isUploaded = image.includes("/storage/v1/object/public/winner-images/");
+  const allImages = (winner.image_urls && winner.image_urls.length > 0) ? winner.image_urls : [];
 
   return (
     <motion.div
@@ -100,7 +102,12 @@ function WinnerCard({ winner, index }: { winner: WinnerRecord; index: number }) 
       style={{ boxShadow: "var(--shadow-card)" }}
     >
       {/* Image */}
-      <div className="w-full bg-muted">
+      <button
+        type="button"
+        onClick={() => allImages.length > 0 && setViewerOpen(true)}
+        className="block w-full bg-muted text-left"
+        disabled={allImages.length === 0}
+      >
         <img
           src={image}
           alt={winner.win_placing || winner.title}
@@ -109,7 +116,8 @@ function WinnerCard({ winner, index }: { winner: WinnerRecord; index: number }) 
           decoding="async"
           onError={() => setImgFailed(true)}
         />
-      </div>
+      </button>
+
 
       {/* Details */}
       <div className="p-3.5 space-y-1">
