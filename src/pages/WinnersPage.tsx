@@ -114,15 +114,11 @@ export default function WinnersPage() {
   const [selectedShow, setSelectedShow] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchOpen, setSearchOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("All Levels");
   const [selectedState, setSelectedState] = useState<string>("All States");
   const [selectedBreeder, setSelectedBreeder] = useState<string>("All Breeders");
-  const [categoryOpen, setCategoryOpen] = useState(false);
-  const [yearOpen, setYearOpen] = useState(false);
-  const [stateOpen, setStateOpen] = useState(false);
-  const [breederOpen, setBreederOpen] = useState(false);
   const [drawerPost, setDrawerPost] = useState<Post | null>(null);
+
 
   const handleModerated = () => setRefreshKey((k) => k + 1);
 
