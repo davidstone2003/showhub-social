@@ -47,20 +47,53 @@ export default function MarketPage() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [category, setCategory] = useState<Category>("All");
   const [view, setView] = useState<"list" | "grid">("list");
+  const [selectedState, setSelectedState] = useState<string>("All States");
+  const [selectedSpecies, setSelectedSpecies] = useState<string>("All");
+  const [priceRange, setPriceRange] = useState<"All" | "Under $500" | "$500-$2K" | "$2K-$5K" | "$5K+">("All");
+  const [stateOpen, setStateOpen] = useState(false);
+  const [speciesOpen, setSpeciesOpen] = useState(false);
+  const [priceOpen, setPriceOpen] = useState(false);
 
-  const stats = useMemo(() => ({
-    listings: LISTINGS.length,
-    sellers: 18,
-    states: 9,
-    categories: 4,
-  }), []);
+  useEffect(() => {
+    const handler = () => { setStateOpen(false); setSpeciesOpen(false); setPriceOpen(false); };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, []);
+
+  const marketStates = useMemo(() => {
+    const states = LISTINGS.map((l) => l.meta.match(/^([A-Z]{2})\s·/)?.[1]).filter(Boolean) as string[];
+    return ["All States", ...Array.from(new Set(states)).sort()];
+  }, []);
+
+  const speciesOptions = ["All", "Sheep", "Goats", "Cattle", "Pigs"];
+  const priceOptions = ["All", "Under $500", "$500-$2K", "$2K-$5K", "$5K+"];
 
   const filtered = useMemo(() => {
-    const byCat = category === "All" ? LISTINGS : LISTINGS.filter((l) => l.category === category);
-    if (!search.trim()) return byCat;
-    const q = search.toLowerCase();
-    return byCat.filter((l) => `${l.title} ${l.meta} ${l.category}`.toLowerCase().includes(q));
-  }, [search, category]);
+    let result = category === "All" ? LISTINGS : LISTINGS.filter((l) => l.category === category);
+    if (selectedState !== "All States") {
+      result = result.filter((l) => l.meta.startsWith(selectedState));
+    }
+    if (selectedSpecies !== "All") {
+      result = result.filter((l) => l.species === selectedSpecies);
+    }
+    if (priceRange !== "All") {
+      result = result.filter((l) => {
+        const n = priceToNumber(l.price);
+        if (n == null) return false;
+        if (priceRange === "Under $500") return n < 500;
+        if (priceRange === "$500-$2K") return n >= 500 && n < 2000;
+        if (priceRange === "$2K-$5K") return n >= 2000 && n < 5000;
+        if (priceRange === "$5K+") return n >= 5000;
+        return true;
+      });
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter((l) => `${l.title} ${l.meta} ${l.category}`.toLowerCase().includes(q));
+    }
+    return result;
+  }, [search, category, selectedState, selectedSpecies, priceRange]);
+
 
   return (
     <Layout showDiscovery={false}>
