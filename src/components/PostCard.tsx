@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Heart, MessageCircle, Share2, Flag, MoreVertical, Pencil, Trash2, User, Trophy } from "lucide-react";
 import { FeedVideo } from "@/components/post/VideoPlayer";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import type { Post } from "@/data/mock";
 import { cn } from "@/lib/utils";
+import { ResultRibbon } from "@/components/ResultRibbon";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useAuth } from "@/contexts/AuthContext";
 import { AdminFlagModal } from "@/components/AdminFlagModal";
