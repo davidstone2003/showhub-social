@@ -1,47 +1,59 @@
-Apply 8 consistency fixes across the app. Each fix is scoped, mostly presentational, with one new submission form.
+# Multi-animal show recap posts
 
-## Fix 1 — Species labels: All | Sheep | Goats | Cattle | Pigs
-Audit and replace any remaining legacy labels ("Hair", "Hogs", etc.) across:
-- `SpeciesPills` (already correct — verify)
-- `breederTaxonomy.ts` species tiles (already correct)
-- `BreedersPage`, `BreederCategoryPage`, `SpeciesHubPage`, any pill/filter row
-Goal: identical ordering and wording everywhere.
+Add Facebook-style recap support alongside the existing single-win flow, plus photo credits and clamped captions.
 
-## Fix 2 — Sires page
-- Replace empty state with: headline "Sires Coming Soon", subline, and a "Submit a Sire" button.
-- New route `/submit-sire` with a simple form (Sire Name, Breed, Owner/Operation, Semen Available, Species) writing to a new `sire_submissions` table.
-- Seed 6 sire cards (Good Life, Chick Magnet, Pipas, Common Ground, On The Rocks, Smoke Bomb) shown as fallback when DB is empty; each: name, "Sheep" breed tag, green "SEMEN" badge, monogram avatar.
+## 1. Database
 
-## Fix 3 — Sales empty state
-- Replace "Source not yet updated" with "Results update daily at 6:00 AM CT" + last-updated timestamp.
-- Add 3 seeded fallback sale-result cards so the page never looks empty.
+Single migration:
+- `posts.photo_credit text null` — free text, used by every post type with photos.
+- `posts.photo_credit_breeder_id uuid null references breeder_profiles(id)` — optional match to a Backdrop breeder/business profile so the credit becomes a link.
 
-## Fix 4 — Breeders page hero
-- Remove dark navy hero background.
-- Light background `#F8F7F4`, navy `#0A1628` text, gold stat numbers, same search bar.
+No changes to `winners` — each result block already writes its own row with `source_post_id`, which is exactly what we need.
 
-## Fix 5 — Remind button color
-- Upcoming sale "Remind" buttons: gold `#C9A84C` bg, navy `#0A1628` text.
+## 2. CreatePostPage — multi-result winner flow
 
-## Fix 6 — Bottom nav contrast
-- Active: gold `#C9A84C`, bold.
-- Inactive: `#9CA3AF`, regular.
-- Update `MobileNav`.
+In the existing winner panel, replace the single set of result fields with a `resultBlocks` array. Each block holds:
+- `animal_name` (a.k.a. shown_by / nickname)
+- `placings: string[]` (one or more, with “+ add placing” inside the block)
+- `bred_by`
+- `placed_by`
+- `sired_by` + `sire_id` (uses existing sire AutocompleteInput)
 
-## Fix 7 — Species pill styling (universal)
-- Active: solid navy `#1B3A6B` fill, white text, no border.
-- Inactive: white fill, navy text, 1px navy border.
-- Update `SpeciesPills` once; all pages inherit.
+Shared across the post: `show_name`, `date` (+ `date_assumed`), `species`, `caption`, photos/video, `photo_credit`.
 
-## Fix 8 — Page headers
-- White bg, page title 28px bold navy, action icons right.
-- Apply to Winners, Sales, Sires, Breeders, Repo, Market headers.
-- Exception: Home feed keeps current header.
+Controls:
+- “+ Add another animal” button below the last block.
+- Each block has a remove (X) button when there is more than one.
+- First placing in the first block drives the ribbon’s “primary” placing.
 
-## Technical
-- Migration: `sire_submissions` table (sire_name, breed, owner, semen_available, species, submitted_by, created_at) with RLS + grants. Authenticated users insert; service_role full; admins read.
-- Add `/submit-sire` route + page.
-- Hardcoded hex values used here are translated to the existing semantic tokens in `index.css` where possible; only introduce new tokens if the existing palette can't express them.
+On submit:
+- Insert one `posts` row (carrying caption, media, `photo_credit`, `photo_credit_breeder_id`, `post_type='champion'`, shared show fields).
+- For each block × each placing in the block, insert a `winners` row with `source_post_id = post.id`, copying the shared show/date/species and the block’s breeder/exhibitor/sire fields. Reuse the existing sire normalization logic.
 
-## Out of scope
-Authentication/profiles work (offered as follow-up).
+Single-result mode keeps working because one block × one placing produces exactly today’s behavior.
+
+## 3. PostCard — recap rendering
+
+When a post has more than one linked winner card, render a `RecapBlocks` section between the caption and the engagement row:
+- Group winner rows by `animal_name` (shown_by).
+- Per animal: bold name; compact bulleted/list of placings; one metadata line “Bred by X · Placed by Y · Sired by Z” with breeder/sire as links where matched.
+- Ribbon overlay still appears once, using the highest-ranked placing across all blocks (Grand → Reserve Grand → Division → Class → other).
+
+Single-card posts continue to use the existing compact metadata line — no visual change for the common case.
+
+## 4. Caption clamp
+
+Wrap the caption `<p>` in a small `ClampedText` component:
+- CSS line-clamp 4 by default.
+- If the rendered text overflows, show an inline “… more” / “less” toggle (gray, 12px) styled to match the muted metadata.
+- Photo credit (when present) renders directly under the caption as a separate small line, e.g. `📸 J. Hutch Media`, with the name linking to `/breeder/{slug}` when `photo_credit_breeder_id` resolves.
+
+## 5. Out of scope (unchanged)
+
+- Sale flow, reel flow, ResultRibbon styling, edge-to-edge photos, double-tap-to-like, headers, filters.
+
+## Technical notes
+
+- Feed.tsx already fetches multiple winner cards per post into `winnerCardsMap[postId]` but only uses the first card. Extend its `Post` mapping to pass the full array (e.g. `winner_cards`) so PostCard can render recaps without an extra query.
+- WinnersPage already lists each winner row individually, so multi-animal posts will naturally appear as multiple archive entries with no changes there.
+- Photo credit matching: simple optional autocomplete against `breeder_profiles.breeder_name` in the composer; stores `photo_credit` text always and `photo_credit_breeder_id` only on match.
