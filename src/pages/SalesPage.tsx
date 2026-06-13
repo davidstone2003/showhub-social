@@ -320,23 +320,24 @@ export default function SalesPage() {
   return (
     <Layout showDiscovery={false}>
       <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
-        {/* Header */}
+        {/* Compact header */}
         <div
-          className="sticky top-0 z-10 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+          className="sticky top-0 z-30 px-4 flex items-center justify-between bg-white"
+          style={{ height: 48, borderBottom: "1px solid #E5E7EB" }}
         >
-          <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Sales</h1>
-          <button className="p-1.5 rounded-lg transition-colors">
-            <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
+          <h1 className="text-[18px] font-bold leading-none" style={{ color: "#0A1628" }}>Sales</h1>
+          <button className="p-1.5" aria-label="Search">
+            <Search className="w-5 h-5" style={{ color: "#6B7280" }} />
           </button>
         </div>
 
         {/* Species pills */}
-        <div style={{ backgroundColor: "#0A1628" }} className="pb-3">
-          <div className="px-4 pt-3">
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-20">
+          <div className="px-4 py-2">
             <SpeciesPills value={species} onChange={setSpecies} appMode />
           </div>
         </div>
+
 
         {/* ─── 1. UPCOMING SALES ─── */}
         <div className="px-4 pt-6">
