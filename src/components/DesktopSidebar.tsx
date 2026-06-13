@@ -14,15 +14,19 @@ const navItems = [
   { icon: ShoppingBag, label: "Market", to: "/market" },
 ];
 
+const SPECIES_SWITCHER_ROUTES = new Set(["/winners", "/breeders", "/sires", "/sales", "/market"]);
+
 export function DesktopSidebar() {
   const { user, profile, signOut } = useAuth();
   const { isAdmin } = useUserRole();
+  const { pathname } = useLocation();
+  const showSwitcher = SPECIES_SWITCHER_ROUTES.has(pathname);
 
   return (
     <aside className="hidden lg:flex flex-col w-[200px] min-h-screen bg-primary text-sidebar-foreground border-r border-sidebar-border sticky top-0">
       <div className="p-5 border-b border-sidebar-border space-y-3">
         <BackdropLogo size="md" showTagline={true} onDark={true} />
-        <GlobalSpeciesSwitcher variant="sidebar" />
+        {showSwitcher && <GlobalSpeciesSwitcher variant="sidebar" />}
       </div>
 
       <nav className="flex-1 py-4 px-3 space-y-1">
