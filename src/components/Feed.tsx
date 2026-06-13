@@ -20,6 +20,8 @@ interface WinnerCard {
   dam: string | null;
 }
 
+const FEED_FILTER_LS = "backdrop_feed_species_filter_on";
+
 export function Feed() {
   const [loading, setLoading] = useState(true);
   const [dbPosts, setDbPosts] = useState<Post[]>([]);
@@ -27,6 +29,19 @@ export function Feed() {
   const [refreshKey, setRefreshKey] = useState(0);
   const { species } = useSpecies();
   const [featuredBreeder, setFeaturedBreeder] = useState<any>(null);
+  const [speciesFilterOn, setSpeciesFilterOn] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(FEED_FILTER_LS) === "1";
+  });
+
+  const toggleSpeciesFilter = () => {
+    setSpeciesFilterOn((on) => {
+      const next = !on;
+      try { localStorage.setItem(FEED_FILTER_LS, next ? "1" : "0"); } catch {}
+      return next;
+    });
+  };
+
 
   const handleModerated = (postId?: string) => {
     if (postId) {
