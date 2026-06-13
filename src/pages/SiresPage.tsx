@@ -7,6 +7,7 @@ import { Layout } from "@/components/Layout";
 import { matchesSpecies } from "@/components/SpeciesPills";
 import { useSpecies } from "@/contexts/SpeciesContext";
 import { FiltersPopover, FilterChip } from "@/components/FiltersPopover";
+import { SpeciesChip } from "@/components/SpeciesChip";
 import gooseImage from "@/assets/sires/goose.jpeg";
 import { REPRO_SHEEP_SIRES } from "@/data/reproSheepSires";
 
