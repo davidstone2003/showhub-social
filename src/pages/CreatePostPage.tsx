@@ -1121,9 +1121,146 @@ export default function CreatePostPage() {
               <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add any extra notes or let AI write your caption above…" className="rounded-lg min-h-[80px]" />
             </div>
 
+            {/* Additional placings for the primary animal */}
+            <div>
+              <label className="text-[12px] font-bold uppercase tracking-wide text-[#5C6470] mb-1.5 block">
+                Additional placings (optional)
+              </label>
+              {extraPlacings.map((p, i) => (
+                <div key={i} className="flex gap-2 mb-1.5">
+                  <Input
+                    value={p}
+                    onChange={(e) =>
+                      setExtraPlacings((prev) => prev.map((x, idx) => (idx === i ? e.target.value : x)))
+                    }
+                    placeholder="e.g. Champion Futurity Lamb"
+                    className="h-10 rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setExtraPlacings((prev) => prev.filter((_, idx) => idx !== i))}
+                    className="px-2 text-[#9CA3AF]"
+                    aria-label="Remove placing"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => setExtraPlacings((prev) => [...prev, ""])}
+                className="text-[12px] font-semibold"
+                style={{ color: "#C9A84C" }}
+              >
+                + Add another placing
+              </button>
+            </div>
+
+            {/* Extra animals (multi-animal recap) */}
+            {extraAnimals.map((a, idx) => (
+              <div key={a.id} className="rounded-xl p-3" style={{ backgroundColor: "#F8F7F4", border: "1px solid #E5E7EB" }}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[12px] font-bold uppercase tracking-wide text-[#5C6470]">
+                    Animal {idx + 2}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => removeExtraAnimal(a.id)}
+                    className="text-[#9CA3AF]"
+                    aria-label="Remove animal"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <Input
+                  value={a.exhibitorName}
+                  onChange={(e) => updateExtraAnimal(a.id, { exhibitorName: e.target.value })}
+                  placeholder="Shown by"
+                  className="h-10 rounded-lg mb-2"
+                />
+                {a.placings.map((p, pi) => (
+                  <div key={pi} className="flex gap-2 mb-1.5">
+                    <Input
+                      value={p}
+                      onChange={(e) =>
+                        updateExtraAnimal(a.id, {
+                          placings: a.placings.map((x, i) => (i === pi ? e.target.value : x)),
+                        })
+                      }
+                      placeholder="Placing (e.g. Class Winner)"
+                      className="h-10 rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => updateExtraAnimal(a.id, { placings: a.placings.filter((_, i) => i !== pi) })}
+                      className="px-2 text-[#9CA3AF]"
+                      aria-label="Remove placing"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => updateExtraAnimal(a.id, { placings: [...a.placings, ""] })}
+                  className="text-[12px] font-semibold mb-2 block"
+                  style={{ color: "#C9A84C" }}
+                >
+                  + Add placing
+                </button>
+                <Input
+                  value={a.bredBy}
+                  onChange={(e) => updateExtraAnimal(a.id, { bredBy: e.target.value })}
+                  placeholder="Bred by"
+                  className="h-10 rounded-lg mb-2"
+                />
+                <Input
+                  value={a.placedBy}
+                  onChange={(e) => updateExtraAnimal(a.id, { placedBy: e.target.value })}
+                  placeholder="Placed by"
+                  className="h-10 rounded-lg mb-2"
+                />
+                <AutocompleteInput
+                  table="sires_lookup"
+                  value={a.sireName}
+                  onChange={(v, id) => updateExtraAnimal(a.id, { sireName: v, sireId: id })}
+                  placeholder="Sired by"
+                />
+                <Input
+                  value={a.dam}
+                  onChange={(e) => updateExtraAnimal(a.id, { dam: e.target.value })}
+                  placeholder="Dam"
+                  className="h-10 rounded-lg mt-2"
+                />
+              </div>
+            ))}
+
+            <button
+              type="button"
+              onClick={addExtraAnimal}
+              className="w-full h-11 rounded-lg font-semibold text-[13px]"
+              style={{ border: "1px dashed #C9A84C", color: "#8B6914", backgroundColor: "rgba(201,168,76,0.06)" }}
+            >
+              + Add another animal
+            </button>
+
+            {/* Photo credit */}
+            <div>
+              <label className="text-[12px] font-bold uppercase tracking-wide text-[#5C6470] mb-1.5 block">
+                Photo credit (optional)
+              </label>
+              <AutocompleteInput
+                table="breeders_lookup"
+                value={photoCredit}
+                onChange={(v, id) => { setPhotoCredit(v); setPhotoCreditBreederId(id); }}
+                placeholder="📸 Photographer or business name"
+              />
+            </div>
+
             <Button onClick={() => setShowWinnerPanel(false)} className="w-full h-12 rounded-xl font-bold mt-2" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
               Done
             </Button>
+
           </div>
         </BottomSheet>
       )}
