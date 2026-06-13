@@ -49,7 +49,7 @@ function PhotoGrid({ images, onTap }: { images: string[]; onTap: (index: number,
     return (
       <button
         type="button"
-        onClick={() => onTap(0)}
+        onClick={(e) => onTap(0, e)}
         className="block w-full overflow-hidden"
       >
         <img
@@ -71,7 +71,7 @@ function PhotoGrid({ images, onTap }: { images: string[]; onTap: (index: number,
           <button
             key={i}
             type="button"
-            onClick={() => onTap(i)}
+            onClick={(e) => onTap(i, e)}
             className="flex-1 overflow-hidden"
           >
             <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
@@ -86,7 +86,7 @@ function PhotoGrid({ images, onTap }: { images: string[]; onTap: (index: number,
       <div className="w-full flex flex-col" style={{ gap: 2 }}>
         <button
           type="button"
-          onClick={() => onTap(0)}
+          onClick={(e) => onTap(0, e)}
           className="block w-full overflow-hidden"
         >
           <img
@@ -103,7 +103,7 @@ function PhotoGrid({ images, onTap }: { images: string[]; onTap: (index: number,
             <button
               key={i}
               type="button"
-              onClick={() => onTap(i + 1)}
+              onClick={(e) => onTap(i + 1, e)}
               className="flex-1 overflow-hidden"
             >
               <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
@@ -122,7 +122,7 @@ function PhotoGrid({ images, onTap }: { images: string[]; onTap: (index: number,
         <button
           key={i}
           type="button"
-          onClick={() => onTap(i)}
+          onClick={(e) => onTap(i, e)}
           className="relative overflow-hidden"
         >
           <img
