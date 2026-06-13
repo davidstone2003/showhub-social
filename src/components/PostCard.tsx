@@ -5,7 +5,7 @@ import { FeedVideo } from "@/components/post/VideoPlayer";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Post } from "@/data/mock";
 import { cn } from "@/lib/utils";
-import { ResultRibbon } from "@/components/ResultRibbon";
+// ResultRibbon removed — placing is shown as text below the photo.
 import { ClampedText } from "@/components/post/ClampedText";
 import { RecapBlocks, highestPlacing, type RecapWinner } from "@/components/post/RecapBlocks";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -352,14 +352,21 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
             )}
             <span className="text-[12px] text-muted-foreground leading-tight">
               {post.created_at ? new Date(post.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : ""}
-              {isWinner && post.show_name && (
-                <>
-                  {" · "}
-                  <span style={{ color: "#0A1628", fontWeight: 600 }}>
-                    {post.created_at ? `${new Date(post.created_at).getFullYear()} ` : ""}{post.show_name}
-                  </span>
-                </>
-              )}
+              {isWinner && post.show_name && (() => {
+                const rawDate = (post as any).show_date as string | undefined;
+                const assumed = (post as any).show_date_assumed as boolean | undefined;
+                const startsWithYear = /^\s*\d{4}\b/.test(post.show_name);
+                const year = !assumed && rawDate ? new Date(rawDate).getFullYear() : null;
+                const prefix = year && !startsWithYear ? `${year} ` : "";
+                return (
+                  <>
+                    {" · "}
+                    <span style={{ color: "#0A1628", fontWeight: 600 }}>
+                      {prefix}{post.show_name}
+                    </span>
+                  </>
+                );
+              })()}
             </span>
           </div>
         </div>
@@ -398,13 +405,6 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
 
         {/* Photos */}
         <div className="relative">
-          {(() => {
-            const cards: RecapWinner[] = ((post as any).winner_cards || []) as RecapWinner[];
-            const primary = isWinner
-              ? (highestPlacing(cards) || (post.win_placing || post.win_title) || null)
-              : null;
-            return primary ? <ResultRibbon placing={primary} /> : null;
-          })()}
           {(post as any).video_url ? (
             <FeedVideo src={(post as any).video_url} aspectRatio="4 / 3" />
           ) : (
@@ -439,11 +439,17 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           if (cards.length > 1) {
             return <RecapBlocks winners={cards} />;
           }
-          // Single-card: existing compact metadata line
-          if (!post.win_placing && !post.win_title) return null;
-          if (!(post.breeder?.name || post.shown_by || post.sired_by)) return null;
+          // Single-card: placing line + compact metadata line
+          const placing = post.win_placing || post.win_title;
+          if (!placing && !(post.breeder?.name || post.shown_by || post.sired_by)) return null;
           return (
             <div className="px-3 pb-1 pt-2">
+              {placing && (
+                <p style={{ fontSize: 14, color: "#0A1628", fontWeight: 700, lineHeight: 1.3, marginBottom: 2 }}>
+                  {placing}
+                </p>
+              )}
+              {(post.breeder?.name || post.shown_by || post.sired_by) && (
               <p style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.5 }}>
                 {post.breeder?.name && (
                   <>Bred by <span style={{ color: "#0A1628", fontWeight: 600 }}>{post.breeder.name}</span></>
@@ -472,6 +478,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                   </>
                 )}
               </p>
+              )}
             </div>
           );
         })()}
