@@ -5,8 +5,6 @@ import { PostCard } from "./PostCard";
 import { PostCardSkeleton } from "./PostCardSkeleton";
 import { BackdropLogo } from "./RinglyLogo";
 import { supabase } from "@/integrations/supabase/client";
-import { useSpecies } from "@/contexts/SpeciesContext";
-import { matchesSpecies } from "@/components/SpeciesPills";
 
 interface WinnerCard {
   id: string;
