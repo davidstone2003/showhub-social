@@ -278,25 +278,88 @@ export default function CreatePostPage() {
         tags: species ? [species] : [], post_type: "winner", show_on_feed: true,
         is_reel: isReel && !!videoUrl,
         tagged_user_ids: taggedPeople.map(p => p.id),
+        photo_credit: photoCredit.trim() || null,
+        photo_credit_breeder_id: photoCreditBreederId,
       }).select("id").single();
       if (postError) throw postError;
 
-      const { error: winError } = await (supabase.from("winners") as any).insert({
-        source_post_id: post.id, title, show_name: showName.trim(),
-        shown_by: exhibitorName.trim(), placed_by: placedBy.trim() || null,
-        bred_by: breederName.trim() || null,
-        sired_by: sireName.trim() || null, sire_id: resolvedSireId,
-        dam: damName.trim() || null,
-        win_placing: effectiveResult.trim() || null, caption: (notes.trim() || generalCaption.trim()) || null,
-        image_urls: imageUrls, video_url: videoUrl, show_id: resolvedShowId,
-        date: format(new Date(), "yyyy-MM-dd"), user_id: user?.id || null,
-        posted_as_breeder_id: postedAsBreederId, post_type: "winner",
-        show_on_feed: true, show_on_breeder_page: true, show_on_winners_archive: true,
-        species: species || null,
-      }).select("id").single();
+      // Compose all winner rows: primary animal × placings, then each extra animal × placings
+      const sharedDate = format(new Date(), "yyyy-MM-dd");
+      const primaryPlacings = [effectiveResult.trim(), ...extraPlacings.map((p) => p.trim())].filter(Boolean);
+      const placingsForPrimary = primaryPlacings.length > 0 ? primaryPlacings : [""];
+
+      type WinRow = Record<string, any>;
+      const rows: WinRow[] = [];
+
+      for (const placing of placingsForPrimary) {
+        rows.push({
+          source_post_id: post.id,
+          title: placing ? `${placing} — ${showName.trim()}` : title,
+          show_name: showName.trim(),
+          shown_by: exhibitorName.trim(),
+          placed_by: placedBy.trim() || null,
+          bred_by: breederName.trim() || null,
+          sired_by: sireName.trim() || null,
+          sire_id: resolvedSireId,
+          dam: damName.trim() || null,
+          win_placing: placing || null,
+          caption: (notes.trim() || generalCaption.trim()) || null,
+          image_urls: imageUrls,
+          video_url: videoUrl,
+          show_id: resolvedShowId,
+          date: sharedDate,
+          user_id: user?.id || null,
+          posted_as_breeder_id: postedAsBreederId,
+          post_type: "winner",
+          show_on_feed: true,
+          show_on_breeder_page: true,
+          show_on_winners_archive: true,
+          species: species || null,
+        });
+      }
+
+      for (const extra of extraAnimals) {
+        if (!extra.exhibitorName.trim() || extra.placings.length === 0) continue;
+        const extraSireId = extra.sireName.trim()
+          ? await ensureLookupEntry("sires_lookup", extra.sireName, extra.sireId)
+          : null;
+        for (const placing of extra.placings) {
+          if (!placing.trim()) continue;
+          rows.push({
+            source_post_id: post.id,
+            title: `${placing.trim()} — ${showName.trim()}`,
+            show_name: showName.trim(),
+            shown_by: extra.exhibitorName.trim(),
+            placed_by: extra.placedBy.trim() || null,
+            bred_by: extra.bredBy.trim() || null,
+            sired_by: extra.sireName.trim() || null,
+            sire_id: extraSireId,
+            dam: extra.dam.trim() || null,
+            win_placing: placing.trim(),
+            caption: (notes.trim() || generalCaption.trim()) || null,
+            image_urls: imageUrls,
+            video_url: videoUrl,
+            show_id: resolvedShowId,
+            date: sharedDate,
+            user_id: user?.id || null,
+            posted_as_breeder_id: postedAsBreederId,
+            post_type: "winner",
+            show_on_feed: false, // extra animals appear via the parent post; archive only
+            show_on_breeder_page: true,
+            show_on_winners_archive: true,
+            species: species || null,
+          });
+        }
+      }
+
+      const { error: winError } = await (supabase.from("winners") as any).insert(rows);
       if (winError) throw winError;
 
-      toast.success("Winner posted!");
+      toast.success(
+        rows.length > 1
+          ? `Recap posted — ${rows.length} results saved`
+          : "Winner posted!"
+      );
       setSuccessData({
         showName: showName.trim(), winPlacing: effectiveResult.trim(),
         shownBy: exhibitorName.trim(), placedBy: placedBy.trim(), sireName: sireName.trim(),
@@ -305,6 +368,7 @@ export default function CreatePostPage() {
     } catch (err: any) { toast.error("Failed to post", { description: err.message }); }
     finally { setSubmitting(false); }
   };
+
 
   const handleSubmitSaleLot = async () => {
     if (!saleName.trim()) { toast.error("Sale name is required"); return; }
