@@ -571,6 +571,8 @@ export default function WinnersPage() {
                     profilesMap={profilesMap}
                     breederProfilesMap={breederProfilesMap}
                     onSelectPost={setDrawerPost}
+                    currentUserId={user?.id || null}
+                    onConfirmDate={(r) => { setConfirmingRow(r); setConfirmDate(r.date || new Date().toISOString().slice(0,10)); }}
                   />
                 ))
               )}
@@ -593,11 +595,13 @@ export default function WinnersPage() {
   );
 }
 
-function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: {
+function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap, currentUserId, onConfirmDate }: {
   group: { showName: string; year: number | null; rows: WinnerRow[] };
   onSelectPost: (post: Post) => void;
   profilesMap: Record<string, any>;
   breederProfilesMap: Record<string, any>;
+  currentUserId: string | null;
+  onConfirmDate: (r: WinnerRow) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const topWinner = group.rows[0];
