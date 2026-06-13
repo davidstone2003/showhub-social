@@ -689,6 +689,7 @@ export type Database = {
           logo_url: string | null
           onboarding_completed: boolean
           phone: string | null
+          preferred_species: string | null
           subscription_tier: string
           tagline: string | null
           username: string
@@ -711,6 +712,7 @@ export type Database = {
           logo_url?: string | null
           onboarding_completed?: boolean
           phone?: string | null
+          preferred_species?: string | null
           subscription_tier?: string
           tagline?: string | null
           username: string
@@ -733,6 +735,7 @@ export type Database = {
           logo_url?: string | null
           onboarding_completed?: boolean
           phone?: string | null
+          preferred_species?: string | null
           subscription_tier?: string
           tagline?: string | null
           username?: string

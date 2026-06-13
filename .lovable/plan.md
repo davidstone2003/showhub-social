@@ -1,59 +1,67 @@
-# Multi-animal show recap posts
+## Goal
+Replace per-page species pills and inline filter dropdowns with a single global species switcher (header + sidebar) and a single "Filters ▼" popover per directory page.
 
-Add Facebook-style recap support alongside the existing single-win flow, plus photo credits and clamped captions.
+## 1. Global species preference
 
-## 1. Database
+**New context:** `src/contexts/SpeciesContext.tsx`
+- Provides `{ species: SpeciesPill, setSpecies(s) }`.
+- Source of truth order: `profiles.preferred_species` (when logged in) → `localStorage.backdrop_species` → `"All"`.
+- On `setSpecies`: update state, write localStorage, and (if user) update `profiles.preferred_species`.
+- Mounted in `App.tsx` above the router (inside `AuthProvider`).
 
-Single migration:
-- `posts.photo_credit text null` — free text, used by every post type with photos.
-- `posts.photo_credit_breeder_id uuid null references breeder_profiles(id)` — optional match to a Backdrop breeder/business profile so the credit becomes a link.
+**Migration:** add `preferred_species text null` to `public.profiles`. No grant changes needed (column on existing table).
 
-No changes to `winners` — each result block already writes its own row with `source_post_id`, which is exactly what we need.
+## 2. Global switcher component
 
-## 2. CreatePostPage — multi-result winner flow
+**New:** `src/components/GlobalSpeciesSwitcher.tsx`
+- Compact pill: `🐑 Sheep ▼` / `🐄 Cattle` / `🐐 Goats` / `🐖 Pigs` / `🌐 All Species`.
+- Radix Popover dropdown with the 5 options; gold check on selected.
+- Reads/writes the SpeciesContext.
 
-In the existing winner panel, replace the single set of result fields with a `resultBlocks` array. Each block holds:
-- `animal_name` (a.k.a. shown_by / nickname)
-- `placings: string[]` (one or more, with “+ add placing” inside the block)
-- `bred_by`
-- `placed_by`
-- `sired_by` + `sire_id` (uses existing sire AutocompleteInput)
+**Placement:**
+- `MobileHeader.tsx`: inserted to the left of `NotificationBell` (root pages) / always visible. Sized to match header (h-9, 12px font).
+- `DesktopSidebar.tsx`: inserted under logo, above nav.
 
-Shared across the post: `show_name`, `date` (+ `date_assumed`), `species`, `caption`, photos/video, `photo_credit`.
+## 3. Page wiring (consume context, drop local pills)
 
-Controls:
-- “+ Add another animal” button below the last block.
-- Each block has a remove (X) button when there is more than one.
-- First placing in the first block drives the ribbon’s “primary” placing.
+`WinnersPage.tsx`, `SiresPage.tsx`, `BreedersPage.tsx`, `SalesPage.tsx`, `MarketPage.tsx`:
+- Remove `<SpeciesPills>` row and local `species` state.
+- Replace with `const { species } = useSpecies()`.
+- Keep `matchesSpecies(...)` calls unchanged.
+- MarketPage: replace its bespoke species dropdown the same way.
 
-On submit:
-- Insert one `posts` row (carrying caption, media, `photo_credit`, `photo_credit_breeder_id`, `post_type='champion'`, shared show fields).
-- For each block × each placing in the block, insert a `winners` row with `source_post_id = post.id`, copying the shared show/date/species and the block’s breeder/exhibitor/sire fields. Reuse the existing sire normalization logic.
+`SpeciesPills.tsx` stays only for `SPECIES_OPTIONS`, `SpeciesPill`, `matchesSpecies` exports (still used by `SubmitSirePage`). The visual `SpeciesPills` component is removed or left unused.
 
-Single-result mode keeps working because one block × one placing produces exactly today’s behavior.
+## 4. Single "Filters ▼" control per directory
 
-## 3. PostCard — recap rendering
+**New:** `src/components/FiltersPopover.tsx` — generic anchored popover that takes a list of `{ key, label, options, value, onChange }` selects + a "Clear all" link. Renders a gold count badge on the trigger when `activeCount > 0`. Active filters render as removable chips below the row (handled by each page using existing chip styles).
 
-When a post has more than one linked winner card, render a `RecapBlocks` section between the caption and the engagement row:
-- Group winner rows by `animal_name` (shown_by).
-- Per animal: bold name; compact bulleted/list of placings; one metadata line “Bred by X · Placed by Y · Sired by Z” with breeder/sire as links where matched.
-- Ribbon overlay still appears once, using the highest-ranked placing across all blocks (Grand → Reserve Grand → Division → Class → other).
+**Per page filter sets:**
+- Winners: Show Level, Year, State, Breeder
+- Sires: Semen Available, Owner
+- Breeders: State
+- Sales / Market: keep existing non-species filters behind the same Filters popover (smallest viable list — Sales: Sale Type / State; Market: Category / State) so the rule "search + one Filters button" holds.
 
-Single-card posts continue to use the existing compact metadata line — no visual change for the common case.
+Each page renders only: compact title, then a row with `[Search] [Filters ▼ (badge)]`, then optional active-filter chips, then content. Existing tabs (Winners Current Season / All Results) are preserved.
 
-## 4. Caption clamp
+## 5. Onboarding step
 
-Wrap the caption `<p>` in a small `ClampedText` component:
-- CSS line-clamp 4 by default.
-- If the rendered text overflows, show an inline “… more” / “less” toggle (gray, 12px) styled to match the muted metadata.
-- Photo credit (when present) renders directly under the caption as a separate small line, e.g. `📸 J. Hutch Media`, with the name linking to `/breeder/{slug}` when `photo_credit_breeder_id` resolves.
+`OnboardingPage.tsx`: insert a "What do you show?" screen before the breeder/vendor form with 5 buttons (Cattle, Sheep, Goats, Pigs, A bit of everything). Selection writes to local state and is sent in the same `profiles.update({ preferred_species })` call as the existing onboarding submit. Default if skipped: null (= All).
 
-## 5. Out of scope (unchanged)
+## 6. Out of scope
+No changes to header CTAs, bottom nav, ribbons/photos, post composer, current-season vs all-results logic, or gold-selected styling.
 
-- Sale flow, reel flow, ResultRibbon styling, edge-to-edge photos, double-tap-to-like, headers, filters.
+## Files
 
-## Technical notes
+**Created**
+- `src/contexts/SpeciesContext.tsx`
+- `src/components/GlobalSpeciesSwitcher.tsx`
+- `src/components/FiltersPopover.tsx`
+- migration: add `profiles.preferred_species`
 
-- Feed.tsx already fetches multiple winner cards per post into `winnerCardsMap[postId]` but only uses the first card. Extend its `Post` mapping to pass the full array (e.g. `winner_cards`) so PostCard can render recaps without an extra query.
-- WinnersPage already lists each winner row individually, so multi-animal posts will naturally appear as multiple archive entries with no changes there.
-- Photo credit matching: simple optional autocomplete against `breeder_profiles.breeder_name` in the composer; stores `photo_credit` text always and `photo_credit_breeder_id` only on match.
+**Edited**
+- `src/App.tsx` (mount provider)
+- `src/components/MobileHeader.tsx`, `src/components/DesktopSidebar.tsx`
+- `src/pages/WinnersPage.tsx`, `SiresPage.tsx`, `BreedersPage.tsx`, `SalesPage.tsx`, `MarketPage.tsx`
+- `src/pages/OnboardingPage.tsx`
+- `src/contexts/AuthContext.tsx` (add `preferred_species` to Profile type)
