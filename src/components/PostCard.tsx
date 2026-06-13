@@ -170,12 +170,42 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
   const isWinner = post.post_type === "champion" && (post.win_placing || post.win_title);
   const isPersistedRecord = UUID_PATTERN.test(post.id);
 
-  const handleLike = () => {
+  const [burst, setBurst] = useState<{ id: number; x: number; y: number } | null>(null);
+  const lastTapRef = useRef<number>(0);
+
+  const triggerLike = (force?: boolean) => {
     if (!user) { setShowAuthGate(true); return; }
     if (requireVerification()) return;
-    setLiked(!liked);
-    setLikeCount((c) => (liked ? c - 1 : c + 1));
+    if (force && liked) return; // double-tap shouldn't unlike
+    setLiked((prev) => {
+      const next = force ? true : !prev;
+      setLikeCount((c) => (next === prev ? c : next ? c + 1 : c - 1));
+      return next;
+    });
   };
+
+  const handleLike = () => triggerLike(false);
+
+  const handlePhotoTap = (i: number, e: React.MouseEvent<HTMLElement>) => {
+    const now = Date.now();
+    if (now - lastTapRef.current < 300) {
+      // Double tap → like burst
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      setBurst({ id: now, x: e.clientX - rect.left, y: e.clientY - rect.top });
+      setTimeout(() => setBurst(null), 600);
+      triggerLike(true);
+      lastTapRef.current = 0;
+      return;
+    }
+    lastTapRef.current = now;
+    setTimeout(() => {
+      if (lastTapRef.current && Date.now() - lastTapRef.current >= 290) {
+        lastTapRef.current = 0;
+        openViewer(i);
+      }
+    }, 310);
+  };
+
 
   const handleDelete = async () => {
     if (!isPersistedRecord) {
