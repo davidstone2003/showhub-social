@@ -212,8 +212,8 @@ const SiresPage = () => {
             )}
           </div>
         )}
-          </div>
-        </div>
+
+
 
         <div className="px-4 pt-3">
           {/* Search */}
