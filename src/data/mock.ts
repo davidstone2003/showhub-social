@@ -54,6 +54,26 @@ export interface Post {
   user_id?: string | null;
   status?: string;
   winner_id?: string | null;
+  // Optional photographer credit shown under the caption
+  photo_credit?: string | null;
+  photo_credit_breeder?: {
+    id: string;
+    name: string;
+    slug?: string | null;
+  } | null;
+  // Multi-animal recap support — every winner row linked to this post
+  winner_cards?: Array<{
+    id: string;
+    animal_name?: string | null;
+    shown_by?: string | null;
+    win_placing?: string | null;
+    show_name?: string | null;
+    bred_by?: string | null;
+    placed_by?: string | null;
+    sired_by?: string | null;
+    sire_id?: string | null;
+    dam?: string | null;
+  }>;
 }
 
 export interface Animal {
