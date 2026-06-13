@@ -16,7 +16,7 @@ interface SpeciesPillsProps {
 export function SpeciesPills({ value, onChange, className = "", appMode = false }: SpeciesPillsProps) {
   return (
     <div
-      className={`flex gap-1.5 overflow-x-auto scrollbar-hide ${className}`}
+      className={`flex gap-1 overflow-x-auto scrollbar-hide ${className}`}
       role="tablist"
       aria-label="Filter by species"
     >
@@ -33,7 +33,7 @@ export function SpeciesPills({ value, onChange, className = "", appMode = false 
             role="tab"
             aria-selected={active}
             onClick={() => onChange(option)}
-            className="h-8 shrink-0 rounded-full px-3.5 text-[12px] font-semibold leading-none transition-colors"
+            className="h-8 shrink-0 rounded-full px-2.5 text-[12px] font-semibold leading-none transition-colors"
             style={style}
           >
             {option}
