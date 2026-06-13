@@ -287,6 +287,9 @@ export default function WinnersPage() {
     if (selectedBreeder !== "All Breeders") {
       filteredRows = filteredRows.filter(r => r.bred_by === selectedBreeder);
     }
+    if (selectedExhibitor !== "All Exhibitors") {
+      filteredRows = filteredRows.filter(r => r.shown_by === selectedExhibitor);
+    }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       filteredRows = filteredRows.filter(r =>
