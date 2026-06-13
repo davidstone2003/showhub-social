@@ -178,25 +178,22 @@ export default function WinnersPage() {
 
   const categoryOptions = ["All Levels", "National / Major", "State Fair", "Jackpot", "County / Local"];
 
-  const closeFilterMenus = () => {
-    setCategoryOpen(false);
-    setYearOpen(false);
-    setStateOpen(false);
-    setBreederOpen(false);
+  const clearAllFilters = () => {
+    setSelectedCategory("All Levels");
+    setSelectedState("All States");
+    setSelectedBreeder("All Breeders");
+    setSelectedYear(null);
+    setSelectedShow(null);
+    setSearchQuery("");
   };
 
-  const activeFilterPanel = categoryOpen ? "category" : yearOpen ? "year" : stateOpen ? "state" : breederOpen ? "breeder" : null;
+  const activeFilterCount =
+    (selectedCategory !== "All Levels" ? 1 : 0) +
+    (selectedState !== "All States" ? 1 : 0) +
+    (selectedBreeder !== "All Breeders" ? 1 : 0) +
+    (selectedYear ? 1 : 0) +
+    (selectedShow ? 1 : 0);
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      const t = e.target as HTMLElement | null;
-      if (t && t.closest("[data-filter-row]")) return;
-      if (t && t.closest("[data-filter-panel]")) return;
-      setCategoryOpen(false); setYearOpen(false); setStateOpen(false); setBreederOpen(false);
-    };
-    document.addEventListener("click", handler);
-    return () => document.removeEventListener("click", handler);
-  }, []);
 
   const allShowNames = useMemo(() => {
     const counts = new Map<string, number>();
