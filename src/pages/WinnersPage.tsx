@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Search, Trophy, Plus, SlidersHorizontal, X } from "lucide-react";
