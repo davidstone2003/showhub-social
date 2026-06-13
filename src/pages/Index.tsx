@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Plus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { LiveStrip } from "@/components/LiveStrip";
 import { Feed } from "@/components/Feed";
