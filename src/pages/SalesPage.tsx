@@ -18,6 +18,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
 import { useSpecies } from "@/contexts/SpeciesContext";
+import { SpeciesChip } from "@/components/SpeciesChip";
 import { SCO_RECENT_SALES } from "@/data/scoRecentSales";
 
 /* ── Upcoming sales ── */
