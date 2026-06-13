@@ -62,7 +62,8 @@ export default function CreatePostPage() {
   const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [isReel, setIsReel] = useState(searchParams.get("type") === "reel");
+  const initialType = searchParams.get("type");
+  const [isReel, setIsReel] = useState(initialType === "reel");
 
   const [category] = useState<PostCategory>(null); // unused but kept for compat
   const [media, setMedia] = useState<MediaFile[]>([]);
@@ -75,11 +76,12 @@ export default function CreatePostPage() {
   const [successData, setSuccessData] = useState<any>(null);
 
   // Sheets
-  const [showWinnerPanel, setShowWinnerPanel] = useState(false);
+  const [showWinnerPanel, setShowWinnerPanel] = useState(initialType === "win");
   const [showSpeciesSheet, setShowSpeciesSheet] = useState(false);
   const [showMoreSheet, setShowMoreSheet] = useState(false);
   const [showIdentitySheet, setShowIdentitySheet] = useState(false);
   const [showTagSheet, setShowTagSheet] = useState(false);
+  const [showSaleLotPanel, setShowSaleLotPanel] = useState(initialType === "listing");
   const [taggedPeople, setTaggedPeople] = useState<TaggedPerson[]>([]);
 
   // Winner fields
