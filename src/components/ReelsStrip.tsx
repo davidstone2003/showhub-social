@@ -111,22 +111,8 @@ export function ReelsStrip({ onOpen }: ReelsStripProps) {
                 style={{ width: 84, height: 126 }}
               />
             ))
-          : reels.length === 0
-          ? Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={`ghost-${i}`}
-                className="shrink-0 snap-start rounded-2xl flex items-center justify-center"
-                style={{
-                  width: 84,
-                  height: 126,
-                  backgroundColor: "#F1EFEA",
-                  border: "1px dashed #D6D1C4",
-                }}
-              >
-                <Play className="w-4 h-4" style={{ color: "#C9C3B2" }} />
-              </div>
-            ))
           : reels.map((r) => (
+
               <button
                 key={r.id}
                 onClick={() => onOpen?.(r.id)}
