@@ -251,17 +251,18 @@ export function Feed() {
   }, [refreshKey]);
 
   const allPosts = useMemo(() => {
-    return dbPosts
-      .filter((post) => !hiddenPostIds.includes(post.id))
-      .filter((post: any) => matchesSpecies(
-        species,
-        post.species,
-        post.show_name,
-        post.caption,
-        (post.tags || []).map((t: any) => t?.label || t).join(" "),
-        ...((post.winner_cards || []).flatMap((w: any) => [w?.show_name, w?.win_placing, w?.bred_by]))
-      ));
-  }, [dbPosts, hiddenPostIds, species]);
+    const base = dbPosts.filter((post) => !hiddenPostIds.includes(post.id));
+    if (!speciesFilterOn || species === "All") return base;
+    return base.filter((post: any) => matchesSpecies(
+      species,
+      post.species,
+      post.show_name,
+      post.caption,
+      (post.tags || []).map((t: any) => t?.label || t).join(" "),
+      ...((post.winner_cards || []).flatMap((w: any) => [w?.show_name, w?.win_placing, w?.bred_by]))
+    ));
+  }, [dbPosts, hiddenPostIds, species, speciesFilterOn]);
+
 
   return (
     <div className="flex-1 max-w-2xl mx-auto w-full">
