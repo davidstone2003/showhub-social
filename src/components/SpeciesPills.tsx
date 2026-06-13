@@ -16,7 +16,7 @@ interface SpeciesPillsProps {
 export function SpeciesPills({ value, onChange, className = "", appMode = false }: SpeciesPillsProps) {
   return (
     <div
-      className={`flex gap-1.5 overflow-x-auto scrollbar-hide ${className}`}
+      className={`flex gap-1 overflow-x-auto scrollbar-hide ${className}`}
       role="tablist"
       aria-label="Filter by species"
     >
