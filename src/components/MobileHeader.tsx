@@ -85,7 +85,7 @@ export function MobileHeader() {
         )}
 
         <div className="flex items-center gap-1.5">
-          {!HIDE_SWITCHER_ROUTES(pathname) && <GlobalSpeciesSwitcher variant="header" />}
+
 
           {user ? (
             <>
