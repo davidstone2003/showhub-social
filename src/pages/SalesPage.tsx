@@ -16,7 +16,8 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
-import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
+import { matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
+import { useSpecies } from "@/contexts/SpeciesContext";
 import { SCO_RECENT_SALES } from "@/data/scoRecentSales";
 
 /* ── Upcoming sales ── */
@@ -201,7 +202,7 @@ export default function SalesPage() {
   const [scrapedResults, setScrapedResults] = useState<SaleResult[]>([]);
   const [scrapedUpcoming, setScrapedUpcoming] = useState<UpcomingSale[]>([]);
   const [sourceStatus, setSourceStatus] = useState<Record<string, SourceStatus>>({});
-  const [species, setSpecies] = useState<SpeciesPill>("All");
+  const { species } = useSpecies();
 
   useEffect(() => {
     let cancelled = false;
@@ -331,12 +332,8 @@ export default function SalesPage() {
           </button>
         </div>
 
-        {/* Species pills */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-20">
-          <div className="px-4 py-2">
-            <SpeciesPills value={species} onChange={setSpecies} appMode />
-          </div>
-        </div>
+
+
 
 
         {/* ─── 1. UPCOMING SALES ─── */}
