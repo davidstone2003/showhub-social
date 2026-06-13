@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Search, LayoutGrid, List as ListIcon, Flame, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Layout } from "@/components/Layout";
 import { matchesSpecies } from "@/components/SpeciesPills";
 import { useSpecies } from "@/contexts/SpeciesContext";
