@@ -90,7 +90,7 @@ export function MobileHeader() {
         )}
 
         <div className="flex items-center gap-1.5">
-          {/* Global search intentionally omitted until search overlay ships */}
+          {!HIDE_SWITCHER_ROUTES(pathname) && <GlobalSpeciesSwitcher variant="header" />}
 
           {user ? (
             <>
