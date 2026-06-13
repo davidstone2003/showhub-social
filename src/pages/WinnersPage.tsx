@@ -561,20 +561,6 @@ export default function WinnersPage() {
         />
       )}
 
-      <Link
-        to="/submit"
-        aria-label="Post a Win"
-        className="fixed z-40 flex items-center justify-center rounded-full active:scale-95 transition-transform"
-        style={{
-          width: 56, height: 56,
-          right: 16, bottom: 80,
-          backgroundColor: "#C9A84C",
-          color: "#0A1628",
-          boxShadow: "0 8px 20px rgba(201,168,76,0.4)"
-        }}
-      >
-        <Plus className="w-7 h-7" strokeWidth={2.5} />
-      </Link>
     </Layout>
   );
 }
