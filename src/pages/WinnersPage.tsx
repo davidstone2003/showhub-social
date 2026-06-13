@@ -353,31 +353,42 @@ export default function WinnersPage() {
         </div>
 
 
-        {/* Section tabs */}
-        <div className="bg-white border-b border-[#E5E7EB] flex sticky top-[48px] z-20">
-          <button
-            onClick={() => setSection("current")}
-            className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
-            style={section === "current"
-              ? { borderColor: "#C9A84C", color: "#0A1628" }
-              : { borderColor: "transparent", color: "#9CA3AF" }
-            }
-          >
-            🏆 Current Season
-          </button>
-          <button
-            onClick={() => setSection("archive")}
-            className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
-            style={section === "archive"
-              ? { borderColor: "#C9A84C", color: "#0A1628" }
-              : { borderColor: "transparent", color: "#9CA3AF" }
-            }
-          >
-            📋 All Results
-          </button>
-        </div>
-        {/* Single filter row: Filters button only */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10 px-4 py-2 flex items-center justify-end gap-2">
+        {/* Filter row: Year dropdown + Filters button */}
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-20 px-4 py-2 flex items-center justify-end gap-2">
+          <Popover open={yearMenuOpen} onOpenChange={setYearMenuOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="shrink-0 flex items-center gap-1.5 rounded-full px-3 h-8 border text-[12px] font-semibold transition-colors"
+                style={{
+                  backgroundColor: "#FFFFFF",
+                  color: "#0A1628",
+                  borderColor: selectedYear ? "#C9A84C" : "#E5E7EB",
+                }}
+                aria-label="Filter by year"
+              >
+                {selectedYear ?? "All Years"}
+                <ChevronDown className="w-3 h-3 opacity-70" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" sideOffset={6} className="w-40 p-1">
+              {[null, ...years].map((y) => {
+                const active = (y ?? null) === selectedYear;
+                const label = y === null ? "All Years" : String(y);
+                return (
+                  <button
+                    key={label}
+                    onClick={() => { setSelectedYear(y as number | null); setYearMenuOpen(false); }}
+                    className="w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-left hover:bg-[#F8F7F4] transition-colors"
+                  >
+                    <span className="text-[13px] font-medium text-[#0A1628]">{label}</span>
+                    {active && <Check className="w-4 h-4" style={{ color: "#C9A84C" }} />}
+                  </button>
+                );
+              })}
+            </PopoverContent>
+          </Popover>
+
           <button
             type="button"
             onClick={() => setFilterSheetOpen(true)}
@@ -391,9 +402,6 @@ export default function WinnersPage() {
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
             Filters{activeFilterCount > 0 ? ` · ${activeFilterCount}` : ""}
-            {activeFilterCount > 0 && (
-              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#C9A84C" }} />
-            )}
           </button>
         </div>
 
@@ -403,14 +411,14 @@ export default function WinnersPage() {
             {selectedCategory !== "All Levels" && (
               <FilterChip label={selectedCategory} onRemove={() => setSelectedCategory("All Levels")} />
             )}
-            {selectedYear && (
-              <FilterChip label={String(selectedYear)} onRemove={() => setSelectedYear(null)} />
-            )}
             {selectedState !== "All States" && (
               <FilterChip label={selectedState} onRemove={() => setSelectedState("All States")} />
             )}
             {selectedBreeder !== "All Breeders" && (
               <FilterChip label={selectedBreeder} onRemove={() => setSelectedBreeder("All Breeders")} />
+            )}
+            {selectedExhibitor !== "All Exhibitors" && (
+              <FilterChip label={selectedExhibitor} onRemove={() => setSelectedExhibitor("All Exhibitors")} />
             )}
             {selectedShow && (
               <FilterChip label={selectedShow} onRemove={() => setSelectedShow(null)} />
@@ -424,6 +432,7 @@ export default function WinnersPage() {
             </button>
           </div>
         )}
+
 
         {/* Filters bottom sheet */}
         <Sheet open={filterSheetOpen} onOpenChange={setFilterSheetOpen}>
