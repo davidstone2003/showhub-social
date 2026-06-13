@@ -379,6 +379,7 @@ export default function SalesPage() {
           <div className="flex items-center justify-between mb-1 gap-2">
             <h2 className="text-[15px] font-bold text-foreground">Sale Results</h2>
             <div className="flex items-center gap-2">
+              <SpeciesChip />
               <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
                 <SheetTrigger asChild>
                   <button className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-[12px] font-semibold text-foreground hover:bg-muted/50 transition-colors">
