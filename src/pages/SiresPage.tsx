@@ -76,6 +76,7 @@ const SiresPage = () => {
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"list" | "grid">("grid");
   const { species } = useSpecies();
+  const { user } = useAuth();
   const [selectedOwner, setSelectedOwner] = useState<string>("All Owners");
   const [semenFilter, setSemenFilter] = useState<"All" | "Available">("All");
 
