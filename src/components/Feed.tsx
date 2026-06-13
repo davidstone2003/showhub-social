@@ -5,6 +5,8 @@ import { PostCard } from "./PostCard";
 import { PostCardSkeleton } from "./PostCardSkeleton";
 import { BackdropLogo } from "./RinglyLogo";
 import { supabase } from "@/integrations/supabase/client";
+import { useSpecies } from "@/contexts/SpeciesContext";
+import { matchesSpecies } from "@/components/SpeciesPills";
 
 interface WinnerCard {
   id: string;
@@ -23,6 +25,7 @@ export function Feed() {
   const [dbPosts, setDbPosts] = useState<Post[]>([]);
   const [hiddenPostIds, setHiddenPostIds] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const { species } = useSpecies();
   const [featuredBreeder, setFeaturedBreeder] = useState<any>(null);
 
   const handleModerated = (postId?: string) => {
@@ -233,8 +236,17 @@ export function Feed() {
   }, [refreshKey]);
 
   const allPosts = useMemo(() => {
-    return dbPosts.filter((post) => !hiddenPostIds.includes(post.id));
-  }, [dbPosts, hiddenPostIds]);
+    return dbPosts
+      .filter((post) => !hiddenPostIds.includes(post.id))
+      .filter((post: any) => matchesSpecies(
+        species,
+        post.species,
+        post.show_name,
+        post.caption,
+        (post.tags || []).map((t: any) => t?.label || t).join(" "),
+        ...((post.winner_cards || []).flatMap((w: any) => [w?.show_name, w?.win_placing, w?.bred_by]))
+      ));
+  }, [dbPosts, hiddenPostIds, species]);
 
   return (
     <div className="flex-1 max-w-2xl mx-auto w-full">
