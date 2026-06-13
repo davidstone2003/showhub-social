@@ -147,33 +147,39 @@ const SiresPage = () => {
   return (
     <Layout showDiscovery={false}>
       <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
-        {/* Header */}
+        {/* Compact header */}
         <div
-          className="sticky top-0 z-20 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+          className="sticky top-0 z-30 px-4 flex items-center justify-between bg-white"
+          style={{ height: 48, borderBottom: "1px solid #E5E7EB" }}
         >
-          <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Sires</h1>
-          <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.12)", backgroundColor: "rgba(255,255,255,0.06)" }}>
-            <button
-              type="button"
-              onClick={() => setView("list")}
-              aria-label="List view"
-              className="p-2 transition-colors"
-              style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "list" ? "rgba(255,255,255,0.08)" : "transparent" }}
-            >
-              <ListIcon className="w-4 h-4" />
+          <h1 className="text-[18px] font-bold leading-none" style={{ color: "#0A1628" }}>Sires</h1>
+          <div className="flex items-center gap-2">
+            <button className="p-1.5" aria-label="Search">
+              <Search className="w-5 h-5" style={{ color: "#6B7280" }} />
             </button>
-            <button
-              type="button"
-              onClick={() => setView("grid")}
-              aria-label="Grid view"
-              className="p-2 transition-colors"
-              style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "grid" ? "rgba(255,255,255,0.08)" : "transparent" }}
-            >
-              <LayoutGrid className="w-4 h-4" />
-            </button>
+            <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
+              <button
+                type="button"
+                onClick={() => setView("list")}
+                aria-label="List view"
+                className="p-1.5 transition-colors"
+                style={{ color: view === "list" ? "#C9A84C" : "#9CA3AF", backgroundColor: view === "list" ? "#FFFBF0" : "transparent" }}
+              >
+                <ListIcon className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("grid")}
+                aria-label="Grid view"
+                className="p-1.5 transition-colors"
+                style={{ color: view === "grid" ? "#C9A84C" : "#9CA3AF", backgroundColor: view === "grid" ? "#FFFBF0" : "transparent" }}
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
+
 
         {/* Filter bar — light */}
         <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10">
