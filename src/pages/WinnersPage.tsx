@@ -318,139 +318,76 @@ export default function WinnersPage() {
         </div>
 
 
-        {/* Filter row: Year dropdown + Filters button */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-20 px-4 py-2 flex items-center justify-end gap-2">
-          <Popover open={yearMenuOpen} onOpenChange={setYearMenuOpen}>
-            <PopoverTrigger asChild>
-              <button
-                type="button"
-                className="shrink-0 flex items-center gap-1.5 rounded-full px-3 h-8 border text-[12px] font-semibold transition-colors"
-                style={{
-                  backgroundColor: "#FFFFFF",
-                  color: "#0A1628",
-                  borderColor: selectedYear ? "#C9A84C" : "#E5E7EB",
-                }}
-                aria-label="Filter by year"
-              >
-                {selectedYear ?? "All Years"}
-                <ChevronDown className="w-3 h-3 opacity-70" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent align="end" sideOffset={6} className="w-40 p-1">
-              {[null, ...years].map((y) => {
-                const active = (y ?? null) === selectedYear;
-                const label = y === null ? "All Years" : String(y);
-                return (
-                  <button
-                    key={label}
-                    onClick={() => { setSelectedYear(y as number | null); setYearMenuOpen(false); }}
-                    className="w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-left hover:bg-[#F8F7F4] transition-colors"
-                  >
-                    <span className="text-[13px] font-medium text-[#0A1628]">{label}</span>
-                    {active && <Check className="w-4 h-4" style={{ color: "#C9A84C" }} />}
-                  </button>
-                );
-              })}
-            </PopoverContent>
-          </Popover>
-
-          <button
-            type="button"
-            onClick={() => setFilterSheetOpen(true)}
-            className="shrink-0 flex items-center gap-1.5 rounded-full px-3 h-8 border text-[12px] font-semibold transition-colors"
-            style={{
-              backgroundColor: "#FFFFFF",
-              color: "#0A1628",
-              borderColor: activeFilterCount > 0 ? "#C9A84C" : "#E5E7EB",
+        {/* Filter chips — Row 1: Species + Year (always visible) */}
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-20 px-4 py-2 flex items-center gap-2">
+          <FilterChipDropdown
+            label="All Species"
+            value={speciesLabel(species)}
+            options={SPECIES_OPTIONS.map(speciesLabel)}
+            defaultOption="All Species"
+            onChange={(v) => {
+              const found = SPECIES_OPTIONS.find((s) => speciesLabel(s) === v) ?? "All";
+              setSpecies(found);
             }}
-            aria-label="Open filters"
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-            Filters{activeFilterCount > 0 ? ` · ${activeFilterCount}` : ""}
-          </button>
+            align="start"
+            width={200}
+          />
+          <FilterChipDropdown
+            label="All Years"
+            value={selectedYear === null ? "All Years" : String(selectedYear)}
+            options={["All Years", ...years.map(String)]}
+            defaultOption="All Years"
+            onChange={(v) => setSelectedYear(v === "All Years" ? null : Number(v))}
+            align="start"
+            width={160}
+          />
         </div>
 
-        {/* Active filter chips — non-sticky */}
-        {activeFilterCount > 0 && (
-          <div className="bg-[#F8F7F4] px-4 py-2 flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
-            {selectedCategory !== "All Levels" && (
-              <FilterChip label={selectedCategory} onRemove={() => setSelectedCategory("All Levels")} />
-            )}
-            {selectedState !== "All States" && (
-              <FilterChip label={selectedState} onRemove={() => setSelectedState("All States")} />
-            )}
-            {selectedBreeder !== "All Breeders" && (
-              <FilterChip label={selectedBreeder} onRemove={() => setSelectedBreeder("All Breeders")} />
-            )}
-            {selectedExhibitor !== "All Exhibitors" && (
-              <FilterChip label={selectedExhibitor} onRemove={() => setSelectedExhibitor("All Exhibitors")} />
-            )}
-            {selectedShow && (
-              <FilterChip label={selectedShow} onRemove={() => setSelectedShow(null)} />
-            )}
+        {/* Filter chips — Row 2: horizontal scroll on mobile */}
+        <div className="bg-white border-b border-[#E5E7EB] px-4 py-2 flex items-center gap-2 overflow-x-auto scrollbar-hide">
+          <FilterChipDropdown
+            label="Level"
+            value={selectedCategory}
+            options={categoryOptions}
+            defaultOption="All Levels"
+            onChange={setSelectedCategory}
+            width={220}
+          />
+          <FilterChipDropdown
+            label="State"
+            value={selectedState}
+            options={availableStates}
+            defaultOption="All States"
+            onChange={setSelectedState}
+            width={180}
+          />
+          <FilterChipDropdown
+            label="Breeder"
+            value={selectedBreeder}
+            options={availableBreeders}
+            defaultOption="All Breeders"
+            onChange={setSelectedBreeder}
+            width={260}
+          />
+          <FilterChipDropdown
+            label="Exhibitor"
+            value={selectedExhibitor}
+            options={availableExhibitors}
+            defaultOption="All Exhibitors"
+            onChange={setSelectedExhibitor}
+            width={260}
+          />
+          {activeFilterCount > 0 && (
             <button
               onClick={clearAllFilters}
-              className="shrink-0 ml-1 text-[12px] font-bold"
+              className="shrink-0 ml-1 text-[12px] font-bold whitespace-nowrap"
               style={{ color: "#C9A84C" }}
             >
               Clear all
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
-
-        {/* Filters bottom sheet */}
-        <Sheet open={filterSheetOpen} onOpenChange={setFilterSheetOpen}>
-          <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] overflow-y-auto">
-            <SheetTitle>Filters</SheetTitle>
-            <SheetDescription>Narrow Winners by show level, state, breeder, and exhibitor.</SheetDescription>
-            <div className="mt-4 space-y-5 pb-4">
-              <SheetSection label="Show Level">
-                <SheetOptions
-                  options={categoryOptions}
-                  selected={selectedCategory}
-                  onSelect={setSelectedCategory}
-                />
-              </SheetSection>
-              <SheetSection label="State">
-                <SheetOptions
-                  options={availableStates}
-                  selected={selectedState}
-                  onSelect={setSelectedState}
-                />
-              </SheetSection>
-              <SheetSection label="Breeder">
-                <SheetOptions
-                  options={availableBreeders}
-                  selected={selectedBreeder}
-                  onSelect={setSelectedBreeder}
-                />
-              </SheetSection>
-              <SheetSection label="Exhibitor">
-                <SheetOptions
-                  options={availableExhibitors}
-                  selected={selectedExhibitor}
-                  onSelect={setSelectedExhibitor}
-                />
-              </SheetSection>
-              <div className="flex gap-2 pt-2 border-t border-[#E5E7EB]">
-                <button
-                  onClick={() => { clearAllFilters(); }}
-                  className="flex-1 h-11 rounded-xl border border-[#E5E7EB] text-[14px] font-bold text-[#0A1628]"
-                >
-                  Clear All
-                </button>
-                <button
-                  onClick={() => setFilterSheetOpen(false)}
-                  className="flex-1 h-11 rounded-xl text-[14px] font-bold"
-                  style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
-                >
-                  Show Results
-                </button>
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
 
         <div>
           {loading ? (
