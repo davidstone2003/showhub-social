@@ -478,6 +478,7 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                   </>
                 )}
               </p>
+              )}
             </div>
           );
         })()}
