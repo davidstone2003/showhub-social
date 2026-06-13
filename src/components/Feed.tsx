@@ -12,6 +12,7 @@ interface WinnerCard {
   show_name: string;
   shown_by: string;
   placed_by: string | null;
+  bred_by: string | null;
   sired_by: string | null;
   sire_id: string | null;
   dam: string | null;
@@ -64,7 +65,7 @@ export function Feed() {
       if (postIds.length > 0) {
         const { data: linkedWinners } = await supabase
           .from("winners")
-          .select("id, source_post_id, win_placing, show_name, shown_by, placed_by, sired_by, sire_id, dam")
+          .select("id, source_post_id, win_placing, show_name, shown_by, placed_by, bred_by, sired_by, sire_id, dam")
           .in("source_post_id", postIds);
         if (linkedWinners) {
           for (const w of linkedWinners) {
@@ -94,7 +95,13 @@ export function Feed() {
       }
 
 
-      const breederIds = [...new Set(allItems.filter((w: any) => w.posted_as_breeder_id).map((w: any) => w.posted_as_breeder_id as string))];
+      const photoCreditBreederIds = (postsData || [])
+        .filter((p: any) => p.photo_credit_breeder_id)
+        .map((p: any) => p.photo_credit_breeder_id as string);
+      const breederIds = [...new Set([
+        ...allItems.filter((w: any) => w.posted_as_breeder_id).map((w: any) => w.posted_as_breeder_id as string),
+        ...photoCreditBreederIds,
+      ])];
       let breederProfilesMap: Record<string, any> = {};
       if (breederIds.length > 0) {
         const { data: bps } = await supabase
@@ -148,13 +155,17 @@ export function Feed() {
           })
           .filter(Boolean) as string[];
 
+        const photoCreditBp = p.photo_credit_breeder_id ? breederProfilesMap[p.photo_credit_breeder_id] : null;
+
         mapped.push({
           id: p.id,
           image: p.image_urls?.[0] || "/placeholder.svg",
+          image_urls: p.image_urls || [],
           breeder,
           win_title: firstCard?.win_placing || undefined,
           show_name: firstCard?.show_name || undefined,
           shown_by: firstCard?.shown_by || undefined,
+          bred_by: firstCard?.bred_by || undefined,
           sired_by: firstCard?.sired_by || undefined,
           sire_id: firstCard?.sire_id || undefined,
           dam: firstCard?.dam || undefined,
@@ -173,6 +184,11 @@ export function Feed() {
           winner_id: firstCard?.id || null,
           tagged_user_ids: taggedUserIds,
           tagged_names: taggedNames,
+          photo_credit: p.photo_credit || null,
+          photo_credit_breeder: photoCreditBp
+            ? { id: photoCreditBp.id, name: photoCreditBp.breeder_name, slug: photoCreditBp.breeder_slug }
+            : null,
+          winner_cards: cards,
         } as any);
       }
 

@@ -595,6 +595,8 @@ export type Database = {
           image_urls: string[] | null
           is_reel: boolean
           likes: number
+          photo_credit: string | null
+          photo_credit_breeder_id: string | null
           post_type: string
           posted_as_breeder_id: string | null
           reposted_from_id: string | null
@@ -613,6 +615,8 @@ export type Database = {
           image_urls?: string[] | null
           is_reel?: boolean
           likes?: number
+          photo_credit?: string | null
+          photo_credit_breeder_id?: string | null
           post_type?: string
           posted_as_breeder_id?: string | null
           reposted_from_id?: string | null
@@ -631,6 +635,8 @@ export type Database = {
           image_urls?: string[] | null
           is_reel?: boolean
           likes?: number
+          photo_credit?: string | null
+          photo_credit_breeder_id?: string | null
           post_type?: string
           posted_as_breeder_id?: string | null
           reposted_from_id?: string | null
@@ -642,6 +648,13 @@ export type Database = {
           video_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "posts_photo_credit_breeder_id_fkey"
+            columns: ["photo_credit_breeder_id"]
+            isOneToOne: false
+            referencedRelation: "breeder_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "posts_posted_as_breeder_id_fkey"
             columns: ["posted_as_breeder_id"]
