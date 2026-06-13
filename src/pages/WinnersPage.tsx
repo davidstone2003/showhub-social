@@ -438,20 +438,13 @@ export default function WinnersPage() {
         <Sheet open={filterSheetOpen} onOpenChange={setFilterSheetOpen}>
           <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] overflow-y-auto">
             <SheetTitle>Filters</SheetTitle>
-            <SheetDescription>Narrow Winners by show level, year, state, and breeder.</SheetDescription>
+            <SheetDescription>Narrow Winners by show level, state, breeder, and exhibitor.</SheetDescription>
             <div className="mt-4 space-y-5 pb-4">
               <SheetSection label="Show Level">
                 <SheetOptions
                   options={categoryOptions}
                   selected={selectedCategory}
                   onSelect={setSelectedCategory}
-                />
-              </SheetSection>
-              <SheetSection label="Year">
-                <SheetOptions
-                  options={["All Years", ...years.map(String)]}
-                  selected={selectedYear ? String(selectedYear) : "All Years"}
-                  onSelect={(v) => setSelectedYear(v === "All Years" ? null : Number(v))}
                 />
               </SheetSection>
               <SheetSection label="State">
@@ -466,6 +459,13 @@ export default function WinnersPage() {
                   options={availableBreeders}
                   selected={selectedBreeder}
                   onSelect={setSelectedBreeder}
+                />
+              </SheetSection>
+              <SheetSection label="Exhibitor">
+                <SheetOptions
+                  options={availableExhibitors}
+                  selected={selectedExhibitor}
+                  onSelect={setSelectedExhibitor}
                 />
               </SheetSection>
               <div className="flex gap-2 pt-2 border-t border-[#E5E7EB]">
