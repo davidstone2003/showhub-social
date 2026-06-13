@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import { ChevronRight, Search, LayoutGrid, List as ListIcon, Flame, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
-import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
+import { matchesSpecies } from "@/components/SpeciesPills";
+import { useSpecies } from "@/contexts/SpeciesContext";
+import { FiltersPopover, FilterChip } from "@/components/FiltersPopover";
 import gooseImage from "@/assets/sires/goose.jpeg";
 import { REPRO_SHEEP_SIRES } from "@/data/reproSheepSires";
 
@@ -72,10 +74,9 @@ const SiresPage = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"list" | "grid">("grid");
-  const [species, setSpecies] = useState<SpeciesPill>("All");
+  const { species } = useSpecies();
   const [selectedOwner, setSelectedOwner] = useState<string>("All Owners");
   const [semenFilter, setSemenFilter] = useState<"All" | "Available">("All");
-  const [ownerOpen, setOwnerOpen] = useState(false);
 
   useEffect(() => {
     async function fetchSires() {
