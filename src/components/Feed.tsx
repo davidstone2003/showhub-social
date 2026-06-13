@@ -164,6 +164,8 @@ export function Feed() {
           breeder,
           win_title: firstCard?.win_placing || undefined,
           show_name: firstCard?.show_name || undefined,
+          show_date: (firstCard as any)?.date || undefined,
+          show_date_assumed: (firstCard as any)?.date_assumed || false,
           shown_by: firstCard?.shown_by || undefined,
           bred_by: firstCard?.bred_by || undefined,
           sired_by: firstCard?.sired_by || undefined,
