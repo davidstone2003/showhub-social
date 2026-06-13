@@ -51,6 +51,15 @@ function getTitle(path: string): string {
   return rule?.title ?? "";
 }
 
+// Context-aware create CTA per route. `to: null` hides the button entirely.
+function getCreateCTA(path: string): { label: string; to: string | null } {
+  if (path === "/winners") return { label: "Post Win", to: "/submit?type=win" };
+  if (path === "/market" || path === "/sales") return { label: "Post Listing", to: "/submit?type=listing" };
+  if (path === "/sires") return { label: "Submit Sire", to: "/submit-sire" };
+  if (path === "/breeders") return { label: "", to: null };
+  return { label: "Post", to: "/submit" };
+}
+
 export function MobileHeader() {
   const { user } = useAuth();
   const { pathname } = useLocation();
