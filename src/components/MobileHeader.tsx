@@ -21,6 +21,9 @@ const ROOT_ROUTES = new Set([
 // Routes that have their own page-level search; suppress the global search icon here
 const PAGES_WITH_OWN_SEARCH = new Set(["/winners", "/breeders", "/sires", "/sales", "/market"]);
 
+// Routes where the global species switcher is shown (directory/data pages only)
+const SPECIES_SWITCHER_ROUTES = new Set(["/winners", "/breeders", "/sires", "/sales", "/market"]);
+
 // Map of route patterns -> screen titles for the back-button header
 const TITLE_RULES: { match: (path: string) => boolean; title: string }[] = [
   { match: (p) => p === "/submit", title: "New Post" },
@@ -82,7 +85,7 @@ export function MobileHeader() {
         )}
 
         <div className="flex items-center gap-1.5">
-          <GlobalSpeciesSwitcher variant="header" />
+          {SPECIES_SWITCHER_ROUTES.has(pathname) && <GlobalSpeciesSwitcher variant="header" />}
           {/* Global search intentionally omitted until search overlay ships */}
 
           {user ? (
