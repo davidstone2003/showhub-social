@@ -5,9 +5,14 @@ interface SpeciesPillsProps {
   value: SpeciesPill;
   onChange: (v: SpeciesPill) => void;
   className?: string;
+  /** When true, render against a dark navy bar (translucent inactive). Otherwise render against a light bar. */
   appMode?: boolean;
 }
 
+/**
+ * Single selected-color system: gold fill + navy text = selected.
+ * Inactive pills adapt to the background (white on light bars, translucent on dark bars).
+ */
 export function SpeciesPills({ value, onChange, className = "", appMode = false }: SpeciesPillsProps) {
   return (
     <div
@@ -17,13 +22,11 @@ export function SpeciesPills({ value, onChange, className = "", appMode = false 
     >
       {SPECIES_OPTIONS.map((option) => {
         const active = value === option;
-        const style = appMode
-          ? active
-            ? { backgroundColor: "#C9A84C", color: "#0A1628", border: "1px solid #C9A84C" }
-            : { backgroundColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", border: "1px solid transparent" }
-          : active
-            ? { backgroundColor: "#1B3A6B", color: "#FFFFFF", border: "1px solid #1B3A6B" }
-            : { backgroundColor: "#FFFFFF", color: "#1B3A6B", border: "1px solid #1B3A6B" };
+        const style = active
+          ? { backgroundColor: "#C9A84C", color: "#0A1628", border: "1px solid #C9A84C" }
+          : appMode
+            ? { backgroundColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.14)" }
+            : { backgroundColor: "#FFFFFF", color: "#6B7280", border: "1px solid #E5E7EB" };
         return (
           <button
             key={option}
