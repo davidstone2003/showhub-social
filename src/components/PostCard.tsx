@@ -352,14 +352,21 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
             )}
             <span className="text-[12px] text-muted-foreground leading-tight">
               {post.created_at ? new Date(post.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : ""}
-              {isWinner && post.show_name && (
-                <>
-                  {" · "}
-                  <span style={{ color: "#0A1628", fontWeight: 600 }}>
-                    {post.created_at ? `${new Date(post.created_at).getFullYear()} ` : ""}{post.show_name}
-                  </span>
-                </>
-              )}
+              {isWinner && post.show_name && (() => {
+                const rawDate = (post as any).show_date as string | undefined;
+                const assumed = (post as any).show_date_assumed as boolean | undefined;
+                const startsWithYear = /^\s*\d{4}\b/.test(post.show_name);
+                const year = !assumed && rawDate ? new Date(rawDate).getFullYear() : null;
+                const prefix = year && !startsWithYear ? `${year} ` : "";
+                return (
+                  <>
+                    {" · "}
+                    <span style={{ color: "#0A1628", fontWeight: 600 }}>
+                      {prefix}{post.show_name}
+                    </span>
+                  </>
+                );
+              })()}
             </span>
           </div>
         </div>
