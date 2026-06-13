@@ -405,13 +405,6 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
 
         {/* Photos */}
         <div className="relative">
-          {(() => {
-            const cards: RecapWinner[] = ((post as any).winner_cards || []) as RecapWinner[];
-            const primary = isWinner
-              ? (highestPlacing(cards) || (post.win_placing || post.win_title) || null)
-              : null;
-            return primary ? <ResultRibbon placing={primary} /> : null;
-          })()}
           {(post as any).video_url ? (
             <FeedVideo src={(post as any).video_url} aspectRatio="4 / 3" />
           ) : (
