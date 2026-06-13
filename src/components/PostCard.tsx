@@ -350,6 +350,14 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
             )}
             <span className="text-[12px] text-muted-foreground leading-tight">
               {post.created_at ? new Date(post.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : ""}
+              {isWinner && post.show_name && (
+                <>
+                  {" · "}
+                  <span style={{ color: "#0A1628", fontWeight: 600 }}>
+                    {post.created_at ? `${new Date(post.created_at).getFullYear()} ` : ""}{post.show_name}
+                  </span>
+                </>
+              )}
             </span>
           </div>
         </div>
@@ -364,53 +372,74 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
         )}
 
         {/* Photos */}
-        {(post as any).video_url ? (
-          <FeedVideo src={(post as any).video_url} aspectRatio="4 / 3" />
-        ) : (
-          <PhotoGrid images={allImages} onTap={openViewer} />
-        )}
+        <div className="relative">
+          {isWinner && (post.win_placing || post.win_title) && (
+            <ResultRibbon placing={(post.win_placing || post.win_title) as string} />
+          )}
+          {(post as any).video_url ? (
+            <FeedVideo src={(post as any).video_url} aspectRatio="4 / 3" />
+          ) : (
+            <PhotoGrid images={allImages} onTap={handlePhotoTap} />
+          )}
+          <AnimatePresence>
+            {burst && (
+              <motion.div
+                key={burst.id}
+                initial={{ opacity: 0, scale: 0.4 }}
+                animate={{ opacity: 1, scale: 1.2 }}
+                exit={{ opacity: 0, scale: 1.6 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="absolute pointer-events-none"
+                style={{ left: burst.x - 40, top: burst.y - 40 }}
+              >
+                <Heart
+                  className="w-20 h-20"
+                  fill="#C9A84C"
+                  strokeWidth={1.5}
+                  style={{ color: "#C9A84C", filter: "drop-shadow(0 2px 8px rgba(10,22,40,0.35))" }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
-        {/* Winner info — plain text, no card */}
+        {/* Winner info — one compact metadata line */}
         {isWinner && (post.win_placing || post.win_title) && (
-          <div className="px-3 pb-1 pt-2">
-            <div className="w-full text-left">
-              <p style={{ fontSize: 14, color: "#0A1628", lineHeight: 1.4 }}>
-                <span className="font-bold">{post.win_placing || post.win_title}</span>
-                {post.show_name && (
-                  <span style={{ color: "#6B7280", fontWeight: 400 }}>
-                    {" "}· {post.created_at ? `${new Date(post.created_at).getFullYear()} ` : ""}{post.show_name}
-                  </span>
+          (post.breeder?.name || post.shown_by || post.sired_by) && (
+            <div className="px-3 pb-1 pt-2">
+              <p style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.5 }}>
+                {post.breeder?.name && (
+                  <>Bred by <span style={{ color: "#0A1628", fontWeight: 600 }}>{post.breeder.name}</span></>
+                )}
+                {post.shown_by && (
+                  <>
+                    {post.breeder?.name && " · "}
+                    Shown by <span style={{ color: "#0A1628", fontWeight: 600 }}>{post.shown_by}</span>
+                  </>
+                )}
+                {post.sired_by && (
+                  <>
+                    {(post.breeder?.name || post.shown_by) && " · "}
+                    Sired by{" "}
+                    {post.sire_id ? (
+                      <Link
+                        to={`/sire/${post.sire_id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ color: "#C9A84C", fontWeight: 600 }}
+                      >
+                        {post.sired_by}
+                      </Link>
+                    ) : (
+                      <span style={{ color: "#C9A84C", fontWeight: 600 }}>{post.sired_by}</span>
+                    )}
+                  </>
                 )}
               </p>
-              {post.breeder?.name && (
-                <p style={{ fontSize: 13, color: "#6B7280", marginTop: 1 }}>
-                  Bred by <span style={{ fontWeight: 600, color: "#0A1628" }}>{post.breeder.name}</span>
-                </p>
-              )}
-              {(post as any).placed_by && (
-                <p style={{ fontSize: 13, color: "#6B7280", marginTop: 1 }}>
-                  Placed by <span style={{ fontWeight: 600, color: "#0A1628" }}>{(post as any).placed_by}</span>
-                </p>
-              )}
-              {post.sired_by && (
-                <p style={{ fontSize: 13, color: "#6B7280", marginTop: 1 }}>
-                  Sired by <span style={{ fontWeight: 600, color: "#C9A84C" }}>{post.sired_by}</span>
-                </p>
-              )}
-              {(post as any).tagged_user_ids?.length > 0 && (post as any).tagged_names?.length > 0 && (
-                <p style={{ fontSize: 13, color: "#6B7280", marginTop: 1 }}>
-                  With{" "}
-                  {((post as any).tagged_names as string[]).map((name, i, arr) => (
-                    <span key={i}>
-                      <span style={{ fontWeight: 600, color: "#0A1628" }}>{name}</span>
-                      {i < arr.length - 2 ? ", " : i === arr.length - 2 ? " and " : ""}
-                    </span>
-                  ))}
-                </p>
-              )}
             </div>
-          </div>
+          )
         )}
+
+
 
 
 
