@@ -642,7 +642,7 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
   );
 }
 
-function SheetSection({ label, children }: { label: string; children: React.ReactNode }) {
+function SheetSection({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
       <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: "#6B7280" }}>
