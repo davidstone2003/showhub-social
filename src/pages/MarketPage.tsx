@@ -151,6 +151,7 @@ export default function MarketPage() {
         {/* Filter bar — light: category pills + single Filters popover */}
         <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10">
           <div className="flex items-center gap-2 px-4 py-2">
+            <SpeciesChip />
             <div className="flex-1 flex gap-2 overflow-x-auto scrollbar-hide">
               {CATEGORIES.map((cat) => (
                 <button
