@@ -494,87 +494,30 @@ export default function WinnersPage() {
                 <div key={i} className="h-48 rounded-2xl bg-[#E5E7EB] animate-pulse" />
               ))}
             </div>
-          ) : section === "current" ? (
-            <div className="px-4 pt-3 pb-24 flex flex-col gap-6">
-              {currentSeasonGroups.length === 0 ? (
-                <div className="flex flex-col items-center py-16 text-center">
-                  <Trophy className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
-                  <p className="font-bold text-[18px]" style={{ color: "#0A1628" }}>No results yet this season</p>
-                  <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>Post your wins to build the record</p>
-                  <Link to="/submit"
-                    className="mt-4 rounded-full px-5 py-2.5 font-bold text-[14px]"
-                    style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
-                    Post a Win
-                  </Link>
-                </div>
-              ) : (
-                currentSeasonGroups.map(group => (
-                  <div key={group.showName + group.year}>
-                    <div className="mb-3 pb-2 border-b-2 border-[#C9A84C]">
-                      <h2 className="font-bold text-[17px]" style={{ color: "#0A1628" }}>{group.showName}</h2>
-                      {group.year !== null && !group.showName.includes(String(group.year)) && (
-                        <p className="text-[12px] mt-0.5" style={{ color: "#9CA3AF" }}>{group.year}</p>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-2 gap-2.5">
-                      {group.rows.map(r => (
-                        <button
-                          key={r.id}
-                          onClick={() => setDrawerPost(winnerToPost(r, profilesMap, breederProfilesMap))}
-                          className="rounded-xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm text-left active:scale-[0.98] transition-transform w-full"
-                        >
-                          <div className="w-full overflow-hidden" style={{ aspectRatio: "4/3" }}>
-                            {r.image_urls?.[0] ? (
-                              <img
-                                src={r.image_urls[0]}
-                                alt={r.win_placing || ""}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center"
-                                style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
-                                <span className="text-2xl font-black" style={{ color: "rgba(201,168,76,0.3)" }}>
-                                  {group.showName.charAt(0)}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                          <div className="p-2.5">
-                            <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: "#C9A84C" }}>
-                              {r.win_placing || "Winner"}
-                            </p>
-                            <p className="text-[13px] font-bold truncate mt-0.5" style={{ color: "#0A1628" }}>
-                              {r.shown_by || "—"}
-                            </p>
-                            {r.bred_by && (
-                              <p className="text-[11px] truncate mt-0.5" style={{ color: "#6B7280" }}>
-                                {r.bred_by}
-                              </p>
-                            )}
-                            {r.sired_by && (
-                              <p className="text-[11px] truncate mt-0.5" style={{ color: "#C9A84C" }}>
-                                {r.sired_by}
-                              </p>
-                            )}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
           ) : (
             <div className="px-4 pt-3 pb-24 flex flex-col gap-2">
               {showGroups.length === 0 ? (
                 <div className="flex flex-col items-center py-16 text-center">
-                  <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No results found</p>
-                  <button
-                    onClick={() => { setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); setSelectedYear(null); setSearchQuery(""); }}
-                    className="mt-4 rounded-full px-5 py-2 font-bold text-[14px]"
-                    style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
-                    Clear Filters
-                  </button>
+                  <Trophy className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
+                  <p className="font-bold text-[18px]" style={{ color: "#0A1628" }}>
+                    {selectedYear ? `No results for ${selectedYear} yet` : "No results found"}
+                  </p>
+                  {user ? (
+                    <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>
+                      {activeFilterCount > 0 || selectedYear
+                        ? "Try clearing filters or switching year"
+                        : "Use Post Win above to add the first one"}
+                    </p>
+                  ) : (
+                    <>
+                      <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>Join free to post your wins and build the record</p>
+                      <Link to="/auth?mode=signup"
+                        className="mt-4 rounded-full px-5 py-2.5 font-bold text-[14px]"
+                        style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+                        Post a Win
+                      </Link>
+                    </>
+                  )}
                 </div>
               ) : (
                 showGroups.map(group => (
