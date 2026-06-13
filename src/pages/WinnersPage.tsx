@@ -141,6 +141,7 @@ const SheetOptions = ({
 );
 
 export default function WinnersPage() {
+  const { user } = useAuth();
   const [rows, setRows] = useState<WinnerRow[]>([]);
   const [profilesMap, setProfilesMap] = useState<Record<string, any>>({});
   const [breederProfilesMap, setBreederProfilesMap] = useState<Record<string, any>>({});
@@ -159,8 +160,22 @@ export default function WinnersPage() {
   const [selectedBreeder, setSelectedBreeder] = useState<string>("All Breeders");
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [drawerPost, setDrawerPost] = useState<Post | null>(null);
+  const [confirmingRow, setConfirmingRow] = useState<WinnerRow | null>(null);
+  const [confirmDate, setConfirmDate] = useState("");
 
   const handleModerated = () => setRefreshKey((k) => k + 1);
+
+  const handleConfirmDate = async () => {
+    if (!confirmingRow || !confirmDate) return;
+    const { error } = await (supabase.from("winners") as any)
+      .update({ date: confirmDate, date_assumed: false })
+      .eq("id", confirmingRow.id);
+    if (error) { toast.error("Couldn't update date", { description: error.message }); return; }
+    toast.success("Show date saved");
+    setRows((prev) => prev.map((r) => r.id === confirmingRow.id ? { ...r, date: confirmDate, date_assumed: false } : r));
+    setConfirmingRow(null);
+    setConfirmDate("");
+  };
 
   useEffect(() => {
     async function load() {
