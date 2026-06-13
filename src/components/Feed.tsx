@@ -12,6 +12,7 @@ interface WinnerCard {
   show_name: string;
   shown_by: string;
   placed_by: string | null;
+  bred_by: string | null;
   sired_by: string | null;
   sire_id: string | null;
   dam: string | null;
