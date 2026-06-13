@@ -347,20 +347,22 @@ const SiresPage = () => {
   );
 };
 
-function EmptyState() {
+function EmptyState({ loggedIn }: { loggedIn: boolean }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-8 text-center">
       <h3 className="text-xl font-bold" style={{ color: NAVY }}>Sires Coming Soon</h3>
       <p className="mt-2 text-sm text-muted-foreground">
         We're building the most complete sire database in the industry. Check back daily as we add records.
       </p>
-      <Link
-        to="/submit-sire"
-        className="inline-flex items-center gap-1.5 mt-5 rounded-full px-5 h-11 text-sm font-bold"
-        style={{ backgroundColor: GOLD, color: NAVY }}
-      >
-        <Plus className="w-4 h-4" strokeWidth={3} /> Submit a Sire
-      </Link>
+      {!loggedIn && (
+        <Link
+          to="/auth?mode=signup"
+          className="inline-flex items-center gap-1.5 mt-5 rounded-full px-5 h-11 text-sm font-bold"
+          style={{ backgroundColor: GOLD, color: NAVY }}
+        >
+          <Plus className="w-4 h-4" strokeWidth={3} /> Submit a Sire
+        </Link>
+      )}
     </div>
   );
 }
