@@ -73,29 +73,35 @@ export function ReelsStrip({ onOpen }: ReelsStripProps) {
     })();
   }, []);
 
+  // Hide strip entirely when nothing to show
+  if (!loading && reels.length === 0 && !user) return null;
+
   return (
     <div className="-mx-3 px-3 pt-2 pb-3">
       <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
-        {/* Create Reel tile */}
-        <Link
-          to="/submit?type=reel"
-          className="shrink-0 snap-start relative rounded-2xl overflow-hidden flex flex-col items-center justify-end"
-          style={{
-            width: 84,
-            height: 126,
-            background: "linear-gradient(180deg, #1B3A6B 0%, #0A1628 100%)",
-          }}
-        >
-          <div
-            className="absolute top-2 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full flex items-center justify-center border-2 border-white"
-            style={{ backgroundColor: "#C9A84C" }}
+        {/* Create Reel tile — logged-in users only */}
+        {user && (
+          <Link
+            to="/submit?type=reel"
+            className="shrink-0 snap-start relative rounded-2xl overflow-hidden flex flex-col items-center justify-end"
+            style={{
+              width: 84,
+              height: 126,
+              background: "linear-gradient(180deg, #1B3A6B 0%, #0A1628 100%)",
+            }}
           >
-            <Plus className="w-3.5 h-3.5" strokeWidth={3} style={{ color: "#0A1628" }} />
-          </div>
-          <div className="w-full text-center pb-2">
-            <p className="text-white text-[10px] font-bold leading-tight">Post a Reel</p>
-          </div>
-        </Link>
+            <div
+              className="absolute top-2 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full flex items-center justify-center border-2 border-white"
+              style={{ backgroundColor: "#C9A84C" }}
+            >
+              <Plus className="w-3.5 h-3.5" strokeWidth={3} style={{ color: "#0A1628" }} />
+            </div>
+            <div className="w-full text-center pb-2">
+              <p className="text-white text-[10px] font-bold leading-tight">Post a Reel</p>
+            </div>
+          </Link>
+        )}
+
 
         {loading
           ? Array.from({ length: 4 }).map((_, i) => (
