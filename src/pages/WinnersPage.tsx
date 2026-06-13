@@ -1,17 +1,17 @@
-import { useState, useEffect, useMemo, type ReactNode } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { Search, Trophy, SlidersHorizontal, X, CalendarClock, ChevronDown, Check } from "lucide-react";
+import { Search, Trophy, CalendarClock } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { PostCard } from "@/components/PostCard";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton";
-import { matchesSpecies } from "@/components/SpeciesPills";
+import { matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
 import { useSpecies } from "@/contexts/SpeciesContext";
 import { WinnerDetailDrawer } from "@/components/post/WinnerDetailDrawer";
+import { FilterChipDropdown } from "@/components/FilterChipDropdown";
 import type { Post } from "@/data/mock";
 
 interface WinnerRow {
