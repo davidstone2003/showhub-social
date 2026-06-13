@@ -346,7 +346,7 @@ export default function WinnersPage() {
 
 
         {/* Section tabs */}
-        <div className="bg-white border-b border-[#E5E7EB] flex sticky top-[60px] z-20">
+        <div className="bg-white border-b border-[#E5E7EB] flex sticky top-[48px] z-20">
           <button
             onClick={() => setSection("current")}
             className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
@@ -369,7 +369,7 @@ export default function WinnersPage() {
           </button>
         </div>
         {/* Single filter row: species pills + Filters button */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10 px-4 py-2 flex items-center gap-2">
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10 px-4 py-2 flex items-center gap-2">
           <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
             <SpeciesPills value={species} onChange={setSpecies} />
           </div>
