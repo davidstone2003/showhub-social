@@ -1,5 +1,5 @@
 import { Home, Trophy, Coins, Users, Dna, ShoppingBag, Plus, LogIn, LogOut, User, Shield } from "lucide-react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useLocation } from "react-router-dom";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
