@@ -13,6 +13,8 @@ function tierLabel(placing: string): string {
 
 export function ResultRibbon({ placing }: ResultRibbonProps) {
   if (!placing) return null;
+  // Suppress ribbon for Reserve Grand Champion (overlay was too heavy on these photos)
+  if (/reserve\s*grand\s*champ/i.test(placing)) return null;
   return (
     <motion.div
       initial={{ opacity: 0, x: -8 }}
