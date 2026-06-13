@@ -95,7 +95,13 @@ export function Feed() {
       }
 
 
-      const breederIds = [...new Set(allItems.filter((w: any) => w.posted_as_breeder_id).map((w: any) => w.posted_as_breeder_id as string))];
+      const photoCreditBreederIds = (postsData || [])
+        .filter((p: any) => p.photo_credit_breeder_id)
+        .map((p: any) => p.photo_credit_breeder_id as string);
+      const breederIds = [...new Set([
+        ...allItems.filter((w: any) => w.posted_as_breeder_id).map((w: any) => w.posted_as_breeder_id as string),
+        ...photoCreditBreederIds,
+      ])];
       let breederProfilesMap: Record<string, any> = {};
       if (breederIds.length > 0) {
         const { data: bps } = await supabase
