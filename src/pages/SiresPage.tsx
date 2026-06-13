@@ -181,7 +181,8 @@ const SiresPage = () => {
 
 
         {/* Single Filters row */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10 px-4 py-2 flex items-center justify-end gap-2">
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10 px-4 py-2 flex items-center gap-2">
+          <SpeciesChip />
           <FiltersPopover
             filters={[
               {
