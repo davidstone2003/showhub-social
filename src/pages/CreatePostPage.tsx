@@ -84,9 +84,10 @@ export default function CreatePostPage() {
   const [showSaleLotPanel, setShowSaleLotPanel] = useState(initialType === "listing");
   const [taggedPeople, setTaggedPeople] = useState<TaggedPerson[]>([]);
 
-  // Winner fields
+  // Winner fields — primary animal
   const [resultTitle, setResultTitle] = useState("");
   const [customResult, setCustomResult] = useState("");
+  const [extraPlacings, setExtraPlacings] = useState<string[]>([]); // additional placings for primary animal
   const [showName, setShowName] = useState("");
   const [showId, setShowId] = useState<string | null>(null);
   const [exhibitorName, setExhibitorName] = useState("");
@@ -97,6 +98,43 @@ export default function CreatePostPage() {
   const [damName, setDamName] = useState("");
   const [notes, setNotes] = useState("");
   const [species, setSpecies] = useState("Sheep");
+
+  // Photo credit (shared across all post types with photos)
+  const [photoCredit, setPhotoCredit] = useState("");
+  const [photoCreditBreederId, setPhotoCreditBreederId] = useState<string | null>(null);
+
+  // Additional animals for Facebook-style multi-animal recap posts
+  interface ExtraAnimal {
+    id: string;
+    exhibitorName: string;
+    placings: string[]; // free-form placing strings
+    bredBy: string;
+    placedBy: string;
+    sireName: string;
+    sireId: string | null;
+    dam: string;
+  }
+  const [extraAnimals, setExtraAnimals] = useState<ExtraAnimal[]>([]);
+
+  const addExtraAnimal = () =>
+    setExtraAnimals((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        exhibitorName: "",
+        placings: [],
+        bredBy: savedDefaults.bredBy || breederName || "",
+        placedBy: "",
+        sireName: "",
+        sireId: null,
+        dam: "",
+      },
+    ]);
+  const updateExtraAnimal = (id: string, patch: Partial<ExtraAnimal>) =>
+    setExtraAnimals((prev) => prev.map((a) => (a.id === id ? { ...a, ...patch } : a)));
+  const removeExtraAnimal = (id: string) =>
+    setExtraAnimals((prev) => prev.filter((a) => a.id !== id));
+
 
   // Sale Lot fields
   const [lotNumber, setLotNumber] = useState("");
