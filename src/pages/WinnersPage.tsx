@@ -151,16 +151,17 @@ export default function WinnersPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const { species } = useSpecies();
 
-  const [section, setSection] = useState<"current" | "archive">("current");
   const currentYear = new Date().getFullYear();
   const [selectedShow, setSelectedShow] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number | null>(currentYear);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("All Levels");
   const [selectedState, setSelectedState] = useState<string>("All States");
   const [selectedBreeder, setSelectedBreeder] = useState<string>("All Breeders");
+  const [selectedExhibitor, setSelectedExhibitor] = useState<string>("All Exhibitors");
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [yearMenuOpen, setYearMenuOpen] = useState(false);
   const [drawerPost, setDrawerPost] = useState<Post | null>(null);
   const [confirmingRow, setConfirmingRow] = useState<WinnerRow | null>(null);
   const [confirmDate, setConfirmDate] = useState("");
