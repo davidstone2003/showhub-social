@@ -103,44 +103,9 @@ function detectShowCategory(showName: string): string {
   return "Jackpot";
 }
 
-const SheetSection = ({ label, children }: { label: string; children: ReactNode }) => (
-  <div>
-    <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: "#6B7280" }}>
-      {label}
-    </p>
-    {children}
-  </div>
-);
+const SPECIES_OPTIONS: SpeciesPill[] = ["All", "Cattle", "Sheep", "Goats", "Pigs"];
+const speciesLabel = (s: SpeciesPill) => (s === "All" ? "All Species" : s);
 
-const SheetOptions = ({
-  options,
-  selected,
-  onSelect,
-}: {
-  options: string[];
-  selected: string;
-  onSelect: (v: string) => void;
-}) => (
-  <div className="flex flex-wrap gap-1.5">
-    {options.map((opt) => {
-      const active = selected === opt;
-      return (
-        <button
-          key={opt}
-          onClick={() => onSelect(opt)}
-          className="h-8 rounded-full px-3 text-[12px] font-semibold border transition-colors"
-          style={
-            active
-              ? { backgroundColor: "#C9A84C", color: "#0A1628", borderColor: "#C9A84C" }
-              : { backgroundColor: "#FFFFFF", color: "#0A1628", borderColor: "#E5E7EB" }
-          }
-        >
-          {opt}
-        </button>
-      );
-    })}
-  </div>
-);
 
 export default function WinnersPage() {
   const { user } = useAuth();
