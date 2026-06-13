@@ -310,7 +310,9 @@ export default function WinnersPage() {
   }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery, selectedCategory, selectedState, selectedBreeder]);
 
   const currentSeasonGroups = useMemo(() => {
-    return showGroups.filter(g => g.year !== null && g.year >= currentYear);
+    return showGroups
+      .map(g => ({ ...g, rows: g.rows.filter(r => !r.date_assumed) }))
+      .filter(g => g.year !== null && g.year >= currentYear && g.rows.length > 0);
   }, [showGroups, currentYear]);
 
   return (
