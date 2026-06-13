@@ -51,10 +51,20 @@ function getTitle(path: string): string {
   return rule?.title ?? "";
 }
 
+// Context-aware create CTA per route. `to: null` hides the button entirely.
+function getCreateCTA(path: string): { label: string; to: string | null } {
+  if (path === "/winners") return { label: "Post Win", to: "/submit?type=win" };
+  if (path === "/market" || path === "/sales") return { label: "Post Listing", to: "/submit?type=listing" };
+  if (path === "/sires") return { label: "Submit Sire", to: "/submit-sire" };
+  if (path === "/breeders") return { label: "", to: null };
+  return { label: "Post", to: "/submit" };
+}
+
 export function MobileHeader() {
   const { user } = useAuth();
   const { pathname } = useLocation();
   const isRoot = ROOT_ROUTES.has(pathname);
+  const cta = getCreateCTA(pathname);
 
   return (
     <header className="lg:hidden sticky top-0 z-40 bg-white border-b border-border" style={{ padding: '8px 12px' }}>
@@ -76,14 +86,16 @@ export function MobileHeader() {
           {user ? (
             <>
               <NotificationBell />
-              <Link
-                to="/submit"
-                className="flex items-center gap-1.5 bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-all shrink-0"
-                style={{ borderRadius: '10px', height: '36px', padding: '0 14px', fontSize: '14px' }}
-              >
-                <Plus className="w-4 h-4 stroke-[2.5]" />
-                Post
-              </Link>
+              {cta.to && (
+                <Link
+                  to={cta.to}
+                  className="flex items-center gap-1.5 bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-all shrink-0"
+                  style={{ borderRadius: '10px', height: '36px', padding: '0 14px', fontSize: '14px' }}
+                >
+                  <Plus className="w-4 h-4 stroke-[2.5]" />
+                  {cta.label}
+                </Link>
+              )}
             </>
           ) : (
             <>
