@@ -347,16 +347,6 @@ export default function MarketPage() {
           )}
         </section>
 
-        {/* FAB */}
-        <Link
-          to="/submit"
-          aria-label="Post a Listing"
-          className="fixed bottom-20 right-4 z-40 flex items-center gap-2 rounded-full px-4 py-3 shadow-lg font-bold text-[13px] active:scale-95 transition-transform"
-          style={{ background: GOLD, color: NAVY, boxShadow: "0 8px 24px rgba(201,168,76,0.4)" }}
-        >
-          <Plus className="w-4 h-4 stroke-[3]" />
-          Post a Listing
-        </Link>
       </div>
     </Layout>
   );
