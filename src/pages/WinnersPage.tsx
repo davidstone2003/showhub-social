@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { Search, Trophy, Plus, SlidersHorizontal, X } from "lucide-react";
+import { Search, Trophy, Plus, SlidersHorizontal, X, CalendarClock } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import { PostCard } from "@/components/PostCard";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton";
 import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
@@ -25,6 +27,7 @@ interface WinnerRow {
   image_urls: string[] | null;
   video_url: string | null;
   date: string;
+  date_assumed: boolean | null;
   created_at: string;
   species: string | null;
   likes: number;
@@ -164,7 +167,7 @@ export default function WinnersPage() {
       setLoading(true);
       const { data } = await supabase
         .from("winners")
-        .select("id, title, show_name, show_id, win_placing, shown_by, bred_by, placed_by, sired_by, sire_id, dam, image_urls, video_url, date, created_at, species, likes, comments, caption, tags, user_id, status, posted_as_breeder_id")
+        .select("id, title, show_name, show_id, win_placing, shown_by, bred_by, placed_by, sired_by, sire_id, dam, image_urls, video_url, date, date_assumed, created_at, species, likes, comments, caption, tags, user_id, status, posted_as_breeder_id")
         .eq("status", "active")
         .eq("show_on_winners_archive", true)
         .order("created_at", { ascending: false })
