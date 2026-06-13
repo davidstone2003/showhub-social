@@ -218,7 +218,7 @@ export default function WinnersPage() {
   }, [refreshKey]);
 
   const years = useMemo(() => {
-    const ys = [...new Set(rows.filter(r => r.date).map(r => new Date(r.date).getFullYear()))];
+    const ys = [...new Set(rows.filter(r => r.date && !r.date_assumed).map(r => new Date(r.date).getFullYear()))];
     return ys.sort((a, b) => b - a);
   }, [rows]);
 
@@ -263,7 +263,7 @@ export default function WinnersPage() {
       matchesSpecies(species, r.species, r.show_name, r.title, r.caption, (r.tags || []).join(" "))
     );
     if (selectedYear) {
-      filteredRows = filteredRows.filter(r => r.date && new Date(r.date).getFullYear() === selectedYear);
+      filteredRows = filteredRows.filter(r => r.date && !r.date_assumed && new Date(r.date).getFullYear() === selectedYear);
     }
     if (selectedShow) {
       filteredRows = filteredRows.filter(r => r.show_name === selectedShow);
@@ -296,7 +296,8 @@ export default function WinnersPage() {
     const result: { showName: string; year: number | null; posts: Post[]; rows: WinnerRow[] }[] = [];
     for (const [, winners] of grouped) {
       const ref = winners[0];
-      const year = ref.date ? new Date(ref.date).getFullYear() : null;
+      const datedRef = winners.find(w => w.date && !w.date_assumed);
+      const year = datedRef?.date ? new Date(datedRef.date).getFullYear() : null;
       result.push({
         showName: ref.show_name,
         year,
