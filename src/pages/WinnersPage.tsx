@@ -591,6 +591,40 @@ export default function WinnersPage() {
         />
       )}
 
+      <Sheet open={!!confirmingRow} onOpenChange={(o) => { if (!o) { setConfirmingRow(null); setConfirmDate(""); } }}>
+        <SheetContent side="bottom" className="rounded-t-2xl">
+          <SheetTitle>Confirm show date</SheetTitle>
+          <SheetDescription>
+            We assumed a date for this result. Set the correct show date so it appears in the right season.
+          </SheetDescription>
+          <div className="mt-4 space-y-3 pb-4">
+            <input
+              type="date"
+              value={confirmDate}
+              onChange={(e) => setConfirmDate(e.target.value)}
+              className="w-full h-11 rounded-lg border border-[#E5E7EB] px-3 text-[14px] text-[#0A1628]"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setConfirmingRow(null); setConfirmDate(""); }}
+                className="flex-1 h-11 rounded-xl border border-[#E5E7EB] text-[14px] font-bold text-[#0A1628]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDate}
+                disabled={!confirmDate}
+                className="flex-1 h-11 rounded-xl text-[14px] font-bold disabled:opacity-40"
+                style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+              >
+                Save date
+              </button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+
     </Layout>
   );
 }
