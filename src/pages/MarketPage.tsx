@@ -154,7 +154,7 @@ export default function MarketPage() {
         )}
 
         {/* Filter bar — light */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10">
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10">
           {/* Category pills */}
           <div className="flex gap-2 overflow-x-auto px-4 pt-2 pb-1 scrollbar-hide">
             {CATEGORIES.map((cat) => (

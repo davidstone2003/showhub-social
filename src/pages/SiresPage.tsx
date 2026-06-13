@@ -182,7 +182,7 @@ const SiresPage = () => {
 
 
         {/* Filter bar — light */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10">
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10">
           <div className="px-4 pt-2 pb-1">
             <SpeciesPills value={species} onChange={setSpecies} />
           </div>
