@@ -155,13 +155,17 @@ export function Feed() {
           })
           .filter(Boolean) as string[];
 
+        const photoCreditBp = p.photo_credit_breeder_id ? breederProfilesMap[p.photo_credit_breeder_id] : null;
+
         mapped.push({
           id: p.id,
           image: p.image_urls?.[0] || "/placeholder.svg",
+          image_urls: p.image_urls || [],
           breeder,
           win_title: firstCard?.win_placing || undefined,
           show_name: firstCard?.show_name || undefined,
           shown_by: firstCard?.shown_by || undefined,
+          bred_by: firstCard?.bred_by || undefined,
           sired_by: firstCard?.sired_by || undefined,
           sire_id: firstCard?.sire_id || undefined,
           dam: firstCard?.dam || undefined,
@@ -180,6 +184,11 @@ export function Feed() {
           winner_id: firstCard?.id || null,
           tagged_user_ids: taggedUserIds,
           tagged_names: taggedNames,
+          photo_credit: p.photo_credit || null,
+          photo_credit_breeder: photoCreditBp
+            ? { id: photoCreditBp.id, name: photoCreditBp.breeder_name, slug: photoCreditBp.breeder_slug }
+            : null,
+          winner_cards: cards,
         } as any);
       }
 
