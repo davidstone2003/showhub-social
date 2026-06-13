@@ -86,14 +86,16 @@ export function MobileHeader() {
           {user ? (
             <>
               <NotificationBell />
-              <Link
-                to="/submit"
-                className="flex items-center gap-1.5 bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-all shrink-0"
-                style={{ borderRadius: '10px', height: '36px', padding: '0 14px', fontSize: '14px' }}
-              >
-                <Plus className="w-4 h-4 stroke-[2.5]" />
-                Post
-              </Link>
+              {cta.to && (
+                <Link
+                  to={cta.to}
+                  className="flex items-center gap-1.5 bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-all shrink-0"
+                  style={{ borderRadius: '10px', height: '36px', padding: '0 14px', fontSize: '14px' }}
+                >
+                  <Plus className="w-4 h-4 stroke-[2.5]" />
+                  {cta.label}
+                </Link>
+              )}
             </>
           ) : (
             <>
