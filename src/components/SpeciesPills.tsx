@@ -33,7 +33,7 @@ export function SpeciesPills({ value, onChange, className = "", appMode = false 
             role="tab"
             aria-selected={active}
             onClick={() => onChange(option)}
-            className="h-8 shrink-0 rounded-full px-3.5 text-[12px] font-semibold leading-none transition-colors"
+            className="h-8 shrink-0 rounded-full px-2.5 text-[12px] font-semibold leading-none transition-colors"
             style={style}
           >
             {option}
