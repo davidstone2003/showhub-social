@@ -1024,6 +1024,42 @@ export default function CreatePostPage() {
         </BottomSheet>
       )}
 
+      {/* Sale Lot bottom sheet */}
+      {showSaleLotPanel && (
+        <BottomSheet onClose={() => setShowSaleLotPanel(false)} title="Sale Listing" tall>
+          <div className="space-y-4 pb-2">
+            <FieldLabel>Sale Name</FieldLabel>
+            <Input value={saleName} onChange={(e) => setSaleName(e.target.value)} placeholder="e.g. Spring Classic Sale" className="h-11 rounded-lg" />
+
+            <FieldLabel>Sale Date</FieldLabel>
+            <Input type="date" value={saleDate} onChange={(e) => setSaleDate(e.target.value)} className="h-11 rounded-lg" />
+
+            <FieldLabel>Lot Number</FieldLabel>
+            <Input value={lotNumber} onChange={(e) => setLotNumber(e.target.value)} placeholder="Lot #" className="h-11 rounded-lg" />
+
+            <FieldLabel>Sire</FieldLabel>
+            <AutocompleteInput
+              table="sires_lookup" value={lotSire}
+              onChange={(v) => setLotSire(v)}
+              placeholder="Sire name"
+            />
+
+            <FieldLabel>Dam</FieldLabel>
+            <Input value={lotDam} onChange={(e) => setLotDam(e.target.value)} placeholder="Dam name" className="h-11 rounded-lg" />
+
+            <FieldLabel>Sale Link</FieldLabel>
+            <Input value={saleLink} onChange={(e) => setSaleLink(e.target.value)} placeholder="https://…" className="h-11 rounded-lg" />
+
+            <FieldLabel>Caption</FieldLabel>
+            <Textarea value={lotCaption} onChange={(e) => setLotCaption(e.target.value)} placeholder="Anything else buyers should know…" className="rounded-lg min-h-[80px]" />
+
+            <Button onClick={() => setShowSaleLotPanel(false)} className="w-full h-12 rounded-xl font-bold mt-2" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+              Done
+            </Button>
+          </div>
+        </BottomSheet>
+      )}
+
       {/* Smart upload modal */}
       {showSmartUpload && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
