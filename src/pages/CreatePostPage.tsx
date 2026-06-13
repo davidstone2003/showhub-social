@@ -417,6 +417,8 @@ export default function CreatePostPage() {
         tags: species ? [species] : [], post_type: "general", show_on_feed: true,
         is_reel: isReel && !!videoUrl,
         tagged_user_ids: taggedPeople.map(p => p.id),
+        photo_credit: photoCredit.trim() || null,
+        photo_credit_breeder_id: photoCreditBreederId,
       }).select("id").single();
       if (postError) throw postError;
 
