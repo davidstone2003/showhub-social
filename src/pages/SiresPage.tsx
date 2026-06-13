@@ -7,6 +7,7 @@ import { Layout } from "@/components/Layout";
 import { matchesSpecies } from "@/components/SpeciesPills";
 import { useSpecies } from "@/contexts/SpeciesContext";
 import { FiltersPopover, FilterChip } from "@/components/FiltersPopover";
+import { SpeciesChip } from "@/components/SpeciesChip";
 import gooseImage from "@/assets/sires/goose.jpeg";
 import { REPRO_SHEEP_SIRES } from "@/data/reproSheepSires";
 
@@ -181,7 +182,8 @@ const SiresPage = () => {
 
 
         {/* Single Filters row */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10 px-4 py-2 flex items-center justify-end gap-2">
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10 px-4 py-2 flex items-center gap-2">
+          <SpeciesChip />
           <FiltersPopover
             filters={[
               {

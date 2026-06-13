@@ -5,6 +5,7 @@ import { Layout } from "@/components/Layout";
 import { matchesSpecies } from "@/components/SpeciesPills";
 import { useSpecies } from "@/contexts/SpeciesContext";
 import { FiltersPopover, FilterChip } from "@/components/FiltersPopover";
+import { SpeciesChip } from "@/components/SpeciesChip";
 import { useBreederDirectory, stateAbbr } from "@/hooks/useBreederDirectory";
 
 const NAVY = "#0A1628";
@@ -117,7 +118,8 @@ export default function BreedersPage() {
         )}
 
         {/* Single Filters row */}
-        <div className="bg-white border-b border-[#E5E7EB] px-4 py-2 flex items-center justify-end gap-2">
+        <div className="bg-white border-b border-[#E5E7EB] px-4 py-2 flex items-center gap-2">
+          <SpeciesChip />
           <FiltersPopover
             filters={[
               {

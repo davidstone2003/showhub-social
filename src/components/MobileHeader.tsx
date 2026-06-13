@@ -4,11 +4,6 @@ import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
 import { NotificationBell } from "@/components/NotificationBell";
 import { BackButton } from "@/components/BackButton";
-import { GlobalSpeciesSwitcher } from "@/components/GlobalSpeciesSwitcher";
-
-// Routes where the species switcher is hidden (submit flows + post detail)
-const HIDE_SWITCHER_ROUTES = (path: string) =>
-  path.startsWith("/submit") || path.startsWith("/auth") || path.startsWith("/onboarding") || path.startsWith("/account-type");
 
 
 // Top-level tab roots — these show the logo, not a back button
@@ -25,9 +20,6 @@ const ROOT_ROUTES = new Set([
 
 // Routes that have their own page-level search; suppress the global search icon here
 const PAGES_WITH_OWN_SEARCH = new Set(["/winners", "/breeders", "/sires", "/sales", "/market"]);
-
-// Routes where the global species switcher is shown (directory/data pages only)
-const SPECIES_SWITCHER_ROUTES = new Set(["/winners", "/breeders", "/sires", "/sales", "/market"]);
 
 // Map of route patterns -> screen titles for the back-button header
 const TITLE_RULES: { match: (path: string) => boolean; title: string }[] = [
@@ -90,7 +82,7 @@ export function MobileHeader() {
         )}
 
         <div className="flex items-center gap-1.5">
-          {!HIDE_SWITCHER_ROUTES(pathname) && <GlobalSpeciesSwitcher variant="header" />}
+
 
           {user ? (
             <>
