@@ -3,6 +3,7 @@ import { NavLink, Link } from "react-router-dom";
 import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
+import { GlobalSpeciesSwitcher } from "@/components/GlobalSpeciesSwitcher";
 
 const navItems = [
   { icon: Home, label: "Home", to: "/" },
@@ -19,8 +20,9 @@ export function DesktopSidebar() {
 
   return (
     <aside className="hidden lg:flex flex-col w-[200px] min-h-screen bg-primary text-sidebar-foreground border-r border-sidebar-border sticky top-0">
-      <div className="p-5 border-b border-sidebar-border">
+      <div className="p-5 border-b border-sidebar-border space-y-3">
         <BackdropLogo size="md" showTagline={true} onDark={true} />
+        <GlobalSpeciesSwitcher variant="sidebar" />
       </div>
 
       <nav className="flex-1 py-4 px-3 space-y-1">

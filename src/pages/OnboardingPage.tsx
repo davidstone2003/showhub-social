@@ -26,6 +26,8 @@ export default function OnboardingPage() {
   const [bio, setBio] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [preferredSpecies, setPreferredSpecies] = useState<string | null>(null);
+  const [step, setStep] = useState<"species" | "profile">("species");
   const [saving, setSaving] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -77,6 +79,7 @@ export default function OnboardingPage() {
       if (location.trim()) updates.location = location.trim();
       if (bio.trim()) updates.bio = bio.trim();
       if (logoUrl) updates.logo_url = logoUrl;
+      if (preferredSpecies) updates.preferred_species = preferredSpecies;
 
       const { error } = await supabase
         .from("profiles")
@@ -91,6 +94,53 @@ export default function OnboardingPage() {
       setSaving(false);
     }
   };
+
+  if (step === "species") {
+    const opts: { label: string; value: string | null; emoji: string }[] = [
+      { label: "Cattle", value: "Cattle", emoji: "🐄" },
+      { label: "Sheep",  value: "Sheep",  emoji: "🐑" },
+      { label: "Goats",  value: "Goats",  emoji: "🐐" },
+      { label: "Pigs",   value: "Pigs",   emoji: "🐖" },
+      { label: "A bit of everything", value: "All", emoji: "🌐" },
+    ];
+    return (
+      <div className="min-h-screen bg-primary flex flex-col items-center justify-center px-6">
+        <div className="flex justify-center mb-4"><BackdropLogo size="md" onDark /></div>
+        <div className="w-full max-w-sm bg-card rounded-2xl shadow-xl p-7 space-y-4">
+          <div className="text-center">
+            <h1 className="text-lg font-bold text-card-foreground">What do you show?</h1>
+            <p className="text-xs text-muted-foreground/70 mt-1">We'll tailor your feed to your species.</p>
+          </div>
+          <div className="space-y-2">
+            {opts.map((o) => {
+              const active = preferredSpecies === o.value;
+              return (
+                <button
+                  key={o.label}
+                  onClick={() => setPreferredSpecies(o.value)}
+                  className="w-full flex items-center gap-3 rounded-2xl border px-4 h-12 text-sm font-semibold transition-colors"
+                  style={active
+                    ? { borderColor: "#C9A84C", backgroundColor: "#FFFBF0", color: "#0A1628" }
+                    : { borderColor: "hsl(var(--border))", backgroundColor: "hsl(var(--background))", color: "hsl(var(--foreground))" }}
+                >
+                  <span className="text-xl" aria-hidden>{o.emoji}</span>
+                  {o.label}
+                </button>
+              );
+            })}
+          </div>
+          <Button
+            onClick={() => setStep("profile")}
+            disabled={!preferredSpecies}
+            className="w-full h-[52px] rounded-2xl text-base font-bold"
+            style={{ backgroundColor: "hsl(var(--gold))", color: "hsl(var(--foreground))" }}
+          >
+            Continue <ArrowRight className="w-4 h-4 ml-1" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-primary flex flex-col items-center justify-center px-6">

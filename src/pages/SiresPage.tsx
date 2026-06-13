@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import { ChevronRight, Search, LayoutGrid, List as ListIcon, Flame, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/Layout";
-import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
+import { matchesSpecies } from "@/components/SpeciesPills";
+import { useSpecies } from "@/contexts/SpeciesContext";
+import { FiltersPopover, FilterChip } from "@/components/FiltersPopover";
 import gooseImage from "@/assets/sires/goose.jpeg";
 import { REPRO_SHEEP_SIRES } from "@/data/reproSheepSires";
 
@@ -72,10 +74,9 @@ const SiresPage = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"list" | "grid">("grid");
-  const [species, setSpecies] = useState<SpeciesPill>("All");
+  const { species } = useSpecies();
   const [selectedOwner, setSelectedOwner] = useState<string>("All Owners");
   const [semenFilter, setSemenFilter] = useState<"All" | "Available">("All");
-  const [ownerOpen, setOwnerOpen] = useState(false);
 
   useEffect(() => {
     async function fetchSires() {
@@ -114,11 +115,7 @@ const SiresPage = () => {
     fetchSires();
   }, []);
 
-  useEffect(() => {
-    const handler = () => setOwnerOpen(false);
-    document.addEventListener("click", handler);
-    return () => document.removeEventListener("click", handler);
-  }, []);
+  // (removed legacy ownerOpen click-outside handler)
 
   const availableOwners = useMemo(() => {
     const owners = sires.map((s) => s.breederName).filter(Boolean) as string[];
@@ -181,64 +178,42 @@ const SiresPage = () => {
         </div>
 
 
-        {/* Filter bar — light */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10">
-          <div className="px-4 pt-2 pb-1">
-            <SpeciesPills value={species} onChange={setSpecies} />
-          </div>
-          <div className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => setSemenFilter((v) => (v === "All" ? "Available" : "All"))}
-              className="shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
-              style={semenFilter === "Available"
-                ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
-                : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
-            >
-              {semenFilter === "Available" ? "✓ Semen Available" : "Semen Available"}
-            </button>
-
-            <div className="relative shrink-0">
-              <button
-                onClick={() => setOwnerOpen((v) => !v)}
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
-                style={selectedOwner !== "All Owners"
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
-              >
-                {selectedOwner === "All Owners" ? "Owner" : selectedOwner}
-                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              {ownerOpen && (
-                <div className="absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 180, maxHeight: 240, overflowY: "auto" }}>
-                  {availableOwners.map((name) => (
-                    <button key={name} onClick={() => { setSelectedOwner(name); setOwnerOpen(false); }}
-                      className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
-                      style={{ borderBottom: "1px solid #F3F4F6" }}>
-                      <span className="text-[13px] font-medium text-[#0A1628] truncate">{name}</span>
-                      {selectedOwner === name && (
-                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5} className="shrink-0 ml-2">
-                          <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {(selectedOwner !== "All Owners" || semenFilter !== "All" || search) && (
-              <button
-                onClick={() => { setSelectedOwner("All Owners"); setSemenFilter("All"); setSearch(""); }}
-                className="shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold"
-                style={{ backgroundColor: "#FFF8E7", color: "#8B6914", border: "1px solid rgba(201,168,76,0.3)" }}
-              >
-                Clear ×
-              </button>
+        {/* Single Filters row */}
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10 px-4 py-2 flex items-center justify-end gap-2">
+          <FiltersPopover
+            filters={[
+              {
+                key: "semen",
+                label: "Semen Available",
+                value: semenFilter,
+                options: ["All", "Available"],
+                allValue: "All",
+                onChange: (v) => setSemenFilter(v as "All" | "Available"),
+              },
+              {
+                key: "owner",
+                label: "Owner",
+                value: selectedOwner,
+                options: availableOwners,
+                allValue: "All Owners",
+                onChange: setSelectedOwner,
+              },
+            ]}
+            onClearAll={() => { setSelectedOwner("All Owners"); setSemenFilter("All"); }}
+          />
+        </div>
+        {(selectedOwner !== "All Owners" || semenFilter !== "All") && (
+          <div className="bg-[#F8F7F4] px-4 py-2 flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
+            {semenFilter !== "All" && (
+              <FilterChip label="Semen Available" onRemove={() => setSemenFilter("All")} />
+            )}
+            {selectedOwner !== "All Owners" && (
+              <FilterChip label={selectedOwner} onRemove={() => setSelectedOwner("All Owners")} />
             )}
           </div>
-        </div>
+        )}
+
+
 
         <div className="px-4 pt-3">
           {/* Search */}

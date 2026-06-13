@@ -8,7 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { PostCard } from "@/components/PostCard";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton";
-import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
+import { matchesSpecies } from "@/components/SpeciesPills";
+import { useSpecies } from "@/contexts/SpeciesContext";
 import { WinnerDetailDrawer } from "@/components/post/WinnerDetailDrawer";
 import type { Post } from "@/data/mock";
 
@@ -147,7 +148,7 @@ export default function WinnersPage() {
   const [breederProfilesMap, setBreederProfilesMap] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [species, setSpecies] = useState<SpeciesPill>("All");
+  const { species } = useSpecies();
 
   const [section, setSection] = useState<"current" | "archive">("current");
   const currentYear = new Date().getFullYear();
@@ -368,11 +369,8 @@ export default function WinnersPage() {
             📋 All Results
           </button>
         </div>
-        {/* Single filter row: species pills + Filters button */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10 px-4 py-2 flex items-center gap-2">
-          <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
-            <SpeciesPills value={species} onChange={setSpecies} />
-          </div>
+        {/* Single filter row: Filters button only */}
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10 px-4 py-2 flex items-center justify-end gap-2">
           <button
             type="button"
             onClick={() => setFilterSheetOpen(true)}

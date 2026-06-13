@@ -1,6 +1,8 @@
 import { useMemo, useState, useEffect } from "react";
 import { Search, ChevronRight, LayoutGrid, List as ListIcon, ShoppingBag, Wheat, SprayCan, Wrench } from "lucide-react";
 import { Layout } from "@/components/Layout";
+import { useSpecies } from "@/contexts/SpeciesContext";
+import { FiltersPopover, FilterChip } from "@/components/FiltersPopover";
 
 const NAVY = "#0A1628";
 const GOLD = "#C9A84C";
@@ -47,17 +49,9 @@ export default function MarketPage() {
   const [category, setCategory] = useState<Category>("All");
   const [view, setView] = useState<"list" | "grid">("list");
   const [selectedState, setSelectedState] = useState<string>("All States");
-  const [selectedSpecies, setSelectedSpecies] = useState<string>("All");
+  const { species: selectedSpecies } = useSpecies();
   const [priceRange, setPriceRange] = useState<"All" | "Under $500" | "$500-$2K" | "$2K-$5K" | "$5K+">("All");
-  const [stateOpen, setStateOpen] = useState(false);
-  const [speciesOpen, setSpeciesOpen] = useState(false);
-  const [priceOpen, setPriceOpen] = useState(false);
 
-  useEffect(() => {
-    const handler = () => { setStateOpen(false); setSpeciesOpen(false); setPriceOpen(false); };
-    document.addEventListener("click", handler);
-    return () => document.removeEventListener("click", handler);
-  }, []);
 
   const marketStates = useMemo(() => {
     const states = LISTINGS.map((l) => l.meta.match(/^([A-Z]{2})\s·/)?.[1]).filter(Boolean) as string[];
@@ -154,133 +148,56 @@ export default function MarketPage() {
           </div>
         )}
 
-        {/* Filter bar — light */}
+        {/* Filter bar — light: category pills + single Filters popover */}
         <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10">
-          {/* Category pills */}
-          <div className="flex gap-2 overflow-x-auto px-4 pt-2 pb-1 scrollbar-hide">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setCategory(cat)}
-                className="shrink-0 rounded-full px-3 py-1.5 border text-[12px] font-bold transition-colors"
-                style={category === cat
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Dropdown filters row */}
-          <div className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide" onClick={(e) => e.stopPropagation()}>
-            {/* Species dropdown */}
-            <div className="relative shrink-0">
-              <button
-                onClick={() => { setSpeciesOpen((v) => !v); setStateOpen(false); setPriceOpen(false); }}
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
-                style={selectedSpecies !== "All"
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
-              >
-                {selectedSpecies === "All" ? "Species" : selectedSpecies}
-                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              {speciesOpen && (
-                <div className="absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 140 }}>
-                  {speciesOptions.map((opt) => (
-                    <button key={opt} onClick={() => { setSelectedSpecies(opt); setSpeciesOpen(false); }}
-                      className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
-                      style={{ borderBottom: "1px solid #F3F4F6" }}>
-                      <span className="text-[13px] font-medium text-[#0A1628]">{opt}</span>
-                      {selectedSpecies === opt && (
-                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}>
-                          <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
+          <div className="flex items-center gap-2 px-4 py-2">
+            <div className="flex-1 flex gap-2 overflow-x-auto scrollbar-hide">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setCategory(cat)}
+                  className="shrink-0 rounded-full px-3 py-1.5 border text-[12px] font-bold transition-colors"
+                  style={category === cat
+                    ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
+                    : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
+                >
+                  {cat}
+                </button>
+              ))}
             </div>
-
-            {/* State dropdown */}
-            <div className="relative shrink-0">
-              <button
-                onClick={() => { setStateOpen((v) => !v); setSpeciesOpen(false); setPriceOpen(false); }}
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
-                style={selectedState !== "All States"
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
-              >
-                {selectedState}
-                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              {stateOpen && (
-                <div className="absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 140, maxHeight: 240, overflowY: "auto" }}>
-                  {marketStates.map((state) => (
-                    <button key={state} onClick={() => { setSelectedState(state); setStateOpen(false); }}
-                      className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
-                      style={{ borderBottom: "1px solid #F3F4F6" }}>
-                      <span className="text-[13px] font-medium text-[#0A1628]">{state}</span>
-                      {selectedState === state && (
-                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}>
-                          <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Price dropdown */}
-            <div className="relative shrink-0">
-              <button
-                onClick={() => { setPriceOpen((v) => !v); setStateOpen(false); setSpeciesOpen(false); }}
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
-                style={priceRange !== "All"
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
-              >
-                {priceRange === "All" ? "Price" : priceRange}
-                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              {priceOpen && (
-                <div className="absolute left-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl z-30 overflow-hidden" style={{ minWidth: 140 }}>
-                  {priceOptions.map((opt) => (
-                    <button key={opt} onClick={() => { setPriceRange(opt as any); setPriceOpen(false); }}
-                      className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4]"
-                      style={{ borderBottom: "1px solid #F3F4F6" }}>
-                      <span className="text-[13px] font-medium text-[#0A1628]">{opt}</span>
-                      {priceRange === opt && (
-                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}>
-                          <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {(selectedState !== "All States" || selectedSpecies !== "All" || priceRange !== "All" || category !== "All") && (
-              <button
-                onClick={() => { setSelectedState("All States"); setSelectedSpecies("All"); setPriceRange("All"); setCategory("All"); }}
-                className="shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold"
-                style={{ backgroundColor: "#FFF8E7", color: "#8B6914", border: "1px solid rgba(201,168,76,0.3)" }}
-              >
-                Clear ×
-              </button>
-            )}
+            <FiltersPopover
+              filters={[
+                {
+                  key: "state",
+                  label: "State",
+                  value: selectedState,
+                  options: marketStates,
+                  allValue: "All States",
+                  onChange: setSelectedState,
+                },
+                {
+                  key: "price",
+                  label: "Price",
+                  value: priceRange,
+                  options: priceOptions,
+                  allValue: "All",
+                  onChange: (v) => setPriceRange(v as any),
+                },
+              ]}
+              onClearAll={() => { setSelectedState("All States"); setPriceRange("All"); }}
+            />
           </div>
         </div>
+        {(selectedState !== "All States" || priceRange !== "All") && (
+          <div className="bg-[#F8F7F4] px-4 py-2 flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
+            {selectedState !== "All States" && (
+              <FilterChip label={selectedState} onRemove={() => setSelectedState("All States")} />
+            )}
+            {priceRange !== "All" && (
+              <FilterChip label={priceRange} onRemove={() => setPriceRange("All")} />
+            )}
+          </div>
+        )}
 
 
 

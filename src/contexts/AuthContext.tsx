@@ -14,6 +14,7 @@ interface Profile {
   onboarding_completed: boolean;
   account_type: string;
   email_verified: boolean;
+  preferred_species: string | null;
 }
 
 interface AuthContextType {
