@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Search, ChevronRight, LayoutGrid, List as ListIcon, ShoppingBag, Wheat, SprayCan, Wrench } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { useSpecies } from "@/contexts/SpeciesContext";
