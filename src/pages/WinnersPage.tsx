@@ -596,20 +596,3 @@ function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap, cu
   );
 }
 
-function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
-  return (
-    <span
-      className="shrink-0 inline-flex items-center gap-1 rounded-full pl-3 pr-1 h-7 text-[12px] font-semibold"
-      style={{ backgroundColor: "#FFF8E7", color: "#8B6914", border: "1px solid rgba(201,168,76,0.35)" }}
-    >
-      {label}
-      <button
-        onClick={onRemove}
-        aria-label={`Remove ${label} filter`}
-        className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-[rgba(201,168,76,0.18)]"
-      >
-        <X className="w-3 h-3" />
-      </button>
-    </span>
-  );
-}
