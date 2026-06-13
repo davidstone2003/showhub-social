@@ -1,6 +1,8 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { Search, ChevronRight, LayoutGrid, List as ListIcon, ShoppingBag, Wheat, SprayCan, Wrench } from "lucide-react";
 import { Layout } from "@/components/Layout";
+import { useSpecies } from "@/contexts/SpeciesContext";
+import { FiltersPopover, FilterChip } from "@/components/FiltersPopover";
 
 const NAVY = "#0A1628";
 const GOLD = "#C9A84C";
@@ -47,17 +49,9 @@ export default function MarketPage() {
   const [category, setCategory] = useState<Category>("All");
   const [view, setView] = useState<"list" | "grid">("list");
   const [selectedState, setSelectedState] = useState<string>("All States");
-  const [selectedSpecies, setSelectedSpecies] = useState<string>("All");
+  const { species: selectedSpecies } = useSpecies();
   const [priceRange, setPriceRange] = useState<"All" | "Under $500" | "$500-$2K" | "$2K-$5K" | "$5K+">("All");
-  const [stateOpen, setStateOpen] = useState(false);
-  const [speciesOpen, setSpeciesOpen] = useState(false);
-  const [priceOpen, setPriceOpen] = useState(false);
 
-  useEffect(() => {
-    const handler = () => { setStateOpen(false); setSpeciesOpen(false); setPriceOpen(false); };
-    document.addEventListener("click", handler);
-    return () => document.removeEventListener("click", handler);
-  }, []);
 
   const marketStates = useMemo(() => {
     const states = LISTINGS.map((l) => l.meta.match(/^([A-Z]{2})\s·/)?.[1]).filter(Boolean) as string[];
