@@ -364,20 +364,47 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </div>
         </div>
 
-        {/* Caption — always before photos */}
+        {/* Caption — clamped to 4 lines with "more" toggle */}
         {(post as any).caption && (
           <div className="px-3 pb-2">
-            <p className="text-foreground" style={{ fontSize: 15, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
-              {(post as any).caption}
+            <ClampedText
+              text={(post as any).caption}
+              lines={4}
+              className="text-foreground"
+              style={{ fontSize: 15, lineHeight: 1.5 }}
+            />
+          </div>
+        )}
+
+        {/* Photo credit — small line under caption, links to breeder when matched */}
+        {(post as any).photo_credit && (
+          <div className="px-3 pb-2 -mt-1">
+            <p className="text-[12px]" style={{ color: "#6B7280" }}>
+              <span style={{ marginRight: 4 }}>📸</span>
+              {(post as any).photo_credit_breeder?.slug ? (
+                <Link
+                  to={`/breeder/${(post as any).photo_credit_breeder.slug}`}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ color: "#C9A84C", fontWeight: 600 }}
+                >
+                  {(post as any).photo_credit}
+                </Link>
+              ) : (
+                <span style={{ color: "#0A1628", fontWeight: 600 }}>{(post as any).photo_credit}</span>
+              )}
             </p>
           </div>
         )}
 
         {/* Photos */}
         <div className="relative">
-          {isWinner && (post.win_placing || post.win_title) && (
-            <ResultRibbon placing={(post.win_placing || post.win_title) as string} />
-          )}
+          {(() => {
+            const cards: RecapWinner[] = ((post as any).winner_cards || []) as RecapWinner[];
+            const primary = isWinner
+              ? (highestPlacing(cards) || (post.win_placing || post.win_title) || null)
+              : null;
+            return primary ? <ResultRibbon placing={primary} /> : null;
+          })()}
           {(post as any).video_url ? (
             <FeedVideo src={(post as any).video_url} aspectRatio="4 / 3" />
           ) : (
@@ -405,9 +432,17 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           </AnimatePresence>
         </div>
 
-        {/* Winner info — one compact metadata line */}
-        {isWinner && (post.win_placing || post.win_title) && (
-          (post.breeder?.name || post.shown_by || post.sired_by) && (
+        {/* Winner info */}
+        {isWinner && (() => {
+          const cards: RecapWinner[] = ((post as any).winner_cards || []) as RecapWinner[];
+          // Recap mode when more than one linked winner card
+          if (cards.length > 1) {
+            return <RecapBlocks winners={cards} />;
+          }
+          // Single-card: existing compact metadata line
+          if (!post.win_placing && !post.win_title) return null;
+          if (!(post.breeder?.name || post.shown_by || post.sired_by)) return null;
+          return (
             <div className="px-3 pb-1 pt-2">
               <p style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.5 }}>
                 {post.breeder?.name && (
@@ -438,8 +473,9 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
                 )}
               </p>
             </div>
-          )
-        )}
+          );
+        })()}
+
 
 
 
