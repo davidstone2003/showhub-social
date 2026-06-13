@@ -64,6 +64,7 @@ export function MobileHeader() {
   const { user } = useAuth();
   const { pathname } = useLocation();
   const isRoot = ROOT_ROUTES.has(pathname);
+  const cta = getCreateCTA(pathname);
 
   return (
     <header className="lg:hidden sticky top-0 z-40 bg-white border-b border-border" style={{ padding: '8px 12px' }}>
