@@ -273,7 +273,7 @@ const SiresPage = () => {
           {loading ? (
             <p className="text-sm text-muted-foreground text-center py-12">Loading…</p>
           ) : filtered.length === 0 ? (
-            <EmptyState />
+            <EmptyState loggedIn={!!user} />
           ) : view === "list" ? (
             <div className="rounded-xl border border-border bg-card overflow-hidden shadow-[var(--shadow-card)]">
               {filtered.map((s, i) => {
