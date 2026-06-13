@@ -236,12 +236,18 @@ export default function WinnersPage() {
     return ["All Breeders", ...Array.from(new Set(names)).sort()];
   }, [rows]);
 
+  const availableExhibitors = useMemo(() => {
+    const names = rows.map(r => r.shown_by).filter(Boolean) as string[];
+    return ["All Exhibitors", ...Array.from(new Set(names)).sort()];
+  }, [rows]);
+
   const categoryOptions = ["All Levels", "National / Major", "State Fair", "Jackpot", "County / Local"];
 
   const clearAllFilters = () => {
     setSelectedCategory("All Levels");
     setSelectedState("All States");
     setSelectedBreeder("All Breeders");
+    setSelectedExhibitor("All Exhibitors");
     setSelectedYear(null);
     setSelectedShow(null);
     setSearchQuery("");
@@ -251,8 +257,9 @@ export default function WinnersPage() {
     (selectedCategory !== "All Levels" ? 1 : 0) +
     (selectedState !== "All States" ? 1 : 0) +
     (selectedBreeder !== "All Breeders" ? 1 : 0) +
-    (selectedYear ? 1 : 0) +
+    (selectedExhibitor !== "All Exhibitors" ? 1 : 0) +
     (selectedShow ? 1 : 0);
+
 
 
   const allShowNames = useMemo(() => {
