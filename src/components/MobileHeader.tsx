@@ -4,6 +4,11 @@ import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
 import { NotificationBell } from "@/components/NotificationBell";
 import { BackButton } from "@/components/BackButton";
+import { GlobalSpeciesSwitcher } from "@/components/GlobalSpeciesSwitcher";
+
+// Routes where the species switcher is hidden (submit flows + post detail)
+const HIDE_SWITCHER_ROUTES = (path: string) =>
+  path.startsWith("/submit") || path.startsWith("/auth") || path.startsWith("/onboarding") || path.startsWith("/account-type");
 
 
 // Top-level tab roots — these show the logo, not a back button
