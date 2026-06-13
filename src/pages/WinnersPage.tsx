@@ -309,137 +309,110 @@ export default function WinnersPage() {
             📋 All Results
           </button>
         </div>
-
-        {/* Filter bar — sticky below dark header */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10">
-          <div className="px-4 pt-2 pb-1">
+        {/* Single filter row: species pills + Filters button */}
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10 px-4 py-2 flex items-center gap-2">
+          <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
             <SpeciesPills value={species} onChange={setSpecies} />
           </div>
-          <div className="relative">
-          <div
-            data-filter-row
-            className="flex items-center gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide"
+          <button
+            type="button"
+            onClick={() => setFilterSheetOpen(true)}
+            className="shrink-0 flex items-center gap-1.5 rounded-full px-3 h-8 border text-[12px] font-semibold transition-colors"
+            style={{
+              backgroundColor: "#FFFFFF",
+              color: "#0A1628",
+              borderColor: activeFilterCount > 0 ? "#C9A84C" : "#E5E7EB",
+            }}
+            aria-label="Open filters"
           >
-            {/* Show Level dropdown */}
-            <div className="relative shrink-0">
-              <button
-                onClick={() => { setCategoryOpen(v => !v); setYearOpen(false); setStateOpen(false); setBreederOpen(false); }}
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
-                style={selectedCategory !== "All Levels"
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
-              >
-                {selectedCategory}
-                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </button>
-            </div>
-
-            {/* Year dropdown */}
-            <div className="relative shrink-0">
-              <button
-                onClick={() => {
-                  setYearOpen(v => !v); setStateOpen(false); setBreederOpen(false); setCategoryOpen(false);
-                }}
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
-                style={selectedYear
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
-              >
-                {selectedYear || "All Years"}
-                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </button>
-            </div>
-
-            {/* State dropdown */}
-            <div className="relative shrink-0">
-              <button
-                onClick={() => { setStateOpen(v => !v); setCategoryOpen(false); setYearOpen(false); setBreederOpen(false); }}
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
-                style={selectedState !== "All States"
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
-              >
-                {selectedState}
-                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </button>
-            </div>
-
-            {/* Breeder dropdown */}
-            <div className="relative shrink-0">
-              <button
-                onClick={() => { setBreederOpen(v => !v); setCategoryOpen(false); setYearOpen(false); setStateOpen(false); }}
-                className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold"
-                style={selectedBreeder !== "All Breeders"
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }}
-              >
-                {selectedBreeder === "All Breeders" ? "Breeder" : selectedBreeder}
-                <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </button>
-            </div>
-
-            {(selectedCategory !== "All Levels" || selectedState !== "All States" || selectedBreeder !== "All Breeders" || selectedYear || selectedShow || searchQuery) && (
-              <button
-                onClick={() => { setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); setSelectedYear(null); setSelectedShow(null); setSearchQuery(""); closeFilterMenus(); }}
-                className="shrink-0 rounded-full px-3 py-1.5 text-[12px] font-bold"
-                style={{ backgroundColor: "#FFF8E7", color: "#8B6914", border: "1px solid rgba(201,168,76,0.3)" }}
-              >
-                Clear ×
-              </button>
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+            Filters{activeFilterCount > 0 ? ` · ${activeFilterCount}` : ""}
+            {activeFilterCount > 0 && (
+              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#C9A84C" }} />
             )}
+          </button>
+        </div>
+
+        {/* Active filter chips — non-sticky */}
+        {activeFilterCount > 0 && (
+          <div className="bg-[#F8F7F4] px-4 py-2 flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
+            {selectedCategory !== "All Levels" && (
+              <FilterChip label={selectedCategory} onRemove={() => setSelectedCategory("All Levels")} />
+            )}
+            {selectedYear && (
+              <FilterChip label={String(selectedYear)} onRemove={() => setSelectedYear(null)} />
+            )}
+            {selectedState !== "All States" && (
+              <FilterChip label={selectedState} onRemove={() => setSelectedState("All States")} />
+            )}
+            {selectedBreeder !== "All Breeders" && (
+              <FilterChip label={selectedBreeder} onRemove={() => setSelectedBreeder("All Breeders")} />
+            )}
+            {selectedShow && (
+              <FilterChip label={selectedShow} onRemove={() => setSelectedShow(null)} />
+            )}
+            <button
+              onClick={clearAllFilters}
+              className="shrink-0 ml-1 text-[12px] font-bold"
+              style={{ color: "#C9A84C" }}
+            >
+              Clear all
+            </button>
           </div>
-            {/* right-edge fade to signal more filters */}
-            <div className="pointer-events-none absolute top-0 right-0 bottom-0 w-8" style={{ background: "linear-gradient(to right, rgba(255,255,255,0), #FFFFFF)" }} />
-          </div>
-          {activeFilterPanel && (
-            <div data-filter-panel className="px-4 pb-3">
-              <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-lg overflow-hidden max-h-[260px] overflow-y-auto">
-                {activeFilterPanel === "category" && categoryOptions.map(cat => (
-                  <button key={cat} onClick={() => { setSelectedCategory(cat); closeFilterMenus(); }}
-                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
-                    style={{ borderBottom: "1px solid #F3F4F6" }}>
-                    <span className="text-[14px] font-medium text-[#0A1628]">{cat}</span>
-                    {selectedCategory === cat && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                  </button>
-                ))}
-                {activeFilterPanel === "year" && (
-                  <>
-                    <button onClick={() => { setSelectedYear(null); closeFilterMenus(); }}
-                      className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
-                      style={{ borderBottom: "1px solid #F3F4F6" }}>
-                      <span className="text-[14px] font-medium text-[#0A1628]">All Years</span>
-                      {!selectedYear && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                    </button>
-                    {years.map(y => (
-                      <button key={y} onClick={() => { setSelectedYear(y); closeFilterMenus(); }}
-                        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
-                        style={{ borderBottom: "1px solid #F3F4F6" }}>
-                        <span className="text-[14px] font-medium text-[#0A1628]">{y}</span>
-                        {selectedYear === y && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                      </button>
-                    ))}
-                  </>
-                )}
-                {activeFilterPanel === "state" && availableStates.map(state => (
-                  <button key={state} onClick={() => { setSelectedState(state); closeFilterMenus(); }}
-                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
-                    style={{ borderBottom: "1px solid #F3F4F6" }}>
-                    <span className="text-[14px] font-medium text-[#0A1628]">{state}</span>
-                    {selectedState === state && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                  </button>
-                ))}
-                {activeFilterPanel === "breeder" && availableBreeders.map(name => (
-                  <button key={name} onClick={() => { setSelectedBreeder(name); closeFilterMenus(); }}
-                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F8F7F4]"
-                    style={{ borderBottom: "1px solid #F3F4F6" }}>
-                    <span className="text-[14px] font-medium text-[#0A1628] truncate">{name}</span>
-                    {selectedBreeder === name && <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5} className="shrink-0 ml-2"><path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                  </button>
-                ))}
+        )}
+
+        {/* Filters bottom sheet */}
+        <Sheet open={filterSheetOpen} onOpenChange={setFilterSheetOpen}>
+          <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] overflow-y-auto">
+            <SheetTitle>Filters</SheetTitle>
+            <SheetDescription>Narrow Winners by show level, year, state, and breeder.</SheetDescription>
+            <div className="mt-4 space-y-5 pb-4">
+              <SheetSection label="Show Level">
+                <SheetOptions
+                  options={categoryOptions}
+                  selected={selectedCategory}
+                  onSelect={setSelectedCategory}
+                />
+              </SheetSection>
+              <SheetSection label="Year">
+                <SheetOptions
+                  options={["All Years", ...years.map(String)]}
+                  selected={selectedYear ? String(selectedYear) : "All Years"}
+                  onSelect={(v) => setSelectedYear(v === "All Years" ? null : Number(v))}
+                />
+              </SheetSection>
+              <SheetSection label="State">
+                <SheetOptions
+                  options={availableStates}
+                  selected={selectedState}
+                  onSelect={setSelectedState}
+                />
+              </SheetSection>
+              <SheetSection label="Breeder">
+                <SheetOptions
+                  options={availableBreeders}
+                  selected={selectedBreeder}
+                  onSelect={setSelectedBreeder}
+                />
+              </SheetSection>
+              <div className="flex gap-2 pt-2 border-t border-[#E5E7EB]">
+                <button
+                  onClick={() => { clearAllFilters(); }}
+                  className="flex-1 h-11 rounded-xl border border-[#E5E7EB] text-[14px] font-bold text-[#0A1628]"
+                >
+                  Clear All
+                </button>
+                <button
+                  onClick={() => setFilterSheetOpen(false)}
+                  className="flex-1 h-11 rounded-xl text-[14px] font-bold"
+                  style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+                >
+                  Show Results
+                </button>
               </div>
             </div>
-          )}
-        </div>
+          </SheetContent>
+        </Sheet>
 
         <div>
           {loading ? (
