@@ -55,7 +55,6 @@ export function GlobalSpeciesSwitcher({ variant = "header" }: Props) {
           aria-label="Change species"
         >
           <span className="flex items-center gap-1">
-            <span aria-hidden>{current.emoji}</span>
             <span className="truncate max-w-[90px]">
               {current.value === "All" ? "All" : current.label}
             </span>
