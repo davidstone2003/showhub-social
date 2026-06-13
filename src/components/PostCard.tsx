@@ -439,11 +439,17 @@ export function PostCard({ post, index, onModerated }: PostCardProps) {
           if (cards.length > 1) {
             return <RecapBlocks winners={cards} />;
           }
-          // Single-card: existing compact metadata line
-          if (!post.win_placing && !post.win_title) return null;
-          if (!(post.breeder?.name || post.shown_by || post.sired_by)) return null;
+          // Single-card: placing line + compact metadata line
+          const placing = post.win_placing || post.win_title;
+          if (!placing && !(post.breeder?.name || post.shown_by || post.sired_by)) return null;
           return (
             <div className="px-3 pb-1 pt-2">
+              {placing && (
+                <p style={{ fontSize: 14, color: "#0A1628", fontWeight: 700, lineHeight: 1.3, marginBottom: 2 }}>
+                  {placing}
+                </p>
+              )}
+              {(post.breeder?.name || post.shown_by || post.sired_by) && (
               <p style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.5 }}>
                 {post.breeder?.name && (
                   <>Bred by <span style={{ color: "#0A1628", fontWeight: 600 }}>{post.breeder.name}</span></>
