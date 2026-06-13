@@ -5,11 +5,7 @@ import { PostCard } from "./PostCard";
 import { PostCardSkeleton } from "./PostCardSkeleton";
 import { BackdropLogo } from "./RinglyLogo";
 import { supabase } from "@/integrations/supabase/client";
-import { useSpecies } from "@/contexts/SpeciesContext";
-import { matchesSpecies } from "@/components/SpeciesPills";
 
-const FEED_FILTER_LS = "backdrop_feed_species_filter_on";
-const SPECIES_EMOJI: Record<string, string> = { Cattle: "🐄", Sheep: "🐑", Goats: "🐐", Pigs: "🐖" };
 
 interface WinnerCard {
   id: string;
