@@ -3,6 +3,7 @@ import { Search, ChevronRight, LayoutGrid, List as ListIcon, ShoppingBag, Wheat,
 import { Layout } from "@/components/Layout";
 import { useSpecies } from "@/contexts/SpeciesContext";
 import { FiltersPopover, FilterChip } from "@/components/FiltersPopover";
+import { SpeciesChip } from "@/components/SpeciesChip";
 
 const NAVY = "#0A1628";
 const GOLD = "#C9A84C";
