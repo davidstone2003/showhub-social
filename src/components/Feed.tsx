@@ -5,8 +5,6 @@ import { PostCard } from "./PostCard";
 import { PostCardSkeleton } from "./PostCardSkeleton";
 import { BackdropLogo } from "./RinglyLogo";
 import { supabase } from "@/integrations/supabase/client";
-import { useSpecies } from "@/contexts/SpeciesContext";
-import { matchesSpecies } from "@/components/SpeciesPills";
 
 interface WinnerCard {
   id: string;
@@ -20,27 +18,12 @@ interface WinnerCard {
   dam: string | null;
 }
 
-const FEED_FILTER_LS = "backdrop_feed_species_filter_on";
-
 export function Feed() {
   const [loading, setLoading] = useState(true);
   const [dbPosts, setDbPosts] = useState<Post[]>([]);
   const [hiddenPostIds, setHiddenPostIds] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
-  const { species } = useSpecies();
   const [featuredBreeder, setFeaturedBreeder] = useState<any>(null);
-  const [speciesFilterOn, setSpeciesFilterOn] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem(FEED_FILTER_LS) === "1";
-  });
-
-  const toggleSpeciesFilter = () => {
-    setSpeciesFilterOn((on) => {
-      const next = !on;
-      try { localStorage.setItem(FEED_FILTER_LS, next ? "1" : "0"); } catch {}
-      return next;
-    });
-  };
 
 
   const handleModerated = (postId?: string) => {
@@ -251,44 +234,13 @@ export function Feed() {
   }, [refreshKey]);
 
   const allPosts = useMemo(() => {
-    const base = dbPosts.filter((post) => !hiddenPostIds.includes(post.id));
-    if (!speciesFilterOn || species === "All") return base;
-    return base.filter((post: any) => matchesSpecies(
-      species,
-      post.species,
-      post.show_name,
-      post.caption,
-      (post.tags || []).map((t: any) => t?.label || t).join(" "),
-      ...((post.winner_cards || []).flatMap((w: any) => [w?.show_name, w?.win_placing, w?.bred_by]))
-    ));
-  }, [dbPosts, hiddenPostIds, species, speciesFilterOn]);
-
-
-  const SPECIES_EMOJI: Record<string, string> = { Cattle: "🐄", Sheep: "🐑", Goats: "🐐", Pigs: "🐖" };
+    return dbPosts.filter((post) => !hiddenPostIds.includes(post.id));
+  }, [dbPosts, hiddenPostIds]);
 
   return (
     <div className="flex-1 max-w-2xl mx-auto w-full">
-      {species !== "All" && !loading && (
-        <div className="px-3 pt-3">
-          <button
-            type="button"
-            onClick={toggleSpeciesFilter}
-            className="inline-flex items-center gap-1.5 rounded-full px-3 h-8 border text-[12px] font-semibold transition-colors"
-            style={
-              speciesFilterOn
-                ? { backgroundColor: "#C9A84C", color: "#0A1628", borderColor: "#C9A84C" }
-                : { backgroundColor: "#FFFFFF", color: "#0A1628", borderColor: "#E5E7EB" }
-            }
-            aria-pressed={speciesFilterOn}
-          >
-            {speciesFilterOn ? "Showing only " : "Show only "}
-            <span aria-hidden>{SPECIES_EMOJI[species] || ""}</span>
-            {species}
-            {speciesFilterOn && <span className="ml-1 opacity-70">· tap to clear</span>}
-          </button>
-        </div>
-      )}
       <div style={{ padding: "8px 0 12px", display: "flex", flexDirection: "column", gap: "0px" }}>
+
 
         {loading ? (
           <>
