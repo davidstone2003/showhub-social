@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { SpeciesProvider } from "@/contexts/SpeciesContext";
 import Index from "./pages/Index";
 import BreedersPage from "./pages/BreedersPage";
 import SpeciesHubPage from "./pages/SpeciesHubPage";
@@ -41,10 +42,11 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+      <SpeciesProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/index" element={<Index />} />
@@ -80,9 +82,10 @@ const App = () => (
             <Route path="/dashboard/lambs/new" element={<LambRegisterPage />} />
 
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </SpeciesProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
