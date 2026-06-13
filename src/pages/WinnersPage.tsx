@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { Search, Trophy, Plus, SlidersHorizontal, X } from "lucide-react";
+import { Search, Trophy, Plus, SlidersHorizontal, X, CalendarClock } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import { PostCard } from "@/components/PostCard";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton";
 import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
@@ -25,6 +27,7 @@ interface WinnerRow {
   image_urls: string[] | null;
   video_url: string | null;
   date: string;
+  date_assumed: boolean | null;
   created_at: string;
   species: string | null;
   likes: number;
@@ -138,6 +141,7 @@ const SheetOptions = ({
 );
 
 export default function WinnersPage() {
+  const { user } = useAuth();
   const [rows, setRows] = useState<WinnerRow[]>([]);
   const [profilesMap, setProfilesMap] = useState<Record<string, any>>({});
   const [breederProfilesMap, setBreederProfilesMap] = useState<Record<string, any>>({});
@@ -156,15 +160,29 @@ export default function WinnersPage() {
   const [selectedBreeder, setSelectedBreeder] = useState<string>("All Breeders");
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [drawerPost, setDrawerPost] = useState<Post | null>(null);
+  const [confirmingRow, setConfirmingRow] = useState<WinnerRow | null>(null);
+  const [confirmDate, setConfirmDate] = useState("");
 
   const handleModerated = () => setRefreshKey((k) => k + 1);
+
+  const handleConfirmDate = async () => {
+    if (!confirmingRow || !confirmDate) return;
+    const { error } = await (supabase.from("winners") as any)
+      .update({ date: confirmDate, date_assumed: false })
+      .eq("id", confirmingRow.id);
+    if (error) { toast.error("Couldn't update date", { description: error.message }); return; }
+    toast.success("Show date saved");
+    setRows((prev) => prev.map((r) => r.id === confirmingRow.id ? { ...r, date: confirmDate, date_assumed: false } : r));
+    setConfirmingRow(null);
+    setConfirmDate("");
+  };
 
   useEffect(() => {
     async function load() {
       setLoading(true);
       const { data } = await supabase
         .from("winners")
-        .select("id, title, show_name, show_id, win_placing, shown_by, bred_by, placed_by, sired_by, sire_id, dam, image_urls, video_url, date, created_at, species, likes, comments, caption, tags, user_id, status, posted_as_breeder_id")
+        .select("id, title, show_name, show_id, win_placing, shown_by, bred_by, placed_by, sired_by, sire_id, dam, image_urls, video_url, date, date_assumed, created_at, species, likes, comments, caption, tags, user_id, status, posted_as_breeder_id")
         .eq("status", "active")
         .eq("show_on_winners_archive", true)
         .order("created_at", { ascending: false })
@@ -200,7 +218,7 @@ export default function WinnersPage() {
   }, [refreshKey]);
 
   const years = useMemo(() => {
-    const ys = [...new Set(rows.filter(r => r.date).map(r => new Date(r.date).getFullYear()))];
+    const ys = [...new Set(rows.filter(r => r.date && !r.date_assumed).map(r => new Date(r.date).getFullYear()))];
     return ys.sort((a, b) => b - a);
   }, [rows]);
 
@@ -245,7 +263,7 @@ export default function WinnersPage() {
       matchesSpecies(species, r.species, r.show_name, r.title, r.caption, (r.tags || []).join(" "))
     );
     if (selectedYear) {
-      filteredRows = filteredRows.filter(r => r.date && new Date(r.date).getFullYear() === selectedYear);
+      filteredRows = filteredRows.filter(r => r.date && !r.date_assumed && new Date(r.date).getFullYear() === selectedYear);
     }
     if (selectedShow) {
       filteredRows = filteredRows.filter(r => r.show_name === selectedShow);
@@ -278,7 +296,8 @@ export default function WinnersPage() {
     const result: { showName: string; year: number | null; posts: Post[]; rows: WinnerRow[] }[] = [];
     for (const [, winners] of grouped) {
       const ref = winners[0];
-      const year = ref.date ? new Date(ref.date).getFullYear() : null;
+      const datedRef = winners.find(w => w.date && !w.date_assumed);
+      const year = datedRef?.date ? new Date(datedRef.date).getFullYear() : null;
       result.push({
         showName: ref.show_name,
         year,
@@ -291,7 +310,9 @@ export default function WinnersPage() {
   }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery, selectedCategory, selectedState, selectedBreeder]);
 
   const currentSeasonGroups = useMemo(() => {
-    return showGroups.filter(g => g.year !== null && g.year >= currentYear);
+    return showGroups
+      .map(g => ({ ...g, rows: g.rows.filter(r => !r.date_assumed) }))
+      .filter(g => g.year !== null && g.year >= currentYear && g.rows.length > 0);
   }, [showGroups, currentYear]);
 
   return (
@@ -550,6 +571,8 @@ export default function WinnersPage() {
                     profilesMap={profilesMap}
                     breederProfilesMap={breederProfilesMap}
                     onSelectPost={setDrawerPost}
+                    currentUserId={user?.id || null}
+                    onConfirmDate={(r) => { setConfirmingRow(r); setConfirmDate(r.date || new Date().toISOString().slice(0,10)); }}
                   />
                 ))
               )}
@@ -568,15 +591,51 @@ export default function WinnersPage() {
         />
       )}
 
+      <Sheet open={!!confirmingRow} onOpenChange={(o) => { if (!o) { setConfirmingRow(null); setConfirmDate(""); } }}>
+        <SheetContent side="bottom" className="rounded-t-2xl">
+          <SheetTitle>Confirm show date</SheetTitle>
+          <SheetDescription>
+            We assumed a date for this result. Set the correct show date so it appears in the right season.
+          </SheetDescription>
+          <div className="mt-4 space-y-3 pb-4">
+            <input
+              type="date"
+              value={confirmDate}
+              onChange={(e) => setConfirmDate(e.target.value)}
+              className="w-full h-11 rounded-lg border border-[#E5E7EB] px-3 text-[14px] text-[#0A1628]"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setConfirmingRow(null); setConfirmDate(""); }}
+                className="flex-1 h-11 rounded-xl border border-[#E5E7EB] text-[14px] font-bold text-[#0A1628]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDate}
+                disabled={!confirmDate}
+                className="flex-1 h-11 rounded-xl text-[14px] font-bold disabled:opacity-40"
+                style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
+              >
+                Save date
+              </button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+
     </Layout>
   );
 }
 
-function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: {
+function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap, currentUserId, onConfirmDate }: {
   group: { showName: string; year: number | null; rows: WinnerRow[] };
   onSelectPost: (post: Post) => void;
   profilesMap: Record<string, any>;
   breederProfilesMap: Record<string, any>;
+  currentUserId: string | null;
+  onConfirmDate: (r: WinnerRow) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const topWinner = group.rows[0];
@@ -625,38 +684,54 @@ function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap }: 
 
       {expanded && (
         <div className="border-t border-[#F3F4F6]">
-          {group.rows.map((r, i) => (
-            <button
+          {group.rows.map((r, i) => {
+            const isOwner = !!currentUserId && r.user_id === currentUserId;
+            return (
+            <div
               key={r.id}
-              onClick={() => onSelectPost(winnerToPost(r, profilesMap, breederProfilesMap))}
-              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#F8F7F4] transition-colors"
               style={{ borderBottom: i < group.rows.length - 1 ? "1px solid #F3F4F6" : "none" }}
             >
-              <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-[#F3F4F6]">
-                {r.image_urls?.[0] ? (
-                  <img src={r.image_urls[0]} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }} />
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-[11px] uppercase tracking-wider truncate" style={{ color: "#C9A84C" }}>
-                  {r.win_placing || "Winner"}
-                </p>
-                <p className="font-semibold text-[13px] truncate text-[#0A1628] mt-0.5">
-                  {r.shown_by || r.bred_by || "—"}
-                </p>
-                {r.sired_by && (
-                  <p className="text-[11px] truncate" style={{ color: "#6B7280" }}>
-                    Sired by {r.sired_by}
+              <button
+                onClick={() => onSelectPost(winnerToPost(r, profilesMap, breederProfilesMap))}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#F8F7F4] transition-colors"
+              >
+                <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-[#F3F4F6]">
+                  {r.image_urls?.[0] ? (
+                    <img src={r.image_urls[0]} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }} />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-[11px] uppercase tracking-wider truncate" style={{ color: "#C9A84C" }}>
+                    {r.win_placing || "Winner"}
                   </p>
-                )}
-              </div>
-              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth={2} className="shrink-0">
-                <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          ))}
+                  <p className="font-semibold text-[13px] truncate text-[#0A1628] mt-0.5">
+                    {r.shown_by || r.bred_by || "—"}
+                  </p>
+                  {r.sired_by && (
+                    <p className="text-[11px] truncate" style={{ color: "#6B7280" }}>
+                      Sired by {r.sired_by}
+                    </p>
+                  )}
+                </div>
+                <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth={2} className="shrink-0">
+                  <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              {r.date_assumed && isOwner && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onConfirmDate(r); }}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-[12px] font-semibold border-t border-dashed border-[#E5E7EB]"
+                  style={{ color: "#8B6914", backgroundColor: "#FFF8E7" }}
+                >
+                  <CalendarClock className="w-3.5 h-3.5" />
+                  Confirm show date
+                </button>
+              )}
+            </div>
+            );
+          })}
         </div>
       )}
     </div>

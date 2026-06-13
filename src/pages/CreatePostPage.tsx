@@ -62,7 +62,8 @@ export default function CreatePostPage() {
   const { showVerifyModal, setShowVerifyModal, requireVerification, resendVerification } = useEmailVerification();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [isReel, setIsReel] = useState(searchParams.get("type") === "reel");
+  const initialType = searchParams.get("type");
+  const [isReel, setIsReel] = useState(initialType === "reel");
 
   const [category] = useState<PostCategory>(null); // unused but kept for compat
   const [media, setMedia] = useState<MediaFile[]>([]);
@@ -75,11 +76,12 @@ export default function CreatePostPage() {
   const [successData, setSuccessData] = useState<any>(null);
 
   // Sheets
-  const [showWinnerPanel, setShowWinnerPanel] = useState(false);
+  const [showWinnerPanel, setShowWinnerPanel] = useState(initialType === "win");
   const [showSpeciesSheet, setShowSpeciesSheet] = useState(false);
   const [showMoreSheet, setShowMoreSheet] = useState(false);
   const [showIdentitySheet, setShowIdentitySheet] = useState(false);
   const [showTagSheet, setShowTagSheet] = useState(false);
+  const [showSaleLotPanel, setShowSaleLotPanel] = useState(initialType === "listing");
   const [taggedPeople, setTaggedPeople] = useState<TaggedPerson[]>([]);
 
   // Winner fields
@@ -1016,6 +1018,42 @@ export default function CreatePostPage() {
             </div>
 
             <Button onClick={() => setShowWinnerPanel(false)} className="w-full h-12 rounded-xl font-bold mt-2" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+              Done
+            </Button>
+          </div>
+        </BottomSheet>
+      )}
+
+      {/* Sale Lot bottom sheet */}
+      {showSaleLotPanel && (
+        <BottomSheet onClose={() => setShowSaleLotPanel(false)} title="Sale Listing" tall>
+          <div className="space-y-4 pb-2">
+            <FieldLabel>Sale Name</FieldLabel>
+            <Input value={saleName} onChange={(e) => setSaleName(e.target.value)} placeholder="e.g. Spring Classic Sale" className="h-11 rounded-lg" />
+
+            <FieldLabel>Sale Date</FieldLabel>
+            <Input type="date" value={saleDate} onChange={(e) => setSaleDate(e.target.value)} className="h-11 rounded-lg" />
+
+            <FieldLabel>Lot Number</FieldLabel>
+            <Input value={lotNumber} onChange={(e) => setLotNumber(e.target.value)} placeholder="Lot #" className="h-11 rounded-lg" />
+
+            <FieldLabel>Sire</FieldLabel>
+            <AutocompleteInput
+              table="sires_lookup" value={lotSire}
+              onChange={(v) => setLotSire(v)}
+              placeholder="Sire name"
+            />
+
+            <FieldLabel>Dam</FieldLabel>
+            <Input value={lotDam} onChange={(e) => setLotDam(e.target.value)} placeholder="Dam name" className="h-11 rounded-lg" />
+
+            <FieldLabel>Sale Link</FieldLabel>
+            <Input value={saleLink} onChange={(e) => setSaleLink(e.target.value)} placeholder="https://…" className="h-11 rounded-lg" />
+
+            <FieldLabel>Caption</FieldLabel>
+            <Textarea value={lotCaption} onChange={(e) => setLotCaption(e.target.value)} placeholder="Anything else buyers should know…" className="rounded-lg min-h-[80px]" />
+
+            <Button onClick={() => setShowSaleLotPanel(false)} className="w-full h-12 rounded-xl font-bold mt-2" style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
               Done
             </Button>
           </div>
