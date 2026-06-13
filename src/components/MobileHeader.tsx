@@ -4,7 +4,7 @@ import { BackdropLogo } from "@/components/RinglyLogo";
 import { useAuth } from "@/contexts/AuthContext";
 import { NotificationBell } from "@/components/NotificationBell";
 import { BackButton } from "@/components/BackButton";
-import { GlobalSpeciesSwitcher } from "@/components/GlobalSpeciesSwitcher";
+
 
 // Top-level tab roots — these show the logo, not a back button
 const ROOT_ROUTES = new Set([
@@ -85,7 +85,6 @@ export function MobileHeader() {
         )}
 
         <div className="flex items-center gap-1.5">
-          {SPECIES_SWITCHER_ROUTES.has(pathname) && <GlobalSpeciesSwitcher variant="header" />}
           {/* Global search intentionally omitted until search overlay ships */}
 
           {user ? (
