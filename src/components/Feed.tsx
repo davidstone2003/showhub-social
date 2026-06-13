@@ -65,7 +65,7 @@ export function Feed() {
       if (postIds.length > 0) {
         const { data: linkedWinners } = await supabase
           .from("winners")
-          .select("id, source_post_id, win_placing, show_name, shown_by, placed_by, bred_by, sired_by, sire_id, dam")
+          .select("id, source_post_id, win_placing, show_name, shown_by, placed_by, bred_by, sired_by, sire_id, dam, date, date_assumed")
           .in("source_post_id", postIds);
         if (linkedWinners) {
           for (const w of linkedWinners) {
