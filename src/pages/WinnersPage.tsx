@@ -114,7 +114,7 @@ export default function WinnersPage() {
   const [breederProfilesMap, setBreederProfilesMap] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
-  const { species } = useSpecies();
+  const { species, setSpecies } = useSpecies();
 
   const currentYear = new Date().getFullYear();
   const [selectedShow, setSelectedShow] = useState<string | null>(null);
