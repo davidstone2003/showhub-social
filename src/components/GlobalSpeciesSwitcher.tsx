@@ -72,7 +72,6 @@ export function GlobalSpeciesSwitcher({ variant = "header" }: Props) {
               className="w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-left hover:bg-[#F8F7F4] transition-colors"
             >
               <span className="flex items-center gap-2 text-[13px] font-medium text-[#0A1628]">
-                <span aria-hidden>{opt.emoji}</span>
                 {opt.label}
               </span>
               {active && <Check className="w-4 h-4" style={{ color: "#C9A84C" }} />}
