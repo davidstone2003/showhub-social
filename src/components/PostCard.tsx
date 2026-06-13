@@ -42,7 +42,7 @@ function accentForPlacing(placing?: string | null): string {
   return "#C9A84C";
 }
 
-function PhotoGrid({ images, onTap }: { images: string[]; onTap: (index: number) => void }) {
+function PhotoGrid({ images, onTap }: { images: string[]; onTap: (index: number, e: React.MouseEvent<HTMLElement>) => void }) {
   if (images.length === 0) return null;
 
   if (images.length === 1) {
