@@ -650,38 +650,54 @@ function ShowGroupRow({ group, onSelectPost, profilesMap, breederProfilesMap, cu
 
       {expanded && (
         <div className="border-t border-[#F3F4F6]">
-          {group.rows.map((r, i) => (
-            <button
+          {group.rows.map((r, i) => {
+            const isOwner = !!currentUserId && r.user_id === currentUserId;
+            return (
+            <div
               key={r.id}
-              onClick={() => onSelectPost(winnerToPost(r, profilesMap, breederProfilesMap))}
-              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#F8F7F4] transition-colors"
               style={{ borderBottom: i < group.rows.length - 1 ? "1px solid #F3F4F6" : "none" }}
             >
-              <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-[#F3F4F6]">
-                {r.image_urls?.[0] ? (
-                  <img src={r.image_urls[0]} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }} />
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-[11px] uppercase tracking-wider truncate" style={{ color: "#C9A84C" }}>
-                  {r.win_placing || "Winner"}
-                </p>
-                <p className="font-semibold text-[13px] truncate text-[#0A1628] mt-0.5">
-                  {r.shown_by || r.bred_by || "—"}
-                </p>
-                {r.sired_by && (
-                  <p className="text-[11px] truncate" style={{ color: "#6B7280" }}>
-                    Sired by {r.sired_by}
+              <button
+                onClick={() => onSelectPost(winnerToPost(r, profilesMap, breederProfilesMap))}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#F8F7F4] transition-colors"
+              >
+                <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-[#F3F4F6]">
+                  {r.image_urls?.[0] ? (
+                    <img src={r.image_urls[0]} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }} />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-[11px] uppercase tracking-wider truncate" style={{ color: "#C9A84C" }}>
+                    {r.win_placing || "Winner"}
                   </p>
-                )}
-              </div>
-              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth={2} className="shrink-0">
-                <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          ))}
+                  <p className="font-semibold text-[13px] truncate text-[#0A1628] mt-0.5">
+                    {r.shown_by || r.bred_by || "—"}
+                  </p>
+                  {r.sired_by && (
+                    <p className="text-[11px] truncate" style={{ color: "#6B7280" }}>
+                      Sired by {r.sired_by}
+                    </p>
+                  )}
+                </div>
+                <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth={2} className="shrink-0">
+                  <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              {r.date_assumed && isOwner && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onConfirmDate(r); }}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-[12px] font-semibold border-t border-dashed border-[#E5E7EB]"
+                  style={{ color: "#8B6914", backgroundColor: "#FFF8E7" }}
+                >
+                  <CalendarClock className="w-3.5 h-3.5" />
+                  Confirm show date
+                </button>
+              )}
+            </div>
+            );
+          })}
         </div>
       )}
     </div>
