@@ -145,9 +145,9 @@ export default function BreedersPage() {
             {selectedState !== "All States" ? ` in ${selectedState}` : ""}
             {species !== "All" ? ` · ${species}` : ""}
           </p>
-          {(search || selectedState !== "All States" || species !== "All") && (
+          {(search || selectedState !== "All States") && (
             <button
-              onClick={() => { setSearch(""); setSelectedState("All States"); setSpecies("All"); }}
+              onClick={() => { setSearch(""); setSelectedState("All States"); }}
               className="text-[12px] font-bold"
               style={{ color: "#C9A84C" }}
             >
@@ -166,7 +166,7 @@ export default function BreedersPage() {
             <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No breeders found</p>
             <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>Try adjusting your filters</p>
             <button
-              onClick={() => { setSearch(""); setSelectedState("All States"); setSpecies("All"); }}
+              onClick={() => { setSearch(""); setSelectedState("All States"); }}
               className="mt-4 rounded-full px-5 py-2 font-bold text-[14px]"
               style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}
             >
