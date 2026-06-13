@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Search, LayoutGrid, List as ListIcon, Flame, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Layout } from "@/components/Layout";
 import { matchesSpecies } from "@/components/SpeciesPills";
 import { useSpecies } from "@/contexts/SpeciesContext";
@@ -75,6 +76,7 @@ const SiresPage = () => {
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"list" | "grid">("grid");
   const { species } = useSpecies();
+  const { user } = useAuth();
   const [selectedOwner, setSelectedOwner] = useState<string>("All Owners");
   const [semenFilter, setSemenFilter] = useState<"All" | "Available">("All");
 
@@ -273,7 +275,7 @@ const SiresPage = () => {
           {loading ? (
             <p className="text-sm text-muted-foreground text-center py-12">Loading…</p>
           ) : filtered.length === 0 ? (
-            <EmptyState />
+            <EmptyState loggedIn={!!user} />
           ) : view === "list" ? (
             <div className="rounded-xl border border-border bg-card overflow-hidden shadow-[var(--shadow-card)]">
               {filtered.map((s, i) => {
@@ -345,20 +347,22 @@ const SiresPage = () => {
   );
 };
 
-function EmptyState() {
+function EmptyState({ loggedIn }: { loggedIn: boolean }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-8 text-center">
       <h3 className="text-xl font-bold" style={{ color: NAVY }}>Sires Coming Soon</h3>
       <p className="mt-2 text-sm text-muted-foreground">
         We're building the most complete sire database in the industry. Check back daily as we add records.
       </p>
-      <Link
-        to="/submit-sire"
-        className="inline-flex items-center gap-1.5 mt-5 rounded-full px-5 h-11 text-sm font-bold"
-        style={{ backgroundColor: GOLD, color: NAVY }}
-      >
-        <Plus className="w-4 h-4" strokeWidth={3} /> Submit a Sire
-      </Link>
+      {!loggedIn && (
+        <Link
+          to="/auth?mode=signup"
+          className="inline-flex items-center gap-1.5 mt-5 rounded-full px-5 h-11 text-sm font-bold"
+          style={{ backgroundColor: GOLD, color: NAVY }}
+        >
+          <Plus className="w-4 h-4" strokeWidth={3} /> Submit a Sire
+        </Link>
+      )}
     </div>
   );
 }

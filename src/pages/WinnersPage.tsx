@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { Search, Trophy, Plus, SlidersHorizontal, X, CalendarClock } from "lucide-react";
+import { Search, Trophy, SlidersHorizontal, X, CalendarClock, ChevronDown, Check } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -150,16 +151,17 @@ export default function WinnersPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const { species } = useSpecies();
 
-  const [section, setSection] = useState<"current" | "archive">("current");
   const currentYear = new Date().getFullYear();
   const [selectedShow, setSelectedShow] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number | null>(currentYear);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("All Levels");
   const [selectedState, setSelectedState] = useState<string>("All States");
   const [selectedBreeder, setSelectedBreeder] = useState<string>("All Breeders");
+  const [selectedExhibitor, setSelectedExhibitor] = useState<string>("All Exhibitors");
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [yearMenuOpen, setYearMenuOpen] = useState(false);
   const [drawerPost, setDrawerPost] = useState<Post | null>(null);
   const [confirmingRow, setConfirmingRow] = useState<WinnerRow | null>(null);
   const [confirmDate, setConfirmDate] = useState("");
@@ -234,12 +236,18 @@ export default function WinnersPage() {
     return ["All Breeders", ...Array.from(new Set(names)).sort()];
   }, [rows]);
 
+  const availableExhibitors = useMemo(() => {
+    const names = rows.map(r => r.shown_by).filter(Boolean) as string[];
+    return ["All Exhibitors", ...Array.from(new Set(names)).sort()];
+  }, [rows]);
+
   const categoryOptions = ["All Levels", "National / Major", "State Fair", "Jackpot", "County / Local"];
 
   const clearAllFilters = () => {
     setSelectedCategory("All Levels");
     setSelectedState("All States");
     setSelectedBreeder("All Breeders");
+    setSelectedExhibitor("All Exhibitors");
     setSelectedYear(null);
     setSelectedShow(null);
     setSearchQuery("");
@@ -249,8 +257,9 @@ export default function WinnersPage() {
     (selectedCategory !== "All Levels" ? 1 : 0) +
     (selectedState !== "All States" ? 1 : 0) +
     (selectedBreeder !== "All Breeders" ? 1 : 0) +
-    (selectedYear ? 1 : 0) +
+    (selectedExhibitor !== "All Exhibitors" ? 1 : 0) +
     (selectedShow ? 1 : 0);
+
 
 
   const allShowNames = useMemo(() => {
@@ -277,6 +286,9 @@ export default function WinnersPage() {
     }
     if (selectedBreeder !== "All Breeders") {
       filteredRows = filteredRows.filter(r => r.bred_by === selectedBreeder);
+    }
+    if (selectedExhibitor !== "All Exhibitors") {
+      filteredRows = filteredRows.filter(r => r.shown_by === selectedExhibitor);
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -308,13 +320,8 @@ export default function WinnersPage() {
     }
     result.sort((a, b) => (b.year ?? -1) - (a.year ?? -1) || a.showName.localeCompare(b.showName));
     return result;
-  }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery, selectedCategory, selectedState, selectedBreeder]);
+  }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery, selectedCategory, selectedState, selectedBreeder, selectedExhibitor]);
 
-  const currentSeasonGroups = useMemo(() => {
-    return showGroups
-      .map(g => ({ ...g, rows: g.rows.filter(r => !r.date_assumed) }))
-      .filter(g => g.year !== null && g.year >= currentYear && g.rows.length > 0);
-  }, [showGroups, currentYear]);
 
   return (
     <Layout showDiscovery={false}>
@@ -346,31 +353,42 @@ export default function WinnersPage() {
         </div>
 
 
-        {/* Section tabs */}
-        <div className="bg-white border-b border-[#E5E7EB] flex sticky top-[48px] z-20">
-          <button
-            onClick={() => setSection("current")}
-            className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
-            style={section === "current"
-              ? { borderColor: "#C9A84C", color: "#0A1628" }
-              : { borderColor: "transparent", color: "#9CA3AF" }
-            }
-          >
-            🏆 Current Season
-          </button>
-          <button
-            onClick={() => setSection("archive")}
-            className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
-            style={section === "archive"
-              ? { borderColor: "#C9A84C", color: "#0A1628" }
-              : { borderColor: "transparent", color: "#9CA3AF" }
-            }
-          >
-            📋 All Results
-          </button>
-        </div>
-        {/* Single filter row: Filters button only */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10 px-4 py-2 flex items-center justify-end gap-2">
+        {/* Filter row: Year dropdown + Filters button */}
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-20 px-4 py-2 flex items-center justify-end gap-2">
+          <Popover open={yearMenuOpen} onOpenChange={setYearMenuOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="shrink-0 flex items-center gap-1.5 rounded-full px-3 h-8 border text-[12px] font-semibold transition-colors"
+                style={{
+                  backgroundColor: "#FFFFFF",
+                  color: "#0A1628",
+                  borderColor: selectedYear ? "#C9A84C" : "#E5E7EB",
+                }}
+                aria-label="Filter by year"
+              >
+                {selectedYear ?? "All Years"}
+                <ChevronDown className="w-3 h-3 opacity-70" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" sideOffset={6} className="w-40 p-1">
+              {[null, ...years].map((y) => {
+                const active = (y ?? null) === selectedYear;
+                const label = y === null ? "All Years" : String(y);
+                return (
+                  <button
+                    key={label}
+                    onClick={() => { setSelectedYear(y as number | null); setYearMenuOpen(false); }}
+                    className="w-full flex items-center justify-between gap-2 rounded-md px-2.5 py-2 text-left hover:bg-[#F8F7F4] transition-colors"
+                  >
+                    <span className="text-[13px] font-medium text-[#0A1628]">{label}</span>
+                    {active && <Check className="w-4 h-4" style={{ color: "#C9A84C" }} />}
+                  </button>
+                );
+              })}
+            </PopoverContent>
+          </Popover>
+
           <button
             type="button"
             onClick={() => setFilterSheetOpen(true)}
@@ -384,9 +402,6 @@ export default function WinnersPage() {
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
             Filters{activeFilterCount > 0 ? ` · ${activeFilterCount}` : ""}
-            {activeFilterCount > 0 && (
-              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#C9A84C" }} />
-            )}
           </button>
         </div>
 
@@ -396,14 +411,14 @@ export default function WinnersPage() {
             {selectedCategory !== "All Levels" && (
               <FilterChip label={selectedCategory} onRemove={() => setSelectedCategory("All Levels")} />
             )}
-            {selectedYear && (
-              <FilterChip label={String(selectedYear)} onRemove={() => setSelectedYear(null)} />
-            )}
             {selectedState !== "All States" && (
               <FilterChip label={selectedState} onRemove={() => setSelectedState("All States")} />
             )}
             {selectedBreeder !== "All Breeders" && (
               <FilterChip label={selectedBreeder} onRemove={() => setSelectedBreeder("All Breeders")} />
+            )}
+            {selectedExhibitor !== "All Exhibitors" && (
+              <FilterChip label={selectedExhibitor} onRemove={() => setSelectedExhibitor("All Exhibitors")} />
             )}
             {selectedShow && (
               <FilterChip label={selectedShow} onRemove={() => setSelectedShow(null)} />
@@ -418,24 +433,18 @@ export default function WinnersPage() {
           </div>
         )}
 
+
         {/* Filters bottom sheet */}
         <Sheet open={filterSheetOpen} onOpenChange={setFilterSheetOpen}>
           <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] overflow-y-auto">
             <SheetTitle>Filters</SheetTitle>
-            <SheetDescription>Narrow Winners by show level, year, state, and breeder.</SheetDescription>
+            <SheetDescription>Narrow Winners by show level, state, breeder, and exhibitor.</SheetDescription>
             <div className="mt-4 space-y-5 pb-4">
               <SheetSection label="Show Level">
                 <SheetOptions
                   options={categoryOptions}
                   selected={selectedCategory}
                   onSelect={setSelectedCategory}
-                />
-              </SheetSection>
-              <SheetSection label="Year">
-                <SheetOptions
-                  options={["All Years", ...years.map(String)]}
-                  selected={selectedYear ? String(selectedYear) : "All Years"}
-                  onSelect={(v) => setSelectedYear(v === "All Years" ? null : Number(v))}
                 />
               </SheetSection>
               <SheetSection label="State">
@@ -450,6 +459,13 @@ export default function WinnersPage() {
                   options={availableBreeders}
                   selected={selectedBreeder}
                   onSelect={setSelectedBreeder}
+                />
+              </SheetSection>
+              <SheetSection label="Exhibitor">
+                <SheetOptions
+                  options={availableExhibitors}
+                  selected={selectedExhibitor}
+                  onSelect={setSelectedExhibitor}
                 />
               </SheetSection>
               <div className="flex gap-2 pt-2 border-t border-[#E5E7EB]">
@@ -478,87 +494,30 @@ export default function WinnersPage() {
                 <div key={i} className="h-48 rounded-2xl bg-[#E5E7EB] animate-pulse" />
               ))}
             </div>
-          ) : section === "current" ? (
-            <div className="px-4 pt-3 pb-24 flex flex-col gap-6">
-              {currentSeasonGroups.length === 0 ? (
-                <div className="flex flex-col items-center py-16 text-center">
-                  <Trophy className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
-                  <p className="font-bold text-[18px]" style={{ color: "#0A1628" }}>No results yet this season</p>
-                  <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>Post your wins to build the record</p>
-                  <Link to="/submit"
-                    className="mt-4 rounded-full px-5 py-2.5 font-bold text-[14px]"
-                    style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
-                    Post a Win
-                  </Link>
-                </div>
-              ) : (
-                currentSeasonGroups.map(group => (
-                  <div key={group.showName + group.year}>
-                    <div className="mb-3 pb-2 border-b-2 border-[#C9A84C]">
-                      <h2 className="font-bold text-[17px]" style={{ color: "#0A1628" }}>{group.showName}</h2>
-                      {group.year !== null && !group.showName.includes(String(group.year)) && (
-                        <p className="text-[12px] mt-0.5" style={{ color: "#9CA3AF" }}>{group.year}</p>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-2 gap-2.5">
-                      {group.rows.map(r => (
-                        <button
-                          key={r.id}
-                          onClick={() => setDrawerPost(winnerToPost(r, profilesMap, breederProfilesMap))}
-                          className="rounded-xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm text-left active:scale-[0.98] transition-transform w-full"
-                        >
-                          <div className="w-full overflow-hidden" style={{ aspectRatio: "4/3" }}>
-                            {r.image_urls?.[0] ? (
-                              <img
-                                src={r.image_urls[0]}
-                                alt={r.win_placing || ""}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center"
-                                style={{ background: "linear-gradient(135deg, #0A1628 0%, #1B3A6B 100%)" }}>
-                                <span className="text-2xl font-black" style={{ color: "rgba(201,168,76,0.3)" }}>
-                                  {group.showName.charAt(0)}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                          <div className="p-2.5">
-                            <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: "#C9A84C" }}>
-                              {r.win_placing || "Winner"}
-                            </p>
-                            <p className="text-[13px] font-bold truncate mt-0.5" style={{ color: "#0A1628" }}>
-                              {r.shown_by || "—"}
-                            </p>
-                            {r.bred_by && (
-                              <p className="text-[11px] truncate mt-0.5" style={{ color: "#6B7280" }}>
-                                {r.bred_by}
-                              </p>
-                            )}
-                            {r.sired_by && (
-                              <p className="text-[11px] truncate mt-0.5" style={{ color: "#C9A84C" }}>
-                                {r.sired_by}
-                              </p>
-                            )}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
           ) : (
             <div className="px-4 pt-3 pb-24 flex flex-col gap-2">
               {showGroups.length === 0 ? (
                 <div className="flex flex-col items-center py-16 text-center">
-                  <p className="font-bold text-[17px]" style={{ color: "#0A1628" }}>No results found</p>
-                  <button
-                    onClick={() => { setSelectedCategory("All Levels"); setSelectedState("All States"); setSelectedBreeder("All Breeders"); setSelectedYear(null); setSearchQuery(""); }}
-                    className="mt-4 rounded-full px-5 py-2 font-bold text-[14px]"
-                    style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
-                    Clear Filters
-                  </button>
+                  <Trophy className="w-12 h-12 mb-3" style={{ color: "#C9A84C" }} />
+                  <p className="font-bold text-[18px]" style={{ color: "#0A1628" }}>
+                    {selectedYear ? `No results for ${selectedYear} yet` : "No results found"}
+                  </p>
+                  {user ? (
+                    <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>
+                      {activeFilterCount > 0 || selectedYear
+                        ? "Try clearing filters or switching year"
+                        : "Use Post Win above to add the first one"}
+                    </p>
+                  ) : (
+                    <>
+                      <p className="text-[14px] mt-1" style={{ color: "#6B7280" }}>Join free to post your wins and build the record</p>
+                      <Link to="/auth?mode=signup"
+                        className="mt-4 rounded-full px-5 py-2.5 font-bold text-[14px]"
+                        style={{ backgroundColor: "#C9A84C", color: "#0A1628" }}>
+                        Post a Win
+                      </Link>
+                    </>
+                  )}
                 </div>
               ) : (
                 showGroups.map(group => (
