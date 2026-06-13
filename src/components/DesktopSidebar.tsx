@@ -14,13 +14,14 @@ const navItems = [
   { icon: ShoppingBag, label: "Market", to: "/market" },
 ];
 
-const SPECIES_SWITCHER_ROUTES = new Set(["/winners", "/breeders", "/sires", "/sales", "/market"]);
+const HIDE_SWITCHER = (p: string) =>
+  p.startsWith("/submit") || p.startsWith("/auth") || p.startsWith("/onboarding") || p.startsWith("/account-type");
 
 export function DesktopSidebar() {
   const { user, profile, signOut } = useAuth();
   const { isAdmin } = useUserRole();
   const { pathname } = useLocation();
-  const showSwitcher = SPECIES_SWITCHER_ROUTES.has(pathname);
+  const showSwitcher = !HIDE_SWITCHER(pathname);
 
   return (
     <aside className="hidden lg:flex flex-col w-[200px] min-h-screen bg-primary text-sidebar-foreground border-r border-sidebar-border sticky top-0">
