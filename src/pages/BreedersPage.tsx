@@ -5,6 +5,7 @@ import { Layout } from "@/components/Layout";
 import { matchesSpecies } from "@/components/SpeciesPills";
 import { useSpecies } from "@/contexts/SpeciesContext";
 import { FiltersPopover, FilterChip } from "@/components/FiltersPopover";
+import { SpeciesChip } from "@/components/SpeciesChip";
 import { useBreederDirectory, stateAbbr } from "@/hooks/useBreederDirectory";
 
 const NAVY = "#0A1628";
