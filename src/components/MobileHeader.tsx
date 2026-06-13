@@ -85,7 +85,7 @@ export function MobileHeader() {
         )}
 
         <div className="flex items-center gap-1.5">
-          <GlobalSpeciesSwitcher variant="header" />
+          {SPECIES_SWITCHER_ROUTES.has(pathname) && <GlobalSpeciesSwitcher variant="header" />}
           {/* Global search intentionally omitted until search overlay ships */}
 
           {user ? (
