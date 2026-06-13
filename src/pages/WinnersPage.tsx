@@ -320,13 +320,8 @@ export default function WinnersPage() {
     }
     result.sort((a, b) => (b.year ?? -1) - (a.year ?? -1) || a.showName.localeCompare(b.showName));
     return result;
-  }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery, selectedCategory, selectedState, selectedBreeder]);
+  }, [rows, profilesMap, breederProfilesMap, species, selectedYear, selectedShow, searchQuery, selectedCategory, selectedState, selectedBreeder, selectedExhibitor]);
 
-  const currentSeasonGroups = useMemo(() => {
-    return showGroups
-      .map(g => ({ ...g, rows: g.rows.filter(r => !r.date_assumed) }))
-      .filter(g => g.year !== null && g.year >= currentYear && g.rows.length > 0);
-  }, [showGroups, currentYear]);
 
   return (
     <Layout showDiscovery={false}>
