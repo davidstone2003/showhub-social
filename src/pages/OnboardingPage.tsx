@@ -26,6 +26,8 @@ export default function OnboardingPage() {
   const [bio, setBio] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [preferredSpecies, setPreferredSpecies] = useState<string | null>(null);
+  const [step, setStep] = useState<"species" | "profile">("species");
   const [saving, setSaving] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
