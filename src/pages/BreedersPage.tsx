@@ -2,7 +2,9 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, BadgeCheck, MapPin, ChevronRight, LayoutGrid, List as ListIcon } from "lucide-react";
 import { Layout } from "@/components/Layout";
-import { SpeciesPills, matchesSpecies, type SpeciesPill } from "@/components/SpeciesPills";
+import { matchesSpecies } from "@/components/SpeciesPills";
+import { useSpecies } from "@/contexts/SpeciesContext";
+import { FiltersPopover, FilterChip } from "@/components/FiltersPopover";
 import { useBreederDirectory, stateAbbr } from "@/hooks/useBreederDirectory";
 
 const NAVY = "#0A1628";
@@ -34,10 +36,9 @@ function breederSpecies(b: any): string {
 export default function BreedersPage() {
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
-  const [species, setSpecies] = useState<SpeciesPill>("All");
+  const { species } = useSpecies();
   const [view, setView] = useState<"list" | "grid">("list");
   const [selectedState, setSelectedState] = useState<string>("All States");
-  const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
   const { data: breeders = [], isLoading } = useBreederDirectory();
 
   const availableStates = useMemo(() => {
@@ -115,50 +116,27 @@ export default function BreedersPage() {
           </div>
         )}
 
-        {/* Filters row */}
-        <div className="bg-white border-b border-[#E5E7EB] px-4 py-2 flex items-center gap-2">
-          <div className="flex-1 overflow-x-auto scrollbar-hide">
-            <SpeciesPills value={species} onChange={setSpecies} />
-          </div>
-          <div className="relative shrink-0">
-            <button
-              onClick={() => setStateDropdownOpen((v) => !v)}
-              className="flex items-center gap-1.5 rounded-full px-3 py-1.5 border text-[12px] font-semibold transition-colors"
-              style={
-                selectedState !== "All States"
-                  ? { backgroundColor: "#0A1628", color: "white", borderColor: "#0A1628" }
-                  : { backgroundColor: "white", color: "#6B7280", borderColor: "#E5E7EB" }
-              }
-            >
-              {selectedState}
-              <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            {stateDropdownOpen && (
-              <div
-                className="absolute right-0 top-full mt-1 rounded-xl bg-white border border-[#E5E7EB] shadow-xl overflow-hidden z-30"
-                style={{ minWidth: 140, maxHeight: 280, overflowY: "auto" }}
-              >
-                {availableStates.map((state) => (
-                  <button
-                    key={state}
-                    onClick={() => { setSelectedState(state); setStateDropdownOpen(false); }}
-                    className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-[#F8F7F4] transition-colors"
-                    style={{ borderBottom: "1px solid #F3F4F6" }}
-                  >
-                    <span className="text-[14px] font-medium text-[#0A1628]">{state}</span>
-                    {selectedState === state && (
-                      <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={2.5}>
-                        <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+        {/* Single Filters row */}
+        <div className="bg-white border-b border-[#E5E7EB] px-4 py-2 flex items-center justify-end gap-2">
+          <FiltersPopover
+            filters={[
+              {
+                key: "state",
+                label: "State",
+                value: selectedState,
+                options: availableStates,
+                allValue: "All States",
+                onChange: setSelectedState,
+              },
+            ]}
+            onClearAll={() => setSelectedState("All States")}
+          />
         </div>
+        {selectedState !== "All States" && (
+          <div className="bg-[#F8F7F4] px-4 py-2 flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
+            <FilterChip label={selectedState} onRemove={() => setSelectedState("All States")} />
+          </div>
+        )}
 
         {/* Results count */}
         <div className="flex items-center justify-between px-4 py-2">
