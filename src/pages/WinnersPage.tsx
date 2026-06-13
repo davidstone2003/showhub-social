@@ -318,10 +318,10 @@ export default function WinnersPage() {
   return (
     <Layout showDiscovery={false}>
       <div className="mx-auto max-w-2xl pb-24" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
-        {/* Header */}
+        {/* Compact header */}
         <div
-          className="sticky top-0 z-10 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+          className="sticky top-0 z-30 px-4 flex items-center justify-between bg-white"
+          style={{ height: 48, borderBottom: "1px solid #E5E7EB" }}
         >
           {searchOpen ? (
             <div className="flex items-center gap-2 w-full">
@@ -330,24 +330,23 @@ export default function WinnersPage() {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Search shows, breeders, exhibitors..."
-                className="flex-1 bg-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-white/40 outline-none"
+                className="flex-1 bg-[#F3F4F6] rounded-lg px-3 py-1.5 text-sm text-[#0A1628] placeholder:text-[#9CA3AF] outline-none"
               />
-              <button onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="text-white/60 text-sm">Cancel</button>
+              <button onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="text-[#6B7280] text-sm">Cancel</button>
             </div>
           ) : (
             <>
-              <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Winners</h1>
-              <div className="flex items-center gap-2">
-                <button onClick={() => setSearchOpen(true)} className="p-1.5">
-                  <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
-                </button>
-              </div>
+              <h1 className="text-[18px] font-bold leading-none" style={{ color: "#0A1628" }}>Winners</h1>
+              <button onClick={() => setSearchOpen(true)} className="p-1.5" aria-label="Search">
+                <Search className="w-5 h-5" style={{ color: "#6B7280" }} />
+              </button>
             </>
           )}
         </div>
 
+
         {/* Section tabs */}
-        <div className="bg-white border-b border-[#E5E7EB] flex sticky top-[60px] z-20">
+        <div className="bg-white border-b border-[#E5E7EB] flex sticky top-[48px] z-20">
           <button
             onClick={() => setSection("current")}
             className="flex-1 py-3 text-[14px] font-bold border-b-2 transition-colors"
@@ -370,7 +369,7 @@ export default function WinnersPage() {
           </button>
         </div>
         {/* Single filter row: species pills + Filters button */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10 px-4 py-2 flex items-center gap-2">
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10 px-4 py-2 flex items-center gap-2">
           <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
             <SpeciesPills value={species} onChange={setSpecies} />
           </div>

@@ -64,36 +64,37 @@ export default function BreedersPage() {
   return (
     <Layout showDiscovery={false}>
       <div style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
-        {/* Dark header */}
+        {/* Compact header */}
         <div
-          className="sticky top-0 z-20 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+          className="sticky top-0 z-30 px-4 flex items-center justify-between bg-white"
+          style={{ height: 48, borderBottom: "1px solid #E5E7EB" }}
         >
-          <h1 className="text-[22px] font-bold text-white">Breeders</h1>
-          <div className="flex items-center gap-3">
+          <h1 className="text-[18px] font-bold" style={{ color: "#0A1628" }}>Breeders</h1>
+          <div className="flex items-center gap-2">
             <button onClick={() => setSearchOpen((v) => !v)} className="p-1.5" aria-label="Search">
-              <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
+              <Search className="w-5 h-5" style={{ color: "#6B7280" }} />
             </button>
-            <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.15)" }}>
+            <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
               <button
                 onClick={() => setView("list")}
-                className="p-2"
-                style={{ backgroundColor: view === "list" ? "rgba(201,168,76,0.25)" : "transparent" }}
+                className="p-1.5"
+                style={{ backgroundColor: view === "list" ? "#FFFBF0" : "transparent" }}
                 aria-label="List view"
               >
-                <ListIcon className="w-4 h-4" style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)" }} />
+                <ListIcon className="w-4 h-4" style={{ color: view === "list" ? "#C9A84C" : "#9CA3AF" }} />
               </button>
               <button
                 onClick={() => setView("grid")}
-                className="p-2"
-                style={{ backgroundColor: view === "grid" ? "rgba(201,168,76,0.25)" : "transparent" }}
+                className="p-1.5"
+                style={{ backgroundColor: view === "grid" ? "#FFFBF0" : "transparent" }}
                 aria-label="Grid view"
               >
-                <LayoutGrid className="w-4 h-4" style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)" }} />
+                <LayoutGrid className="w-4 h-4" style={{ color: view === "grid" ? "#C9A84C" : "#9CA3AF" }} />
               </button>
             </div>
           </div>
         </div>
+
 
         {/* Search bar */}
         {searchOpen && (

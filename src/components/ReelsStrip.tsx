@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ReelCard {
   id: string;
@@ -16,8 +17,10 @@ interface ReelsStripProps {
 }
 
 export function ReelsStrip({ onOpen }: ReelsStripProps) {
+  const { user } = useAuth();
   const [reels, setReels] = useState<ReelCard[]>([]);
   const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     (async () => {
@@ -70,29 +73,35 @@ export function ReelsStrip({ onOpen }: ReelsStripProps) {
     })();
   }, []);
 
+  // Hide strip entirely when nothing to show
+  if (!loading && reels.length === 0 && !user) return null;
+
   return (
     <div className="-mx-3 px-3 pt-2 pb-3">
       <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
-        {/* Create Reel tile */}
-        <Link
-          to="/submit?type=reel"
-          className="shrink-0 snap-start relative rounded-2xl overflow-hidden flex flex-col items-center justify-end"
-          style={{
-            width: 84,
-            height: 126,
-            background: "linear-gradient(180deg, #1B3A6B 0%, #0A1628 100%)",
-          }}
-        >
-          <div
-            className="absolute top-2 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full flex items-center justify-center border-2 border-white"
-            style={{ backgroundColor: "#C9A84C" }}
+        {/* Create Reel tile — logged-in users only */}
+        {user && (
+          <Link
+            to="/submit?type=reel"
+            className="shrink-0 snap-start relative rounded-2xl overflow-hidden flex flex-col items-center justify-end"
+            style={{
+              width: 84,
+              height: 126,
+              background: "linear-gradient(180deg, #1B3A6B 0%, #0A1628 100%)",
+            }}
           >
-            <Plus className="w-3.5 h-3.5" strokeWidth={3} style={{ color: "#0A1628" }} />
-          </div>
-          <div className="w-full text-center pb-2">
-            <p className="text-white text-[10px] font-bold leading-tight">Post a Reel</p>
-          </div>
-        </Link>
+            <div
+              className="absolute top-2 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full flex items-center justify-center border-2 border-white"
+              style={{ backgroundColor: "#C9A84C" }}
+            >
+              <Plus className="w-3.5 h-3.5" strokeWidth={3} style={{ color: "#0A1628" }} />
+            </div>
+            <div className="w-full text-center pb-2">
+              <p className="text-white text-[10px] font-bold leading-tight">Post a Reel</p>
+            </div>
+          </Link>
+        )}
+
 
         {loading
           ? Array.from({ length: 4 }).map((_, i) => (
@@ -102,22 +111,8 @@ export function ReelsStrip({ onOpen }: ReelsStripProps) {
                 style={{ width: 84, height: 126 }}
               />
             ))
-          : reels.length === 0
-          ? Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={`ghost-${i}`}
-                className="shrink-0 snap-start rounded-2xl flex items-center justify-center"
-                style={{
-                  width: 84,
-                  height: 126,
-                  backgroundColor: "#F1EFEA",
-                  border: "1px dashed #D6D1C4",
-                }}
-              >
-                <Play className="w-4 h-4" style={{ color: "#C9C3B2" }} />
-              </div>
-            ))
           : reels.map((r) => (
+
               <button
                 key={r.id}
                 onClick={() => onOpen?.(r.id)}
@@ -144,19 +139,25 @@ export function ReelsStrip({ onOpen }: ReelsStripProps) {
                   className="absolute inset-x-0 bottom-0 h-20 pointer-events-none"
                   style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)" }}
                 />
-                {/* Avatar circle */}
+                {/* Avatar with gold gradient ring */}
                 <div
-                  className="absolute top-1.5 left-1.5 w-6 h-6 rounded-full overflow-hidden flex items-center justify-center border-2"
-                  style={{ borderColor: "#C9A84C", background: "linear-gradient(135deg, #0A1628, #1B3A6B)" }}
+                  className="absolute top-1.5 left-1.5 rounded-full p-[2px]"
+                  style={{ background: "linear-gradient(135deg, #C9A84C 0%, #E8D080 50%, #8B6914 100%)" }}
                 >
-                  {r.breeder_logo ? (
-                    <img src={r.breeder_logo} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-[9px] font-bold text-[#C9A84C]">
-                      {r.breeder_name.charAt(0).toUpperCase()}
-                    </span>
-                  )}
+                  <div
+                    className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center border border-black/40"
+                    style={{ background: "linear-gradient(135deg, #0A1628, #1B3A6B)" }}
+                  >
+                    {r.breeder_logo ? (
+                      <img src={r.breeder_logo} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-[9px] font-bold text-[#C9A84C]">
+                        {r.breeder_name.charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </div>
                 </div>
+
                 {/* Play icon */}
                 <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-black/40 flex items-center justify-center">
                   <Play className="w-2.5 h-2.5 text-white" fill="white" />

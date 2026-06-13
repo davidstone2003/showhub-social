@@ -97,27 +97,27 @@ export default function MarketPage() {
   return (
     <Layout showDiscovery={false}>
       <div className="mx-auto max-w-2xl pb-24 relative" style={{ backgroundColor: "#F8F7F4", minHeight: "100vh" }}>
-        {/* Header */}
+        {/* Compact header */}
         <div
-          className="sticky top-0 z-10 px-4 flex items-center justify-between"
-          style={{ height: 60, backgroundColor: "#0A1628", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+          className="sticky top-0 z-30 px-4 flex items-center justify-between bg-white"
+          style={{ height: 48, borderBottom: "1px solid #E5E7EB" }}
         >
-          <h1 className="text-[22px] font-bold leading-none" style={{ color: "#FFFFFF" }}>Market</h1>
+          <h1 className="text-[18px] font-bold leading-none" style={{ color: "#0A1628" }}>Market</h1>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSearchOpen((v) => !v)}
-              className="p-1.5 rounded-lg transition-colors"
+              className="p-1.5"
               aria-label="Search"
             >
-              <Search className="w-5 h-5" style={{ color: "rgba(255,255,255,0.6)" }} />
+              <Search className="w-5 h-5" style={{ color: "#6B7280" }} />
             </button>
-            <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.12)", backgroundColor: "rgba(255,255,255,0.06)" }}>
+            <div className="flex rounded-lg overflow-hidden" style={{ border: "1px solid #E5E7EB" }}>
               <button
                 type="button"
                 onClick={() => setView("list")}
                 aria-label="List view"
-                className="p-2 transition-colors"
-                style={{ color: view === "list" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "list" ? "rgba(255,255,255,0.08)" : "transparent" }}
+                className="p-1.5 transition-colors"
+                style={{ color: view === "list" ? "#C9A84C" : "#9CA3AF", backgroundColor: view === "list" ? "#FFFBF0" : "transparent" }}
               >
                 <ListIcon className="w-4 h-4" />
               </button>
@@ -125,14 +125,15 @@ export default function MarketPage() {
                 type="button"
                 onClick={() => setView("grid")}
                 aria-label="Grid view"
-                className="p-2 transition-colors"
-                style={{ color: view === "grid" ? "#C9A84C" : "rgba(255,255,255,0.5)", backgroundColor: view === "grid" ? "rgba(255,255,255,0.08)" : "transparent" }}
+                className="p-1.5 transition-colors"
+                style={{ color: view === "grid" ? "#C9A84C" : "#9CA3AF", backgroundColor: view === "grid" ? "#FFFBF0" : "transparent" }}
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
             </div>
           </div>
         </div>
+
 
         {/* Optional search */}
         {searchOpen && (
@@ -154,7 +155,7 @@ export default function MarketPage() {
         )}
 
         {/* Filter bar — light */}
-        <div className="bg-white border-b border-[#E5E7EB] sticky top-[60px] z-10">
+        <div className="bg-white border-b border-[#E5E7EB] sticky top-[48px] z-10">
           {/* Category pills */}
           <div className="flex gap-2 overflow-x-auto px-4 pt-2 pb-1 scrollbar-hide">
             {CATEGORIES.map((cat) => (
