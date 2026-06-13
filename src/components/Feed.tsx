@@ -29,6 +29,18 @@ export function Feed() {
   const [hiddenPostIds, setHiddenPostIds] = useState<string[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [featuredBreeder, setFeaturedBreeder] = useState<any>(null);
+  const { species } = useSpecies();
+  const [feedSpeciesOn, setFeedSpeciesOn] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(FEED_FILTER_LS) === "1";
+  });
+  const toggleFeedSpecies = () => {
+    setFeedSpeciesOn((on) => {
+      const next = !on;
+      try { localStorage.setItem(FEED_FILTER_LS, next ? "1" : "0"); } catch {}
+      return next;
+    });
+  };
 
 
   const handleModerated = (postId?: string) => {
