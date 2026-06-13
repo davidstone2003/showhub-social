@@ -17,8 +17,10 @@ interface ReelsStripProps {
 }
 
 export function ReelsStrip({ onOpen }: ReelsStripProps) {
+  const { user } = useAuth();
   const [reels, setReels] = useState<ReelCard[]>([]);
   const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     (async () => {
