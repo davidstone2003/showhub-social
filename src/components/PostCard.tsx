@@ -5,7 +5,7 @@ import { FeedVideo } from "@/components/post/VideoPlayer";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Post } from "@/data/mock";
 import { cn } from "@/lib/utils";
-import { ResultRibbon } from "@/components/ResultRibbon";
+// ResultRibbon removed — placing is shown as text below the photo.
 import { ClampedText } from "@/components/post/ClampedText";
 import { RecapBlocks, highestPlacing, type RecapWinner } from "@/components/post/RecapBlocks";
 import { useUserRole } from "@/hooks/useUserRole";
